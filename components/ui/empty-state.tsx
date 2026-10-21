@@ -5,7 +5,7 @@ import { LucideIcon } from "lucide-react"
 
 interface EmptyStateProps {
   title: string
-  description: string
+  description?: string
   icons?: LucideIcon[]
   action?: {
     label: string
@@ -55,7 +55,7 @@ export function EmptyState({
         )}
       </div>
       <h2 className="text-foreground font-medium mt-6">{title}</h2>
-      <p className="text-sm text-muted-foreground mt-1 whitespace-pre-line">{description}</p>
+      {description && <p className="text-sm text-muted-foreground mt-1 whitespace-pre-line">{description}</p>}
       {action && (
         <Button
           onClick={action.onClick}

@@ -1,0 +1,28 @@
+{
+  "$schema": "./schemas/manifest.schema.json",
+  "schemaVersion": "openfront.marketplace-source.v1",
+  "platform": "openfront-collectibles",
+  "verticals": ["collectibles"],
+  "capabilities": [
+    {
+      "id": "marketplace.discovery",
+      "version": 1,
+      "vertical": "collectibles",
+      "resultKind": "collectibles.specimen-listing",
+      "extensionSchema": "openfront.collectibles.specimen-listing/v1",
+      "actions": ["discovery.details", "listing.offer", "auction.bid", "cart.add", "checkout.source"]
+    }
+  ],
+  "graphql": {
+    "path": "/api/graphql",
+    "capabilitiesQuery": "marketplaceCollectiblesCapabilities",
+    "discoveryQuery": "publicCollectiblesDiscovery",
+    "handoffMutation": "createCollectiblesMarketplaceHandoff"
+  },
+  "ownership": {
+    "merchantOfRecord": "source",
+    "checkout": "source",
+    "payments": "source",
+    "orders": "source"
+  }
+}

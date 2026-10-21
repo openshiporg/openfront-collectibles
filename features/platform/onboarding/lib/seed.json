@@ -1,0 +1,770 @@
+{
+  "store": {
+    "name": "Northstar Collectibles",
+    "defaultCurrencyCode": "USD",
+    "homepageTitle": "Objects with a story",
+    "homepageDescription": "Cards, comics, coins, toys, art, watches, and memorabilia.",
+    "metadata": {
+      "vertical": "collectibles"
+    }
+  },
+  "regions": [
+    {
+      "code": "na",
+      "name": "North America",
+      "currencyCode": "usd",
+      "currencySymbol": "$",
+      "currencyName": "US Dollar",
+      "taxRate": 0.0,
+      "paymentProviders": {
+        "connect": [
+          {
+            "code": "pp_stripe_stripe"
+          },
+          {
+            "code": "pp_system_default"
+          }
+        ]
+      },
+      "fulfillmentProviders": {
+        "connect": [
+          {
+            "code": "fp_manual"
+          }
+        ]
+      },
+      "countries": [
+        {
+          "iso2": "us",
+          "iso3": "usa",
+          "numCode": 840,
+          "name": "United States",
+          "displayName": "United States"
+        },
+        {
+          "iso2": "ca",
+          "iso3": "can",
+          "numCode": 124,
+          "name": "Canada",
+          "displayName": "Canada"
+        }
+      ]
+    },
+    {
+      "code": "eu",
+      "name": "Europe",
+      "currencyCode": "eur",
+      "currencySymbol": "€",
+      "currencyName": "Euro",
+      "taxRate": 0.0,
+      "paymentProviders": {
+        "connect": [
+          {
+            "code": "pp_stripe_stripe"
+          },
+          {
+            "code": "pp_system_default"
+          }
+        ]
+      },
+      "fulfillmentProviders": {
+        "connect": [
+          {
+            "code": "fp_manual"
+          }
+        ]
+      },
+      "countries": [
+        {
+          "iso2": "de",
+          "iso3": "deu",
+          "numCode": 276,
+          "name": "Germany",
+          "displayName": "Germany"
+        }
+      ]
+    }
+  ],
+  "paymentProviders": [
+    {
+      "name": "Stripe",
+      "code": "pp_stripe_stripe",
+      "isInstalled": true,
+      "createPaymentFunction": "stripe",
+      "capturePaymentFunction": "stripe",
+      "refundPaymentFunction": "stripe",
+      "getPaymentStatusFunction": "stripe",
+      "generatePaymentLinkFunction": "stripe",
+      "handleWebhookFunction": "stripe"
+    },
+    {
+      "name": "Manual review",
+      "code": "pp_system_default",
+      "isInstalled": true,
+      "createPaymentFunction": "manual",
+      "capturePaymentFunction": "manual",
+      "refundPaymentFunction": "manual",
+      "getPaymentStatusFunction": "manual",
+      "generatePaymentLinkFunction": "manual",
+      "handleWebhookFunction": "manual"
+    }
+  ],
+  "shipping_options": [
+    {
+      "name": "Tracked shipping",
+      "priceType": "flat_rate",
+      "amount": 1800
+    },
+    {
+      "name": "High-value signature service",
+      "priceType": "flat_rate",
+      "amount": 4800
+    },
+    {
+      "name": "Return shipping",
+      "priceType": "flat_rate",
+      "amount": 1800,
+      "isReturn": true
+    }
+  ],
+  "categories": [
+    {
+      "name": "Trading Cards",
+      "handle": "trading-cards",
+      "isActive": true
+    },
+    {
+      "name": "Comics",
+      "handle": "comics",
+      "isActive": true
+    },
+    {
+      "name": "Coins",
+      "handle": "coins",
+      "isActive": true
+    },
+    {
+      "name": "Toys",
+      "handle": "toys",
+      "isActive": true
+    },
+    {
+      "name": "Art",
+      "handle": "art",
+      "isActive": true
+    },
+    {
+      "name": "Watches",
+      "handle": "watches",
+      "isActive": true
+    },
+    {
+      "name": "Memorabilia",
+      "handle": "memorabilia",
+      "isActive": true
+    }
+  ],
+  "collections": [
+    {
+      "title": "Fresh to the vault",
+      "handle": "fresh-to-the-vault"
+    },
+    {
+      "title": "Staff picks",
+      "handle": "staff-picks"
+    },
+    {
+      "title": "Under $500",
+      "handle": "under-500"
+    }
+  ],
+  "products": [
+    {
+      "title": "1999 First Edition Fire Dragon Holo",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Trading card. Condition: seller-reported Near Mint."
+            }
+          ]
+        }
+      ],
+      "handle": "1999-first-edition-fire-dragon-holo",
+      "status": "published",
+      "isGiftcard": false,
+      "productCategories": {
+        "connect": [
+          {
+            "handle": "trading-cards"
+          }
+        ]
+      },
+      "productCollections": {
+        "connect": [
+          {
+            "handle": "fresh-to-the-vault"
+          }
+        ]
+      },
+      "productOptions": {
+        "create": [
+          {
+            "title": "Item",
+            "productOptionValues": {
+              "create": [
+                {
+                  "value": "NS-0001"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "variants": [
+        {
+          "title": "NS-0001",
+          "inventoryQuantity": 1,
+          "manageInventory": true,
+          "options": [
+            {
+              "value": "NS-0001"
+            }
+          ],
+          "prices": [
+            {
+              "currencyCode": "usd",
+              "regionCode": "na",
+              "amount": 285000
+            },
+            {
+              "currencyCode": "eur",
+              "regionCode": "eu",
+              "amount": 265000
+            }
+          ],
+          "sku": "NS-0001"
+        }
+      ],
+      "metadata": {
+        "vertical": "collectibles",
+        "specimenCode": "NS-0001"
+      }
+    },
+    {
+      "title": "Amazing Adventures No. 12",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Comic. Condition: seller-reported Fine."
+            }
+          ]
+        }
+      ],
+      "handle": "amazing-adventures-12",
+      "status": "published",
+      "isGiftcard": false,
+      "productCategories": {
+        "connect": [
+          {
+            "handle": "comics"
+          }
+        ]
+      },
+      "productCollections": {
+        "connect": [
+          {
+            "handle": "staff-picks"
+          }
+        ]
+      },
+      "productOptions": {
+        "create": [
+          {
+            "title": "Item",
+            "productOptionValues": {
+              "create": [
+                {
+                  "value": "NS-0002"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "variants": [
+        {
+          "title": "NS-0002",
+          "inventoryQuantity": 1,
+          "manageInventory": true,
+          "options": [
+            {
+              "value": "NS-0002"
+            }
+          ],
+          "prices": [
+            {
+              "currencyCode": "usd",
+              "regionCode": "na",
+              "amount": 42500
+            },
+            {
+              "currencyCode": "eur",
+              "regionCode": "eu",
+              "amount": 39500
+            }
+          ],
+          "sku": "NS-0002"
+        }
+      ],
+      "metadata": {
+        "vertical": "collectibles",
+        "specimenCode": "NS-0002"
+      }
+    },
+    {
+      "title": "1881 Silver Dollar",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Coin. Condition: seller-reported circulation wear."
+            }
+          ]
+        }
+      ],
+      "handle": "1881-silver-dollar",
+      "status": "published",
+      "isGiftcard": false,
+      "productCategories": {
+        "connect": [
+          {
+            "handle": "coins"
+          }
+        ]
+      },
+      "productCollections": {
+        "connect": [
+          {
+            "handle": "under-500"
+          }
+        ]
+      },
+      "productOptions": {
+        "create": [
+          {
+            "title": "Item",
+            "productOptionValues": {
+              "create": [
+                {
+                  "value": "NS-0003"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "variants": [
+        {
+          "title": "NS-0003",
+          "inventoryQuantity": 1,
+          "manageInventory": true,
+          "options": [
+            {
+              "value": "NS-0003"
+            }
+          ],
+          "prices": [
+            {
+              "currencyCode": "usd",
+              "regionCode": "na",
+              "amount": 19500
+            },
+            {
+              "currencyCode": "eur",
+              "regionCode": "eu",
+              "amount": 18000
+            }
+          ],
+          "sku": "NS-0003"
+        }
+      ],
+      "metadata": {
+        "vertical": "collectibles",
+        "specimenCode": "NS-0003"
+      }
+    },
+    {
+      "title": "Orbit Ranger Prototype Figure",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Unboxed toy. Condition: seller-reported surface wear."
+            }
+          ]
+        }
+      ],
+      "handle": "orbit-ranger-prototype",
+      "status": "published",
+      "isGiftcard": false,
+      "productCategories": {
+        "connect": [
+          {
+            "handle": "toys"
+          }
+        ]
+      },
+      "productCollections": {
+        "connect": [
+          {
+            "handle": "fresh-to-the-vault"
+          }
+        ]
+      },
+      "productOptions": {
+        "create": [
+          {
+            "title": "Item",
+            "productOptionValues": {
+              "create": [
+                {
+                  "value": "NS-0004"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "variants": [
+        {
+          "title": "NS-0004",
+          "inventoryQuantity": 1,
+          "manageInventory": true,
+          "options": [
+            {
+              "value": "NS-0004"
+            }
+          ],
+          "prices": [
+            {
+              "currencyCode": "usd",
+              "regionCode": "na",
+              "amount": 87500
+            },
+            {
+              "currencyCode": "eur",
+              "regionCode": "eu",
+              "amount": 81000
+            }
+          ],
+          "sku": "NS-0004"
+        }
+      ],
+      "metadata": {
+        "vertical": "collectibles",
+        "specimenCode": "NS-0004"
+      }
+    },
+    {
+      "title": "Harbor at Dusk — Study",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Work on paper. Condition: seller-reported edge wear."
+            }
+          ]
+        }
+      ],
+      "handle": "harbor-at-dusk-study",
+      "status": "published",
+      "isGiftcard": false,
+      "productCategories": {
+        "connect": [
+          {
+            "handle": "art"
+          }
+        ]
+      },
+      "productCollections": {
+        "connect": [
+          {
+            "handle": "fresh-to-the-vault"
+          }
+        ]
+      },
+      "productOptions": {
+        "create": [
+          {
+            "title": "Item",
+            "productOptionValues": {
+              "create": [
+                {
+                  "value": "NS-0005"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "variants": [
+        {
+          "title": "NS-0005",
+          "inventoryQuantity": 1,
+          "manageInventory": true,
+          "options": [
+            {
+              "value": "NS-0005"
+            }
+          ],
+          "prices": [
+            {
+              "currencyCode": "usd",
+              "regionCode": "na",
+              "amount": 320000
+            },
+            {
+              "currencyCode": "eur",
+              "regionCode": "eu",
+              "amount": 297000
+            }
+          ],
+          "sku": "NS-0005"
+        }
+      ],
+      "metadata": {
+        "vertical": "collectibles",
+        "specimenCode": "NS-0005"
+      }
+    },
+    {
+      "title": "1968 Meridian Diver",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Wristwatch. Condition: seller-reported case wear."
+            }
+          ]
+        }
+      ],
+      "handle": "1968-meridian-diver",
+      "status": "published",
+      "isGiftcard": false,
+      "productCategories": {
+        "connect": [
+          {
+            "handle": "watches"
+          }
+        ]
+      },
+      "productCollections": {
+        "connect": [
+          {
+            "handle": "staff-picks"
+          }
+        ]
+      },
+      "productOptions": {
+        "create": [
+          {
+            "title": "Item",
+            "productOptionValues": {
+              "create": [
+                {
+                  "value": "NS-0006"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "variants": [
+        {
+          "title": "NS-0006",
+          "inventoryQuantity": 1,
+          "manageInventory": true,
+          "options": [
+            {
+              "value": "NS-0006"
+            }
+          ],
+          "prices": [
+            {
+              "currencyCode": "usd",
+              "regionCode": "na",
+              "amount": 475000
+            },
+            {
+              "currencyCode": "eur",
+              "regionCode": "eu",
+              "amount": 440000
+            }
+          ],
+          "sku": "NS-0006"
+        }
+      ],
+      "metadata": {
+        "vertical": "collectibles",
+        "specimenCode": "NS-0006"
+      }
+    },
+    {
+      "title": "1977 Championship Final Ticket",
+      "description": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "text": "Event ticket. Condition: seller-reported Very Good."
+            }
+          ]
+        }
+      ],
+      "handle": "1977-championship-final-ticket",
+      "status": "published",
+      "isGiftcard": false,
+      "productCategories": {
+        "connect": [
+          {
+            "handle": "memorabilia"
+          }
+        ]
+      },
+      "productCollections": {
+        "connect": [
+          {
+            "handle": "under-500"
+          }
+        ]
+      },
+      "productOptions": {
+        "create": [
+          {
+            "title": "Item",
+            "productOptionValues": {
+              "create": [
+                {
+                  "value": "NS-0007"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "variants": [
+        {
+          "title": "NS-0007",
+          "inventoryQuantity": 1,
+          "manageInventory": true,
+          "options": [
+            {
+              "value": "NS-0007"
+            }
+          ],
+          "prices": [
+            {
+              "currencyCode": "usd",
+              "regionCode": "na",
+              "amount": 14500
+            },
+            {
+              "currencyCode": "eur",
+              "regionCode": "eu",
+              "amount": 13500
+            }
+          ],
+          "sku": "NS-0007"
+        }
+      ],
+      "metadata": {
+        "vertical": "collectibles",
+        "specimenCode": "NS-0007"
+      }
+    }
+  ],
+  "collectibles": [
+    {
+      "code": "NS-0001",
+      "category": "trading-cards",
+      "title": "1999 First Edition Fire Dragon Holo",
+      "catalogNumber": "FD-004",
+      "maker": "Northstar Games",
+      "year": 1999,
+      "condition": "Near Mint",
+      "priceMinor": 285000,
+      "format": "fixed_price"
+    },
+    {
+      "code": "NS-0002",
+      "category": "comics",
+      "title": "Amazing Adventures No. 12",
+      "catalogNumber": "12",
+      "maker": "Atlas House",
+      "year": 1974,
+      "condition": "Fine",
+      "priceMinor": 42500,
+      "format": "fixed_price"
+    },
+    {
+      "code": "NS-0003",
+      "category": "coins",
+      "title": "1881 Silver Dollar",
+      "catalogNumber": "1881-S",
+      "maker": "United States Mint",
+      "year": 1881,
+      "condition": "Circulation wear",
+      "priceMinor": 19500,
+      "format": "fixed_price"
+    },
+    {
+      "code": "NS-0004",
+      "category": "toys",
+      "title": "Orbit Ranger Prototype Figure",
+      "maker": "Vector Toy Works",
+      "year": 1986,
+      "condition": "Prototype, unboxed",
+      "priceMinor": 87500,
+      "format": "fixed_price"
+    },
+    {
+      "code": "NS-0005",
+      "category": "art",
+      "title": "Harbor at Dusk — Study",
+      "maker": "Mara Vale",
+      "year": 1962,
+      "condition": "Edge wear",
+      "priceMinor": 320000,
+      "format": "fixed_price"
+    },
+    {
+      "code": "NS-0006",
+      "category": "watches",
+      "title": "1968 Meridian Diver",
+      "catalogNumber": "MD-200",
+      "maker": "Meridian",
+      "year": 1968,
+      "condition": "Running; service history reported",
+      "priceMinor": 475000,
+      "format": "fixed_price"
+    },
+    {
+      "code": "NS-0007",
+      "category": "memorabilia",
+      "title": "1977 Championship Final Ticket",
+      "maker": "Metro Arena",
+      "year": 1977,
+      "condition": "Very Good",
+      "priceMinor": 14500,
+      "format": "fixed_price"
+    }
+  ]
+}

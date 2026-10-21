@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openfront.dev/schemas/marketplace-source/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "platform", "verticals", "capabilities", "graphql", "ownership"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "openfront.marketplace-source.v1" },
+    "platform": { "const": "openfront-collectibles" },
+    "verticals": { "type": "array", "items": { "const": "collectibles" }, "minItems": 1, "maxItems": 1 },
+    "capabilities": { "type": "array", "items": { "$ref": "./collectibles-listing.schema.json#/$defs/capability" }, "minItems": 1 },
+    "graphql": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "capabilitiesQuery", "discoveryQuery"],
+      "properties": {
+        "path": { "const": "/api/graphql" },
+        "capabilitiesQuery": { "type": "string" },
+        "discoveryQuery": { "type": "string" }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merchantOfRecord", "checkout", "payments", "orders"],
+      "properties": {
+        "merchantOfRecord": { "const": "source" },
+        "checkout": { "const": "source" },
+        "payments": { "const": "source" },
+        "orders": { "const": "source" }
+      }
+    }
+  }
+}

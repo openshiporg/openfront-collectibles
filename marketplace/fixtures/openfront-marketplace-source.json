@@ -1,0 +1,9 @@
+{
+  "baseUrl": "https://collectibles.example.com",
+  "platform": "openfront-collectibles",
+  "name": "Example Collectibles House",
+  "apiPath": "/api/graphql",
+  "vertical": "collectibles",
+  "capability": "marketplace.discovery",
+  "manifestPath": "/marketplace/manifest.json"
+}

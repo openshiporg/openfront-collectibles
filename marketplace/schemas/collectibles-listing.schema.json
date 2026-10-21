@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openfront.dev/schemas/collectibles/specimen-listing/v1",
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "vertical", "resultKind", "extensionSchema", "actions"],
+      "properties": {
+        "id": { "const": "marketplace.discovery" },
+        "version": { "const": 1 },
+        "vertical": { "const": "collectibles" },
+        "resultKind": { "const": "collectibles.specimen-listing" },
+        "extensionSchema": { "const": "openfront.collectibles.specimen-listing/v1" },
+        "actions": {
+          "type": "array",
+          "items": { "const": "discovery.details" },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["listing", "specimen", "observations"],
+  "properties": {
+    "listing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "format", "priceMinor", "currencyCode"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string" },
+        "format": { "enum": ["fixed_price", "auction"] },
+        "priceMinor": { "type": ["integer", "null"], "minimum": 0 },
+        "currencyCode": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      }
+    },
+    "specimen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName", "category", "catalogReference", "attributes"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "displayName": { "type": "string" },
+        "category": { "type": "string" },
+        "catalogReference": { "type": ["string", "null"] },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              { "type": ["string", "number", "boolean", "null"] },
+              { "type": "array", "maxItems": 30, "items": { "type": "string" } }
+            ]
+          }
+        }
+      }
+    },
+    "observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Attributed evidence only; no field is an Openfront authenticity, grading, appraisal, insurance, or delivery assertion.",
+      "required": ["condition", "grading", "provenance", "valuation"],
+      "properties": {
+        "condition": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "sourceType", "label", "observedAt", "status"],
+            "properties": {
+              "id": { "type": "string" },
+              "sourceType": { "enum": ["operator", "seller", "buyer", "provider", "import"] },
+              "scale": { "type": ["string", "null"] },
+              "label": { "type": "string" },
+              "score": { "type": ["string", "null"] },
+              "observedAt": { "type": "string", "format": "date-time" },
+              "status": { "enum": ["reported", "reviewed", "superseded", "disputed"] }
+            }
+          }
+        },
+        "grading": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "reportedGrade", "observedAt", "verificationState", "disclaimer", "gradingCompany"],
+            "properties": {
+              "id": { "type": "string" },
+              "reportedGrade": { "type": "string" },
+              "reportedLabel": { "type": ["string", "null"] },
+              "certificateReference": { "type": ["string", "null"] },
+              "observedAt": { "type": "string", "format": "date-time" },
+              "verificationState": { "enum": ["not_checked", "provider_reported", "matched", "mismatch", "unavailable", "manual_review"] },
+              "disclaimer": { "type": "string" },
+              "gradingCompany": {
+                "type": ["object", "null"],
+                "additionalProperties": false,
+                "required": ["id", "name", "code"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "name": { "type": "string" },
+                  "code": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "provenance": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "eventType", "confidence", "reviewState"],
+            "properties": {
+              "id": { "type": "string" },
+              "eventType": { "enum": ["claimed_origin", "ownership", "sale", "exhibition", "publication", "restoration", "loss", "recovery", "other"] },
+              "occurredAt": { "type": ["string", "null"], "format": "date-time" },
+              "confidence": { "enum": ["unreviewed", "low", "medium", "high", "provider_reported"] },
+              "reviewState": { "enum": ["reported", "reviewed", "disputed", "rejected"] }
+            }
+          }
+        },
+        "valuation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "amountMinor", "currencyCode", "sourceType", "sourceName", "observedAt", "confidence", "disclaimer"],
+            "properties": {
+              "id": { "type": "string" },
+              "amountMinor": { "type": "integer", "minimum": 0 },
+              "currencyCode": { "type": "string", "pattern": "^[A-Z]{3}$" },
+              "sourceType": { "enum": ["operator", "comparable_sale", "price_guide", "auction_result", "provider", "seller", "other"] },
+              "sourceName": { "type": "string" },
+              "observedAt": { "type": "string", "format": "date-time" },
+              "confidence": { "enum": ["unreviewed", "low", "medium", "high", "provider_reported"] },
+              "disclaimer": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

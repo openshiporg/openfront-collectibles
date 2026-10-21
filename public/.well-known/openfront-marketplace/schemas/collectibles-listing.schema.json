@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openfront.dev/schemas/collectibles/specimen-listing/v1",
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "vertical", "resultKind", "extensionSchema", "actions"],
+      "properties": {
+        "id": { "const": "marketplace.discovery" },
+        "version": { "const": 1 },
+        "vertical": { "const": "collectibles" },
+        "resultKind": { "const": "collectibles.specimen-listing" },
+        "extensionSchema": { "const": "openfront.collectibles.specimen-listing/v1" },
+        "actions": {
+          "type": "array",
+          "items": { "enum": ["discovery.details", "listing.offer", "auction.bid", "cart.add", "checkout.source"] },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["listing", "specimen", "observations"],
+  "properties": {
+    "listing": {
+      "type": "object",
+      "required": ["id", "title", "format", "currencyCode"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "format": { "enum": ["fixed_price", "auction"] },
+        "priceMinor": { "type": ["integer", "null"], "minimum": 0 },
+        "currencyCode": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      }
+    },
+    "specimen": {
+      "type": "object",
+      "required": ["id", "displayName", "category"],
+      "properties": {
+        "id": { "type": "string" },
+        "displayName": { "type": "string" },
+        "category": { "type": "string" },
+        "catalogReference": { "type": ["string", "null"] },
+        "attributes": { "type": "object" }
+      }
+    },
+    "observations": {
+      "type": "object",
+      "description": "Attributed evidence only; no field is an Openfront authenticity, grading, or appraisal assertion.",
+      "properties": {
+        "condition": { "type": "array" },
+        "grading": { "type": "array" },
+        "provenance": { "type": "array" },
+        "valuation": { "type": "array" }
+      }
+    }
+  }
+}

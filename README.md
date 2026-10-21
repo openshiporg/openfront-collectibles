@@ -1,163 +1,220 @@
-# Next.js + KeystoneJS Starter
+# Openfront Collectibles
 
-A modern full-stack application combining Next.js 15 with KeystoneJS 6, featuring admin dashboard implementation and sophisticated role-based permissions.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fopenshiporg%2Fopenfront-collectibles&env=DATABASE_URL%2CSESSION_SECRET%2CS3_BUCKET_NAME%2CS3_REGION%2CS3_ACCESS_KEY_ID%2CS3_SECRET_ACCESS_KEY)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjunaid33%2Fnext-keystone-starter%2F&stores=[{"type"%3A"postgres"}])
+Openfront Collectibles is a self-hostable catalog and discovery application for unique physical specimens. Operators can organize inventory, condition, grading, provenance, and listing records, while collectors browse published items and follow merchant-owned detail handoffs. Collectible checkout, bidding, offers, payouts, and settlement are not launch-ready.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/TK5wC1?referralCode=I_tWSs)
+## Demo
 
-## Architecture Overview
+![Illustrative collectible catalog artwork included in this repository](public/images/collectibles/ns-0001.svg)
 
-This project features a **modern admin architecture** with:
+Explore the application locally using the setup instructions below.
 
-- **Backend**: KeystoneJS 6 providing GraphQL API, authentication, and database operations
-- **Frontend**: Custom Next.js admin dashboard with enhanced UI components
-- **Image Support**: S3-compatible image storage and management 
+| | |
+|---|---|
+| **Public application** | `/[countryCode]` on your development URL |
+| **Dashboard** | `/dashboard` on your development URL |
 
-## Tech Stack
+[Learn more →](https://openship.org/products/openfront-collectibles)
 
-### Frontend
-- **Next.js 15** with App Router
-- **React 19** with TypeScript
-- **Radix UI** primitives for accessible components
-- **Tailwind CSS 4** for styling
-- **Remix Icons** (@remixicon/react) for icons
-- **SWR** for client-side data fetching
-- **TipTap** for rich text editing
-- **React Hook Form** for form management
-- **Zod** for schema validation
+[Documentation →](features/keystone/models)
 
-### Backend
-- **KeystoneJS 6** for GraphQL API and admin interface
-- **Prisma ORM** for database operations
-- **GraphQL Yoga** for GraphQL server
-- **PostgreSQL** database
-- **S3-compatible storage** for image management
+## The Openfront Ecosystem
 
-### Key Features
-- **Role-based access control** with granular permissions
-- **Dynamic field controllers** with conditional behavior
-- **Rich text editing** with document fields
-- **Relationship management** with inline editing capabilities
-- **Image upload and management** with S3 storage
-- **Inline create/edit components** for seamless UX
-- **Advanced filtering system** for all field types
-- **Responsive design** with mobile support
+Openfront is part of an ecosystem of open-source commerce tools:
+
+- **[Openfront E-commerce](https://github.com/openshiporg/openfront)**: Headless e-commerce for retail.
+- **[Openfront Restaurant](https://github.com/openshiporg/openfront-restaurant)**: Restaurant ordering, point of sale, and kitchen operations.
+- **[Openship](https://github.com/openshiporg/openship)**: Order routing for multi-channel fulfillment.
+- **Openfront Collectibles**: (This repository) a self-hostable catalog and discovery application for unique physical specimens.
+
+## Core Features
+
+### Admin Dashboard
+Manage collectible commerce, gift cards, regions, currencies, collectors, products, product categories, evidence, price lists, invoices, catalog, discounts through dedicated dashboard workspaces and permission-controlled data screens.
+
+### Storefront
+Country-scoped storefront pages expose catalog browsing and collectible handoffs at `/[countryCode]/collectibles/handoff/[listingId]`. Public observation projections preserve evidence sources and review states rather than presenting provenance or grading as a software guarantee.
+
+### Catalog & Specimens
+Separate catalog definitions from individual specimens, identifiers, custody, inventory units, locations, condition observations, and media.
+
+### Grading & Provenance Evidence
+Maintain grading-company references, reported grades, certificate references, provenance events, and valuation observations with source and confidence information.
+
+### Listing Preparation & Discovery
+Prepare specimens, manage collectible listing records, and publish read-only discovery projections. Auction, consignment, buylist, and offer records are not evidence of completed money movement or active bidding.
+
+## Architecture
+
+### Technology Stack
+- **Frontend**: Next.js 16 with App Router and React 19.
+- **Backend**: KeystoneJS 6 with a GraphQL API.
+- **Database**: PostgreSQL with Prisma ORM.
+- **Styling**: Tailwind CSS 4 and shared shadcn/ui components.
+- **Authentication**: Password-based user accounts and session-based access with role capabilities.
+
+### Application Structure
+```text
+openfront-collectibles/
+├── app/                    # Public pages, dashboard routes, and HTTP endpoints
+├── features/
+│   ├── keystone/           # Backend models, access rules, and GraphQL workflows
+│   ├── platform/           # Operator workspaces and onboarding
+│   ├── storefront/         # Public application components and screens
+│   └── dashboard/          # Authentication and shared dashboard shell
+└── components/             # Shared UI components
+```
+
+### Data Models
+The [model registry](features/keystone/models/index.ts) and [Prisma schema](schema.prisma) cover:
+
+- Categories, franchises, sets, releases, catalog items, specimens, identifiers, and media.
+- Condition, grading, provenance, custody, and valuation observations.
+- Inventory units, locations, movements, reservations, and listings.
+- Auction, bid, offer, consignment, buylist, collector, and inherited commerce records.
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
-- PostgreSQL database
+- Node.js 22, compatible with the [package requirements](package.json) and Next.js 16.
+- A PostgreSQL database you can migrate.
+- npm.
 
 ### Setup
 
 1. **Clone and install dependencies:**
    ```bash
-   git clone https://github.com/junaid33/next-keystone-starter
-   cd next-keystone-starter
+   git clone https://github.com/openshiporg/openfront-collectibles.git
+   cd openfront-collectibles
    npm install
    ```
 
 2. **Configure environment variables:**
    ```bash
-   cp env.example .env
+   cp .env.example .env
    ```
-   
-   Update `.env` with your database configuration:
+
+   Review the [example configuration](.env.example) and replace its placeholders. Keep only the local settings you need; do not copy production-mode or infrastructure examples unchanged.
+
    ```env
-   DATABASE_URL=postgresql://username:password@localhost:5432/database_name
-   SESSION_SECRET=your-super-secret-session-key-change-this-in-production
+   DATABASE_URL=postgresql://user:password@host/database
+   SESSION_SECRET=replace-with-a-new-private-random-secret
    ```
+
+   Generate the session secret with `openssl rand -hex 32`; use the generated value, not the placeholder. Never commit `.env`.
+
+   Review [runtime configuration](features/keystone/index.ts) for additional application settings before building or deploying. Configure enabled integrations separately; the two values above are not a complete production configuration.
+
+   Production also requires configured object storage. Set `S3_BUCKET_NAME`, `S3_REGION`, `S3_ACCESS_KEY_ID`, and `S3_SECRET_ACCESS_KEY`, and supply the S3-compatible endpoint described in the source. Review mail and application-specific security settings there as well.
 
 3. **Start development server:**
    ```bash
    npm run dev
    ```
 
-   This will:
-   - Build KeystoneJS schema
-   - Run database migrations
-   - Start Next.js development server with Turbopack
+   The development script prepares the backend schema, applies checked-in migrations, and starts Next.js.
 
 4. **Access the application:**
-   - Frontend: [http://localhost:3000](http://localhost:3000)
-   - Dashboard: [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
-   - GraphQL API: [http://localhost:3000/api/graphql](http://localhost:3000/api/graphql)
+   Open the URL `npm run dev` prints, then use these paths:
+
+   - **Public application**: `/[countryCode]`
+   - **Admin dashboard**: `/dashboard`
+   - **GraphQL API**: `/api/graphql`
+
+5. **Create your first admin user:**
+   Visit `/dashboard/init` on an empty database to create the initial administrator, then sign in to the dashboard.
+
+6. **Run application onboarding:**
+   Configure store and regional settings, then use specimen preparation and collectible catalog workspaces to review evidence and publish eligible listings. Do not treat sample listings as verified authenticity or active auctions.
 
 ## Development Commands
 
-- `npm run dev` - Build Keystone + migrate + start Next.js dev server
-- `npm run build` - Build Keystone + migrate + build Next.js for production
-- `npm run migrate:gen` - Generate and apply new database migrations
-- `npm run migrate` - Deploy existing migrations to database
-- `npm run lint` - Run ESLint
+- `npm run dev` - Prepare the backend schema, apply migrations, and start Next.js development.
+- `npm run build` - Build the backend and Next.js for production; does not apply migrations.
+- `npm start` - Start the production Next.js server.
+- `npm run migrate:gen` - Prepare the schema and generate/apply development migrations.
+- `npm run migrate` - Apply checked-in Prisma migrations.
+- `npm run lint` - Run the repository's ESLint script.
 
-## API Endpoints
+Use a disposable development database for migration generation. Review the script before running it against any existing data.
 
-### GraphQL API
-- **Endpoint**: `/api/graphql`
-- **Features**: Full CRUD operations, relationships, authentication
-- **Playground**: Available in development mode
+### Discovery & Evidence Integration
+The [collectible commands](features/keystone/mutations/collectibles.ts) and [public observation projection](features/keystone/mutations/collectibles-public-projection.ts) define the public handoff and evidence boundary. Existing payment or grading adapter directories do not establish a live collectibles transaction service.
 
-## Data Models
+## Documentation
 
-### Core Models
-- **User** - Authentication and user management
-- **Role** - Role-based access control
-- **Todo** - Example content model with relationships
-- **TodoImage** - Image management for Todo items with S3 storage
+The [backend models](features/keystone/models), [registered business workflows](features/keystone/mutations/index.ts), [access rules](features/keystone/access.ts), and [application routes](app) document the implementation in this repository.
 
-### Permission System
-Sophisticated role-based permissions including:
-- `canAccessDashboard`, `canManagePeople`, `canManageRoles`
-- `canCreateTodos`, `canManageAllTodos`
-- `canSeeOtherPeople`, `canEditOtherPeople`
+## Security & Permissions
 
-## Project Structure
+### Role-Based Access Control
+- `canAccessDashboard` - Access dashboard.
+- `canManageProducts` - Manage products.
+- `canManageInventory` - Manage inventory.
+- `canReadOrders` - Read orders.
+- `canManageOrders` - Manage orders.
 
-```
-├── app/                    # Next.js App Router
-│   ├── api/
-│   │   └── graphql.ts     # GraphQL API endpoint
-│   └── dashboard/         # Admin dashboard pages
-├── features/
-│   ├── keystone/          # Backend configuration
-│   │   ├── models/        # Keystone list definitions
-│   │   ├── access.ts      # Permission logic
-│   │   └── mutations/     # Custom GraphQL mutations
-│   └── dashboard/         # Admin interface implementation
-│       ├── actions/       # Server actions
-│       ├── components/    # Reusable UI components
-│       ├── screens/       # Page-level components
-│       └── views/         # Field type implementations
-├── keystone.ts            # KeystoneJS configuration
-└── schema.prisma          # Database schema
-```
+### Security Features
+- Session-based authentication for signed-in users.
+- Backend list access and workflow authorization, rather than dashboard visibility alone.
+- Administrative access uses explicit role permissions. Machine credentials require credential scope as well as current owner-role authority; public discovery uses a separate projected listing surface.
 
-## Development Notes
+Review the [access implementation](features/keystone/access.ts) and individual workflow checks before extending permissions.
 
-- **GraphQL endpoint** available at `/api/graphql`
-- **Field implementations** follow KeystoneJS controller patterns
-- **Permission checks** are integrated throughout the UI layer
-- **Server actions** used for data mutations in dashboard components
-- **Inline editing** components provide seamless UX for relationship management
-- **Image uploads** configured for S3-compatible storage
-- **Advanced filtering** supports all field types including documents, JSON, and images
+## Platform Components
+
+### Admin Platform (`/dashboard`)
+- **Collectible Commerce**: `/dashboard/platform/collectible-commerce`.
+- **Gift Cards**: `/dashboard/platform/gift-cards`.
+- **Regions**: `/dashboard/platform/regions`.
+- **Currencies**: `/dashboard/platform/currencies`.
+- **Collectors**: `/dashboard/platform/collectors`.
+- **Products**: `/dashboard/platform/products`.
+- **Product Categories**: `/dashboard/platform/product-categories`.
+- **Evidence**: `/dashboard/platform/evidence`.
+- **Price Lists**: `/dashboard/platform/price-lists`.
+- **Invoices**: `/dashboard/platform/invoices`.
+- **Catalog**: `/dashboard/platform/catalog`.
+- **Discounts**: `/dashboard/platform/discounts`.
+
+### Storefront Experience
+Country-scoped storefront pages expose catalog browsing and collectible handoffs at `/[countryCode]/collectibles/handoff/[listingId]`. Public observation projections preserve evidence sources and review states rather than presenting provenance or grading as a software guarantee.
+
+Separate catalog definitions from individual specimens, identifiers, custody, inventory units, locations, condition observations, and media.
 
 ## Deployment
 
-The application can be deployed to any platform supporting Node.js and PostgreSQL:
+### Production Deployment
+The Vercel button imports this application's own repository. Provision PostgreSQL and configure the application's complete runtime requirements, storage, mail, and enabled providers before building. Importing the source does not configure these services.
 
-1. Set up PostgreSQL database
-2. Configure environment variables
-3. Run `npm run build`
-4. Run `npm start`
+Build the application and apply checked-in migrations as a release step before starting the server. Back up existing data before migration.
+
+```bash
+npm run build
+npm run migrate
+npm start
+```
+
+The included [Railway configuration](railway.toml) defines this app's build and startup lifecycle. Provision services and secrets separately.
+
+### Scaling Considerations
+Keep the shared PostgreSQL database, session secrets, and configured object storage consistent across application processes. Review background delivery and integration requirements before choosing a serverless runtime; a source import does not supply persistent workers.
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+Use the development commands above when preparing changes. Keep model changes and their migrations together, and describe workflow and permission changes in pull requests.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
+
+## Support
+
+- **Documentation**: [Source models and workflows](features/keystone/models).
+- **Issues**: [Report bugs and feature requests](https://github.com/openshiporg/openfront-collectibles/issues).
+- **Product**: [Learn more about Openfront Collectibles](https://openship.org/products/openfront-collectibles).
+
+---
+
+Built with [Next.js](https://nextjs.org) and [KeystoneJS](https://keystonejs.com).

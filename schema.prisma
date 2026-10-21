@@ -11,70 +11,2962 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id                      String    @id @default(cuid())
-  name                    String    @default("")
-  email                   String    @unique @default("")
-  password                String
-  role                    Role?     @relation("User_role", fields: [roleId], references: [id])
-  roleId                  String?   @map("role")
-  tasks                   Todo[]    @relation("Todo_assignedTo")
-  passwordResetToken      String?
-  passwordResetIssuedAt   DateTime?
-  passwordResetRedeemedAt DateTime?
+model Account {
+  id                                           String                   @id @default(cuid())
+  user                                         User?                    @relation("Account_user", fields: [userId], references: [id])
+  userId                                       String?                  @map("user")
+  accountNumber                                String                   @unique @default("")
+  title                                        String                   @default("Business Account")
+  description                                  String                   @default("Running business account for automated orders placed through API integration")
+  totalAmount                                  Int?                     @default(0)
+  paidAmount                                   Int?                     @default(0)
+  creditLimit                                  Int                      @default(100000)
+  currency                                     Currency?                @relation("Account_currency", fields: [currencyId], references: [id])
+  currencyId                                   String?                  @map("currency")
+  status                                       String                   @default("active")
+  dueDate                                      DateTime?
+  paidAt                                       DateTime?
+  suspendedAt                                  DateTime?
+  notApprovedAt                                DateTime?
+  accountType                                  String                   @default("business")
+  metadata                                     Json?                    @default("{}")
+  orders                                       Order[]                  @relation("Order_account")
+  lineItems                                    AccountLineItem[]        @relation("AccountLineItem_account")
+  invoices                                     Invoice[]                @relation("Invoice_account")
+  createdAt                                    DateTime                 @default(now())
+  updatedAt                                    DateTime                 @default(now()) @updatedAt
+  from_BusinessAccountRequest_generatedAccount BusinessAccountRequest[] @relation("BusinessAccountRequest_generatedAccount")
 
-  @@index([roleId])
+  @@index([userId])
+  @@index([currencyId])
 }
 
-model Role {
-  id                 String  @id @default(cuid())
-  name               String  @default("")
-  canCreateTodos     Boolean @default(false)
-  canManageAllTodos  Boolean @default(false)
-  canSeeOtherPeople  Boolean @default(false)
-  canEditOtherPeople Boolean @default(false)
-  canManagePeople    Boolean @default(false)
-  canManageRoles     Boolean @default(false)
-  canAccessDashboard Boolean @default(false)
-  assignedTo         User[]  @relation("User_role")
+model AccountLineItem {
+  id               String            @id @default(cuid())
+  account          Account?          @relation("AccountLineItem_account", fields: [accountId], references: [id])
+  accountId        String?           @map("account")
+  order            Order?            @relation("AccountLineItem_order", fields: [orderId], references: [id])
+  orderId          String?           @map("order")
+  orderKey         String?           @unique
+  region           Region?           @relation("AccountLineItem_region", fields: [regionId], references: [id])
+  regionId         String?           @map("region")
+  description      String            @default("Order line item")
+  amount           Int
+  orderDisplayId   String            @default("")
+  itemCount        Int               @default(0)
+  paymentStatus    String            @default("unpaid")
+  invoiceLineItems InvoiceLineItem[] @relation("InvoiceLineItem_accountLineItem")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now()) @updatedAt
+
+  @@index([accountId])
+  @@index([orderId])
+  @@index([regionId])
+  @@index([orderDisplayId])
 }
 
-model Todo {
-  id                   String      @id @default(cuid())
-  label                String      @default("")
-  description          Json        @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
-  isComplete           Boolean     @default(false)
-  status               String?     @default("todo")
-  priority             Int?        @default(1)
-  tags                 Json        @default("[]")
-  dueDate              DateTime?
-  weight               Float?      @default(1)
-  budget               Decimal?    @default("0.00") @postgresql.Decimal(10, 2)
-  isPrivate            Boolean     @default(false)
-  largeNumber          BigInt?
-  metadata             Json?
-  secretNote           String?
-  coverImage_id        String?
-  coverImage_filesize  Int?
-  coverImage_width     Int?
-  coverImage_height    Int?
-  coverImage_extension String?
-  todoImages           TodoImage[] @relation("Todo_todoImages")
-  assignedTo           User?       @relation("Todo_assignedTo", fields: [assignedToId], references: [id])
-  assignedToId         String?     @map("assignedTo")
+model Address {
+  id                           String             @id @default(cuid())
+  company                      String             @default("")
+  firstName                    String             @default("")
+  lastName                     String             @default("")
+  address1                     String             @default("")
+  address2                     String             @default("")
+  city                         String             @default("")
+  province                     String             @default("")
+  postalCode                   String             @default("")
+  phone                        String             @default("")
+  isBilling                    Boolean            @default(false)
+  metadata                     Json?
+  country                      Country?           @relation("Address_country", fields: [countryId], references: [id])
+  countryId                    String?            @map("country")
+  user                         User?              @relation("Address_user", fields: [userId], references: [id])
+  userId                       String?            @map("user")
+  shippingProviders            ShippingProvider[] @relation("ShippingProvider_fromAddress")
+  cart                         Cart?              @relation("Address_cart", fields: [cartId], references: [id])
+  cartId                       String?            @map("cart")
+  claimOrders                  ClaimOrder[]       @relation("ClaimOrder_address")
+  ordersUsingAsBillingAddress  Order[]            @relation("Order_billingAddress")
+  ordersUsingAsShippingAddress Order[]            @relation("Order_shippingAddress")
+  cartsUsingAsBillingAddress   Cart[]             @relation("Cart_billingAddress")
+  cartsUsingAsShippingAddress  Cart[]             @relation("Cart_shippingAddress")
+  swaps                        Swap[]             @relation("Swap_address")
+  createdAt                    DateTime           @default(now())
+  updatedAt                    DateTime           @default(now()) @updatedAt
 
-  @@index([assignedToId])
+  @@index([countryId])
+  @@index([userId])
+  @@index([cartId])
 }
 
-model TodoImage {
-  id              String  @id @default(cuid())
+model ApiKey {
+  id              String            @id @default(cuid())
+  name            String            @default("")
+  tokenSecret     String
+  tokenPreview    String            @default("")
+  scopes          Json?             @default("[]")
+  status          ApiKeyStatusType? @default(active)
+  expiresAt       DateTime?
+  lastUsedAt      DateTime?
+  usageCount      Json?             @default("{\"total\":0,\"daily\":{}}")
+  restrictedToIPs Json?             @default("[]")
+  user            User?             @relation("ApiKey_user", fields: [userId], references: [id])
+  userId          String?           @map("user")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now()) @updatedAt
+
+  @@index([userId])
+}
+
+model BatchJob {
+  id          String             @id @default(cuid())
+  type        BatchJobTypeType
+  status      BatchJobStatusType @default(CREATED)
+  context     Json?              @default("{}")
+  result      Json?              @default("{}")
+  error       String             @default("")
+  progress    Int?               @default(0)
+  createdBy   User?              @relation("BatchJob_createdBy", fields: [createdById], references: [id])
+  createdById String?            @map("createdBy")
+  completedAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now()) @updatedAt
+
+  @@index([createdById])
+}
+
+model Capture {
+  id                 String   @id @default(cuid())
+  amount             Int
+  providerCaptureKey String?  @unique
+  payment            Payment? @relation("Capture_payment", fields: [paymentId], references: [id])
+  paymentId          String?  @map("payment")
+  metadata           Json?
+  createdBy          String   @default("")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+
+  @@index([paymentId])
+}
+
+model Cart {
+  id                    String                 @id @default(cuid())
+  email                 String                 @default("")
+  type                  CartTypeType           @default(default)
+  metadata              Json?
+  idempotencyKey        String?                @unique
+  context               Json?
+  paymentAuthorizedAt   DateTime?
+  abandonedEmailSent    Boolean                @default(false)
+  user                  User?                  @relation("Cart_user", fields: [userId], references: [id])
+  userId                String?                @map("user")
+  region                Region?                @relation("Cart_region", fields: [regionId], references: [id])
+  regionId              String?                @map("region")
+  addresses             Address[]              @relation("Address_cart")
+  discounts             Discount[]             @relation("Cart_discounts")
+  giftCards             GiftCard[]             @relation("Cart_giftCards")
+  draftOrder            DraftOrder?            @relation("Cart_draftOrder", fields: [draftOrderId], references: [id])
+  draftOrderId          String?                @unique @map("draftOrder")
+  order                 Order?                 @relation("Cart_order", fields: [orderId], references: [id])
+  orderId               String?                @unique @map("order")
+  lineItems             LineItem[]             @relation("LineItem_cart")
+  customShippingOptions CustomShippingOption[] @relation("CustomShippingOption_cart")
+  swap                  Swap?                  @relation("Cart_swap", fields: [swapId], references: [id])
+  swapId                String?                @unique @map("swap")
+  shippingMethods       ShippingMethod[]       @relation("ShippingMethod_cart")
+  payment               Payment?               @relation("Cart_payment", fields: [paymentId], references: [id])
+  paymentId             String?                @unique @map("payment")
+  paymentCollection     PaymentCollection?     @relation("Cart_paymentCollection", fields: [paymentCollectionId], references: [id])
+  paymentCollectionId   String?                @unique @map("paymentCollection")
+  billingAddress        Address?               @relation("Cart_billingAddress", fields: [billingAddressId], references: [id])
+  billingAddressId      String?                @map("billingAddress")
+  shippingAddress       Address?               @relation("Cart_shippingAddress", fields: [shippingAddressId], references: [id])
+  shippingAddressId     String?                @map("shippingAddress")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @default(now()) @updatedAt
+  from_Reservation_cart Reservation[]          @relation("Reservation_cart")
+
+  @@index([userId])
+  @@index([regionId])
+  @@index([billingAddressId])
+  @@index([shippingAddressId])
+}
+
+model ClaimImage {
+  id              String     @id @default(cuid())
   image_id        String?
   image_filesize  Int?
   image_width     Int?
   image_height    Int?
   image_extension String?
-  imagePath       String  @default("")
-  altText         String  @default("")
-  todos           Todo[]  @relation("Todo_todoImages")
+  url             String     @default("")
+  altText         String     @default("")
+  claimItem       ClaimItem? @relation("ClaimImage_claimItem", fields: [claimItemId], references: [id])
+  claimItemId     String?    @map("claimItem")
   metadata        Json?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @default(now()) @updatedAt
+
+  @@index([claimItemId])
+}
+
+model ClaimItem {
+  id               String              @id @default(cuid())
+  reason           ClaimItemReasonType
+  note             String              @default("")
+  quantity         Int
+  metadata         Json?
+  productVariant   ProductVariant?     @relation("ClaimItem_productVariant", fields: [productVariantId], references: [id])
+  productVariantId String?             @map("productVariant")
+  lineItem         LineItem?           @relation("ClaimItem_lineItem", fields: [lineItemId], references: [id])
+  lineItemId       String?             @map("lineItem")
+  claimOrder       ClaimOrder?         @relation("ClaimItem_claimOrder", fields: [claimOrderId], references: [id])
+  claimOrderId     String?             @map("claimOrder")
+  claimImages      ClaimImage[]        @relation("ClaimImage_claimItem")
+  claimTags        ClaimTag[]          @relation("ClaimItem_claimTags")
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @default(now()) @updatedAt
+
+  @@index([productVariantId])
+  @@index([lineItemId])
+  @@index([claimOrderId])
+}
+
+model ClaimOrder {
+  id                String                          @id @default(cuid())
+  paymentStatus     ClaimOrderPaymentStatusType     @default(na)
+  fulfillmentStatus ClaimOrderFulfillmentStatusType @default(not_fulfilled)
+  type              ClaimOrderTypeType
+  refundAmount      Int?
+  canceledAt        DateTime?
+  metadata          Json?
+  idempotencyKey    String                          @default("")
+  noNotification    Boolean                         @default(false)
+  address           Address?                        @relation("ClaimOrder_address", fields: [addressId], references: [id])
+  addressId         String?                         @map("address")
+  order             Order?                          @relation("ClaimOrder_order", fields: [orderId], references: [id])
+  orderId           String?                         @map("order")
+  claimItems        ClaimItem[]                     @relation("ClaimItem_claimOrder")
+  fulfillments      Fulfillment[]                   @relation("Fulfillment_claimOrder")
+  lineItems         LineItem[]                      @relation("LineItem_claimOrder")
+  return            Return?                         @relation("ClaimOrder_return", fields: [returnId], references: [id])
+  returnId          String?                         @unique @map("return")
+  shippingMethods   ShippingMethod[]                @relation("ShippingMethod_claimOrder")
+  createdAt         DateTime                        @default(now())
+  updatedAt         DateTime                        @default(now()) @updatedAt
+
+  @@index([addressId])
+  @@index([orderId])
+}
+
+model ClaimTag {
+  id          String      @id @default(cuid())
+  value       String      @default("")
+  description String      @default("")
+  metadata    Json?
+  claimItems  ClaimItem[] @relation("ClaimItem_claimTags")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now()) @updatedAt
+}
+
+model Country {
+  id          String    @id @default(cuid())
+  iso2        String    @unique @default("")
+  iso3        String    @default("")
+  numCode     Int
+  name        String    @default("")
+  displayName String    @default("")
+  region      Region?   @relation("Country_region", fields: [regionId], references: [id])
+  regionId    String?   @map("region")
+  addresses   Address[] @relation("Address_country")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+
+  @@index([regionId])
+}
+
+model Currency {
+  id                             String             @id @default(cuid())
+  code                           String             @unique @default("")
+  symbol                         String             @default("")
+  symbolNative                   String             @default("")
+  name                           String             @default("")
+  moneyAmounts                   MoneyAmount[]      @relation("MoneyAmount_currency")
+  orders                         Order[]            @relation("Order_currency")
+  payments                       Payment[]          @relation("Payment_currency")
+  regions                        Region[]           @relation("Region_currency")
+  stores                         Store[]            @relation("Currency_stores")
+  accounts                       Account[]          @relation("Account_currency")
+  invoices                       Invoice[]          @relation("Invoice_currency")
+  createdAt                      DateTime           @default(now())
+  updatedAt                      DateTime           @default(now()) @updatedAt
+  from_OrderMoneyAmount_currency OrderMoneyAmount[] @relation("OrderMoneyAmount_currency")
+}
+
+model AttributeDefinition {
+  id              String               @id @default(cuid())
+  store           Store?               @relation("AttributeDefinition_store", fields: [storeId], references: [id])
+  storeId         String?              @map("store")
+  category        CollectibleCategory? @relation("AttributeDefinition_category", fields: [categoryId], references: [id])
+  categoryId      String?              @map("category")
+  name            String               @default("")
+  key             String               @default("")
+  valueType       String?              @default("text")
+  required        Boolean              @default(false)
+  filterable      Boolean              @default(true)
+  public          Boolean              @default(true)
+  options         Json?                @default("[]")
+  validationRules Json?                @default("{}")
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @default(now()) @updatedAt
+
+  @@index([storeId])
+  @@index([categoryId])
+  @@index([key])
+}
+
+model CatalogItem {
+  id                            String               @id @default(cuid())
+  store                         Store?               @relation("CatalogItem_store", fields: [storeId], references: [id])
+  storeId                       String?              @map("store")
+  category                      CollectibleCategory? @relation("CatalogItem_category", fields: [categoryId], references: [id])
+  categoryId                    String?              @map("category")
+  franchise                     Franchise?           @relation("CatalogItem_franchise", fields: [franchiseId], references: [id])
+  franchiseId                   String?              @map("franchise")
+  collectibleSet                CollectibleSet?      @relation("CatalogItem_collectibleSet", fields: [collectibleSetId], references: [id])
+  collectibleSetId              String?              @map("collectibleSet")
+  release                       CollectibleRelease?  @relation("CatalogItem_release", fields: [releaseId], references: [id])
+  releaseId                     String?              @map("release")
+  title                         String               @default("")
+  handle                        String               @unique @default("")
+  catalogNumber                 String               @default("")
+  maker                         String               @default("")
+  year                          Int?
+  description                   String               @default("")
+  attributeValues               Json?                @default("{}")
+  status                        String?              @default("draft")
+  specimens                     Specimen[]           @relation("Specimen_catalogItem")
+  media                         CollectibleMedia[]   @relation("CollectibleMedia_catalogItem")
+  createdAt                     DateTime             @default(now())
+  updatedAt                     DateTime             @default(now()) @updatedAt
+  from_WishlistItem_catalogItem WishlistItem[]       @relation("WishlistItem_catalogItem")
+  from_BuylistEntry_catalogItem BuylistEntry[]       @relation("BuylistEntry_catalogItem")
+  from_TradeInItem_catalogItem  TradeInItem[]        @relation("TradeInItem_catalogItem")
+
+  @@index([storeId])
+  @@index([categoryId])
+  @@index([franchiseId])
+  @@index([collectibleSetId])
+  @@index([releaseId])
+}
+
+model CollectibleCategory {
+  id                           String                @id @default(cuid())
+  store                        Store?                @relation("CollectibleCategory_store", fields: [storeId], references: [id])
+  storeId                      String?               @map("store")
+  name                         String                @default("")
+  handle                       String                @unique @default("")
+  description                  String                @default("")
+  parent                       CollectibleCategory?  @relation("CollectibleCategory_parent", fields: [parentId], references: [id])
+  parentId                     String?               @map("parent")
+  children                     CollectibleCategory[] @relation("CollectibleCategory_parent")
+  attributeDefinitions         AttributeDefinition[] @relation("AttributeDefinition_category")
+  status                       String?               @default("draft")
+  sortOrder                    Int?                  @default(0)
+  publicMetadata               Json?                 @default("{}")
+  createdAt                    DateTime              @default(now())
+  updatedAt                    DateTime              @default(now()) @updatedAt
+  from_CatalogItem_category    CatalogItem[]         @relation("CatalogItem_category")
+  from_CollectibleSet_category CollectibleSet[]      @relation("CollectibleSet_category")
+
+  @@index([storeId])
+  @@index([parentId])
+}
+
+model CollectibleMedia {
+  id            String       @id @default(cuid())
+  store         Store?       @relation("CollectibleMedia_store", fields: [storeId], references: [id])
+  storeId       String?      @map("store")
+  catalogItem   CatalogItem? @relation("CollectibleMedia_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId String?      @map("catalogItem")
+  specimen      Specimen?    @relation("CollectibleMedia_specimen", fields: [specimenId], references: [id])
+  specimenId    String?      @map("specimen")
+  kind          String?      @default("image")
+  url           String       @default("")
+  altText       String       @default("")
+  visibility    String?      @default("restricted")
+  source        String       @default("")
+  capturedAt    DateTime?
+  checksum      String       @default("")
+  metadata      Json?        @default("{}")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+
+  @@index([storeId])
+  @@index([catalogItemId])
+  @@index([specimenId])
+}
+
+model CollectibleRelease {
+  id                       String          @id @default(cuid())
+  store                    Store?          @relation("CollectibleRelease_store", fields: [storeId], references: [id])
+  storeId                  String?         @map("store")
+  collectibleSet           CollectibleSet? @relation("CollectibleRelease_collectibleSet", fields: [collectibleSetId], references: [id])
+  collectibleSetId         String?         @map("collectibleSet")
+  name                     String          @default("")
+  handle                   String          @unique @default("")
+  releaseDate              DateTime?
+  edition                  String          @default("")
+  printRunReported         Int?
+  printRunSource           String          @default("")
+  publicNotes              String          @default("")
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @default(now()) @updatedAt
+  from_CatalogItem_release CatalogItem[]   @relation("CatalogItem_release")
+
+  @@index([storeId])
+  @@index([collectibleSetId])
+}
+
+model CollectibleSet {
+  id                                     String               @id @default(cuid())
+  store                                  Store?               @relation("CollectibleSet_store", fields: [storeId], references: [id])
+  storeId                                String?              @map("store")
+  franchise                              Franchise?           @relation("CollectibleSet_franchise", fields: [franchiseId], references: [id])
+  franchiseId                            String?              @map("franchise")
+  category                               CollectibleCategory? @relation("CollectibleSet_category", fields: [categoryId], references: [id])
+  categoryId                             String?              @map("category")
+  name                                   String               @default("")
+  handle                                 String               @unique @default("")
+  manufacturer                           String               @default("")
+  startYear                              Int?
+  endYear                                Int?
+  metadata                               Json?                @default("{}")
+  createdAt                              DateTime             @default(now())
+  updatedAt                              DateTime             @default(now()) @updatedAt
+  from_CatalogItem_collectibleSet        CatalogItem[]        @relation("CatalogItem_collectibleSet")
+  from_CollectibleRelease_collectibleSet CollectibleRelease[] @relation("CollectibleRelease_collectibleSet")
+
+  @@index([storeId])
+  @@index([franchiseId])
+  @@index([categoryId])
+}
+
+model Franchise {
+  id                            String           @id @default(cuid())
+  store                         Store?           @relation("Franchise_store", fields: [storeId], references: [id])
+  storeId                       String?          @map("store")
+  name                          String           @default("")
+  handle                        String           @unique @default("")
+  description                   String           @default("")
+  externalReferences            Json?            @default("[]")
+  createdAt                     DateTime         @default(now())
+  updatedAt                     DateTime         @default(now()) @updatedAt
+  from_CatalogItem_franchise    CatalogItem[]    @relation("CatalogItem_franchise")
+  from_CollectibleSet_franchise CollectibleSet[] @relation("CollectibleSet_franchise")
+
+  @@index([storeId])
+}
+
+model Specimen {
+  id                            String                 @id @default(cuid())
+  store                         Store?                 @relation("Specimen_store", fields: [storeId], references: [id])
+  storeId                       String?                @map("store")
+  catalogItem                   CatalogItem?           @relation("Specimen_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId                 String?                @map("catalogItem")
+  displayName                   String                 @default("")
+  specimenCode                  String                 @unique @default("")
+  lifecycleStatus               String?                @default("intake")
+  attributeValues               Json?                  @default("{}")
+  identifiers                   SpecimenIdentifier[]   @relation("SpecimenIdentifier_specimen")
+  media                         CollectibleMedia[]     @relation("CollectibleMedia_specimen")
+  conditionObservations         ConditionObservation[] @relation("ConditionObservation_specimen")
+  gradeObservations             GradeObservation[]     @relation("GradeObservation_specimen")
+  provenanceEvents              ProvenanceEvent[]      @relation("ProvenanceEvent_specimen")
+  custodyEvents                 CustodyEvent[]         @relation("CustodyEvent_specimen")
+  valuationObservations         ValuationObservation[] @relation("ValuationObservation_specimen")
+  inventoryUnits                InventoryUnit[]        @relation("InventoryUnit_specimen")
+  createdAt                     DateTime               @default(now())
+  updatedAt                     DateTime               @default(now()) @updatedAt
+  from_ConsignmentItem_specimen ConsignmentItem[]      @relation("ConsignmentItem_specimen")
+  from_TradeInItem_specimen     TradeInItem[]          @relation("TradeInItem_specimen")
+
+  @@index([storeId])
+  @@index([catalogItemId])
+}
+
+model SpecimenIdentifier {
+  id         String    @id @default(cuid())
+  specimen   Specimen? @relation("SpecimenIdentifier_specimen", fields: [specimenId], references: [id])
+  specimenId String?   @map("specimen")
+  type       String?   @default("operator")
+  issuer     String    @default("")
+  value      String    @default("")
+  observedAt DateTime? @default(now())
+  evidence   Json?     @default("{}")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+
+  @@index([specimenId])
+  @@index([value])
+}
+
+model ConditionObservation {
+  id                                             String        @id @default(cuid())
+  specimen                                       Specimen?     @relation("ConditionObservation_specimen", fields: [specimenId], references: [id])
+  specimenId                                     String?       @map("specimen")
+  observer                                       User?         @relation("ConditionObservation_observer", fields: [observerId], references: [id])
+  observerId                                     String?       @map("observer")
+  sourceType                                     String?       @default("operator")
+  scale                                          String        @default("")
+  label                                          String        @default("")
+  score                                          String        @default("")
+  notes                                          String        @default("")
+  observedAt                                     DateTime?     @default(now())
+  status                                         String?       @default("reported")
+  publiclyVisible                                Boolean       @default(false)
+  mediaReferences                                Json?         @default("[]")
+  evidence                                       Json?         @default("{}")
+  createdAt                                      DateTime      @default(now())
+  updatedAt                                      DateTime      @default(now()) @updatedAt
+  from_TradeInItem_inspectedConditionObservation TradeInItem[] @relation("TradeInItem_inspectedConditionObservation")
+
+  @@index([specimenId])
+  @@index([observerId])
+}
+
+model CustodyEvent {
+  id                    String             @id @default(cuid())
+  specimen              Specimen?          @relation("CustodyEvent_specimen", fields: [specimenId], references: [id])
+  specimenId            String?            @map("specimen")
+  type                  String?            @default("intake")
+  occurredAt            DateTime?          @default(now())
+  fromLocation          InventoryLocation? @relation("CustodyEvent_fromLocation", fields: [fromLocationId], references: [id])
+  fromLocationId        String?            @map("fromLocation")
+  toLocation            InventoryLocation? @relation("CustodyEvent_toLocation", fields: [toLocationId], references: [id])
+  toLocationId          String?            @map("toLocation")
+  actor                 User?              @relation("CustodyEvent_actor", fields: [actorId], references: [id])
+  actorId               String?            @map("actor")
+  counterpartyReference String             @default("")
+  evidence              Json?              @default("{}")
+  idempotencyKey        String             @unique @default("")
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @default(now()) @updatedAt
+
+  @@index([specimenId])
+  @@index([fromLocationId])
+  @@index([toLocationId])
+  @@index([actorId])
+}
+
+model GradeObservation {
+  id                   String          @id @default(cuid())
+  specimen             Specimen?       @relation("GradeObservation_specimen", fields: [specimenId], references: [id])
+  specimenId           String?         @map("specimen")
+  gradingCompany       GradingCompany? @relation("GradeObservation_gradingCompany", fields: [gradingCompanyId], references: [id])
+  gradingCompanyId     String?         @map("gradingCompany")
+  reportedGrade        String          @default("")
+  reportedLabel        String          @default("")
+  certificateReference String          @default("")
+  certificateLookupUrl String          @default("")
+  observedAt           DateTime?       @default(now())
+  verificationState    String?         @default("not_checked")
+  publiclyVisible      Boolean         @default(false)
+  providerResponseHash String          @default("")
+  providerResponse     Json?
+  reviewedBy           User?           @relation("GradeObservation_reviewedBy", fields: [reviewedById], references: [id])
+  reviewedById         String?         @map("reviewedBy")
+  reviewedAt           DateTime?
+  disclaimer           String          @default("This records an attributed grading/certificate observation and does not establish authenticity.")
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @default(now()) @updatedAt
+
+  @@index([specimenId])
+  @@index([gradingCompanyId])
+  @@index([certificateReference])
+  @@index([reviewedById])
+}
+
+model GradingCompany {
+  id                                   String             @id @default(cuid())
+  name                                 String             @default("")
+  code                                 String             @unique @default("")
+  website                              String             @default("")
+  certificateLookupTemplate            String             @default("")
+  active                               Boolean            @default(true)
+  disclaimer                           String             @default("Provider-reported grading evidence; not an Openfront authenticity determination.")
+  createdAt                            DateTime           @default(now())
+  updatedAt                            DateTime           @default(now()) @updatedAt
+  from_GradeObservation_gradingCompany GradeObservation[] @relation("GradeObservation_gradingCompany")
+}
+
+model ProvenanceEvent {
+  id                String    @id @default(cuid())
+  specimen          Specimen? @relation("ProvenanceEvent_specimen", fields: [specimenId], references: [id])
+  specimenId        String?   @map("specimen")
+  eventType         String?   @default("other")
+  occurredAt        DateTime?
+  recordedAt        DateTime? @default(now())
+  summary           String    @default("")
+  source            String    @default("")
+  confidence        String?   @default("unreviewed")
+  reviewState       String?   @default("reported")
+  publiclyVisible   Boolean   @default(false)
+  publicEvidence    Json?     @default("[]")
+  restrictedParties Json?
+  reviewedBy        User?     @relation("ProvenanceEvent_reviewedBy", fields: [reviewedById], references: [id])
+  reviewedById      String?   @map("reviewedBy")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now()) @updatedAt
+
+  @@index([specimenId])
+  @@index([reviewedById])
+}
+
+model ValuationObservation {
+  id              String    @id @default(cuid())
+  specimen        Specimen? @relation("ValuationObservation_specimen", fields: [specimenId], references: [id])
+  specimenId      String?   @map("specimen")
+  amountMinor     Int
+  currencyCode    String    @default("")
+  sourceType      String?   @default("operator")
+  sourceName      String    @default("")
+  sourceReference String    @default("")
+  observedAt      DateTime? @default(now())
+  confidence      String?   @default("unreviewed")
+  publiclyVisible Boolean   @default(false)
+  notes           String    @default("")
+  disclaimer      String    @default("Attributed valuation evidence; not an appraisal or guarantee of sale value.")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+
+  @@index([specimenId])
+}
+
+model InventoryLocation {
+  id                                  String              @id @default(cuid())
+  store                               Store?              @relation("InventoryLocation_store", fields: [storeId], references: [id])
+  storeId                             String?             @map("store")
+  name                                String              @default("")
+  code                                String              @unique @default("")
+  type                                String?             @default("shop")
+  publicLabel                         String              @default("")
+  restrictedLocation                  Json?
+  status                              String?             @default("active")
+  createdAt                           DateTime            @default(now())
+  updatedAt                           DateTime            @default(now()) @updatedAt
+  from_CustodyEvent_fromLocation      CustodyEvent[]      @relation("CustodyEvent_fromLocation")
+  from_CustodyEvent_toLocation        CustodyEvent[]      @relation("CustodyEvent_toLocation")
+  from_InventoryMovement_fromLocation InventoryMovement[] @relation("InventoryMovement_fromLocation")
+  from_InventoryMovement_toLocation   InventoryMovement[] @relation("InventoryMovement_toLocation")
+  from_InventoryUnit_location         InventoryUnit[]     @relation("InventoryUnit_location")
+
+  @@index([storeId])
+}
+
+model InventoryMovement {
+  id              String             @id @default(cuid())
+  inventoryUnit   InventoryUnit?     @relation("InventoryMovement_inventoryUnit", fields: [inventoryUnitId], references: [id])
+  inventoryUnitId String?            @map("inventoryUnit")
+  type            String?            @default("adjust")
+  fromStatus      String             @default("")
+  toStatus        String             @default("")
+  fromLocation    InventoryLocation? @relation("InventoryMovement_fromLocation", fields: [fromLocationId], references: [id])
+  fromLocationId  String?            @map("fromLocation")
+  toLocation      InventoryLocation? @relation("InventoryMovement_toLocation", fields: [toLocationId], references: [id])
+  toLocationId    String?            @map("toLocation")
+  reason          String             @default("")
+  actor           User?              @relation("InventoryMovement_actor", fields: [actorId], references: [id])
+  actorId         String?            @map("actor")
+  occurredAt      DateTime?          @default(now())
+  evidence        Json?              @default("{}")
+  idempotencyKey  String             @unique @default("")
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @default(now()) @updatedAt
+
+  @@index([inventoryUnitId])
+  @@index([fromLocationId])
+  @@index([toLocationId])
+  @@index([actorId])
+}
+
+model InventoryUnit {
+  id                                 String              @id @default(cuid())
+  store                              Store?              @relation("InventoryUnit_store", fields: [storeId], references: [id])
+  storeId                            String?             @map("store")
+  specimen                           Specimen?           @relation("InventoryUnit_specimen", fields: [specimenId], references: [id])
+  specimenId                         String?             @map("specimen")
+  commerceVariant                    ProductVariant?     @relation("InventoryUnit_commerceVariant", fields: [commerceVariantId], references: [id])
+  commerceVariantId                  String?             @unique @map("commerceVariant")
+  sku                                String              @unique @default("")
+  ownershipBasis                     String?             @default("owned")
+  status                             String?             @default("intake")
+  location                           InventoryLocation?  @relation("InventoryUnit_location", fields: [locationId], references: [id])
+  locationId                         String?             @map("location")
+  quantity                           Int?                @default(1)
+  version                            Int?                @default(1)
+  acquiredAmountMinor                Int?
+  currencyCode                       String              @default("")
+  movements                          InventoryMovement[] @relation("InventoryMovement_inventoryUnit")
+  reservations                       Reservation[]       @relation("Reservation_inventoryUnit")
+  createdAt                          DateTime            @default(now())
+  updatedAt                          DateTime            @default(now()) @updatedAt
+  from_Listing_inventoryUnit         Listing[]           @relation("Listing_inventoryUnit")
+  from_ConsignmentItem_inventoryUnit ConsignmentItem[]   @relation("ConsignmentItem_inventoryUnit")
+
+  @@index([storeId])
+  @@index([specimenId])
+  @@index([locationId])
+}
+
+model Reservation {
+  id                       String         @id @default(cuid())
+  inventoryUnit            InventoryUnit? @relation("Reservation_inventoryUnit", fields: [inventoryUnitId], references: [id])
+  inventoryUnitId          String?        @map("inventoryUnit")
+  listing                  Listing?       @relation("Reservation_listing", fields: [listingId], references: [id])
+  listingId                String?        @map("listing")
+  cart                     Cart?          @relation("Reservation_cart", fields: [cartId], references: [id])
+  cartId                   String?        @map("cart")
+  offer                    Offer?         @relation("Reservation_offer", fields: [offerId], references: [id])
+  offerId                  String?        @map("offer")
+  auction                  Auction?       @relation("Reservation_auction", fields: [auctionId], references: [id])
+  auctionId                String?        @map("auction")
+  purpose                  String?        @default("cart")
+  status                   String?        @default("active")
+  expiresAt                DateTime?
+  ownerUser                User?          @relation("Reservation_ownerUser", fields: [ownerUserId], references: [id])
+  ownerUserId              String?        @map("ownerUser")
+  guestProofHash           String         @default("")
+  idempotencyKey           String         @unique @default("")
+  releasedAt               DateTime?
+  releaseReason            String         @default("")
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @default(now()) @updatedAt
+  from_Auction_reservation Auction[]      @relation("Auction_reservation")
+  from_Offer_reservation   Offer[]        @relation("Offer_reservation")
+
+  @@index([inventoryUnitId])
+  @@index([listingId])
+  @@index([cartId])
+  @@index([offerId])
+  @@index([auctionId])
+  @@index([ownerUserId])
+}
+
+model Auction {
+  id                       String        @id @default(cuid())
+  listing                  Listing?      @relation("Auction_listing", fields: [listingId], references: [id])
+  listingId                String?       @unique @map("listing")
+  status                   String?       @default("draft")
+  startAt                  DateTime
+  endAt                    DateTime
+  openingAmountMinor       Int
+  currentAmountMinor       Int
+  currencyCode             String        @default("")
+  reserveAmountMinor       Int?
+  reserveMet               Boolean       @default(false)
+  minimumIncrementMinor    Int           @default(100)
+  extensionWindowSeconds   Int?          @default(120)
+  extensionSeconds         Int?          @default(120)
+  maximumExtensions        Int?          @default(5)
+  extensionCount           Int?          @default(0)
+  leadingBidder            User?         @relation("Auction_leadingBidder", fields: [leadingBidderId], references: [id])
+  leadingBidderId          String?       @map("leadingBidder")
+  bidCount                 Int?          @default(0)
+  bids                     Bid[]         @relation("Bid_auction")
+  reservation              Reservation?  @relation("Auction_reservation", fields: [reservationId], references: [id])
+  reservationId            String?       @map("reservation")
+  settlementSnapshot       Json?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @default(now()) @updatedAt
+  from_Reservation_auction Reservation[] @relation("Reservation_auction")
+
+  @@index([leadingBidderId])
+  @@index([reservationId])
+}
+
+model Bid {
+  id              String    @id @default(cuid())
+  auction         Auction?  @relation("Bid_auction", fields: [auctionId], references: [id])
+  auctionId       String?   @map("auction")
+  bidder          User?     @relation("Bid_bidder", fields: [bidderId], references: [id])
+  bidderId        String?   @map("bidder")
+  amountMinor     Int
+  currencyCode    String    @default("")
+  status          String?   @default("accepted")
+  rejectionReason String    @default("")
+  acceptedAt      DateTime? @default(now())
+  resultingEndAt  DateTime?
+  idempotencyKey  String    @unique @default("")
+  requestMetadata Json?     @default("{}")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+
+  @@index([auctionId])
+  @@index([bidderId])
+}
+
+model Listing {
+  id                        String         @id @default(cuid())
+  store                     Store?         @relation("Listing_store", fields: [storeId], references: [id])
+  storeId                   String?        @map("store")
+  inventoryUnit             InventoryUnit? @relation("Listing_inventoryUnit", fields: [inventoryUnitId], references: [id])
+  inventoryUnitId           String?        @map("inventoryUnit")
+  seller                    SellerProfile? @relation("Listing_seller", fields: [sellerId], references: [id])
+  sellerId                  String?        @map("seller")
+  title                     String         @default("")
+  slug                      String         @unique @default("")
+  format                    String?        @default("fixed_price")
+  status                    String?        @default("draft")
+  priceMinor                Int?
+  compareAtMinor            Int?
+  currencyCode              String         @default("USD")
+  publishedAt               DateTime?
+  endsAt                    DateTime?
+  publicationSnapshot       Json?          @default("{}")
+  publicSummary             String         @default("")
+  offersEnabled             Boolean        @default(true)
+  minimumOfferMinor         Int?
+  auction                   Auction?       @relation("Auction_listing")
+  offers                    Offer[]        @relation("Offer_listing")
+  createdAt                 DateTime       @default(now())
+  updatedAt                 DateTime       @default(now()) @updatedAt
+  from_Reservation_listing  Reservation[]  @relation("Reservation_listing")
+  from_WishlistItem_listing WishlistItem[] @relation("WishlistItem_listing")
+
+  @@index([storeId])
+  @@index([inventoryUnitId])
+  @@index([sellerId])
+}
+
+model Offer {
+  id                     String          @id @default(cuid())
+  listing                Listing?        @relation("Offer_listing", fields: [listingId], references: [id])
+  listingId              String?         @map("listing")
+  buyer                  User?           @relation("Offer_buyer", fields: [buyerId], references: [id])
+  buyerId                String?         @map("buyer")
+  seller                 SellerProfile?  @relation("Offer_seller", fields: [sellerId], references: [id])
+  sellerId               String?         @map("seller")
+  status                 String?         @default("open")
+  currentAmountMinor     Int
+  currencyCode           String          @default("")
+  expiresAt              DateTime?
+  currentRevision        Int?            @default(1)
+  revisions              OfferRevision[] @relation("OfferRevision_offer")
+  reservation            Reservation?    @relation("Offer_reservation", fields: [reservationId], references: [id])
+  reservationId          String?         @map("reservation")
+  idempotencyKey         String          @unique @default("")
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @default(now()) @updatedAt
+  from_Reservation_offer Reservation[]   @relation("Reservation_offer")
+
+  @@index([listingId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([reservationId])
+}
+
+model OfferRevision {
+  id             String    @id @default(cuid())
+  offer          Offer?    @relation("OfferRevision_offer", fields: [offerId], references: [id])
+  offerId        String?   @map("offer")
+  sequence       Int
+  actorType      String?   @default("buyer")
+  actor          User?     @relation("OfferRevision_actor", fields: [actorId], references: [id])
+  actorId        String?   @map("actor")
+  action         String?   @default("created")
+  amountMinor    Int
+  currencyCode   String    @default("")
+  message        String    @default("")
+  occurredAt     DateTime? @default(now())
+  idempotencyKey String    @unique @default("")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+
+  @@index([offerId])
+  @@index([actorId])
+}
+
+model SavedSearch {
+  id                    String    @id @default(cuid())
+  user                  User?     @relation("SavedSearch_user", fields: [userId], references: [id])
+  userId                String?   @map("user")
+  name                  String    @default("")
+  query                 String    @default("")
+  filters               Json?     @default("{}")
+  notificationFrequency String?   @default("none")
+  lastNotifiedAt        DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @default(now()) @updatedAt
+
+  @@index([userId])
+}
+
+model WishlistItem {
+  id            String       @id @default(cuid())
+  user          User?        @relation("WishlistItem_user", fields: [userId], references: [id])
+  userId        String?      @map("user")
+  catalogItem   CatalogItem? @relation("WishlistItem_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId String?      @map("catalogItem")
+  listing       Listing?     @relation("WishlistItem_listing", fields: [listingId], references: [id])
+  listingId     String?      @map("listing")
+  notes         String       @default("")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+
+  @@index([userId])
+  @@index([catalogItemId])
+  @@index([listingId])
+}
+
+model Buylist {
+  id           String         @id @default(cuid())
+  store        Store?         @relation("Buylist_store", fields: [storeId], references: [id])
+  storeId      String?        @map("store")
+  name         String         @default("")
+  status       String?        @default("draft")
+  currencyCode String         @default("")
+  entries      BuylistEntry[] @relation("BuylistEntry_buylist")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now()) @updatedAt
+
+  @@index([storeId])
+}
+
+model BuylistEntry {
+  id               String       @id @default(cuid())
+  buylist          Buylist?     @relation("BuylistEntry_buylist", fields: [buylistId], references: [id])
+  buylistId        String?      @map("buylist")
+  catalogItem      CatalogItem? @relation("BuylistEntry_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId    String?      @map("catalogItem")
+  criteria         Json?        @default("{}")
+  offerAmountMinor Int
+  maximumQuantity  Int?
+  active           String?      @default("active")
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @default(now()) @updatedAt
+
+  @@index([buylistId])
+  @@index([catalogItemId])
+}
+
+model ConsignmentAgreement {
+  id                    String             @id @default(cuid())
+  intake                ConsignmentIntake? @relation("ConsignmentAgreement_intake", fields: [intakeId], references: [id])
+  intakeId              String?            @unique @map("intake")
+  consignor             SellerProfile?     @relation("ConsignmentAgreement_consignor", fields: [consignorId], references: [id])
+  consignorId           String?            @map("consignor")
+  version               Int
+  status                String?            @default("draft")
+  commissionBasisPoints Int
+  fixedFeeMinor         Int?               @default(0)
+  currencyCode          String             @default("")
+  pricingAuthority      String?            @default("mutual")
+  startsAt              DateTime?
+  endsAt                DateTime?
+  termsSnapshot         Json?              @default("{}")
+  acceptedAt            DateTime?
+  acceptanceEvidence    Json?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @default(now()) @updatedAt
+
+  @@index([consignorId])
+}
+
+model ConsignmentIntake {
+  id                   String                @id @default(cuid())
+  store                Store?                @relation("ConsignmentIntake_store", fields: [storeId], references: [id])
+  storeId              String?               @map("store")
+  consignor            SellerProfile?        @relation("ConsignmentIntake_consignor", fields: [consignorId], references: [id])
+  consignorId          String?               @map("consignor")
+  reference            String                @unique @default("")
+  status               String?               @default("submitted")
+  submittedDescription String                @default("")
+  intakeObservations   Json?                 @default("{}")
+  receivedAt           DateTime?
+  items                ConsignmentItem[]     @relation("ConsignmentItem_intake")
+  agreement            ConsignmentAgreement? @relation("ConsignmentAgreement_intake")
+  custodyEvidence      Json?                 @default("[]")
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @default(now()) @updatedAt
+
+  @@index([storeId])
+  @@index([consignorId])
+}
+
+model ConsignmentItem {
+  id                                  String             @id @default(cuid())
+  intake                              ConsignmentIntake? @relation("ConsignmentItem_intake", fields: [intakeId], references: [id])
+  intakeId                            String?            @map("intake")
+  specimen                            Specimen?          @relation("ConsignmentItem_specimen", fields: [specimenId], references: [id])
+  specimenId                          String?            @map("specimen")
+  inventoryUnit                       InventoryUnit?     @relation("ConsignmentItem_inventoryUnit", fields: [inventoryUnitId], references: [id])
+  inventoryUnitId                     String?            @map("inventoryUnit")
+  status                              String?            @default("pending")
+  reserveAmountMinor                  Int?
+  agreedPriceMinor                    Int?
+  currencyCode                        String             @default("")
+  notes                               String             @default("")
+  createdAt                           DateTime           @default(now())
+  updatedAt                           DateTime           @default(now()) @updatedAt
+  from_SettlementLine_consignmentItem SettlementLine[]   @relation("SettlementLine_consignmentItem")
+
+  @@index([intakeId])
+  @@index([specimenId])
+  @@index([inventoryUnitId])
+}
+
+model ConsignmentSettlement {
+  id                  String           @id @default(cuid())
+  store               Store?           @relation("ConsignmentSettlement_store", fields: [storeId], references: [id])
+  storeId             String?          @map("store")
+  consignor           SellerProfile?   @relation("ConsignmentSettlement_consignor", fields: [consignorId], references: [id])
+  consignorId         String?          @map("consignor")
+  reference           String           @unique @default("")
+  status              String?          @default("pending")
+  currencyCode        String           @default("")
+  grossAmountMinor    Int
+  feeAmountMinor      Int
+  refundHoldbackMinor Int              @default(0)
+  payableAmountMinor  Int
+  calculationSnapshot Json?            @default("{}")
+  lines               SettlementLine[] @relation("SettlementLine_settlement")
+  payoutEvidence      Json?
+  idempotencyKey      String           @unique @default("")
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @default(now()) @updatedAt
+
+  @@index([storeId])
+  @@index([consignorId])
+}
+
+model SettlementLine {
+  id                    String                 @id @default(cuid())
+  settlement            ConsignmentSettlement? @relation("SettlementLine_settlement", fields: [settlementId], references: [id])
+  settlementId          String?                @map("settlement")
+  consignmentItem       ConsignmentItem?       @relation("SettlementLine_consignmentItem", fields: [consignmentItemId], references: [id])
+  consignmentItemId     String?                @map("consignmentItem")
+  orderLineItem         OrderLineItem?         @relation("SettlementLine_orderLineItem", fields: [orderLineItemId], references: [id])
+  orderLineItemId       String?                @map("orderLineItem")
+  grossAmountMinor      Int
+  commissionAmountMinor Int
+  feeAmountMinor        Int
+  refundAmountMinor     Int                    @default(0)
+  payableAmountMinor    Int
+  snapshot              Json?                  @default("{}")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @default(now()) @updatedAt
+
+  @@index([settlementId])
+  @@index([consignmentItemId])
+  @@index([orderLineItemId])
+}
+
+model TradeInItem {
+  id                              String                @id @default(cuid())
+  submission                      TradeInSubmission?    @relation("TradeInItem_submission", fields: [submissionId], references: [id])
+  submissionId                    String?               @map("submission")
+  catalogItem                     CatalogItem?          @relation("TradeInItem_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId                   String?               @map("catalogItem")
+  specimen                        Specimen?             @relation("TradeInItem_specimen", fields: [specimenId], references: [id])
+  specimenId                      String?               @map("specimen")
+  customerDescription             String                @default("")
+  customerCondition               String                @default("")
+  inspectedConditionObservation   ConditionObservation? @relation("TradeInItem_inspectedConditionObservation", fields: [inspectedConditionObservationId], references: [id])
+  inspectedConditionObservationId String?               @map("inspectedConditionObservation")
+  quotedAmountMinor               Int?
+  acceptedAmountMinor             Int?
+  currencyCode                    String                @default("")
+  decisionEvidence                Json?                 @default("{}")
+  createdAt                       DateTime              @default(now())
+  updatedAt                       DateTime              @default(now()) @updatedAt
+
+  @@index([submissionId])
+  @@index([catalogItemId])
+  @@index([specimenId])
+  @@index([inspectedConditionObservationId])
+}
+
+model TradeInSubmission {
+  id               String        @id @default(cuid())
+  store            Store?        @relation("TradeInSubmission_store", fields: [storeId], references: [id])
+  storeId          String?       @map("store")
+  customer         User?         @relation("TradeInSubmission_customer", fields: [customerId], references: [id])
+  customerId       String?       @map("customer")
+  reference        String        @unique @default("")
+  status           String?       @default("submitted")
+  disposition      String?       @default("cash")
+  items            TradeInItem[] @relation("TradeInItem_submission")
+  shippingEvidence Json?         @default("{}")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now()) @updatedAt
+
+  @@index([storeId])
+  @@index([customerId])
+}
+
+model CollectorProfile {
+  id          String   @id @default(cuid())
+  user        User?    @relation("CollectorProfile_user", fields: [userId], references: [id])
+  userId      String?  @map("user")
+  displayName String   @default("")
+  bio         String   @default("")
+  interests   Json?    @default("[]")
+  preferences Json?    @default("{}")
+  public      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@index([userId])
+}
+
+model DisputeCase {
+  id           String               @id @default(cuid())
+  store        Store?               @relation("DisputeCase_store", fields: [storeId], references: [id])
+  storeId      String?              @map("store")
+  order        Order?               @relation("DisputeCase_order", fields: [orderId], references: [id])
+  orderId      String?              @map("order")
+  return       Return?              @relation("DisputeCase_return", fields: [returnId], references: [id])
+  returnId     String?              @map("return")
+  openedBy     User?                @relation("DisputeCase_openedBy", fields: [openedById], references: [id])
+  openedById   String?              @map("openedBy")
+  assignedTo   User?                @relation("DisputeCase_assignedTo", fields: [assignedToId], references: [id])
+  assignedToId String?              @map("assignedTo")
+  type         String?              @default("other")
+  status       String?              @default("open")
+  summary      String               @default("")
+  resolution   String               @default("")
+  evidence     EvidenceAttachment[] @relation("EvidenceAttachment_dispute")
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @default(now()) @updatedAt
+
+  @@index([storeId])
+  @@index([orderId])
+  @@index([returnId])
+  @@index([openedById])
+  @@index([assignedToId])
+}
+
+model EvidenceAttachment {
+  id           String       @id @default(cuid())
+  dispute      DisputeCase? @relation("EvidenceAttachment_dispute", fields: [disputeId], references: [id])
+  disputeId    String?      @map("dispute")
+  url          String       @default("")
+  type         String       @default("")
+  checksum     String       @default("")
+  uploadedBy   User?        @relation("EvidenceAttachment_uploadedBy", fields: [uploadedById], references: [id])
+  uploadedById String?      @map("uploadedBy")
+  metadata     Json?        @default("{}")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now()) @updatedAt
+
+  @@index([disputeId])
+  @@index([uploadedById])
+}
+
+model FulfillmentRequirement {
+  id                                String             @id @default(cuid())
+  order                             Order?             @relation("FulfillmentRequirement_order", fields: [orderId], references: [id])
+  orderId                           String?            @map("order")
+  orderLineItem                     OrderLineItem?     @relation("FulfillmentRequirement_orderLineItem", fields: [orderLineItemId], references: [id])
+  orderLineItemId                   String?            @map("orderLineItem")
+  declaredValueMinor                Int?
+  currencyCode                      String             @default("")
+  signatureRequired                 Boolean            @default(false)
+  insuranceRequested                Boolean            @default(false)
+  insuranceProviderReference        String             @default("")
+  packagingInstructions             String             @default("")
+  policySnapshot                    Json?              @default("{}")
+  createdAt                         DateTime           @default(now())
+  updatedAt                         DateTime           @default(now()) @updatedAt
+  from_ShipmentEvidence_requirement ShipmentEvidence[] @relation("ShipmentEvidence_requirement")
+
+  @@index([orderId])
+  @@index([orderLineItemId])
+}
+
+model NotificationIntent {
+  id                String    @id @default(cuid())
+  user              User?     @relation("NotificationIntent_user", fields: [userId], references: [id])
+  userId            String?   @map("user")
+  channel           String?   @default("email")
+  template          String    @default("")
+  status            String?   @default("queued")
+  payload           Json?     @default("{}")
+  provider          String    @default("")
+  providerReference String    @default("")
+  idempotencyKey    String    @unique @default("")
+  attemptedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now()) @updatedAt
+
+  @@index([userId])
+}
+
+model ProviderConnection {
+  id              String    @id @default(cuid())
+  store           Store?    @relation("ProviderConnection_store", fields: [storeId], references: [id])
+  storeId         String?   @map("store")
+  kind            String?   @default("notification")
+  provider        String    @default("")
+  status          String?   @default("draft")
+  adapterKey      String    @default("")
+  configuration   Json?     @default("{}")
+  secretReference String    @default("")
+  lastObservedAt  DateTime?
+  lastObservation Json?     @default("{}")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+
+  @@index([storeId])
+}
+
+model RiskAssessment {
+  id                String       @id @default(cuid())
+  store             Store?       @relation("RiskAssessment_store", fields: [storeId], references: [id])
+  storeId           String?      @map("store")
+  subjectType       String?      @default("order")
+  subjectId         String       @default("")
+  provider          String       @default("")
+  status            String?      @default("provider_reported")
+  score             Int?
+  reasonCodes       Json?        @default("[]")
+  observedAt        DateTime?    @default(now())
+  signals           RiskSignal[] @relation("RiskSignal_assessment")
+  restrictedPayload Json?
+  disclaimer        String       @default("Risk evidence is provider/operator attributed and is not proof of fraud or identity.")
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @default(now()) @updatedAt
+
+  @@index([storeId])
+}
+
+model RiskSignal {
+  id           String          @id @default(cuid())
+  assessment   RiskAssessment? @relation("RiskSignal_assessment", fields: [assessmentId], references: [id])
+  assessmentId String?         @map("assessment")
+  code         String          @default("")
+  severity     String?         @default("info")
+  summary      String          @default("")
+  evidence     Json?           @default("{}")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @default(now()) @updatedAt
+
+  @@index([assessmentId])
+}
+
+model SellerProfile {
+  id                                   String                  @id @default(cuid())
+  store                                Store?                  @relation("SellerProfile_store", fields: [storeId], references: [id])
+  storeId                              String?                 @map("store")
+  user                                 User?                   @relation("SellerProfile_user", fields: [userId], references: [id])
+  userId                               String?                 @map("user")
+  displayName                          String                  @default("")
+  status                               String?                 @default("applicant")
+  publicBio                            String                  @default("")
+  privateContact                       Json?
+  identityEvidenceState                String?                 @default("not_requested")
+  payoutConfigurationReference         String                  @default("")
+  createdAt                            DateTime                @default(now())
+  updatedAt                            DateTime                @default(now()) @updatedAt
+  from_Listing_seller                  Listing[]               @relation("Listing_seller")
+  from_Offer_seller                    Offer[]                 @relation("Offer_seller")
+  from_ConsignmentAgreement_consignor  ConsignmentAgreement[]  @relation("ConsignmentAgreement_consignor")
+  from_ConsignmentIntake_consignor     ConsignmentIntake[]     @relation("ConsignmentIntake_consignor")
+  from_ConsignmentSettlement_consignor ConsignmentSettlement[] @relation("ConsignmentSettlement_consignor")
+
+  @@index([storeId])
+  @@index([userId])
+}
+
+model ShipmentEvidence {
+  id                String                  @id @default(cuid())
+  fulfillment       Fulfillment?            @relation("ShipmentEvidence_fulfillment", fields: [fulfillmentId], references: [id])
+  fulfillmentId     String?                 @map("fulfillment")
+  requirement       FulfillmentRequirement? @relation("ShipmentEvidence_requirement", fields: [requirementId], references: [id])
+  requirementId     String?                 @map("requirement")
+  type              String?                 @default("tracking")
+  provider          String                  @default("")
+  providerReference String                  @default("")
+  observedAt        DateTime?               @default(now())
+  status            String                  @default("")
+  publicSummary     String                  @default("")
+  restrictedPayload Json?
+  disclaimer        String                  @default("Provider-attributed fulfillment evidence; not an independent guarantee of delivery or coverage.")
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @default(now()) @updatedAt
+
+  @@index([fulfillmentId])
+  @@index([requirementId])
+}
+
+model StoreMembership {
+  id          String   @id @default(cuid())
+  store       Store?   @relation("StoreMembership_store", fields: [storeId], references: [id])
+  storeId     String?  @map("store")
+  user        User?    @relation("StoreMembership_user", fields: [userId], references: [id])
+  userId      String?  @map("user")
+  role        String?  @default("viewer")
+  status      String?  @default("invited")
+  permissions Json?    @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@index([storeId])
+  @@index([userId])
+}
+
+model CustomShippingOption {
+  id               String          @id @default(cuid())
+  price            Int
+  metadata         Json?
+  shippingOption   ShippingOption? @relation("CustomShippingOption_shippingOption", fields: [shippingOptionId], references: [id])
+  shippingOptionId String?         @map("shippingOption")
+  cart             Cart?           @relation("CustomShippingOption_cart", fields: [cartId], references: [id])
+  cartId           String?         @map("cart")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @default(now()) @updatedAt
+
+  @@index([shippingOptionId])
+  @@index([cartId])
+}
+
+model CustomerGroup {
+  id                 String              @id @default(cuid())
+  name               String              @default("")
+  metadata           Json?
+  users              User[]              @relation("CustomerGroup_users")
+  discountConditions DiscountCondition[] @relation("CustomerGroup_discountConditions")
+  priceLists         PriceList[]         @relation("CustomerGroup_priceLists")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+}
+
+model Discount {
+  id                  String               @id @default(cuid())
+  code                String               @unique @default("")
+  isDynamic           Boolean              @default(false)
+  isDisabled          Boolean              @default(false)
+  stackable           Boolean              @default(false)
+  startsAt            DateTime             @default(now())
+  endsAt              DateTime?
+  metadata            Json?
+  usageLimit          Int?
+  usageCount          Int                  @default(0)
+  validDuration       String               @default("")
+  discountRule        DiscountRule?        @relation("Discount_discountRule", fields: [discountRuleId], references: [id])
+  discountRuleId      String?              @map("discountRule")
+  carts               Cart[]               @relation("Cart_discounts")
+  lineItemAdjustments LineItemAdjustment[] @relation("LineItemAdjustment_discount")
+  regions             Region[]             @relation("Discount_regions")
+  orders              Order[]              @relation("Discount_orders")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @default(now()) @updatedAt
+
+  @@index([discountRuleId])
+}
+
+model DiscountCondition {
+  id                 String                        @id @default(cuid())
+  type               DiscountConditionTypeType
+  operator           DiscountConditionOperatorType
+  metadata           Json?
+  discountRule       DiscountRule?                 @relation("DiscountCondition_discountRule", fields: [discountRuleId], references: [id])
+  discountRuleId     String?                       @map("discountRule")
+  customerGroups     CustomerGroup[]               @relation("CustomerGroup_discountConditions")
+  products           Product[]                     @relation("DiscountCondition_products")
+  productCollections ProductCollection[]           @relation("DiscountCondition_productCollections")
+  productCategories  ProductCategory[]             @relation("DiscountCondition_productCategories")
+  productTags        ProductTag[]                  @relation("DiscountCondition_productTags")
+  productTypes       ProductType[]                 @relation("DiscountCondition_productTypes")
+  createdAt          DateTime                      @default(now())
+  updatedAt          DateTime                      @default(now()) @updatedAt
+
+  @@index([discountRuleId])
+}
+
+model DiscountRule {
+  id                 String                      @id @default(cuid())
+  description        String                      @default("")
+  type               DiscountRuleTypeType
+  value              Int
+  allocation         DiscountRuleAllocationType?
+  metadata           Json?
+  discounts          Discount[]                  @relation("Discount_discountRule")
+  discountConditions DiscountCondition[]         @relation("DiscountCondition_discountRule")
+  products           Product[]                   @relation("DiscountRule_products")
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @default(now()) @updatedAt
+}
+
+model DraftOrder {
+  id                  String               @id @default(cuid())
+  status              DraftOrderStatusType @default(open)
+  displayId           Int
+  canceledAt          DateTime?
+  completedAt         DateTime?
+  metadata            Json?
+  idempotencyKey      String               @default("")
+  noNotificationOrder Boolean              @default(false)
+  cart                Cart?                @relation("Cart_draftOrder")
+  order               Order?               @relation("DraftOrder_order", fields: [orderId], references: [id])
+  orderId             String?              @unique @map("order")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @default(now()) @updatedAt
+}
+
+model Fulfillment {
+  id                                String               @id @default(cuid())
+  shippedAt                         DateTime?
+  canceledAt                        DateTime?
+  data                              Json?
+  metadata                          Json?
+  idempotencyKey                    String               @default("")
+  noNotification                    Boolean              @default(false)
+  order                             Order?               @relation("Fulfillment_order", fields: [orderId], references: [id])
+  orderId                           String?              @map("order")
+  claimOrder                        ClaimOrder?          @relation("Fulfillment_claimOrder", fields: [claimOrderId], references: [id])
+  claimOrderId                      String?              @map("claimOrder")
+  swap                              Swap?                @relation("Fulfillment_swap", fields: [swapId], references: [id])
+  swapId                            String?              @map("swap")
+  fulfillmentProvider               FulfillmentProvider? @relation("Fulfillment_fulfillmentProvider", fields: [fulfillmentProviderId], references: [id])
+  fulfillmentProviderId             String?              @map("fulfillmentProvider")
+  fulfillmentItems                  FulfillmentItem[]    @relation("FulfillmentItem_fulfillment")
+  shippingLabels                    ShippingLabel[]      @relation("ShippingLabel_fulfillment")
+  createdAt                         DateTime             @default(now())
+  updatedAt                         DateTime             @default(now()) @updatedAt
+  from_ShipmentEvidence_fulfillment ShipmentEvidence[]   @relation("ShipmentEvidence_fulfillment")
+
+  @@index([orderId])
+  @@index([claimOrderId])
+  @@index([swapId])
+  @@index([fulfillmentProviderId])
+}
+
+model FulfillmentItem {
+  id            String         @id @default(cuid())
+  quantity      Int
+  fulfillment   Fulfillment?   @relation("FulfillmentItem_fulfillment", fields: [fulfillmentId], references: [id])
+  fulfillmentId String?        @map("fulfillment")
+  lineItem      OrderLineItem? @relation("FulfillmentItem_lineItem", fields: [lineItemId], references: [id])
+  lineItemId    String?        @map("lineItem")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
+
+  @@index([fulfillmentId])
+  @@index([lineItemId])
+}
+
+model FulfillmentProvider {
+  id                String             @id @default(cuid())
+  name              String             @default("")
+  code              String             @unique @default("")
+  isInstalled       Boolean            @default(true)
+  credentials       Json?
+  metadata          Json?
+  fulfillments      Fulfillment[]      @relation("Fulfillment_fulfillmentProvider")
+  regions           Region[]           @relation("FulfillmentProvider_regions")
+  shippingOptions   ShippingOption[]   @relation("ShippingOption_fulfillmentProvider")
+  shippingProviders ShippingProvider[] @relation("ShippingProvider_fulfillmentProvider")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now()) @updatedAt
+}
+
+model GiftCard {
+  id                   String                @id @default(cuid())
+  code                 String                @unique @default("")
+  value                Int
+  balance              Int
+  isDisabled           Boolean               @default(false)
+  endsAt               DateTime?
+  metadata             Json?
+  order                Order?                @relation("GiftCard_order", fields: [orderId], references: [id])
+  orderId              String?               @map("order")
+  carts                Cart[]                @relation("Cart_giftCards")
+  giftCardTransactions GiftCardTransaction[] @relation("GiftCardTransaction_giftCard")
+  region               Region?               @relation("GiftCard_region", fields: [regionId], references: [id])
+  regionId             String?               @map("region")
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @default(now()) @updatedAt
+
+  @@index([orderId])
+  @@index([regionId])
+}
+
+model GiftCardTransaction {
+  id         String    @id @default(cuid())
+  amount     Int
+  isTaxable  Boolean   @default(false)
+  taxRate    Float?
+  giftCard   GiftCard? @relation("GiftCardTransaction_giftCard", fields: [giftCardId], references: [id])
+  giftCardId String?   @map("giftCard")
+  order      Order?    @relation("GiftCardTransaction_order", fields: [orderId], references: [id])
+  orderId    String?   @map("order")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+
+  @@index([giftCardId])
+  @@index([orderId])
+}
+
+model IdempotencyKey {
+  id             String    @id @default(cuid())
+  idempotencyKey String    @unique @default("")
+  requestMethod  String    @default("")
+  requestParams  Json?
+  requestPath    String    @default("")
+  responseCode   Int?
+  responseBody   Json?
+  recoveryPoint  String    @default("started")
+  lockedAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+}
+
+model Invite {
+  id        String          @id @default(cuid())
+  userEmail String          @default("")
+  role      InviteRoleType? @default(member)
+  accepted  Boolean         @default(false)
+  metadata  Json?
+  token     String          @default("")
+  expiresAt DateTime        @default(now())
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @default(now()) @updatedAt
+}
+
+model Invoice {
+  id                  String             @id @default(cuid())
+  user                User?              @relation("Invoice_user", fields: [userId], references: [id])
+  userId              String?            @map("user")
+  invoiceNumber       String             @unique @default("")
+  title               String             @default("Payment Invoice")
+  description         String             @default("Invoice for selected orders payment")
+  totalAmount         Int                @default(0)
+  currency            Currency?          @relation("Invoice_currency", fields: [currencyId], references: [id])
+  currencyId          String?            @map("currency")
+  status              String             @default("draft")
+  dueDate             DateTime?
+  paidAt              DateTime?
+  metadata            Json?              @default("{}")
+  account             Account?           @relation("Invoice_account", fields: [accountId], references: [id])
+  accountId           String?            @map("account")
+  lineItems           InvoiceLineItem[]  @relation("InvoiceLineItem_invoice")
+  paymentCollection   PaymentCollection? @relation("Invoice_paymentCollection", fields: [paymentCollectionId], references: [id])
+  paymentCollectionId String?            @unique @map("paymentCollection")
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @default(now()) @updatedAt
+
+  @@index([userId])
+  @@index([currencyId])
+  @@index([accountId])
+}
+
+model InvoiceLineItem {
+  id                String           @id @default(cuid())
+  invoice           Invoice?         @relation("InvoiceLineItem_invoice", fields: [invoiceId], references: [id])
+  invoiceId         String?          @map("invoice")
+  accountLineItem   AccountLineItem? @relation("InvoiceLineItem_accountLineItem", fields: [accountLineItemId], references: [id])
+  accountLineItemId String?          @map("accountLineItem")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now()) @updatedAt
+
+  @@index([invoiceId])
+  @@index([accountLineItemId])
+}
+
+model BusinessAccountRequest {
+  id                   String    @id @default(cuid())
+  user                 User?     @relation("BusinessAccountRequest_user", fields: [userId], references: [id])
+  userId               String?   @unique @map("user")
+  businessName         String    @default("")
+  businessType         String
+  monthlyOrderVolume   String
+  requestedCreditLimit Int
+  businessDescription  String    @default("")
+  status               String    @default("pending")
+  reviewedBy           User?     @relation("BusinessAccountRequest_reviewedBy", fields: [reviewedById], references: [id])
+  reviewedById         String?   @map("reviewedBy")
+  reviewNotes          String    @default("")
+  approvedCreditLimit  Int?
+  submittedAt          DateTime  @default(now())
+  reviewedAt           DateTime?
+  generatedAccount     Account?  @relation("BusinessAccountRequest_generatedAccount", fields: [generatedAccountId], references: [id])
+  generatedAccountId   String?   @map("generatedAccount")
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @default(now()) @updatedAt
+
+  @@index([reviewedById])
+  @@index([generatedAccountId])
+}
+
+model LineItem {
+  id                                  String               @id @default(cuid())
+  quantity                            Int
+  metadata                            Json?
+  isReturn                            Boolean              @default(false)
+  isGiftcard                          Boolean              @default(false)
+  shouldMerge                         Boolean              @default(true)
+  allowDiscounts                      Boolean              @default(true)
+  hasShipping                         Boolean              @default(false)
+  claimOrder                          ClaimOrder?          @relation("LineItem_claimOrder", fields: [claimOrderId], references: [id])
+  claimOrderId                        String?              @map("claimOrder")
+  cart                                Cart?                @relation("LineItem_cart", fields: [cartId], references: [id])
+  cartId                              String?              @map("cart")
+  swap                                Swap?                @relation("LineItem_swap", fields: [swapId], references: [id])
+  swapId                              String?              @map("swap")
+  productVariant                      ProductVariant?      @relation("LineItem_productVariant", fields: [productVariantId], references: [id])
+  productVariantId                    String?              @map("productVariant")
+  claimItems                          ClaimItem[]          @relation("ClaimItem_lineItem")
+  lineItemAdjustments                 LineItemAdjustment[] @relation("LineItemAdjustment_lineItem")
+  lineItemTaxLines                    LineItemTaxLine[]    @relation("LineItemTaxLine_lineItem")
+  returnItems                         ReturnItem[]         @relation("ReturnItem_lineItem")
+  createdAt                           DateTime             @default(now())
+  updatedAt                           DateTime             @default(now()) @updatedAt
+  from_OrderLineItem_originalLineItem OrderLineItem[]      @relation("OrderLineItem_originalLineItem")
+
+  @@index([claimOrderId])
+  @@index([cartId])
+  @@index([swapId])
+  @@index([productVariantId])
+}
+
+model LineItemAdjustment {
+  id          String    @id @default(cuid())
+  description String    @default("")
+  amount      Int
+  metadata    Json?
+  discount    Discount? @relation("LineItemAdjustment_discount", fields: [discountId], references: [id])
+  discountId  String?   @map("discount")
+  lineItem    LineItem? @relation("LineItemAdjustment_lineItem", fields: [lineItemId], references: [id])
+  lineItemId  String?   @map("lineItem")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+
+  @@index([discountId])
+  @@index([lineItemId])
+}
+
+model LineItemTaxLine {
+  id         String    @id @default(cuid())
+  rate       Float
+  name       String    @default("")
+  code       String    @default("")
+  metadata   Json?
+  lineItem   LineItem? @relation("LineItemTaxLine_lineItem", fields: [lineItemId], references: [id])
+  lineItemId String?   @map("lineItem")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+
+  @@index([lineItemId])
+}
+
+model Location {
+  id          String           @id @default(cuid())
+  name        String           @default("")
+  description String           @default("")
+  address     String           @default("")
+  variants    ProductVariant[] @relation("ProductVariant_location")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now()) @updatedAt
+}
+
+model Measurement {
+  id               String          @id @default(cuid())
+  value            Float
+  unit             String          @default("g")
+  type             String          @default("weight")
+  productVariant   ProductVariant? @relation("Measurement_productVariant", fields: [productVariantId], references: [id])
+  productVariantId String?         @map("productVariant")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @default(now()) @updatedAt
+
+  @@index([productVariantId])
+}
+
+model MoneyAmount {
+  id               String          @id @default(cuid())
+  amount           Int
+  compareAmount    Int?
+  minQuantity      Int?
+  maxQuantity      Int?
+  productVariant   ProductVariant? @relation("MoneyAmount_productVariant", fields: [productVariantId], references: [id])
+  productVariantId String?         @map("productVariant")
+  region           Region?         @relation("MoneyAmount_region", fields: [regionId], references: [id])
+  regionId         String?         @map("region")
+  currency         Currency?       @relation("MoneyAmount_currency", fields: [currencyId], references: [id])
+  currencyId       String?         @map("currency")
+  priceList        PriceList?      @relation("MoneyAmount_priceList", fields: [priceListId], references: [id])
+  priceListId      String?         @map("priceList")
+  priceSet         PriceSet?       @relation("MoneyAmount_priceSet", fields: [priceSetId], references: [id])
+  priceSetId       String?         @map("priceSet")
+  priceRules       PriceRule[]     @relation("MoneyAmount_priceRules")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @default(now()) @updatedAt
+
+  @@index([productVariantId])
+  @@index([regionId])
+  @@index([currencyId])
+  @@index([priceListId])
+  @@index([priceSetId])
+}
+
+model Note {
+  id           String   @id @default(cuid())
+  value        String   @default("")
+  resourceType String   @default("")
+  resourceId   String   @default("")
+  authorId     String   @default("")
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+}
+
+model Notification {
+  id                                   String                @id @default(cuid())
+  eventName                            String                @default("")
+  resourceType                         String                @default("")
+  resourceId                           String                @default("")
+  to                                   String                @default("")
+  data                                 Json?
+  parentId                             String                @default("")
+  notificationProvider                 NotificationProvider? @relation("Notification_notificationProvider", fields: [notificationProviderId], references: [id])
+  notificationProviderId               String?               @map("notificationProvider")
+  user                                 User?                 @relation("Notification_user", fields: [userId], references: [id])
+  userId                               String?               @map("user")
+  otherNotifications                   Notification[]        @relation("Notification_otherNotifications")
+  createdAt                            DateTime              @default(now())
+  updatedAt                            DateTime              @default(now()) @updatedAt
+  from_Notification_otherNotifications Notification[]        @relation("Notification_otherNotifications")
+
+  @@index([notificationProviderId])
+  @@index([userId])
+}
+
+model NotificationProvider {
+  id            String         @id @default(cuid())
+  isInstalled   Boolean        @default(true)
+  notifications Notification[] @relation("Notification_notificationProvider")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
+}
+
+model OAuthApp {
+  id                String   @id @default(cuid())
+  name              String   @default("")
+  clientId          String   @unique @default("")
+  clientSecret      String   @default("")
+  redirectUris      Json?    @default("[]")
+  scopes            Json?    @default("[\"read_products\",\"read_orders\"]")
+  webhookUrl        String   @default("")
+  status            String?  @default("active")
+  installUrl        String   @default("")
+  uninstallUrl      String   @default("")
+  description       String   @default("")
+  metadata          Json?    @default("{}")
+  developerEmail    String   @default("")
+  privacyPolicyUrl  String   @default("")
+  termsOfServiceUrl String   @default("")
+  supportUrl        String   @default("")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
+
+model OAuthToken {
+  id                  String    @id @default(cuid())
+  tokenType           String
+  token               String    @unique @default("")
+  clientId            String    @default("")
+  user                User?     @relation("OAuthToken_user", fields: [userId], references: [id])
+  userId              String?   @map("user")
+  scopes              Json?     @default("[]")
+  redirectUri         String    @default("")
+  expiresAt           DateTime?
+  isRevoked           String?   @default("false")
+  authorizationCode   String    @default("")
+  refreshToken        String    @default("")
+  accessToken         String    @default("")
+  state               String    @default("")
+  codeChallenge       String    @default("")
+  codeChallengeMethod String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now()) @updatedAt
+
+  @@index([clientId])
+  @@index([userId])
+}
+
+model Order {
+  id                                String                   @id @default(cuid())
+  status                            OrderStatusType          @default(pending)
+  displayId                         Int
+  email                             String                   @default("")
+  taxRate                           Float?
+  canceledAt                        DateTime?
+  metadata                          Json?
+  idempotencyKey                    String                   @default("")
+  noNotification                    Boolean                  @default(false)
+  externalId                        String                   @default("")
+  shippingAddress                   Address?                 @relation("Order_shippingAddress", fields: [shippingAddressId], references: [id])
+  shippingAddressId                 String?                  @map("shippingAddress")
+  billingAddress                    Address?                 @relation("Order_billingAddress", fields: [billingAddressId], references: [id])
+  billingAddressId                  String?                  @map("billingAddress")
+  currency                          Currency?                @relation("Order_currency", fields: [currencyId], references: [id])
+  currencyId                        String?                  @map("currency")
+  draftOrder                        DraftOrder?              @relation("DraftOrder_order")
+  cart                              Cart?                    @relation("Cart_order")
+  user                              User?                    @relation("Order_user", fields: [userId], references: [id])
+  userId                            String?                  @map("user")
+  region                            Region?                  @relation("Order_region", fields: [regionId], references: [id])
+  regionId                          String?                  @map("region")
+  claimOrders                       ClaimOrder[]             @relation("ClaimOrder_order")
+  fulfillments                      Fulfillment[]            @relation("Fulfillment_order")
+  giftCards                         GiftCard[]               @relation("GiftCard_order")
+  giftCardTransactions              GiftCardTransaction[]    @relation("GiftCardTransaction_order")
+  lineItems                         OrderLineItem[]          @relation("OrderLineItem_order")
+  discounts                         Discount[]               @relation("Discount_orders")
+  payments                          Payment[]                @relation("Payment_order")
+  returns                           Return[]                 @relation("Return_order")
+  shippingMethods                   ShippingMethod[]         @relation("ShippingMethod_order")
+  swaps                             Swap[]                   @relation("Swap_order")
+  account                           Account?                 @relation("Order_account", fields: [accountId], references: [id])
+  accountId                         String?                  @map("account")
+  accountLineItems                  AccountLineItem[]        @relation("AccountLineItem_order")
+  secretKey                         String                   @default("")
+  events                            OrderEvent[]             @relation("OrderEvent_order")
+  note                              String                   @default("")
+  shippingLabels                    ShippingLabel[]          @relation("ShippingLabel_order")
+  createdAt                         DateTime                 @default(now())
+  updatedAt                         DateTime                 @default(now()) @updatedAt
+  from_DisputeCase_order            DisputeCase[]            @relation("DisputeCase_order")
+  from_FulfillmentRequirement_order FulfillmentRequirement[] @relation("FulfillmentRequirement_order")
+
+  @@index([shippingAddressId])
+  @@index([billingAddressId])
+  @@index([currencyId])
+  @@index([userId])
+  @@index([regionId])
+  @@index([accountId])
+}
+
+model OrderEvent {
+  id          String             @id @default(cuid())
+  order       Order?             @relation("OrderEvent_order", fields: [orderId], references: [id])
+  orderId     String?            @map("order")
+  user        User?              @relation("OrderEvent_user", fields: [userId], references: [id])
+  userId      String?            @map("user")
+  type        OrderEventTypeType @default(STATUS_CHANGE)
+  data        Json?              @default("{}")
+  time        DateTime?          @default(now())
+  createdBy   User?              @relation("OrderEvent_createdBy", fields: [createdById], references: [id])
+  createdById String?            @map("createdBy")
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now()) @updatedAt
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([createdById])
+}
+
+model OrderLineItem {
+  id                                        String                   @id @default(cuid())
+  quantity                                  Int
+  title                                     String                   @default("")
+  sku                                       String                   @default("")
+  metadata                                  Json?
+  productData                               Json?
+  variantData                               Json?
+  variantTitle                              String                   @default("")
+  formattedUnitPrice                        String                   @default("")
+  formattedTotal                            String                   @default("")
+  order                                     Order?                   @relation("OrderLineItem_order", fields: [orderId], references: [id])
+  orderId                                   String?                  @map("order")
+  productVariant                            ProductVariant?          @relation("OrderLineItem_productVariant", fields: [productVariantId], references: [id])
+  productVariantId                          String?                  @map("productVariant")
+  moneyAmount                               OrderMoneyAmount?        @relation("OrderLineItem_moneyAmount", fields: [moneyAmountId], references: [id])
+  moneyAmountId                             String?                  @unique @map("moneyAmount")
+  originalLineItem                          LineItem?                @relation("OrderLineItem_originalLineItem", fields: [originalLineItemId], references: [id])
+  originalLineItemId                        String?                  @map("originalLineItem")
+  fulfillmentItems                          FulfillmentItem[]        @relation("FulfillmentItem_lineItem")
+  createdAt                                 DateTime                 @default(now())
+  updatedAt                                 DateTime                 @default(now()) @updatedAt
+  from_SettlementLine_orderLineItem         SettlementLine[]         @relation("SettlementLine_orderLineItem")
+  from_FulfillmentRequirement_orderLineItem FulfillmentRequirement[] @relation("FulfillmentRequirement_orderLineItem")
+
+  @@index([orderId])
+  @@index([productVariantId])
+  @@index([originalLineItemId])
+}
+
+model OrderMoneyAmount {
+  id             String         @id @default(cuid())
+  amount         Int
+  originalAmount Int
+  priceData      Json?
+  metadata       Json?
+  orderLineItem  OrderLineItem? @relation("OrderLineItem_moneyAmount")
+  currency       Currency?      @relation("OrderMoneyAmount_currency", fields: [currencyId], references: [id])
+  currencyId     String?        @map("currency")
+  region         Region?        @relation("OrderMoneyAmount_region", fields: [regionId], references: [id])
+  regionId       String?        @map("region")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now()) @updatedAt
+
+  @@index([currencyId])
+  @@index([regionId])
+}
+
+model Payment {
+  id                  String             @id @default(cuid())
+  status              PaymentStatusType  @default(pending)
+  amount              Int
+  currencyCode        String             @default("")
+  amountRefunded      Int                @default(0)
+  data                Json?
+  capturedAt          DateTime?
+  canceledAt          DateTime?
+  metadata            Json?
+  idempotencyKey      String             @default("")
+  cart                Cart?              @relation("Cart_payment")
+  paymentCollection   PaymentCollection? @relation("Payment_paymentCollection", fields: [paymentCollectionId], references: [id])
+  paymentCollectionId String?            @map("paymentCollection")
+  swap                Swap?              @relation("Payment_swap", fields: [swapId], references: [id])
+  swapId              String?            @unique @map("swap")
+  currency            Currency?          @relation("Payment_currency", fields: [currencyId], references: [id])
+  currencyId          String?            @map("currency")
+  order               Order?             @relation("Payment_order", fields: [orderId], references: [id])
+  orderId             String?            @map("order")
+  captures            Capture[]          @relation("Capture_payment")
+  refunds             Refund[]           @relation("Refund_payment")
+  user                User?              @relation("Payment_user", fields: [userId], references: [id])
+  userId              String?            @map("user")
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @default(now()) @updatedAt
+
+  @@index([paymentCollectionId])
+  @@index([currencyId])
+  @@index([orderId])
+  @@index([userId])
+}
+
+model PaymentCollection {
+  id               String                            @id @default(cuid())
+  description      PaymentCollectionDescriptionType? @default(default)
+  amount           Int
+  authorizedAmount Int?                              @default(0)
+  refundedAmount   Int?                              @default(0)
+  metadata         Json?
+  paymentSessions  PaymentSession[]                  @relation("PaymentSession_paymentCollection")
+  payments         Payment[]                         @relation("Payment_paymentCollection")
+  cart             Cart?                             @relation("Cart_paymentCollection")
+  invoice          Invoice?                          @relation("Invoice_paymentCollection")
+  createdAt        DateTime                          @default(now())
+  updatedAt        DateTime                          @default(now()) @updatedAt
+}
+
+model PaymentProvider {
+  id                          String           @id @default(cuid())
+  name                        String           @default("")
+  code                        String           @unique @default("")
+  isInstalled                 Boolean          @default(true)
+  credentials                 Json?            @default("{}")
+  metadata                    Json?            @default("{}")
+  createPaymentFunction       String           @default("")
+  capturePaymentFunction      String           @default("")
+  refundPaymentFunction       String           @default("")
+  getPaymentStatusFunction    String           @default("")
+  generatePaymentLinkFunction String           @default("")
+  handleWebhookFunction       String           @default("")
+  regions                     Region[]         @relation("PaymentProvider_regions")
+  sessions                    PaymentSession[] @relation("PaymentSession_paymentProvider")
+  createdAt                   DateTime         @default(now())
+  updatedAt                   DateTime         @default(now()) @updatedAt
+}
+
+model PaymentSession {
+  id                  String             @id @default(cuid())
+  isSelected          Boolean            @default(false)
+  isInitiated         Boolean            @default(false)
+  amount              Int
+  data                Json?              @default("{}")
+  idempotencyKey      String             @default("")
+  paymentCollection   PaymentCollection? @relation("PaymentSession_paymentCollection", fields: [paymentCollectionId], references: [id])
+  paymentCollectionId String?            @map("paymentCollection")
+  paymentProvider     PaymentProvider?   @relation("PaymentSession_paymentProvider", fields: [paymentProviderId], references: [id])
+  paymentProviderId   String?            @map("paymentProvider")
+  paymentAuthorizedAt DateTime?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @default(now()) @updatedAt
+
+  @@index([idempotencyKey])
+  @@index([paymentCollectionId])
+  @@index([paymentProviderId])
+}
+
+model PriceList {
+  id             String              @id @default(cuid())
+  name           String              @default("")
+  description    String              @default("")
+  type           PriceListTypeType   @default(sale)
+  status         PriceListStatusType @default(draft)
+  startsAt       DateTime?
+  endsAt         DateTime?
+  moneyAmounts   MoneyAmount[]       @relation("MoneyAmount_priceList")
+  customerGroups CustomerGroup[]     @relation("CustomerGroup_priceLists")
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @default(now()) @updatedAt
+}
+
+model PriceRule {
+  id            String            @id @default(cuid())
+  type          PriceRuleTypeType
+  value         Float
+  priority      Int?              @default(0)
+  ruleAttribute String            @default("")
+  ruleValue     String            @default("")
+  moneyAmounts  MoneyAmount[]     @relation("MoneyAmount_priceRules")
+  priceSet      PriceSet?         @relation("PriceRule_priceSet", fields: [priceSetId], references: [id])
+  priceSetId    String?           @map("priceSet")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @default(now()) @updatedAt
+
+  @@index([priceSetId])
+}
+
+model PriceSet {
+  id         String        @id @default(cuid())
+  prices     MoneyAmount[] @relation("MoneyAmount_priceSet")
+  priceRules PriceRule[]   @relation("PriceRule_priceSet")
+  ruleTypes  RuleType[]    @relation("PriceSet_ruleTypes")
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @default(now()) @updatedAt
+}
+
+model Product {
+  id                 String              @id @default(cuid())
+  title              String              @default("")
+  description        Json                @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  handle             String              @unique @default("")
+  subtitle           String              @default("")
+  isGiftcard         Boolean             @default(false)
+  metadata           Json?
+  discountable       Boolean             @default(true)
+  status             ProductStatusType   @default(draft)
+  externalId         String              @default("")
+  productCollections ProductCollection[] @relation("Product_productCollections")
+  productCategories  ProductCategory[]   @relation("Product_productCategories")
+  shippingProfile    ShippingProfile?    @relation("Product_shippingProfile", fields: [shippingProfileId], references: [id])
+  shippingProfileId  String?             @map("shippingProfile")
+  productType        ProductType?        @relation("Product_productType", fields: [productTypeId], references: [id])
+  productTypeId      String?             @map("productType")
+  discountConditions DiscountCondition[] @relation("DiscountCondition_products")
+  discountRules      DiscountRule[]      @relation("DiscountRule_products")
+  productImages      ProductImage[]      @relation("Product_productImages")
+  productOptions     ProductOption[]     @relation("ProductOption_product")
+  productTags        ProductTag[]        @relation("Product_productTags")
+  taxRates           TaxRate[]           @relation("Product_taxRates")
+  productVariants    ProductVariant[]    @relation("ProductVariant_product")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+
+  @@index([shippingProfileId])
+  @@index([productTypeId])
+}
+
+model ProductCategory {
+  id                 String              @id @default(cuid())
+  title              String              @default("")
+  handle             String              @unique @default("")
+  metadata           Json?
+  isInternal         Boolean             @default(false)
+  isActive           Boolean             @default(true)
+  discountConditions DiscountCondition[] @relation("DiscountCondition_productCategories")
+  products           Product[]           @relation("Product_productCategories")
+  parentCategory     ProductCategory?    @relation("ProductCategory_parentCategory", fields: [parentCategoryId], references: [id])
+  parentCategoryId   String?             @map("parentCategory")
+  categoryChildren   ProductCategory[]   @relation("ProductCategory_parentCategory")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+
+  @@index([parentCategoryId])
+}
+
+model ProductCollection {
+  id                 String              @id @default(cuid())
+  title              String              @default("")
+  handle             String              @unique @default("")
+  metadata           Json?
+  discountConditions DiscountCondition[] @relation("DiscountCondition_productCollections")
+  products           Product[]           @relation("Product_productCollections")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+}
+
+model ProductImage {
+  id              String           @id @default(cuid())
+  image_id        String?
+  image_filesize  Int?
+  image_width     Int?
+  image_height    Int?
+  image_extension String?
+  imagePath       String           @default("")
+  altText         String           @default("")
+  order           Int?             @default(0)
+  products        Product[]        @relation("Product_productImages")
+  productVariants ProductVariant[] @relation("ProductVariant_primaryImage")
+  metadata        Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
+}
+
+model ProductOption {
+  id                  String               @id @default(cuid())
+  title               String               @default("")
+  metadata            Json?
+  product             Product?             @relation("ProductOption_product", fields: [productId], references: [id])
+  productId           String?              @map("product")
+  productOptionValues ProductOptionValue[] @relation("ProductOptionValue_productOption")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @default(now()) @updatedAt
+
+  @@index([productId])
+}
+
+model ProductOptionValue {
+  id              String           @id @default(cuid())
+  value           String           @default("")
+  metadata        Json?
+  productVariants ProductVariant[] @relation("ProductOptionValue_productVariants")
+  productOption   ProductOption?   @relation("ProductOptionValue_productOption", fields: [productOptionId], references: [id])
+  productOptionId String?          @map("productOption")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
+
+  @@index([productOptionId])
+}
+
+model ProductTag {
+  id                 String              @id @default(cuid())
+  value              String              @default("")
+  metadata           Json?
+  discountConditions DiscountCondition[] @relation("DiscountCondition_productTags")
+  products           Product[]           @relation("Product_productTags")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+}
+
+model ProductType {
+  id                 String              @id @default(cuid())
+  value              String              @default("")
+  metadata           Json?
+  discountConditions DiscountCondition[] @relation("DiscountCondition_productTypes")
+  products           Product[]           @relation("Product_productType")
+  taxRates           TaxRate[]           @relation("ProductType_taxRates")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+}
+
+model ProductVariant {
+  id                                String               @id @default(cuid())
+  title                             String               @default("")
+  sku                               String               @default("")
+  barcode                           String               @default("")
+  ean                               String               @default("")
+  upc                               String               @default("")
+  inventoryQuantity                 Int
+  allowBackorder                    Boolean              @default(false)
+  manageInventory                   Boolean              @default(true)
+  hsCode                            String               @default("")
+  originCountry                     String               @default("")
+  midCode                           String               @default("")
+  material                          String               @default("")
+  metadata                          Json?
+  variantRank                       Int?                 @default(0)
+  product                           Product?             @relation("ProductVariant_product", fields: [productId], references: [id])
+  productId                         String?              @map("product")
+  claimItems                        ClaimItem[]          @relation("ClaimItem_productVariant")
+  lineItems                         LineItem[]           @relation("LineItem_productVariant")
+  prices                            MoneyAmount[]        @relation("MoneyAmount_productVariant")
+  productOptionValues               ProductOptionValue[] @relation("ProductOptionValue_productVariants")
+  location                          Location?            @relation("ProductVariant_location", fields: [locationId], references: [id])
+  locationId                        String?              @map("location")
+  stockMovements                    StockMovement[]      @relation("StockMovement_variant")
+  collectibleInventoryUnit          InventoryUnit?       @relation("InventoryUnit_commerceVariant")
+  measurements                      Measurement[]        @relation("Measurement_productVariant")
+  primaryImage                      ProductImage?        @relation("ProductVariant_primaryImage", fields: [primaryImageId], references: [id])
+  primaryImageId                    String?              @map("primaryImage")
+  createdAt                         DateTime             @default(now())
+  updatedAt                         DateTime             @default(now()) @updatedAt
+  from_OrderLineItem_productVariant OrderLineItem[]      @relation("OrderLineItem_productVariant")
+
+  @@index([productId])
+  @@index([locationId])
+  @@index([primaryImageId])
+}
+
+model Refund {
+  id             String           @id @default(cuid())
+  amount         Int
+  note           String           @default("")
+  reason         RefundReasonType
+  metadata       Json?
+  idempotencyKey String           @default("")
+  payment        Payment?         @relation("Refund_payment", fields: [paymentId], references: [id])
+  paymentId      String?          @map("payment")
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
+
+  @@index([paymentId])
+}
+
+model Region {
+  id                           String                @id @default(cuid())
+  code                         String                @unique @default("")
+  name                         String                @default("")
+  taxRate                      Float
+  taxCode                      String                @default("")
+  metadata                     Json?
+  giftCardsTaxable             Boolean               @default(true)
+  automaticTaxes               Boolean               @default(true)
+  currency                     Currency?             @relation("Region_currency", fields: [currencyId], references: [id])
+  currencyId                   String?               @map("currency")
+  carts                        Cart[]                @relation("Cart_region")
+  countries                    Country[]             @relation("Country_region")
+  discounts                    Discount[]            @relation("Discount_regions")
+  giftCards                    GiftCard[]            @relation("GiftCard_region")
+  moneyAmounts                 MoneyAmount[]         @relation("MoneyAmount_region")
+  orders                       Order[]               @relation("Order_region")
+  taxProvider                  TaxProvider?          @relation("Region_taxProvider", fields: [taxProviderId], references: [id])
+  taxProviderId                String?               @map("taxProvider")
+  fulfillmentProviders         FulfillmentProvider[] @relation("FulfillmentProvider_regions")
+  paymentProviders             PaymentProvider[]     @relation("PaymentProvider_regions")
+  shippingOptions              ShippingOption[]      @relation("ShippingOption_region")
+  taxRates                     TaxRate[]             @relation("TaxRate_region")
+  shippingProviders            ShippingProvider[]    @relation("Region_shippingProviders")
+  accountLineItems             AccountLineItem[]     @relation("AccountLineItem_region")
+  createdAt                    DateTime              @default(now())
+  updatedAt                    DateTime              @default(now()) @updatedAt
+  from_OrderMoneyAmount_region OrderMoneyAmount[]    @relation("OrderMoneyAmount_region")
+
+  @@index([currencyId])
+  @@index([taxProviderId])
+}
+
+model Return {
+  id                      String           @id @default(cuid())
+  status                  ReturnStatusType @default(requested)
+  shippingData            Json?
+  refundAmount            Int
+  receivedAt              DateTime?
+  metadata                Json?
+  idempotencyKey          String           @default("")
+  noNotification          Boolean          @default(false)
+  claimOrder              ClaimOrder?      @relation("ClaimOrder_return")
+  swap                    Swap?            @relation("Return_swap", fields: [swapId], references: [id])
+  swapId                  String?          @unique @map("swap")
+  order                   Order?           @relation("Return_order", fields: [orderId], references: [id])
+  orderId                 String?          @map("order")
+  returnItems             ReturnItem[]     @relation("ReturnItem_return")
+  shippingMethod          ShippingMethod?  @relation("Return_shippingMethod", fields: [shippingMethodId], references: [id])
+  shippingMethodId        String?          @unique @map("shippingMethod")
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @default(now()) @updatedAt
+  from_DisputeCase_return DisputeCase[]    @relation("DisputeCase_return")
+
+  @@index([orderId])
+}
+
+model ReturnItem {
+  id                String        @id @default(cuid())
+  quantity          Int
+  isRequested       Boolean       @default(true)
+  requestedQuantity Int?
+  receivedQuantity  Int?
+  metadata          Json?
+  note              String        @default("")
+  return            Return?       @relation("ReturnItem_return", fields: [returnId], references: [id])
+  returnId          String?       @map("return")
+  lineItem          LineItem?     @relation("ReturnItem_lineItem", fields: [lineItemId], references: [id])
+  lineItemId        String?       @map("lineItem")
+  returnReason      ReturnReason? @relation("ReturnItem_returnReason", fields: [returnReasonId], references: [id])
+  returnReasonId    String?       @map("returnReason")
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @default(now()) @updatedAt
+
+  @@index([returnId])
+  @@index([lineItemId])
+  @@index([returnReasonId])
+}
+
+model ReturnReason {
+  id                                   String         @id @default(cuid())
+  value                                String         @unique @default("")
+  label                                String         @default("")
+  description                          String         @default("")
+  metadata                             Json?
+  parentReturnReason                   ReturnReason?  @relation("ReturnReason_parentReturnReason", fields: [parentReturnReasonId], references: [id])
+  parentReturnReasonId                 String?        @map("parentReturnReason")
+  returnItems                          ReturnItem[]   @relation("ReturnItem_returnReason")
+  createdAt                            DateTime       @default(now())
+  updatedAt                            DateTime       @default(now()) @updatedAt
+  from_ReturnReason_parentReturnReason ReturnReason[] @relation("ReturnReason_parentReturnReason")
+
+  @@index([parentReturnReasonId])
+}
+
+model Role {
+  id                            String   @id @default(cuid())
+  name                          String   @default("")
+  canAccessDashboard            Boolean  @default(false)
+  canReadOrders                 Boolean  @default(false)
+  canManageOrders               Boolean  @default(false)
+  canReadProducts               Boolean  @default(false)
+  canManageProducts             Boolean  @default(false)
+  canReadFulfillments           Boolean  @default(false)
+  canManageFulfillments         Boolean  @default(false)
+  canReadUsers                  Boolean  @default(false)
+  canManageUsers                Boolean  @default(false)
+  canReadRoles                  Boolean  @default(false)
+  canManageRoles                Boolean  @default(false)
+  canReadCheckouts              Boolean  @default(false)
+  canManageCheckouts            Boolean  @default(false)
+  canReadDiscounts              Boolean  @default(false)
+  canManageDiscounts            Boolean  @default(false)
+  canReadGiftCards              Boolean  @default(false)
+  canManageGiftCards            Boolean  @default(false)
+  canReadReturns                Boolean  @default(false)
+  canManageReturns              Boolean  @default(false)
+  canReadSalesChannels          Boolean  @default(false)
+  canManageSalesChannels        Boolean  @default(false)
+  canReadPayments               Boolean  @default(false)
+  canManagePayments             Boolean  @default(false)
+  canReadIdempotencyKeys        Boolean  @default(false)
+  canManageIdempotencyKeys      Boolean  @default(false)
+  canReadApps                   Boolean  @default(false)
+  canManageApps                 Boolean  @default(false)
+  canManageKeys                 Boolean  @default(false)
+  canManageOnboarding           Boolean  @default(false)
+  canReadCollectibles           Boolean  @default(false)
+  canManageCatalog              Boolean  @default(false)
+  canManageInventory            Boolean  @default(false)
+  canManageListings             Boolean  @default(false)
+  canManageAuctions             Boolean  @default(false)
+  canManageConsignments         Boolean  @default(false)
+  canManageCollectibleCustomers Boolean  @default(false)
+  canManageEvidence             Boolean  @default(false)
+  canManageRisk                 Boolean  @default(false)
+  canManageIntegrations         Boolean  @default(false)
+  canReadWebhooks               Boolean  @default(false)
+  canManageWebhooks             Boolean  @default(false)
+  assignedTo                    User[]   @relation("User_role")
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @default(now()) @updatedAt
+}
+
+model RuleType {
+  id            String     @id @default(cuid())
+  name          String     @default("")
+  ruleAttribute String     @unique @default("")
+  priceSets     PriceSet[] @relation("PriceSet_ruleTypes")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
+}
+
+model SalesChannel {
+  id          String   @id @default(cuid())
+  name        String   @default("")
+  description String   @default("")
+  isDisabled  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+model ShippingLabel {
+  id             String                  @id @default(cuid())
+  status         ShippingLabelStatusType @default(created)
+  labelUrl       String                  @default("")
+  carrier        String                  @default("")
+  service        String                  @default("")
+  rate           Json?
+  trackingNumber String                  @default("")
+  trackingUrl    String                  @default("")
+  order          Order?                  @relation("ShippingLabel_order", fields: [orderId], references: [id])
+  orderId        String?                 @map("order")
+  provider       ShippingProvider?       @relation("ShippingLabel_provider", fields: [providerId], references: [id])
+  providerId     String?                 @map("provider")
+  fulfillment    Fulfillment?            @relation("ShippingLabel_fulfillment", fields: [fulfillmentId], references: [id])
+  fulfillmentId  String?                 @map("fulfillment")
+  data           Json?
+  metadata       Json?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @default(now()) @updatedAt
+
+  @@index([orderId])
+  @@index([providerId])
+  @@index([fulfillmentId])
+}
+
+model ShippingMethod {
+  id                     String                  @id @default(cuid())
+  price                  Int
+  data                   Json?
+  return                 Return?                 @relation("Return_shippingMethod")
+  order                  Order?                  @relation("ShippingMethod_order", fields: [orderId], references: [id])
+  orderId                String?                 @map("order")
+  claimOrder             ClaimOrder?             @relation("ShippingMethod_claimOrder", fields: [claimOrderId], references: [id])
+  claimOrderId           String?                 @map("claimOrder")
+  cart                   Cart?                   @relation("ShippingMethod_cart", fields: [cartId], references: [id])
+  cartId                 String?                 @map("cart")
+  swap                   Swap?                   @relation("ShippingMethod_swap", fields: [swapId], references: [id])
+  swapId                 String?                 @map("swap")
+  shippingOption         ShippingOption?         @relation("ShippingMethod_shippingOption", fields: [shippingOptionId], references: [id])
+  shippingOptionId       String?                 @map("shippingOption")
+  shippingMethodTaxLines ShippingMethodTaxLine[] @relation("ShippingMethodTaxLine_shippingMethod")
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @default(now()) @updatedAt
+
+  @@index([orderId])
+  @@index([claimOrderId])
+  @@index([cartId])
+  @@index([swapId])
+  @@index([shippingOptionId])
+}
+
+model ShippingMethodTaxLine {
+  id               String          @id @default(cuid())
+  rate             Float
+  name             String          @default("")
+  code             String          @default("")
+  metadata         Json?
+  shippingMethod   ShippingMethod? @relation("ShippingMethodTaxLine_shippingMethod", fields: [shippingMethodId], references: [id])
+  shippingMethodId String?         @map("shippingMethod")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @default(now()) @updatedAt
+
+  @@index([shippingMethodId])
+}
+
+model ShippingOption {
+  id                         String                      @id @default(cuid())
+  name                       String                      @default("")
+  uniqueKey                  String                      @unique @default("")
+  priceType                  ShippingOptionPriceTypeType
+  amount                     Int?
+  isReturn                   Boolean                     @default(false)
+  data                       Json?
+  metadata                   Json?
+  adminOnly                  Boolean                     @default(false)
+  region                     Region?                     @relation("ShippingOption_region", fields: [regionId], references: [id])
+  regionId                   String?                     @map("region")
+  fulfillmentProvider        FulfillmentProvider?        @relation("ShippingOption_fulfillmentProvider", fields: [fulfillmentProviderId], references: [id])
+  fulfillmentProviderId      String?                     @map("fulfillmentProvider")
+  shippingProfile            ShippingProfile?            @relation("ShippingOption_shippingProfile", fields: [shippingProfileId], references: [id])
+  shippingProfileId          String?                     @map("shippingProfile")
+  customShippingOptions      CustomShippingOption[]      @relation("CustomShippingOption_shippingOption")
+  shippingMethods            ShippingMethod[]            @relation("ShippingMethod_shippingOption")
+  shippingOptionRequirements ShippingOptionRequirement[] @relation("ShippingOptionRequirement_shippingOption")
+  taxRates                   TaxRate[]                   @relation("ShippingOption_taxRates")
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @default(now()) @updatedAt
+
+  @@index([regionId])
+  @@index([fulfillmentProviderId])
+  @@index([shippingProfileId])
+}
+
+model ShippingOptionRequirement {
+  id               String                            @id @default(cuid())
+  type             ShippingOptionRequirementTypeType
+  amount           Int
+  shippingOption   ShippingOption?                   @relation("ShippingOptionRequirement_shippingOption", fields: [shippingOptionId], references: [id])
+  shippingOptionId String?                           @map("shippingOption")
+  createdAt        DateTime                          @default(now())
+  updatedAt        DateTime                          @default(now()) @updatedAt
+
+  @@index([shippingOptionId])
+}
+
+model ShippingProfile {
+  id              String                  @id @default(cuid())
+  name            String                  @default("")
+  type            ShippingProfileTypeType
+  metadata        Json?
+  products        Product[]               @relation("Product_shippingProfile")
+  shippingOptions ShippingOption[]        @relation("ShippingOption_shippingProfile")
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @default(now()) @updatedAt
+}
+
+model ShippingProvider {
+  id                      String               @id @default(cuid())
+  name                    String               @default("")
+  isActive                Boolean              @default(false)
+  accessToken             String               @default("")
+  createLabelFunction     String               @default("")
+  getRatesFunction        String               @default("")
+  validateAddressFunction String               @default("")
+  trackShipmentFunction   String               @default("")
+  cancelLabelFunction     String               @default("")
+  metadata                Json?
+  regions                 Region[]             @relation("Region_shippingProviders")
+  labels                  ShippingLabel[]      @relation("ShippingLabel_provider")
+  fulfillmentProvider     FulfillmentProvider? @relation("ShippingProvider_fulfillmentProvider", fields: [fulfillmentProviderId], references: [id])
+  fulfillmentProviderId   String?              @map("fulfillmentProvider")
+  fromAddress             Address?             @relation("ShippingProvider_fromAddress", fields: [fromAddressId], references: [id])
+  fromAddressId           String?              @map("fromAddress")
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @default(now()) @updatedAt
+
+  @@index([fulfillmentProviderId])
+  @@index([fromAddressId])
+}
+
+model StockMovement {
+  id        String                @id @default(cuid())
+  type      StockMovementTypeType
+  quantity  Int
+  reason    String                @default("")
+  note      String                @default("")
+  variant   ProductVariant?       @relation("StockMovement_variant", fields: [variantId], references: [id])
+  variantId String?               @map("variant")
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @default(now()) @updatedAt
+
+  @@index([variantId])
+}
+
+model Store {
+  id                               String                  @id @default(cuid())
+  name                             String                  @default("Openfront Store")
+  defaultCurrencyCode              String                  @default("usd")
+  homepageTitle                    String                  @default("Openfront Next.js Starter")
+  homepageDescription              String                  @default("A performant frontend e-commerce starter template with Next.js 15 and Openfront.")
+  logoIcon                         String                  @default("<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" height=\"100%\" width=\"100%\" viewBox=\"0 0 42 48\"><path fill=\"#155eef\" fill-rule=\"evenodd\" d=\"m22.102 20.86 9.9-9.9L29.88 8.84l-7.339 7.339V3h-3v13.178l-7.339-7.34-2.121 2.122 9.9 9.9 1.06 1.06zm2.12 2.121 9.9-9.9 2.121 2.122-7.339 7.339H42v3H28.904l7.34 7.339L34.121 35l-9.9-9.899-1.06-1.06zM7.96 35.001l9.9-9.899 1.06-1.06-1.06-1.061-9.9-9.9-2.121 2.122 7.339 7.339H.002v3h13.176l-7.34 7.339zm12.02-7.777-9.9 9.9 2.122 2.12 7.339-7.338V45h3V31.906l7.339 7.338L32 37.124l-9.9-9.9-1.06-1.061z\" clip-rule=\"evenodd\"/></svg>")
+  logoColor                        String                  @default("0")
+  metadata                         Json?
+  swapLinkTemplate                 String                  @default("")
+  paymentLinkTemplate              String                  @default("")
+  inviteLinkTemplate               String                  @default("")
+  currencies                       Currency[]              @relation("Currency_stores")
+  createdAt                        DateTime                @default(now())
+  updatedAt                        DateTime                @default(now()) @updatedAt
+  from_AttributeDefinition_store   AttributeDefinition[]   @relation("AttributeDefinition_store")
+  from_CatalogItem_store           CatalogItem[]           @relation("CatalogItem_store")
+  from_CollectibleCategory_store   CollectibleCategory[]   @relation("CollectibleCategory_store")
+  from_CollectibleMedia_store      CollectibleMedia[]      @relation("CollectibleMedia_store")
+  from_CollectibleRelease_store    CollectibleRelease[]    @relation("CollectibleRelease_store")
+  from_CollectibleSet_store        CollectibleSet[]        @relation("CollectibleSet_store")
+  from_Franchise_store             Franchise[]             @relation("Franchise_store")
+  from_Specimen_store              Specimen[]              @relation("Specimen_store")
+  from_InventoryLocation_store     InventoryLocation[]     @relation("InventoryLocation_store")
+  from_InventoryUnit_store         InventoryUnit[]         @relation("InventoryUnit_store")
+  from_Listing_store               Listing[]               @relation("Listing_store")
+  from_Buylist_store               Buylist[]               @relation("Buylist_store")
+  from_ConsignmentIntake_store     ConsignmentIntake[]     @relation("ConsignmentIntake_store")
+  from_ConsignmentSettlement_store ConsignmentSettlement[] @relation("ConsignmentSettlement_store")
+  from_TradeInSubmission_store     TradeInSubmission[]     @relation("TradeInSubmission_store")
+  from_DisputeCase_store           DisputeCase[]           @relation("DisputeCase_store")
+  from_ProviderConnection_store    ProviderConnection[]    @relation("ProviderConnection_store")
+  from_RiskAssessment_store        RiskAssessment[]        @relation("RiskAssessment_store")
+  from_SellerProfile_store         SellerProfile[]         @relation("SellerProfile_store")
+  from_StoreMembership_store       StoreMembership[]       @relation("StoreMembership_store")
+}
+
+model Swap {
+  id                String                    @id @default(cuid())
+  fulfillmentStatus SwapFulfillmentStatusType
+  paymentStatus     SwapPaymentStatusType
+  differenceDue     Int?
+  confirmedAt       DateTime?
+  metadata          Json?
+  idempotencyKey    String                    @default("")
+  noNotification    Boolean                   @default(false)
+  canceledAt        DateTime?
+  allowBackorder    Boolean                   @default(false)
+  cart              Cart?                     @relation("Cart_swap")
+  order             Order?                    @relation("Swap_order", fields: [orderId], references: [id])
+  orderId           String?                   @map("order")
+  address           Address?                  @relation("Swap_address", fields: [addressId], references: [id])
+  addressId         String?                   @map("address")
+  lineItems         LineItem[]                @relation("LineItem_swap")
+  fulfillments      Fulfillment[]             @relation("Fulfillment_swap")
+  payment           Payment?                  @relation("Payment_swap")
+  return            Return?                   @relation("Return_swap")
+  shippingMethods   ShippingMethod[]          @relation("ShippingMethod_swap")
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @default(now()) @updatedAt
+
+  @@index([orderId])
+  @@index([addressId])
+}
+
+model TaxProvider {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  isInstalled Boolean  @default(true)
+  regions     Region[] @relation("Region_taxProvider")
+}
+
+model TaxRate {
+  id              String           @id @default(cuid())
+  rate            Float?
+  code            String           @default("")
+  name            String           @default("")
+  metadata        Json?
+  products        Product[]        @relation("Product_taxRates")
+  productTypes    ProductType[]    @relation("ProductType_taxRates")
+  region          Region?          @relation("TaxRate_region", fields: [regionId], references: [id])
+  regionId        String?          @map("region")
+  shippingOptions ShippingOption[] @relation("ShippingOption_taxRates")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
+
+  @@index([regionId])
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String   @default("")
+  description String   @default("")
+  members     User[]   @relation("User_team")
+  leader      User?    @relation("Team_leader", fields: [leaderId], references: [id])
+  leaderId    String?  @map("leader")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@index([leaderId])
+}
+
+model User {
+  id                                     String                   @id @default(cuid())
+  name                                   String                   @default("")
+  email                                  String                   @unique @default("")
+  password                               String
+  role                                   Role?                    @relation("User_role", fields: [roleId], references: [id])
+  roleId                                 String?                  @map("role")
+  apiKeys                                ApiKey[]                 @relation("ApiKey_user")
+  phone                                  String                   @default("")
+  hasAccount                             Boolean                  @default(false)
+  addresses                              Address[]                @relation("Address_user")
+  orders                                 Order[]                  @relation("Order_user")
+  orderEvents                            OrderEvent[]             @relation("OrderEvent_user")
+  carts                                  Cart[]                   @relation("Cart_user")
+  customerGroups                         CustomerGroup[]          @relation("CustomerGroup_users")
+  notifications                          Notification[]           @relation("Notification_user")
+  payments                               Payment[]                @relation("Payment_user")
+  batchJobs                              BatchJob[]               @relation("BatchJob_createdBy")
+  team                                   Team?                    @relation("User_team", fields: [teamId], references: [id])
+  teamId                                 String?                  @map("team")
+  teamLead                               Team[]                   @relation("Team_leader")
+  userField                              UserField?               @relation("User_userField", fields: [userFieldId], references: [id])
+  userFieldId                            String?                  @unique @map("userField")
+  onboardingStatus                       String?                  @default("not_started")
+  accounts                               Account[]                @relation("Account_user")
+  webhookEndpoints                       WebhookEndpoint[]        @relation("WebhookEndpoint_user")
+  invoices                               Invoice[]                @relation("Invoice_user")
+  businessAccountRequest                 BusinessAccountRequest?  @relation("BusinessAccountRequest_user")
+  customerToken                          String?
+  tokenGeneratedAt                       DateTime?
+  createdAt                              DateTime                 @default(now())
+  updatedAt                              DateTime                 @default(now()) @updatedAt
+  passwordResetToken                     String?
+  passwordResetIssuedAt                  DateTime?
+  passwordResetRedeemedAt                DateTime?
+  from_ConditionObservation_observer     ConditionObservation[]   @relation("ConditionObservation_observer")
+  from_CustodyEvent_actor                CustodyEvent[]           @relation("CustodyEvent_actor")
+  from_GradeObservation_reviewedBy       GradeObservation[]       @relation("GradeObservation_reviewedBy")
+  from_ProvenanceEvent_reviewedBy        ProvenanceEvent[]        @relation("ProvenanceEvent_reviewedBy")
+  from_InventoryMovement_actor           InventoryMovement[]      @relation("InventoryMovement_actor")
+  from_Reservation_ownerUser             Reservation[]            @relation("Reservation_ownerUser")
+  from_Auction_leadingBidder             Auction[]                @relation("Auction_leadingBidder")
+  from_Bid_bidder                        Bid[]                    @relation("Bid_bidder")
+  from_Offer_buyer                       Offer[]                  @relation("Offer_buyer")
+  from_OfferRevision_actor               OfferRevision[]          @relation("OfferRevision_actor")
+  from_SavedSearch_user                  SavedSearch[]            @relation("SavedSearch_user")
+  from_WishlistItem_user                 WishlistItem[]           @relation("WishlistItem_user")
+  from_TradeInSubmission_customer        TradeInSubmission[]      @relation("TradeInSubmission_customer")
+  from_CollectorProfile_user             CollectorProfile[]       @relation("CollectorProfile_user")
+  from_DisputeCase_openedBy              DisputeCase[]            @relation("DisputeCase_openedBy")
+  from_DisputeCase_assignedTo            DisputeCase[]            @relation("DisputeCase_assignedTo")
+  from_EvidenceAttachment_uploadedBy     EvidenceAttachment[]     @relation("EvidenceAttachment_uploadedBy")
+  from_NotificationIntent_user           NotificationIntent[]     @relation("NotificationIntent_user")
+  from_SellerProfile_user                SellerProfile[]          @relation("SellerProfile_user")
+  from_StoreMembership_user              StoreMembership[]        @relation("StoreMembership_user")
+  from_BusinessAccountRequest_reviewedBy BusinessAccountRequest[] @relation("BusinessAccountRequest_reviewedBy")
+  from_OAuthToken_user                   OAuthToken[]             @relation("OAuthToken_user")
+  from_OrderEvent_createdBy              OrderEvent[]             @relation("OrderEvent_createdBy")
+
+  @@index([roleId])
+  @@index([teamId])
+}
+
+model UserField {
+  id                  String    @id @default(cuid())
+  user                User?     @relation("User_userField")
+  lastLoginIp         String    @default("")
+  lastLoginUserAgent  String    @default("")
+  loginHistory        Json?     @default("[]")
+  preferences         Json?     @default("{\"theme\":\"light\",\"notifications\":true,\"emailNotifications\":true}")
+  notes               String    @default("")
+  lastPasswordChange  DateTime?
+  failedLoginAttempts Json?     @default("{\"count\":0,\"lastAttempt\":null,\"lockedUntil\":null}")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now()) @updatedAt
+}
+
+model WebhookEndpoint {
+  id              String         @id @default(cuid())
+  url             String         @default("")
+  registrationKey String?
+  subscriptionKey String?        @unique
+  events          Json?          @default("[]")
+  scope           String         @default("STORE")
+  user            User?          @relation("WebhookEndpoint_user", fields: [userId], references: [id])
+  userId          String?        @map("user")
+  isActive        Boolean        @default(true)
+  secret          String         @default("")
+  lastTriggered   DateTime?
+  failureCount    Int?           @default(0)
+  webhookEvents   WebhookEvent[] @relation("WebhookEvent_endpoint")
+  createdAt       DateTime?      @default(now())
+  updatedAt       DateTime?      @updatedAt
+
+  @@index([userId])
+}
+
+model WebhookEvent {
+  id               String           @id @default(cuid())
+  eventType        String           @default("")
+  resourceId       String           @default("")
+  resourceType     String           @default("")
+  payload          Json?
+  deliveryAttempts Int?             @default(0)
+  delivered        Boolean          @default(false)
+  lastAttempt      DateTime?
+  nextAttempt      DateTime?
+  deadLetteredAt   DateTime?
+  responseStatus   Int?
+  responseBody     String           @default("")
+  endpoint         WebhookEndpoint? @relation("WebhookEvent_endpoint", fields: [endpointId], references: [id])
+  endpointId       String?          @map("endpoint")
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @default(now()) @updatedAt
+
+  @@index([endpointId])
+  @@index([delivered, deadLetteredAt, nextAttempt], map: "WebhookEvent_retry_queue_idx")
+}
+
+enum ApiKeyStatusType {
+  active
+  inactive
+  revoked
+}
+
+enum BatchJobTypeType {
+  PRODUCT_IMPORT
+  ORDER_EXPORT
+  INVENTORY_UPDATE
+  PRICE_UPDATE
+}
+
+enum BatchJobStatusType {
+  CREATED
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+enum CartTypeType {
+  default
+  swap
+  draft_order
+  payment_link
+  claim
+}
+
+enum ClaimItemReasonType {
+  missing_item
+  wrong_item
+  production_failure
+  other
+}
+
+enum ClaimOrderPaymentStatusType {
+  na
+  not_refunded
+  refunded
+}
+
+enum ClaimOrderFulfillmentStatusType {
+  not_fulfilled
+  partially_fulfilled
+  fulfilled
+  partially_shipped
+  shipped
+  partially_returned
+  returned
+  canceled
+  requires_action
+}
+
+enum ClaimOrderTypeType {
+  refund
+  replace
+}
+
+enum DiscountConditionTypeType {
+  products
+  product_types
+  product_collections
+  product_tags
+  customer_groups
+}
+
+enum DiscountConditionOperatorType {
+  in
+  not_in
+}
+
+enum DiscountRuleTypeType {
+  fixed
+  percentage
+  free_shipping
+}
+
+enum DiscountRuleAllocationType {
+  total
+  item
+}
+
+enum DraftOrderStatusType {
+  open
+  completed
+}
+
+enum InviteRoleType {
+  admin
+  member
+  developer
+}
+
+enum OrderStatusType {
+  pending
+  completed
+  archived
+  canceled
+  requires_action
+}
+
+enum OrderEventTypeType {
+  ORDER_PLACED
+  STATUS_CHANGE
+  PAYMENT_STATUS_CHANGE
+  PAYMENT_CAPTURED
+  FULFILLMENT_STATUS_CHANGE
+  NOTE_ADDED
+  EMAIL_SENT
+  TRACKING_NUMBER_ADDED
+  RETURN_REQUESTED
+  REFUND_PROCESSED
+}
+
+enum PaymentStatusType {
+  pending
+  authorized
+  captured
+  failed
+  canceled
+}
+
+enum PaymentCollectionDescriptionType {
+  default
+  refund
+}
+
+enum PriceListTypeType {
+  sale
+  override
+}
+
+enum PriceListStatusType {
+  active
+  draft
+}
+
+enum PriceRuleTypeType {
+  fixed
+  percentage
+}
+
+enum ProductStatusType {
+  draft
+  proposed
+  published
+  rejected
+}
+
+enum RefundReasonType {
+  discount
+  return
+  swap
+  claim
+  other
+}
+
+enum ReturnStatusType {
+  requested
+  received
+  requires_action
+  canceled
+}
+
+enum ShippingLabelStatusType {
+  created
+  purchased
+  failed
+}
+
+enum ShippingOptionPriceTypeType {
+  flat_rate
+  calculated
+  free
+}
+
+enum ShippingOptionRequirementTypeType {
+  min_subtotal
+  max_subtotal
+}
+
+enum ShippingProfileTypeType {
+  default
+  gift_card
+  custom
+}
+
+enum StockMovementTypeType {
+  RECEIVE
+  REMOVE
+}
+
+enum SwapFulfillmentStatusType {
+  not_fulfilled
+  fulfilled
+  shipped
+  partially_shipped
+  canceled
+  requires_action
+}
+
+enum SwapPaymentStatusType {
+  not_paid
+  awaiting
+  captured
+  confirmed
+  canceled
+  difference_refunded
+  partially_refunded
+  refunded
+  requires_action
 }

@@ -1,96 +1,312 @@
-import { list } from '@keystone-6/core'
-import { allOperations, denyAll } from '@keystone-6/core/access'
-import { checkbox, password, relationship, text } from '@keystone-6/core/fields'
+import type { Lists } from '.keystone/types';
+import { list, graphql, group } from '@keystone-6/core';
+import { denyAll } from '@keystone-6/core/access';
+import {
+  json,
+  password,
+  select,
+  text,
+  relationship,
+  checkbox,
+  virtual,
+  timestamp,
+} from '@keystone-6/core/fields';
+import { isSignedIn, permissions, rules } from '../access';
+import { trackingFields } from './trackingFields';
+import { controlPlaneAccess } from '../security/control-plane';
+import {
+  canCreateUserRole,
+  resolvePublicUserCreateData,
+} from '../security/user-create';
 
-import { isSignedIn, permissions, rules } from '../access'
-import type { Session } from '../access'
+const canManageUsers = ({ session }: { session?: { itemId?: string; data?: { role?: Record<string, boolean> } } }) => {
+  if (!isSignedIn({ session })) {
+    return false;
+  }
+  if (permissions.canManageUsers({ session })) {
+    return true;
+  }
+  return { id: { equals: session?.itemId } };
+};
 
-export const User = list({
+export const User = list<Lists.User.TypeInfo>({
   access: {
     operation: {
-      ...allOperations(isSignedIn),
-      create: (args) => {
-        // Allow public sign-ups if environment variable is set to true
-        if (process.env.PUBLIC_SIGNUPS_ALLOWED === 'true') {
-          return true;
-        }
-        // Otherwise, require canManagePeople permission
-        return permissions.canManagePeople(args);
-      },
-      delete: permissions.canManagePeople,
+      create: () => true,
+      query: isSignedIn,
+      update: permissions.canManageUsers,
+      delete: permissions.canManageUsers,
     },
     filter: {
-      query: rules.canReadPeople,
-      update: rules.canUpdatePeople,
+      query: canManageUsers,
+      update: canManageUsers,
+      delete: controlPlaneAccess.userDeletionScope,
+    },
+  },
+  hooks: {
+    resolveInput: ({ operation, inputData, resolvedData, context }) => {
+      if (operation === 'create' && !permissions.canManageUsers({ session: context.session })) {
+        return resolvePublicUserCreateData({ inputData, resolvedData });
+      }
+      return resolvedData;
     },
   },
   ui: {
-    hideCreate: args => !permissions.canManagePeople(args),
-    hideDelete: args => !permissions.canManagePeople(args),
-    listView: {
-      initialColumns: ['name', 'email', 'role', 'tasks'],
-    },
-    itemView: {
-      defaultFieldMode: ({ session, item }) => {
-        // canEditOtherPeople can edit other people
-        if (session?.data.role?.canEditOtherPeople) return 'edit'
-
-        // edit themselves
-        if (session?.itemId === item?.id) return 'edit'
-
-        // else, default all fields to read mode
-        return 'read'
-      },
-    },
+    // hide the backend UI from regular users
+    hideCreate: (args) => !permissions.canManageUsers(args),
+    hideDelete: (args) => !permissions.canManageRoles(args),
   },
   fields: {
     name: text({
-      validation: {
-        isRequired: true,
-      },
-    }),
-    email: text({
-      isFilterable: false,
-      isOrderable: false,
-      isIndexed: 'unique',
-      validation: {
-        isRequired: true,
-      },
-    }),
-    password: password({
-      access: {
-        read: denyAll,
-        update: ({ session, item }) =>
-          permissions.canManagePeople({ session }) || session?.itemId === item.id,
-      },
       validation: { isRequired: true },
+    }),
+    email: text({ isIndexed: 'unique', isFilterable: true, validation: { isRequired: true }, access: { update: controlPlaneAccess.emailUpdate }, ui: { itemView: { fieldMode: (args) => permissions.canManageRoles(args) ? 'edit' : 'read' } } }),
+    password: password({
+      access: { update: controlPlaneAccess.passwordUpdate },
+      ui: { itemView: { fieldMode: 'read' } },
+      validation: {
+        length: { min: 10, max: 1000 },
+        isRequired: true,
+        rejectCommon: true,
+      },
     }),
     role: relationship({
       ref: 'Role.assignedTo',
       access: {
-        create: permissions.canManagePeople,
-        update: permissions.canManagePeople,
+        create: canCreateUserRole,
+        update: permissions.canManageRoles,
       },
       ui: {
         itemView: {
-          fieldMode: args => (permissions.canManagePeople(args) ? 'edit' : 'read'),
+          fieldMode: (args) =>
+            permissions.canManageRoles(args) ? 'edit' : 'read',
         },
       },
     }),
-    tasks: relationship({
-      ref: 'Todo.assignedTo',
+
+    apiKeys: relationship({ ref: 'ApiKey.user', many: true, access: { create: denyAll, update: denyAll } }),
+
+    phone: text(),
+    hasAccount: checkbox(),
+    addresses: relationship({
+      ref: 'Address.user',
       many: true,
+      // Ownership/lifecycle changes go through the related domain's command.
+      access: { create: denyAll, update: denyAll },
+    }),
+    orders: relationship({
+      ref: 'Order.user',
+      many: true,
+      // Ownership/lifecycle changes go through the related domain's command.
+      access: { create: denyAll, update: denyAll },
+    }),
+    orderEvents: relationship({
+      ref: 'OrderEvent.user',
+      many: true,
+      // Ownership/lifecycle changes go through the related domain's command.
+      access: { create: denyAll, update: denyAll },
+    }),
+    carts: relationship({
+      ref: 'Cart.user',
+      many: true,
+      // Ownership/lifecycle changes go through the related domain's command.
+      access: { create: denyAll, update: denyAll },
+    }),
+    customerGroups: relationship({
+      ref: 'CustomerGroup.users',
+      many: true,
+    }),
+    notifications: relationship({
+      ref: 'Notification.user',
+      many: true,
+    }),
+    payments: relationship({
+      ref: 'Payment.user',
+      many: true,
+      // Ownership/lifecycle changes go through the related domain's command.
+      access: { create: denyAll, update: denyAll },
+    }),
+    batchJobs: relationship({
+      ref: 'BatchJob.createdBy',
+      many: true,
+    }),
+    team: relationship({
+      ref: 'Team.members',
+      many: false,
+    }),
+    teamLead: relationship({
+      ref: 'Team.leader',
+      many: true,
+    }),
+    userField: relationship({
+      ref: 'UserField.user',
+      many: false,
+    }),
+    onboardingStatus: select({
+      options: [
+        { label: 'Not Started', value: 'not_started' },
+        { label: 'In Progress', value: 'in_progress' },
+        { label: 'Completed', value: 'completed' },
+        { label: 'Dismissed', value: 'dismissed' },
+      ],
+      defaultValue: 'not_started',
+    }),
+
+    // Account system fields
+    accounts: relationship({
+      ref: 'Account.user',
+      many: true,
+      // Ownership/lifecycle changes go through the related domain's command.
+      access: { create: denyAll, update: denyAll },
+    }),
+    webhookEndpoints: relationship({
+      ref: 'WebhookEndpoint.user',
+      many: true,
+      // Ownership/lifecycle changes go through the related domain's command.
+      access: { create: denyAll, update: denyAll },
+      ui: { displayMode: 'count' },
+    }),
+    invoices: relationship({
+      ref: 'Invoice.user',
+      many: true,
+      // Ownership/lifecycle changes go through the related domain's command.
+      access: { create: denyAll, update: denyAll },
+    }),
+    businessAccountRequest: relationship({
+      ref: 'BusinessAccountRequest.user', 
+      many: false,
+    }),
+    customerToken: text({
+      isFilterable: false,
+      isOrderable: false,
       access: {
-        create: permissions.canManageAllTodos,
-        update: ({ session, item }) =>
-          permissions.canManageAllTodos({ session }) || session?.itemId === item.id,
+        read: () => false,
+        create: () => false,
+        update: () => false,
       },
       ui: {
-        createView: {
-          fieldMode: args => (permissions.canManageAllTodos(args) ? 'edit' : 'hidden'),
-        },
-        // itemView: { fieldMode: 'read' },
+        createView: { fieldMode: 'hidden' },
+        itemView: { fieldMode: 'hidden' },
+        listView: { fieldMode: 'hidden' },
+      },
+      db: {
+        isNullable: true,
       },
     }),
+    tokenGeneratedAt: timestamp(),
+    ...group({
+      label: 'Virtual Fields',
+      description: 'Calculated fields for user display and cart status',
+      fields: {
+        firstName: virtual({
+          field: graphql.field({
+            type: graphql.String,
+            resolve(item) {
+              if (!item.name) return '';
+
+              // Split on spaces and get first part
+              const parts = item.name.trim().split(/\s+/);
+              return parts[0] || '';
+            },
+          }),
+        }),
+        lastName: virtual({
+          field: graphql.field({
+            type: graphql.String,
+            resolve(item) {
+              if (!item.name) return '';
+
+              // Split on spaces
+              const parts = item.name.trim().split(/\s+/);
+
+              if (parts.length === 1) return ''; // Only first name
+
+              // Handle middle names/initials:
+              // If second to last part is a single letter (initial), include it in lastName
+              if (parts.length > 2 && parts[parts.length - 2].length === 1) {
+                return parts.slice(-2).join(' ');
+              }
+
+              // Otherwise return last part
+              return parts[parts.length - 1];
+            },
+          }),
+        }),
+        activeCartId: virtual({
+          field: graphql.field({
+            type: graphql.String,
+            async resolve(item, args, context) {
+              // Use sudo context to bypass access control for this check
+              const sudoContext = context.sudo();
+
+              // Find the most recently updated cart that is:
+              // 1. Owned by this user
+              // 2. Has no associated order
+              // 3. Is of type 'default'
+              const activeCarts = await sudoContext.query.Cart.findMany({
+                where: {
+                  user: { id: { equals: item.id } },
+                  order: null,
+                  type: { equals: 'default' },
+                },
+                orderBy: { updatedAt: 'desc' },
+                take: 1,
+                query: `
+                  id
+                  lineItems {
+                    id
+                  }
+                `,
+              });
+
+              // Only return the cart ID if it has line items
+              const cart = activeCarts[0];
+              if (cart && cart.lineItems?.length > 0) {
+                return cart.id;
+              }
+
+              return null;
+            },
+          }),
+        }),
+        billingAddress: virtual({
+          field: (lists) =>
+            graphql.field({
+              type: lists.Address.types.output,
+              async resolve(item, args, context) {
+                const address = await context.db.Address.findMany({
+                  where: {
+                    user: { id: { equals: item.id } },
+                    isBilling: { equals: true },
+                  },
+                  take: 1,
+                });
+
+                if (!address.length) return null;
+
+                return address[0];
+              },
+            }),
+          ui: {
+            query: `{
+                firstName
+                lastName
+                company
+                address1
+                address2
+                city
+                province
+                postalCode
+                country {
+                  id
+                  iso2
+                }
+                phone
+            }`,
+          },
+        }),
+      },
+    }),
+    ...trackingFields,
   },
 });
