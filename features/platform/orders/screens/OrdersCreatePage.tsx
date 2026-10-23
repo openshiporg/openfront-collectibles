@@ -196,15 +196,16 @@ export function OrdersCreatePage() {
   };
 
   // Calculate totals
+  // Shipping and tax are computed on the cart from its shipping option and region,
+  // so this screen only totals what it knows: the line items.
   const subtotal = lineItems.reduce((sum, item) => sum + item.total, 0);
-  const shippingCost = 5.00; // Placeholder
-  const taxAmount = subtotal * 0.1; // 10% tax placeholder
-  const total = subtotal + shippingCost + taxAmount;
+  const firstPrice = lineItems[0]?.variant?.prices?.[0];
+  const currencyCode = (firstPrice?.currency?.code || firstPrice?.calculatedPrice?.currencyCode || 'USD').toUpperCase();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currencyCode,
     }).format(price);
   };
 
@@ -343,8 +344,8 @@ export function OrdersCreatePage() {
               <ListBand>
                 {[
                   ["Subtotal", formatPrice(subtotal)],
-                  ["Shipping", formatPrice(shippingCost)],
-                  ["Tax", formatPrice(taxAmount)],
+                  ["Shipping", "Calculated on the cart"],
+                  ["Tax", "Calculated on the cart"],
                 ].map(([name, value]) => (
                   <div key={name} className="flex justify-between gap-4 px-4 py-2.5 text-sm">
                     <span className="text-muted-foreground">{name}</span>
@@ -352,12 +353,12 @@ export function OrdersCreatePage() {
                   </div>
                 ))}
                 <div className="flex justify-between gap-4 px-4 py-3 text-sm font-semibold">
-                  <span className="text-foreground">Total</span>
-                  <span className="font-mono tabular-nums text-foreground">{formatPrice(total)}</span>
+                  <span className="text-foreground">Total before shipping and tax</span>
+                  <span className="font-mono tabular-nums text-foreground">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between gap-4 px-4 py-2.5 text-sm">
                   <span className="text-muted-foreground">Paid</span>
-                  <span className="font-mono tabular-nums text-foreground">€0.00</span>
+                  <span className="font-mono tabular-nums text-foreground">{formatPrice(0)}</span>
                 </div>
               </ListBand>
             </section>

@@ -359,7 +359,7 @@ export function MiniStorefront({
         // Mock payment methods
         setPaymentMethods([
           { id: 'stripe', name: 'Credit Card', description: 'Pay with credit card' },
-          { id: 'manual', name: 'Cash on Delivery', description: 'Pay on delivery' }
+          { id: 'manual', name: 'Bank transfer (manual review)', description: 'Paid outside checkout' }
         ]);
       } catch (error) {
         console.error("Error setting shipping method:", error);

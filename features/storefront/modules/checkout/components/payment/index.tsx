@@ -1,5 +1,5 @@
 "use client";
-import { isStripe, paymentInfoMap, isStripeSandbox, isPayPalSandbox } from "@/features/storefront/lib/constants";
+import { isStripe, isPaypal, paymentInfoMap, isStripeSandbox, isPayPalSandbox } from "@/features/storefront/lib/constants";
 import { initiatePaymentSession } from "@/features/storefront/lib/data/payment";
 import { CreditCard, FlaskConical } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -59,7 +59,6 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
   const stripeReady = useContext(StripeContext);
 
   // Check if we're in sandbox/test mode
-  const isSandboxMode = isStripeSandbox() || isPayPalSandbox();
 
   const paidByGiftcard =
     cart?.giftCards && cart?.giftCards?.length > 0 && cart?.total === 0;
@@ -192,7 +191,7 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
                         </span>
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
-                        {isSandboxMode && (
+                        {((isStripe(method.code) && isStripeSandbox()) || (isPaypal(method.code) && isPayPalSandbox())) && (
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>

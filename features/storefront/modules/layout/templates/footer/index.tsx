@@ -5,6 +5,7 @@ import LocalizedClientLink from "@/features/storefront/modules/common/components
 import Logo from "@/features/storefront/modules/layout/components/logo"
 import CountrySelect from "@/features/storefront/modules/layout/components/country-select"
 import { getStore } from "@/features/storefront/lib/data/store"
+import { getUser } from "@/features/storefront/lib/data/user"
 
 function Column({ title, links }: { title: string; links: { title: string; href: string }[] }) {
   if (!links.length) return null
@@ -28,11 +29,12 @@ function Column({ title, links }: { title: string; links: { title: string; href:
 }
 
 export default async function Footer() {
-  const [{ collections }, { productCategories }, { regions }, store] = await Promise.all([
+  const [{ collections }, { productCategories }, { regions }, store, customer] = await Promise.all([
     getCollectionsList(0, 6),
     getCategoriesList(0, 12),
     listRegions(),
     getStore(),
+    getUser().catch(() => null),
   ])
   const storeName = store?.name || "Store"
 
@@ -61,7 +63,7 @@ export default async function Footer() {
             <Column
               title="Account"
               links={[
-                { title: "Sign in", href: "/account" },
+                { title: customer ? "Account" : "Sign in", href: "/account" },
                 { title: "Orders", href: "/account/orders" },
                 { title: "Addresses", href: "/account/addresses" },
                 { title: "Cart", href: "/cart" },

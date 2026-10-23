@@ -76,7 +76,7 @@ const SideMenu = ({
           </SheetHeader>
 
           <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-5">
-            {group("Shop", [{ title: "All items", href: "/store" }, ...categories])}
+            {group("Shop", [{ title: "Search", href: "/search" }, { title: "All items", href: "/store" }, ...categories])}
             {group("Collections", collections)}
             {group("You", [
               { title: "Account", href: "/account" },

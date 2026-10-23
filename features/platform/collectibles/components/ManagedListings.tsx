@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { parseMajorToMinor, currencyExponent } from '@/features/lib/minor-units';
 import { getManagedListingData, runManagedListingCommand, type ManagedListingData } from '../actions/listings';
+import { money } from '../lib/format';
 export function ManagedListings() {
   const [data, setData] = useState<ManagedListingData | null>(null);
   const [error, setError] = useState(''), [message, setMessage] = useState(''), [pending, setPending] = useState(false);
@@ -32,11 +33,8 @@ export function ManagedListings() {
       await submit(selected ? 'update_draft' : 'create', { ...(selected ? { listingId: selected.id } : { unitId: unit.id, key, slug: String(form.get('slug')) }), expectedVersion: unit.version, title: String(form.get('title')), publicSummary: String(form.get('condition')), priceMinor });
     } catch { setError('Enter an exact positive price in the stock currency'); }
   }
-  const formatPrice = (row: ManagedListingData['listings'][number]) => {
-    if (row.priceMinor === null) return 'Unpriced';
-    try { const exp = currencyExponent(row.currencyCode); return `${row.currencyCode} ${(row.priceMinor / 10 ** exp).toFixed(exp)}`; }
-    catch { return row.currencyCode; }
-  };
+  // Same money format as the Listings queue above.
+  const formatPrice = (row: ManagedListingData['listings'][number]) => row.priceMinor === null ? 'Unpriced' : money(row.priceMinor, row.currencyCode);
   const toneFor = (status: string): DotTone => status === 'published' ? 'ok' : status === 'scheduled' || status === 'paused' ? 'warn' : status === 'sold' ? 'info' : 'muted';
   const selectCls = 'min-h-10 w-full rounded-md border border-input bg-background px-3 text-sm';
   return <section className="space-y-4" aria-labelledby="listing-editor">
@@ -60,16 +58,23 @@ export function ManagedListings() {
             </div>
             <span className="shrink-0 font-mono text-xs tabular-nums text-foreground">{formatPrice(row)}</span>
           </div>
-          <Track label={`Actions for ${row.title}`}>
-            <Pill active={editing === row.id} disabled={pending || row.status !== 'draft'} onClick={() => setEditing(row.id)}>Edit draft</Pill>
-            <Pill disabled={pending || !row.inventoryUnit || !['draft','withdrawn'].includes(row.status)} onClick={() => submit('publish', { listingId: row.id, expectedVersion: row.inventoryUnit!.version })}>Publish</Pill>
-            <Pill disabled={pending || !row.inventoryUnit || !['draft','published','paused','scheduled'].includes(row.status)} onClick={() => submit('withdraw', { listingId: row.id, expectedVersion: row.inventoryUnit!.version })}>Withdraw</Pill>
-          </Track>
+          {(() => {
+            // Only the commands valid for this status are offered.
+            const canEdit = row.status === 'draft';
+            const canPublish = !!row.inventoryUnit && ['draft', 'withdrawn'].includes(row.status);
+            const canWithdraw = !!row.inventoryUnit && ['draft', 'published', 'paused', 'scheduled'].includes(row.status);
+            if (!canEdit && !canPublish && !canWithdraw) return null;
+            return <Track label={`Actions for ${row.title}`}>
+              {canEdit && <Pill active={editing === row.id} disabled={pending} onClick={() => setEditing(row.id)}>Edit draft</Pill>}
+              {canPublish && <Pill disabled={pending} onClick={() => submit('publish', { listingId: row.id, expectedVersion: row.inventoryUnit!.version })}>Publish</Pill>}
+              {canWithdraw && <Pill disabled={pending} onClick={() => submit('withdraw', { listingId: row.id, expectedVersion: row.inventoryUnit!.version })}>Withdraw</Pill>}
+            </Track>;
+          })()}
         </article>)}
       </ListBand>
       <form key={editing ?? key} action={save} className="grid content-start gap-3 rounded-xl bg-background p-4 shadow-[0_1px_2px_rgb(0_0_0/0.06)] ring-1 ring-border">
         <h3 className="text-sm font-semibold text-foreground">{selected ? 'Edit draft' : 'New draft listing'}</h3>
-        {!selected && <div className="grid gap-1.5"><Label htmlFor="listing-unit">Available stock</Label><select id="listing-unit" name="unitId" onChange={event => setUnitChoice(event.target.value)} required className={selectCls}><option value="">Select unit</option>{freeUnits.map(unit => <option key={unit.id} value={unit.id}>{unit.sku}</option>)}</select>{freeUnits.length === 0 && <p className="text-xs text-muted-foreground">No available stock</p>}</div>}
+        {!selected && <div className="grid gap-1.5"><Label htmlFor="listing-unit">Available stock</Label><select id="listing-unit" name="unitId" onChange={event => setUnitChoice(event.target.value)} required className={selectCls}><option value="">Select unit</option>{freeUnits.map(unit => <option key={unit.id} value={unit.id}>{unit.sku}</option>)}</select>{freeUnits.length === 0 && <p className="text-xs text-muted-foreground">{data.inventoryUnits.some(unit => unit.status === 'available') ? 'Every available unit already has an active listing' : 'No available stock'}</p>}</div>}
         <div className="grid gap-1.5"><Label htmlFor="listing-title">Title</Label><Input id="listing-title" name="title" required maxLength={300} defaultValue={selected?.title} /></div>
         {!selected && <div className="grid gap-1.5"><Label htmlFor="listing-slug">Slug</Label><Input id="listing-slug" name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={180} className="font-mono" /></div>}
         <div className="grid gap-1.5"><Label htmlFor="listing-condition">Reported condition</Label><Input id="listing-condition" name="condition" required maxLength={2000} defaultValue={selected?.publicSummary} /></div>

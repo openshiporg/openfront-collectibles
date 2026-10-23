@@ -51,7 +51,8 @@ export async function loadQueue(spec: QueueSpec): Promise<QueueResult> {
     return `s${index}: ${spec.list}Count(where: $w${index})`;
   });
 
-  const query = `query Desk_${spec.key}(${declarations.join(', ')}) {
+  const operationName = `Desk_${spec.key.replace(/[^A-Za-z0-9_]/g, '_')}`;
+  const query = `query ${operationName}(${declarations.join(', ')}) {
     total: ${spec.list}Count(where: $where)
     rows: ${spec.list}(where: $where, take: ${spec.take ?? 6}, orderBy: [{ ${spec.orderBy ?? 'createdAt'}: desc }]) { id ${spec.fields} }
     ${countFields.join('\n    ')}
@@ -59,7 +60,10 @@ export async function loadQueue(spec: QueueSpec): Promise<QueueResult> {
 
   try {
     const response = await keystoneClient(query, variables);
-    if (!response.success) return { ...base, ok: false };
+    if (!response.success) {
+      console.error(`Desk queue ${spec.key} failed:`, response.error);
+      return { ...base, ok: false };
+    }
     const data = response.data as Record<string, any>;
     const rows: QueueRow[] = Array.isArray(data.rows)
       ? data.rows.map((record: any) => ({ id: String(record.id), ...spec.row(record) }))
@@ -76,6 +80,7 @@ export async function loadQueue(spec: QueueSpec): Promise<QueueResult> {
       })),
     };
   } catch {
+    console.error(`Desk queue ${spec.key} failed`);
     return { ...base, ok: false };
   }
 }

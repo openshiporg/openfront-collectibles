@@ -83,7 +83,7 @@ const CountrySelect = ({ regions }: CountrySelectProps) => {
   return (
     <div className="w-full">
       <Select
-        value={current?.country}
+        value={current?.country ?? ""}
         onValueChange={(value) => {
           const option = options?.find((o) => o.country === value)
           if (option) handleChange(option)

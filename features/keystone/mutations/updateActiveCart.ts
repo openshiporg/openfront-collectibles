@@ -40,7 +40,7 @@ async function updateActiveCart(
   for (const relation of [safeData.shippingAddress, safeData.billingAddress]) {
     const addressId = relation?.connect?.id;
     if (addressId) await assertAddressAccess(context, addressId);
-    if (!addressId) throw new Error("Address ID is required");
+    if (relation && !addressId) throw new Error("Address ID is required");
   }
 
   const existingLineItemIds = [

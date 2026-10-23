@@ -163,10 +163,13 @@ export function LineItemsManager({
     onLineItemsChange(nextItems);
   };
 
-  const formatPrice = (price: number) => {
+  const currencyOf = (variant?: ProductVariant) =>
+    variant?.prices?.[0]?.currency?.code || variant?.prices?.[0]?.calculatedPrice?.currencyCode || 'USD';
+
+  const formatPrice = (price: number, currency = currencyOf(lineItems[0]?.variant)) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currency.toUpperCase(),
     }).format(price);
   };
 
@@ -244,7 +247,7 @@ export function LineItemsManager({
                                 {variant.sku && <span className="font-mono text-xs tabular-nums text-muted-foreground">{variant.sku}</span>}
                               </div>
                               <div className="flex items-center gap-3">
-                                <span className="font-mono text-sm font-medium tabular-nums">{formatPrice(unitPrice)}</span>
+                                <span className="font-mono text-sm font-medium tabular-nums">{formatPrice(unitPrice, currencyOf(variant))}</span>
                                 {existingQty > 0 ? (
                                   <div className="flex h-6 min-w-6 items-center justify-center rounded-full bg-foreground px-1.5 font-mono text-xs tabular-nums text-background">
                                     {existingQty}
@@ -330,11 +333,11 @@ export function LineItemsManager({
 
                     <div className="flex flex-col items-end min-w-[70px]">
                       <span className="font-mono text-sm font-medium tabular-nums text-foreground">
-                        {formatPrice(item.total)}
+                        {formatPrice(item.total, currencyOf(item.variant))}
                       </span>
                       {item.quantity > 1 && (
                         <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
-                          {formatPrice(item.unitPrice)} ea
+                          {formatPrice(item.unitPrice, currencyOf(item.variant))} ea
                         </span>
                       )}
                     </div>

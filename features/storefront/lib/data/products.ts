@@ -360,3 +360,68 @@ export const getProductsListByPrice = cache(async function ({
     queryParams,
   };
 });
+
+const MAX_SEARCH_LENGTH = 80;
+const SEARCH_LIMIT = 24;
+
+/**
+ * Storefront search: product title, handle and SKU, plus the collectible
+ * discovery index (item name, catalogue number, maker, set, franchise, category).
+ */
+export const searchProducts = cache(async function ({
+  query,
+  countryCode,
+}: {
+  query: string;
+  countryCode: string;
+}): Promise<{ products: any[]; count: number }> {
+  const q = String(query || "").trim().slice(0, MAX_SEARCH_LENGTH);
+  if (!q) return { products: [], count: 0 };
+
+  // Discovery results point at product pages; collect their handles.
+  let discoveryHandles: string[] = [];
+  try {
+    const { getPublicCollectibleListings } = await import("./collectibles");
+    const results = await getPublicCollectibleListings({ query: q, countryCode, limit: SEARCH_LIMIT });
+    discoveryHandles = results
+      .map((result: any) => {
+        const match = /\/products\/([^/?#]+)/.exec(String(result?.merchantUrl || ""));
+        return match ? decodeURIComponent(match[1]) : null;
+      })
+      .filter((handle: string | null): handle is string => !!handle);
+  } catch {
+    // Discovery is optional; product text search still answers.
+  }
+
+  const where = {
+    status: { equals: "published" },
+    productVariants: {
+      some: {
+        prices: { some: { region: { countries: { some: { iso2: { equals: countryCode } } } } } },
+      },
+    },
+    OR: [
+      { title: { contains: q, mode: "insensitive" } },
+      { handle: { contains: q, mode: "insensitive" } },
+      { productVariants: { some: { sku: { contains: q, mode: "insensitive" } } } },
+      ...(discoveryHandles.length ? [{ handle: { in: discoveryHandles } }] : []),
+    ],
+  };
+
+  const data = await openfrontClient.request(
+    gql`
+      query SearchProducts($where: ProductWhereInput!, $limit: Int!) {
+        products(where: $where, take: $limit, orderBy: [{ createdAt: desc }]) {
+          id
+          title
+          handle
+          thumbnail
+        }
+        productsCount(where: $where)
+      }
+    `,
+    { where, limit: SEARCH_LIMIT }
+  );
+
+  return { products: data.products || [], count: data.productsCount || 0 };
+});

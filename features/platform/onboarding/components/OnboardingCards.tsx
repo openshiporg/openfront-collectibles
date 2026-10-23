@@ -61,7 +61,6 @@ const InfoCardFooter = ({
     <div
       className={cn(
         "flex justify-between text-xs text-muted-foreground mt-2 overflow-hidden transition-all duration-300 ease-spring",
-        isHovered ? "max-h-[60px] opacity-100" : "max-h-0 opacity-0",
         className
       )}
     >
@@ -165,7 +164,7 @@ function OnboardingCard({
         <InfoCardFooter isHovered={isHovered}>
           <Track label="Setup" className="mt-1">
             <Pill active onClick={onOpenDialog} className="min-h-7 px-2.5 text-xs">
-              Set up
+              Get started
             </Pill>
             <Pill onClick={handleDismiss} className="min-h-7 px-2.5 text-xs">
               Skip

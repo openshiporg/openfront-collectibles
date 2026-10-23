@@ -1,4 +1,5 @@
 import { getInventory } from '../actions';
+import { getAdminMetaAction } from '@/features/dashboard/actions/getAdminMetaAction';
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -38,11 +39,20 @@ export default async function InventoryListPage({ searchParams }: PageProps) {
   const safeSort = Object.prototype.hasOwnProperty.call(list.fields, sortBy) ? sortBy : 'updatedAt';
 
   const dataResult = await getInventory({ search, page: currentPage, pageSize, sortBy: safeSort, sortDirection });
+
+  // The filter bar renders fields through their admin views, so use the real admin
+  // meta for these columns when it is available (it carries each field's viewsIndex).
+  const meta = await getAdminMetaAction('ProductVariant');
+  const metaFields = meta.success ? meta.data?.list?.fields : null;
+  const fieldKeys = Object.keys(list.fields);
+  const pageList = metaFields && fieldKeys.every((key) => metaFields[key])
+    ? { ...list, fields: Object.fromEntries(fieldKeys.map((key) => [key, { ...(list.fields as any)[key], ...metaFields[key], label: (list.fields as any)[key].label }])) }
+    : list;
   const initialData = dataResult.success ? dataResult.data : { items: [], count: 0 };
 
   return (
     <InventoryListPageClient
-      list={list}
+      list={pageList as typeof list}
       initialData={initialData}
       initialError={dataResult.success ? null : dataResult.error || 'Unable to load inventory.'}
       initialSearchParams={{ page: currentPage, pageSize, search }}

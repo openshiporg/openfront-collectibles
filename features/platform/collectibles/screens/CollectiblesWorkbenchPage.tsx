@@ -32,7 +32,7 @@ async function WorkbenchPage({ kind }: { kind: DeskKind }) {
         { type: 'page', label: desk.title },
       ]}
     >
-      <div className="w-full max-w-6xl space-y-8 px-4 pb-10 md:px-6">
+      <div className="w-full max-w-6xl space-y-8 px-4 pb-28 md:px-6 md:pb-12">
         <PageTitle
           title={desk.title}
           state={state}

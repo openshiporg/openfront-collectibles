@@ -23,6 +23,9 @@ export function projectPublicListingExtension(listing: any) {
         displayName: typeof specimen.displayName === 'string' ? specimen.displayName : '',
         category: typeof specimen.catalogItem?.category?.name === 'string' ? specimen.catalogItem.category.name : 'Uncategorized',
         catalogReference: typeof specimen.catalogItem?.handle === 'string' ? specimen.catalogItem.handle : null,
+        catalogNumber: typeof specimen.catalogItem?.catalogNumber === 'string' && specimen.catalogItem.catalogNumber.trim() ? specimen.catalogItem.catalogNumber.trim() : null,
+        maker: typeof specimen.catalogItem?.maker === 'string' && specimen.catalogItem.maker.trim() ? specimen.catalogItem.maker.trim() : null,
+        year: Number.isSafeInteger(specimen.catalogItem?.year) ? specimen.catalogItem.year : null,
         attributes: {
           ...projectPublicAttributes(specimen.catalogItem?.attributeValues, definitions),
           ...projectPublicAttributes(specimen.attributeValues, definitions),

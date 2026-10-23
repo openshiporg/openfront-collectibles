@@ -41,8 +41,9 @@ export default async function getProductsSortedByPrice(
   args: GetProductsSortedByPriceArgs,
   context: any
 ) {
-  const countryCode = String(args.countryCode || '').trim().toUpperCase();
-  if (!/^[A-Z]{2}$/.test(countryCode)) throw new Error('Country code is invalid');
+  // Country iso2 codes are stored lowercase, as the storefront route uses them.
+  const countryCode = String(args.countryCode || '').trim().toLowerCase();
+  if (!/^[a-z]{2}$/.test(countryCode)) throw new Error('Country code is invalid');
 
   const limit = Number(args.limit);
   const offset = Number(args.offset);

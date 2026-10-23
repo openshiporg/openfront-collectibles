@@ -85,11 +85,11 @@ export const DESKS: Record<DeskKind, Desk> = {
       {
         key: 'specimens', title: 'Items', type: 'Specimen', list: 'specimens', path: 'specimens',
         statusField: 'lifecycleStatus', statuses: SPECIMEN_STATUSES,
-        fields: 'displayName specimenCode lifecycleStatus catalogItem { title year } gradeObservationsCount',
+        fields: 'displayName specimenCode lifecycleStatus catalogItem { year maker category { name } } gradeObservationsCount',
         row: (r) => ({
           title: r.displayName || r.specimenCode,
           state: humanize(r.lifecycleStatus), tone: toneOf(SPECIMEN_STATUSES, r.lifecycleStatus),
-          meta: join(r.specimenCode, r.catalogItem?.title, r.catalogItem?.year),
+          meta: join(r.specimenCode, r.catalogItem?.category?.name, r.catalogItem?.maker, r.catalogItem?.year),
           trailing: r.gradeObservationsCount ? `${r.gradeObservationsCount} grade` : undefined,
         }),
       },
@@ -349,7 +349,10 @@ export const DESKS: Record<DeskKind, Desk> = {
   customers: {
     title: 'Collectors & Sellers',
     attention: { queue: 'sellers', statuses: ['applicant'], label: 'seller applications', tone: 'warn', clear: 'No seller applications' },
-    links: [{ label: 'Users', href: '/dashboard/platform/users' }],
+    links: [
+      { label: 'New seller', href: '/dashboard/seller-profiles/create' },
+      { label: 'Users', href: '/dashboard/platform/users' },
+    ],
     queues: [
       {
         key: 'sellers', title: 'Sellers', type: 'SellerProfile', list: 'sellerProfiles', path: 'seller-profiles',

@@ -70,7 +70,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           >
             <ProductActionsWrapper handle={product.handle} region={region} />
           </Suspense>
-          {specimen && (
+          {specimen && slab && (
             <SlabLabel
               company={slab?.companyName || slab?.company}
               grade={slab?.grade}
@@ -78,7 +78,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
               certificate={slab?.certificate}
               verification={slab?.verification}
               title={specimen.displayName || product.title}
-              line={[specimen.category, specimen.catalogReference].filter(Boolean).join(" · ")}
+              line={[specimen.category, specimen.catalogNumber, specimen.maker, specimen.year].filter(Boolean).join(" · ")}
             />
           )}
           <ProductDescription product={product} />

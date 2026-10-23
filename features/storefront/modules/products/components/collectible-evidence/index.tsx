@@ -63,15 +63,13 @@ function Entry({
   );
 }
 
+// Sections the record has no entries for are left out, like the facts band.
 function Field({ label, children, empty }: { label: string; children?: ReactNode; empty: boolean }) {
+  if (empty) return null;
   return (
     <div className="grid gap-3 border-t border-cx-line py-6 md:grid-cols-[200px_minmax(0,1fr)] md:gap-10">
       <h3 className="cx-label pt-1">{label}</h3>
-      {empty ? (
-        <p className="text-[14px] text-cx-ink-3">Not provided</p>
-      ) : (
-        <ul className="divide-y divide-cx-line">{children}</ul>
-      )}
+      <ul className="divide-y divide-cx-line">{children}</ul>
     </div>
   );
 }
@@ -109,8 +107,10 @@ export function CollectibleEvidencePanel({ result, unavailable = false }: Eviden
             Item record
           </h2>
         </div>
-        {specimen.catalogReference && (
-          <span className="cx-num text-[12px] text-cx-ink-2">Catalogue {specimen.catalogReference}</span>
+        {(specimen.catalogNumber || specimen.maker) && (
+          <span className="cx-num text-[12px] text-cx-ink-2">
+            {[specimen.catalogNumber && `Catalogue ${specimen.catalogNumber}`, specimen.maker, specimen.year].filter(Boolean).join(" · ")}
+          </span>
         )}
       </div>
 

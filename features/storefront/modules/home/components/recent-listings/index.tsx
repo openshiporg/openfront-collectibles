@@ -18,7 +18,7 @@ export default async function RecentListings({ countryCode, locale }: { countryC
   return (
     <section className="space-y-6 pt-16 sm:pt-20" aria-label="Recently listed">
       <SectionHead title="Recently listed" meta={results.length} href="/store" />
-      <ul className="no-scrollbar -mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 md:grid-cols-3 lg:grid-cols-4">
+      <ul className="no-scrollbar -mx-4 flex snap-x scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 md:grid-cols-3 lg:grid-cols-4">
         {results.map((result) => {
           const specimen = result?.extension?.value?.specimen
           const slab = slabFromGrading(result?.extension?.value?.observations?.grading)
@@ -39,7 +39,7 @@ export default async function RecentListings({ countryCode, locale }: { countryC
                   certificate={slab?.certificate}
                   verification={slab?.verification}
                   title={title}
-                  line={specimen?.category}
+                  line={[specimen?.category, specimen?.catalogNumber].filter(Boolean).join(" · ")}
                   className="transition-transform duration-200 ease-out group-hover:-translate-y-0.5"
                 />
                 <div className="flex items-baseline justify-between gap-2 px-0.5">

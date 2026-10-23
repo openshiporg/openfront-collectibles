@@ -27,7 +27,7 @@ export const paymentInfoMap: Record<
     icon: <PayPal />,
   },
   pp_system_default: {
-    title: "Cash on Delivery",
+    title: "Bank transfer (manual review)",
     icon: <CreditCard className="w-5 h-5" />,
   },
   // Add more payment providers here

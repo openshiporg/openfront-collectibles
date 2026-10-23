@@ -28,7 +28,8 @@ export type SlabLabelProps = {
 
 /**
  * The grading-slab label: a vault band with the grader and grade, over a paper
- * strip with the item and certificate. Only shows what the record holds.
+ * strip with the item and certificate. Only shows what the record holds; an
+ * ungraded item shows the strip alone.
  */
 export default function SlabLabel({
   company,
@@ -43,6 +44,8 @@ export default function SlabLabel({
 }: SlabLabelProps) {
   const v = verificationOf(verification)
   const lg = size === "lg"
+  // A raw (ungraded) item gets the paper strip only; the vault band is for graded items.
+  const graded = !!(company || grade)
 
   return (
     <div
@@ -51,10 +54,11 @@ export default function SlabLabel({
         className
       )}
     >
+      {graded && (
       <div className={cn("flex items-stretch justify-between gap-3 bg-cx-vault text-[#f3eee3]", lg ? "px-5 py-4" : "px-3 py-2.5")}>
         <div className="min-w-0">
           <span className={cn("cx-num block uppercase tracking-[0.12em] text-cx-accent-soft", lg ? "text-[12px]" : "text-[10px]")}>
-            {company || "Ungraded"}
+            {company || "Grade"}
           </span>
           {gradeLabel && (
             <span className={cn("mt-1 block truncate text-[#cfc6b6]", lg ? "text-[13px]" : "text-[11px]")}>{gradeLabel}</span>
@@ -64,6 +68,7 @@ export default function SlabLabel({
           <span className={cn("font-cx-serif leading-none tracking-[-0.02em]", lg ? "text-[44px]" : "text-[26px]")}>{grade}</span>
         )}
       </div>
+      )}
       <div className={cn("space-y-1", lg ? "px-5 py-4" : "px-3 py-2.5")}>
         <p className={cn("font-cx-serif text-cx-ink", lg ? "text-[19px] leading-[24px]" : "line-clamp-2 text-[14px] leading-[18px]")}>{title}</p>
         {line && <p className={cn("text-cx-ink-2", lg ? "text-[13px]" : "truncate text-[11px]")}>{line}</p>}

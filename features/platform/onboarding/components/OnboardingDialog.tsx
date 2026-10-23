@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -180,6 +181,7 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
             />
             Store setup
           </DialogTitle>
+          <DialogDescription className="sr-only">Choose a setup and create the store's starting data.</DialogDescription>
         </DialogHeader>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">

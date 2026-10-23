@@ -33,7 +33,7 @@ interface CreatePaymentProviderDrawerProps {
 const PAYMENT_PROVIDER_PRESETS = [
   { 
     id: 'manual', 
-    name: 'Cash on Delivery', 
+    name: 'Bank transfer (manual review)', 
     description: 'Cash on Delivery payment method allows customers to pay when they receive their order. Orders are placed immediately and payment is collected upon delivery.',
     envVars: []
   },

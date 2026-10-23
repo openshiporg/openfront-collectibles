@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import Wrapper from "@/features/storefront/modules/checkout/components/payment-wrapper";
 import CheckoutForm from "@/features/storefront/modules/checkout/templates/checkout-form";
 import CheckoutSummary from "@/features/storefront/modules/checkout/templates/checkout-summary";
@@ -16,18 +16,15 @@ export const metadata = {
   title: "Checkout",
 };
 
-const fetchCart = async () => {
+export async function CheckoutPage(props: { params: Promise<{ countryCode: string }> }) {
+  const { countryCode } = await props.params;
   const cart = await retrieveCart();
 
-  if (!cart) {
-    return notFound();
+  // Checkout needs something to buy: no cart or an empty one goes back to the cart page.
+  if (!cart || !cart.lineItems?.length) {
+    redirect(`/${countryCode}/cart`);
   }
 
-  return cart;
-};
-
-export async function CheckoutPage() {
-  const cart = await fetchCart();
   const customer = await getUser();
 
   return (

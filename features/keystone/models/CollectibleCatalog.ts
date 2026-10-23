@@ -120,7 +120,16 @@ export const Specimen = list({
   graphql: { plural: 'Specimens' },
   // Mutable catalog descriptions are not physical claim/tenant/lifecycle authority.
   access: { operation: { query: canRead, create: canManage, update: canManage, delete: denyAll } },
-  ui: { labelField: 'displayName', listView: { initialColumns: ['displayName', 'catalogItem', 'lifecycleStatus', 'updatedAt'] } },
+  // pluralize() keeps "Specimen" unchanged, so the default UI plural would equal the
+  // list key and the dashboard's GraphQL-name derivation throws for the whole admin meta.
+  ui: {
+    label: 'Specimens',
+    singular: 'Specimen',
+    plural: 'Specimens',
+    path: 'specimens',
+    labelField: 'displayName',
+    listView: { initialColumns: ['displayName', 'catalogItem', 'lifecycleStatus', 'updatedAt'] },
+  },
   fields: {
     store: relationship({ ref: 'Store', access: { create: canManage, update: denyAll } }),
     catalogItem: relationship({ ref: 'CatalogItem.specimens' }),

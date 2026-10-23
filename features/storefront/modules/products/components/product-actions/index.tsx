@@ -147,7 +147,9 @@ export default function ProductActions({ product, region, disabled, onVariantCha
     setCartError(null);
     setIsAdding(true);
     try {
-      await addToCart({ variantId: variant.id, quantity: 1, countryCode });
+      // addToCart returns an error message instead of throwing when the mutation fails.
+      const failure = await addToCart({ variantId: variant.id, quantity: 1, countryCode });
+      if (failure) setCartError('Could not add this item to your cart.');
     } catch {
       setCartError('Could not add this item to your cart.');
     } finally {
