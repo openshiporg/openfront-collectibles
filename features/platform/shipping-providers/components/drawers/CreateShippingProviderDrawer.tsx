@@ -179,16 +179,14 @@ export function CreateShippingProviderDrawer({
   return (
     <Drawer open={open} onOpenChange={(open) => { if (!open) handleClose() }}>
       <DrawerContent>
-        <DrawerHeader className="flex-shrink-0">
-          <DrawerTitle>Create Shipping Provider</DrawerTitle>
-          <DrawerDescription>
-            Set up a new shipping provider for your store
-          </DrawerDescription>
+        <DrawerHeader className="flex-shrink-0 border-b border-border">
+          <DrawerTitle className="text-lg font-semibold tracking-tight">Create Shipping Provider</DrawerTitle>
+          <DrawerDescription className="sr-only">Create Shipping Provider</DrawerDescription>
         </DrawerHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6">
+            <div className="mx-auto max-w-xl space-y-5">
               {/* Shipping Method Selection */}
               <div>
                 <Label htmlFor="shipping-method" className="text-sm font-medium">
@@ -318,7 +316,8 @@ export function CreateShippingProviderDrawer({
             <div className="flex gap-2 justify-end">
               <Button 
                 type="button" 
-                variant="outline" 
+                variant="ghost"
+                className="h-10 rounded-full bg-muted px-4 hover:bg-muted/80"
                 onClick={handleClose}
                 disabled={loading}
               >
@@ -327,7 +326,7 @@ export function CreateShippingProviderDrawer({
               <Button 
                 type="submit" 
                 disabled={loading || !isFormValid()}
-                className="min-w-[120px]"
+                className="h-10 min-w-[120px] rounded-full px-4"
               >
                 {loading ? (
                   <>

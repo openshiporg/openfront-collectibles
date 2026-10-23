@@ -7,19 +7,13 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  CirclePlus,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '../../components/PlatformEmptyState'
 import { Button } from '@/components/ui/button'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
-import { PlatformFilterBar } from '../../components/PlatformFilterBar'
+import { PlatformFilterBar, platformCreateButtonClass } from '../../components/PlatformFilterBar'
+import { ListBand, PageTitle } from '../../components/vault-ui'
 import { RegionDetailsComponent } from '../components/RegionDetailsComponent'
 import { RegionCreateDrawer } from '../components/RegionCreateDrawer'
 import { Pagination } from '../../../dashboard/components/Pagination'
@@ -43,27 +37,11 @@ interface RegionListPageClientProps {
 }
 
 function EmptyStateDefault() {
-  return (
-    <EmptyState
-      title="No Regions Created"
-      description="You can create a new region to get started."
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title="No regions" />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function RegionListPageClient({
@@ -190,24 +168,16 @@ export function RegionListPageClient({
     { type: 'page' as const, label: 'Markets' }
   ]
 
-  const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        Markets
-      </h1>
-      <p className="text-muted-foreground">
-        Manage your global markets, currencies, and shipping setup
-      </p>
-    </div>
-  )
+  const header = <PageTitle title="Markets" />
 
   const customCreateButton = (
-    <Button 
+    <Button
       onClick={() => setIsCreateDrawerOpen(true)}
-      className="flex items-center gap-2"
+      size="icon"
+      className={platformCreateButtonClass}
     >
-      <CirclePlus className="h-4 w-4" />
-      New Region
+      <Plus />
+      <span className="sr-only lg:not-sr-only lg:whitespace-nowrap">New Region</span>
     </Button>
   )
 
@@ -226,10 +196,8 @@ export function RegionListPageClient({
         />
       </div>
 
-      {/* Status Tabs removed - regions don't have status field */}
-
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -253,10 +221,12 @@ export function RegionListPageClient({
       ) : (
         <>
           {/* Data grid - full width */}
-          <div className="grid grid-cols-1 divide-y">
-            {data?.items?.map((region: any) => (
-              <RegionDetailsComponent key={region.id} region={region} list={list} />
-            ))}
+          <div className="px-4 md:px-6 pb-6">
+            <ListBand>
+              {data?.items?.map((region: any) => (
+                <RegionDetailsComponent key={region.id} region={region} list={list} />
+              ))}
+            </ListBand>
           </div>
           
           {/* Pagination */}

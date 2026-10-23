@@ -73,7 +73,6 @@ const BillingAddress = ({ cart }: { cart: any | null }) => {
           required
           data-testid="billing-city-input"
         />
-        <div className="grid grid-cols-2 gap-x-2">
           <Input
             label="State / Province"
             name="billingAddress.province"
@@ -91,8 +90,11 @@ const BillingAddress = ({ cart }: { cart: any | null }) => {
             required
             data-testid="billing-postal-input"
           />
-        </div>
-        <CountrySelect
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-medium leading-[18px] text-cx-ink-2">
+            Country <span className="text-cx-ink-3">*</span>
+          </span>
+          <CountrySelect
           name="billingAddress.countryCode"
           autoComplete="country"
           region={cart?.region}
@@ -101,6 +103,7 @@ const BillingAddress = ({ cart }: { cart: any | null }) => {
           required
           data-testid="billing-country-select"
         />
+        </div>
         <Input
           label="Phone"
           name="billingAddress.phone"

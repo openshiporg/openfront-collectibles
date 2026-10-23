@@ -2,7 +2,6 @@
 
 import { isManual, isStripe, isPaypal } from "@/features/storefront/lib/constants"
 import { placeOrder } from "@/features/storefront/lib/data/cart"
-import { Button } from "@/components/ui/button"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js"
 import React, { useState } from "react"
@@ -70,7 +69,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <ManualTestPaymentButton notReady={notReady} cart={cart} data-testid={dataTestId} />
       )
     default:
-      return <Button disabled size="lg">Select a payment method</Button>
+      return <button type="button" disabled className="cx-btn w-full sm:w-auto">Select a payment method</button>
   }
 }
 
@@ -162,15 +161,16 @@ const StripePaymentButton: React.FC<StripePaymentButtonProps> = ({
 
   return (
     <>
-      <Button
+      <button
+        type="button"
+        className="cx-btn w-full sm:w-auto"
         disabled={disabled || notReady || submitting}
         onClick={handlePayment}
-        size="lg"
         data-testid={dataTestId}
       >
-        {submitting && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />}
+        {submitting && <RiLoader2Fill className="size-4 animate-spin" />}
         Place order
-      </Button>
+      </button>
       <ErrorMessage
         error={errorMessage}
         data-testid="stripe-payment-error-message"
@@ -220,15 +220,16 @@ const ManualTestPaymentButton = ({ notReady, cart, "data-testid": dataTestId }: 
 
   return (
     <>
-      <Button
+      <button
+        type="button"
+        className="cx-btn w-full sm:w-auto"
         disabled={notReady || submitting}
         onClick={handlePayment}
-        size="lg"
         data-testid={dataTestId || "submit-order-button"}
       >
-        {submitting && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />} 
+        {submitting && <RiLoader2Fill className="size-4 animate-spin" />} 
         Place order
-      </Button>
+      </button>
       <ErrorMessage
         error={errorMessage}
         data-testid="cash-on-delivery-error-message"
@@ -296,7 +297,7 @@ const PayPalPaymentButton: React.FC<PayPalPaymentButtonProps> = ({
   const [{ isPending }] = usePayPalScriptReducer()
 
   if (isPending) {
-    return <RiLoader2Fill className="animate-spin"/>
+    return <RiLoader2Fill className="size-5 animate-spin text-cx-ink-3" role="status" aria-label="Loading PayPal" />
   }
 
   if (!session?.data?.orderId) {

@@ -7,15 +7,9 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '../../components/PlatformEmptyState'
+import { ListBand, PageTitle } from '../../components/vault-ui'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
 import { PlatformFilterBar } from '../../components/PlatformFilterBar'
 import { StatusTabs } from '../../components/StatusTabs'
@@ -44,27 +38,11 @@ interface StoreListPageClientProps {
 }
 
 function EmptyStateDefault() {
-  return (
-    <EmptyState
-      title="No Stores Created"
-      description="You can create a new store to get started."
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title="No stores" />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function StoreListPageClient({
@@ -179,16 +157,7 @@ export function StoreListPageClient({
     { type: 'page' as const, label: 'Stores' }
   ]
 
-  const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        Stores
-      </h1>
-      <p className="text-muted-foreground">
-        Create and manage stores
-      </p>
-    </div>
-  )
+  const header = <PageTitle title="Stores" />
 
   // Check if we have any active filters (search or actual filters)
   const hasFilters = !!searchString
@@ -204,8 +173,7 @@ export function StoreListPageClient({
 
       {/* Status Tabs */}
       {statusCounts && (
-        <div className="border-b">
-          <StatusTabs 
+        <StatusTabs
             statusCounts={statusCounts}
             statusConfig={{
                       "active": {
@@ -219,11 +187,10 @@ export function StoreListPageClient({
             }}
             entityName="Stores"
           />
-        </div>
       )}
 
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -247,10 +214,12 @@ export function StoreListPageClient({
       ) : (
         <>
           {/* Data grid - full width */}
-          <div className="grid grid-cols-1 divide-y">
-            {data?.items?.map((store: any) => (
-              <StoreDetailsComponent key={store.id} store={store} list={list} />
-            ))}
+          <div className="px-4 md:px-6 pb-6">
+            <ListBand>
+              {data?.items?.map((store: any) => (
+                <StoreDetailsComponent key={store.id} store={store} list={list} />
+              ))}
+            </ListBand>
           </div>
           
           {/* Pagination */}

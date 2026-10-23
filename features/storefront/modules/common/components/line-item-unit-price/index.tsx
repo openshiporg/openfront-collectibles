@@ -16,31 +16,15 @@ const LineItemUnitPrice = ({
   const hasReducedPrice = item.percentageOff > 0
 
   return (
-    <div className="flex flex-col text-muted-foreground justify-center h-full">
+    <span className="cx-num inline-flex items-baseline gap-1.5">
       {hasReducedPrice && (
         <>
-          <p>
-            {style === "default" && (
-              <span className="text-muted-foreground">Original: </span>
-            )}
-            <span className="line-through">
-              {item.originalPrice}
-            </span>
-          </p>
-          {style === "default" && (
-            <span className="text-primary">
-              -{item.percentageOff}%
-            </span>
-          )}
+          <span className="line-through text-cx-ink-3">{item.originalPrice}</span>
+          {style === "default" && <span className="text-cx-accent">-{item.percentageOff}%</span>}
         </>
       )}
-      <span
-        className={cn("text-base-regular", {
-          "text-primary": hasReducedPrice,
-        })}>
-        {item.unitPrice}
-      </span>
-    </div>
+      <span className={cn({ "text-cx-accent": hasReducedPrice })}>{item.unitPrice}</span>
+    </span>
   );
 }
 

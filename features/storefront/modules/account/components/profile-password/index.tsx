@@ -38,7 +38,7 @@ const ProfilePassword: React.FC<MyInformationProps> = ({ customer }) => {
       <AccountInfo
         label="Password"
         currentInfo={
-          <span>The password is not shown for security reasons</span>
+          <span className="cx-num" aria-label="Hidden">••••••••</span>
         }
         isSuccess={successState}
         isError={!!state.error} 
@@ -46,7 +46,7 @@ const ProfilePassword: React.FC<MyInformationProps> = ({ customer }) => {
         clearState={clearState}
         data-testid="account-password-editor"
       >
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Input
             label="Old password"
             name="oldPassword" 

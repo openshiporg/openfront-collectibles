@@ -1,39 +1,48 @@
 "use client"
 
-import { Button, buttonVariants } from "@/components/ui/button" // Shadcn Button
 import React from "react"
 import { useFormStatus } from "react-dom"
 import { RiLoader2Fill } from "@remixicon/react"
-import type { VariantProps } from "class-variance-authority" // For variant types
+import { cn } from "@/lib/utils"
 
 type ButtonVariant = "secondary" | "outline" | "destructive" | "link" | "default" | "ghost" | null;
+type ButtonSize = "default" | "sm" | "lg" | "icon" | null
+
+const VARIANTS: Record<string, string> = {
+  default: "cx-btn",
+  destructive: "cx-btn !bg-cx-danger",
+  secondary:
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-cx-surface px-5 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14),0_0_0_0.5px_rgb(26_23_18/0.1)] hover:bg-cx-bg disabled:opacity-50",
+  outline:
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-cx-line bg-transparent px-5 text-[14px] font-medium text-cx-ink hover:bg-cx-well disabled:opacity-50",
+  ghost:
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-4 text-[14px] font-medium text-cx-ink hover:bg-cx-well disabled:opacity-50",
+  link: "inline-flex min-h-11 items-center gap-1 text-[14px] font-medium text-cx-ink underline-offset-4 hover:underline disabled:opacity-50",
+}
 
 export function SubmitButton({
   children,
   variant = "default",
   className,
-  size,
   "data-testid": dataTestId,
 }: {
   children: React.ReactNode
-  variant?: ButtonVariant // Use the Medusa variant type here
+  variant?: ButtonVariant
   className?: string
-  size?: VariantProps<typeof buttonVariants>["size"]
+  size?: ButtonSize
   "data-testid"?: string
 }) {
   const { pending } = useFormStatus()
 
   return (
-    <Button
-      className={className}
-      variant={variant}
-      size={size}
+    <button
+      className={cn(VARIANTS[variant || "default"], className)}
       type="submit"
       disabled={pending}
       data-testid={dataTestId}
     >
-      {pending && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />}
+      {pending && <RiLoader2Fill className="size-4 animate-spin" />}
       {children}
-    </Button>
+    </button>
   )
 }

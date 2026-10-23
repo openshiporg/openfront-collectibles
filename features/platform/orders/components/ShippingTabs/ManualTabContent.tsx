@@ -47,11 +47,11 @@ export function ManualTabContent({
     <div className="space-y-6">
       <div className="flex flex-wrap gap-3">
         <div className="flex-1 min-w-[200px]">
-          <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground mb-1.5">
+          <h3 className="text-xs font-medium text-muted-foreground mb-1.5">
             Carrier
           </h3>
           <Select value={carrier} onValueChange={setCarrier}>
-            <SelectTrigger className="h-8 rounded-lg text-sm bg-background shadow-sm">
+            <SelectTrigger className="h-9 max-sm:h-10 rounded-lg text-sm bg-background shadow-sm">
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
@@ -63,14 +63,14 @@ export function ManualTabContent({
           </Select>
         </div>
         <div className="flex-1 min-w-[200px]">
-          <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground mb-1.5">
+          <h3 className="text-xs font-medium text-muted-foreground mb-1.5">
             Tracking Number
           </h3>
           <Input
             value={trackingNumber}
             onChange={(e) => setTrackingNumber(e.target.value)}
-            className="h-8 rounded-lg text-sm bg-background shadow-sm"
-            placeholder="Enter tracking number"
+            className="h-9 max-sm:h-10 rounded-lg text-sm bg-background shadow-sm"
+            placeholder="Tracking number"
           />
         </div>
       </div>
@@ -84,7 +84,7 @@ export function ManualTabContent({
               onCheckedChange={(checked) => setNoNotification(!checked)}
             />
             <Label htmlFor="send-notification" asChild>
-              <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground">
+              <h3 className="text-xs font-medium text-muted-foreground">
                 Notify Customer
               </h3>
             </Label>
@@ -95,9 +95,9 @@ export function ManualTabContent({
           onClick={handleManualFulfill}
           size="sm"
           disabled={fulfillmentState.loading || !hasSelectedItems}
-          className="h-8 rounded-lg"
+          className="h-9 rounded-full px-4 max-sm:h-10"
         >
-          {fulfillmentState.loading ? 'Fulfilling...' : 'Fulfill Items'}
+          {fulfillmentState.loading ? 'Fulfilling...' : 'Fulfill items'}
         </Button>
       </div>
     </div>

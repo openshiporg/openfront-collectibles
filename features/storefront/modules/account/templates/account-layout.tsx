@@ -1,14 +1,12 @@
 import React from "react"
 
 import AccountNav from "../components/account-nav"
-// Removed HttpTypes import
 
 // Define inline type based on GraphQL User schema
 type CustomerInfoForLayout = {
   id: string;
   firstName?: string | null;
   lastName?: string | null;
-  // Add other fields if needed by AccountNav or children
 };
 
 interface AccountLayoutProps {
@@ -24,23 +22,17 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
   const isAuthView = !customer;
 
   return (
-    <div className="flex-1 sm:py-12" data-testid="account-page">
-      <div className="flex-1 w-full px-6 h-full max-w-5xl mx-auto bg-background flex flex-col">
-        {isAuthView ? (
-          // Login/Register view - centered layout
-          <div className="flex-1 flex items-center justify-center py-12">
-            {children}
-          </div>
-        ) : (
-          // Dashboard view - grid layout with nav
-          <div className="grid grid-cols-1 sm:grid-cols-[240px_1fr] py-12">
-            <div>
-              <AccountNav customer={customer} />
-            </div>
-            <div className="flex-1">{children}</div>
-          </div>
-        )}
-      </div>
+    <div className="flex-1" data-testid="account-page">
+      {isAuthView ? (
+        <div className="mx-auto flex w-full max-w-[1320px] justify-center px-4 py-12 sm:px-6 sm:py-20">
+          {children}
+        </div>
+      ) : (
+        <div className="mx-auto w-full max-w-[1120px] px-4 pb-16 pt-6 sm:px-6 sm:pt-10">
+          <AccountNav customer={customer} />
+          <div className="mt-8 min-w-0">{children}</div>
+        </div>
+      )}
     </div>
   )
 }

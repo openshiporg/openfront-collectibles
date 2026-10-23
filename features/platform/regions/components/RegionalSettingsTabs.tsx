@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Globe, MapPin, DollarSign } from "lucide-react";
+import { Count, Pill, Track } from "../../components/vault-ui";
 import { Region } from "../actions";
 import { Country } from "../actions/country-actions";
 import { Currency } from "../actions/currency-actions";
@@ -69,62 +67,51 @@ export function RegionalSettingsTabs({
     router.push(newUrl);
   };
 
+  const tabs = [
+    { value: 'regions', label: 'Regions', count: regionData.count },
+    { value: 'countries', label: 'Countries', count: countryData.count },
+    { value: 'currencies', label: 'Currencies', count: currencyData.count },
+  ] as const;
+
   return (
-    <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="regions" className="flex items-center gap-2">
-            <Globe className="w-4 h-4" />
-            <span className="hidden sm:inline">Regions</span>
-            <span className="inline sm:hidden">Regions</span>
-            <span className="text-xs text-muted-foreground">
-              ({regionData.count})
-            </span>
-          </TabsTrigger>
-          
-          <TabsTrigger value="countries" className="flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            <span className="hidden sm:inline">Countries</span>
-            <span className="inline sm:hidden">Countries</span>
-            <span className="text-xs text-muted-foreground">
-              ({countryData.count})
-            </span>
-          </TabsTrigger>
-          
-          <TabsTrigger value="currencies" className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4" />
-            <span className="hidden sm:inline">Currencies</span>
-            <span className="inline sm:hidden">Currencies</span>
-            <span className="text-xs text-muted-foreground">
-              ({currencyData.count})
-            </span>
-          </TabsTrigger>
-        </TabsList>
+    <div className="space-y-4">
+      <div className="px-4 md:px-6">
+        <Track label="Regional settings">
+          {tabs.map((tab) => (
+            <Pill
+              key={tab.value}
+              active={activeTab === tab.value}
+              onClick={() => handleTabChange(tab.value)}
+            >
+              {tab.label} <Count>{tab.count}</Count>
+            </Pill>
+          ))}
+        </Track>
+      </div>
 
-        <TabsContent value="regions" className="mt-6">
-          <RegionList 
-            data={regionData}
-            statusCounts={statusCounts.regions}
-            list={list}
-          />
-        </TabsContent>
+      {activeTab === 'regions' && (
+        <RegionList
+          data={regionData}
+          statusCounts={statusCounts.regions}
+          list={list}
+        />
+      )}
 
-        <TabsContent value="countries" className="mt-6">
-          <CountryList 
-            data={countryData}
-            statusCounts={statusCounts.countries}
-            list={list}
-          />
-        </TabsContent>
+      {activeTab === 'countries' && (
+        <CountryList
+          data={countryData}
+          statusCounts={statusCounts.countries}
+          list={list}
+        />
+      )}
 
-        <TabsContent value="currencies" className="mt-6">
-          <CurrencyList 
-            data={currencyData}
-            statusCounts={statusCounts.currencies}
-            list={list}
-          />
-        </TabsContent>
-      </Tabs>
+      {activeTab === 'currencies' && (
+        <CurrencyList
+          data={currencyData}
+          statusCounts={statusCounts.currencies}
+          list={list}
+        />
+      )}
     </div>
   );
 }

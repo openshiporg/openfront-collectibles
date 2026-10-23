@@ -85,8 +85,9 @@ export async function CategoryPage(props: Props) {
   // Map to expected format for CategoryTemplate
   const category: StorefrontProductCategory = {
     ...productCategory,
-    parent_category: productCategory.parent_category,
-    category_children: productCategory.category_children,
+    // The query returns camelCase relations; the template reads snake_case.
+    parent_category: productCategory.parent_category ?? (productCategory as any).parentCategory ?? undefined,
+    category_children: productCategory.category_children ?? (productCategory as any).categoryChildren ?? undefined,
   }
 
   return (

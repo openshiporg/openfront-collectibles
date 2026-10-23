@@ -1,7 +1,6 @@
 "use client"
 
 import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useEffect, useState, useActionState } from "react"
@@ -19,6 +18,7 @@ import CountrySelect from "@/features/storefront/modules/checkout/components/cou
 import { SubmitButton } from "@/features/storefront/modules/checkout/components/submit-button"
 import { createCustomerAddress } from "@/features/storefront/lib/data/user"
 import { Input } from "@/components/ui/input"
+import { cxInput } from "../account-ui"
 
 const AddAddress = ({
   region,
@@ -56,25 +56,28 @@ const AddAddress = ({
     <Dialog open={state} onOpenChange={(isOpen) => isOpen ? open() : close()}>
       <DialogTrigger asChild>
         <button
-          className="border rounded-lg p-5 min-h-[220px] h-full w-full flex flex-col justify-between bg-muted/40"
+          type="button"
+          className="cx-btn"
           onClick={open}
           data-testid="add-address-button"
         >
-          <span className="text-sm leading-6 font-semibold">New address</span>
-          <Plus />
+          <Plus className="size-4" aria-hidden="true" />
+          Add address
         </button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-xl" data-testid="add-address-modal">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-2xl border-cx-line bg-cx-bg sm:max-w-xl" data-testid="add-address-modal">
         <DialogHeader>
-          <DialogTitle>Add address</DialogTitle>
+          <DialogTitle className="font-cx-serif text-[24px] font-normal leading-[28px] text-cx-ink">Add address</DialogTitle>
         </DialogHeader>
 
         <form action={formAction}>
-          <div className="flex flex-col gap-y-2">
-            <div className="grid grid-cols-2 gap-x-2">
+          <div className="flex flex-col gap-y-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Input
                 placeholder="First name"
+                aria-label="First name"
+                className={cxInput}
                 name="first_name"
                 required
                 autoComplete="given-name"
@@ -82,6 +85,8 @@ const AddAddress = ({
               />
               <Input
                 placeholder="Last name"
+                aria-label="Last name"
+                className={cxInput}
                 name="last_name"
                 required
                 autoComplete="family-name"
@@ -90,12 +95,16 @@ const AddAddress = ({
             </div>
             <Input
               placeholder="Company"
+              aria-label="Company"
+              className={cxInput}
               name="company"
               autoComplete="organization"
               data-testid="company-input"
             />
             <Input
               placeholder="Address"
+              aria-label="Address"
+              className={cxInput}
               name="address_1"
               required
               autoComplete="address-line1"
@@ -103,26 +112,34 @@ const AddAddress = ({
             />
             <Input
               placeholder="Apartment, suite, etc."
+              aria-label="Apartment, suite, etc."
+              className={cxInput}
               name="address_2"
               autoComplete="address-line2"
               data-testid="address-2-input"
             />
             <Input
               placeholder="City"
+              aria-label="City"
+              className={cxInput}
               name="city"
               required
               autoComplete="locality"
               data-testid="city-input"
             />
-            <div className="grid grid-cols-2 gap-x-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Input
                 placeholder="State / Province"
+                aria-label="State / Province"
+                className={cxInput}
                 name="province"
                 autoComplete="address-level1"
                 data-testid="state-input"
               />
               <Input
                 placeholder="ZIP / Postal code"
+                aria-label="ZIP / Postal code"
+                className={cxInput}
                 name="postal_code"
                 required
                 autoComplete="postal-code"
@@ -145,7 +162,7 @@ const AddAddress = ({
               />
               <Label
                 htmlFor="is_billing"
-                className="!text-[0.8125rem] leading-5 font-normal text-foreground"
+                className="text-[14px] font-normal text-cx-ink"
                 data-testid="billing-label"
               >
                 Set as default billing address
@@ -153,30 +170,34 @@ const AddAddress = ({
             </div>
             <Input
               placeholder="Phone"
+              aria-label="Phone"
+              className={cxInput}
               name="phone"
-              autoComplete="phone"
+              autoComplete="tel"
+              type="tel"
               data-testid="phone-input"
             />
           </div>
           {formState.error && (
             <div
-              className="text-rose-500 text-xs leading-5 font-normal py-2"
+              className="py-2 text-[13px] text-cx-danger"
+              role="alert"
               data-testid="address-error"
             >
               {formState.error}
             </div>
           )}
 
-          <DialogFooter className="mt-6">
-            <Button
+          <DialogFooter className="mt-6 gap-2">
+            <button
               type="reset"
-              variant="outline"
               onClick={close}
+              className="inline-flex min-h-12 items-center justify-center rounded-full px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
               data-testid="cancel-button"
             >
               Cancel
-            </Button>
-            <SubmitButton data-testid="save-button">Save</SubmitButton>
+            </button>
+            <SubmitButton data-testid="save-button" className="h-12 rounded-full px-6 text-[15px]">Save</SubmitButton>
           </DialogFooter>
         </form>
       </DialogContent>

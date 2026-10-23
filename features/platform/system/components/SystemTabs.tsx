@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Store, CreditCard } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { ListBand, Pill, Track } from "../../components/vault-ui";
 
 export type TabType = 'settings' | 'stores' | 'payment-providers';
 
@@ -11,6 +12,12 @@ interface SystemTabsProps {
   list: any;
 }
 
+const tabs: { value: TabType; label: string; title: string; href?: string }[] = [
+  { value: 'settings', label: 'Settings', title: 'Store settings', href: '/dashboard/platform/store' },
+  { value: 'stores', label: 'Stores', title: 'Store configuration' },
+  { value: 'payment-providers', label: 'Payment', title: 'Payment providers', href: '/dashboard/platform/payment-providers' },
+];
+
 export function SystemTabs({
   initialTab = 'settings',
   list
@@ -18,92 +25,58 @@ export function SystemTabs({
   const router = useRouter();
   const pathname = usePathname() ?? '';
   const searchParams = useSearchParams() ?? new URLSearchParams();
-  
+
   // Get active tab from URL or use initial
   const activeTab = (searchParams.get('tab') as TabType) || initialTab;
-  
+
   // Handle tab change with URL manipulation
   const handleTabChange = (tab: string) => {
     if (tab !== 'settings' && tab !== 'stores' && tab !== 'payment-providers') return;
     const params = new URLSearchParams(searchParams.toString());
-    
+
     if (tab === 'settings') {
       // Remove tab param for default tab
       params.delete('tab');
     } else {
       params.set('tab', tab);
     }
-    
+
     // Keep other params like search, page, etc.
     const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
     router.push(newUrl);
   };
 
+  const current = tabs.find((tab) => tab.value === activeTab) || tabs[0];
+
   return (
-    <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Settings className="w-4 h-4" />
-            <span className="hidden sm:inline">Settings</span>
-          </TabsTrigger>
-          
-          <TabsTrigger value="stores" className="flex items-center gap-2">
-            <Store className="w-4 h-4" />
-            <span className="hidden sm:inline">Stores</span>
-          </TabsTrigger>
-          
-          <TabsTrigger value="payment-providers" className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4" />
-            <span className="hidden sm:inline">Payment</span>
-          </TabsTrigger>
-        </TabsList>
+    <div className="space-y-4 px-4 pb-6 md:px-6">
+      <Track label="System sections">
+        {tabs.map((tab) => (
+          <Pill
+            key={tab.value}
+            active={current.value === tab.value}
+            onClick={() => handleTabChange(tab.value)}
+          >
+            {tab.label}
+          </Pill>
+        ))}
+      </Track>
 
-        <TabsContent value="settings" className="mt-6">
-          <div className="text-center py-8 space-y-4">
-            <Settings className="w-12 h-12 mx-auto text-muted-foreground" />
-            <div>
-              <h3 className="text-lg font-medium">System Settings</h3>
-              <p className="text-muted-foreground">
-                Configure platform settings, integrations, and system preferences.
-              </p>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Settings management will be implemented based on specific configuration needs.
-            </div>
+      <ListBand>
+        {current.href ? (
+          <Link
+            href={current.href}
+            className="group flex min-h-11 items-center justify-between gap-4 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-background/60"
+          >
+            {current.title}
+            <ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+          </Link>
+        ) : (
+          <div className="flex min-h-11 items-center px-4 py-3 text-sm text-muted-foreground">
+            {current.title}: not configured
           </div>
-        </TabsContent>
-
-        <TabsContent value="stores" className="mt-6">
-          <div className="text-center py-8 space-y-4">
-            <Store className="w-12 h-12 mx-auto text-muted-foreground" />
-            <div>
-              <h3 className="text-lg font-medium">Store Configuration</h3>
-              <p className="text-muted-foreground">
-                Configure store settings, templates, and multi-store setup.
-              </p>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Store management will use the same patterns as other platform entities.
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="payment-providers" className="mt-6">
-          <div className="text-center py-8 space-y-4">
-            <CreditCard className="w-12 h-12 mx-auto text-muted-foreground" />
-            <div>
-              <h3 className="text-lg font-medium">Payment Providers</h3>
-              <p className="text-muted-foreground">
-                Manage payment gateways and processing configurations.
-              </p>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Payment provider management will follow the established detail component patterns.
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+        )}
+      </ListBand>
     </div>
   );
 }

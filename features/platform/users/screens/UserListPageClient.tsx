@@ -7,19 +7,13 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  CirclePlus,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '../../components/PlatformEmptyState'
 import { Button } from '@/components/ui/button'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
-import { PlatformFilterBar } from '../../components/PlatformFilterBar'
+import { PlatformFilterBar, platformCreateButtonClass } from '../../components/PlatformFilterBar'
+import { ListBand, PageTitle } from '../../components/vault-ui'
 import { StatusTabs } from '../components/StatusTabs'
 import { UserDetailsComponent } from '../components/UserDetailsComponent'
 import { Pagination } from '../../../dashboard/components/Pagination'
@@ -49,27 +43,11 @@ interface UserListPageClientProps {
 }
 
 function EmptyStateDefault() {
-  return (
-    <EmptyState
-      title="No Users Created"
-      description="You can create a new user to get started."
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title="No users" />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function UserListPageClient({
@@ -248,16 +226,7 @@ export function UserListPageClient({
     { type: 'page' as const, label: 'Users' }
   ]
 
-  const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        Users
-      </h1>
-      <p className="text-muted-foreground">
-        Create and manage users
-      </p>
-    </div>
-  )
+  const header = <PageTitle title="Users" />
 
   // Check if we have any active filters (search or actual filters)
   const hasFilters = !!searchString
@@ -274,9 +243,9 @@ export function UserListPageClient({
             <Button 
               onClick={() => setIsCreateDrawerOpen(true)}
               size="icon"
-              className="lg:px-4 lg:py-2 lg:w-auto rounded-lg"
+              className={platformCreateButtonClass}
             >
-              <CirclePlus />
+              <Plus />
               <span className="hidden lg:inline">Create {list.singular}</span>
             </Button>
           }
@@ -285,13 +254,11 @@ export function UserListPageClient({
 
       {/* Status Tabs */}
       {statusCounts && (
-        <div className="border-b">
-          <StatusTabs statusCounts={statusCounts} />
-        </div>
+        <StatusTabs statusCounts={statusCounts} />
       )}
 
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -315,10 +282,12 @@ export function UserListPageClient({
       ) : (
         <>
           {/* Data grid - full width */}
-          <div className="grid grid-cols-1 divide-y">
-            {data?.items?.map((user: any) => (
-              <UserDetailsComponent key={user.id} user={user} list={list} />
-            ))}
+          <div className="px-4 md:px-6 pb-6">
+            <ListBand>
+              {data?.items?.map((user: any) => (
+                <UserDetailsComponent key={user.id} user={user} list={list} />
+              ))}
+            </ListBand>
           </div>
           
           {/* Pagination */}

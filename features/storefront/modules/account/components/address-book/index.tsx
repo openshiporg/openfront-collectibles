@@ -12,15 +12,24 @@ type AddressBookProps = {
 const AddressBook: React.FC<AddressBookProps> = ({ customer, region }) => {
   const { addresses } = customer
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 mt-4">
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="cx-num text-[13px] text-cx-ink-3">
+          {addresses?.length || 0} saved
+        </span>
         <AddAddress region={region} />
-        {addresses?.map((address) => {
-          return (
-            <EditAddress region={region} address={address} key={address.id} />
-          )
-        })}
       </div>
+      {addresses && addresses.length > 0 ? (
+        <div className="cx-band divide-y divide-cx-line overflow-hidden">
+          {addresses.map((address) => (
+            <EditAddress region={region} address={address} key={address.id} />
+          ))}
+        </div>
+      ) : (
+        <div className="cx-band px-5 py-8">
+          <p className="font-cx-serif text-[20px] leading-[26px] text-cx-ink">No saved addresses</p>
+        </div>
+      )}
     </div>
   )
 }

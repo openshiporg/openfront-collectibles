@@ -1,19 +1,18 @@
 "use client";
 import { isStripe, paymentInfoMap, isStripeSandbox, isPayPalSandbox } from "@/features/storefront/lib/constants";
 import { initiatePaymentSession } from "@/features/storefront/lib/data/payment";
-import { CircleCheck, CreditCard, FlaskConical } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CreditCard, FlaskConical } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ErrorMessage from "../error-message";
 import { StripeContext } from "../payment-wrapper/stripe-wrapper";
-import Divider from "@/features/storefront/modules/common/components/divider";
+import Radio from "@/features/storefront/modules/common/components/radio";
+import StepHeader, { StepSection, SummaryBlock, optionBand, optionRow, secondaryPill } from "../step-header";
 import { CardElement } from "@stripe/react-stripe-js";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { RiLoader2Fill } from "@remixicon/react";
-import { cn } from "@/lib/utils";
 
 interface PaymentProps {
   cart: {
@@ -72,16 +71,18 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
     return {
       style: {
         base: {
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "ui-sans-serif, system-ui, sans-serif",
           fontSize: "16px",
-          color: "#424270",
+          color: "#1a1712",
           "::placeholder": {
-            color: "rgb(107 114 128)",
+            color: "#8c8477",
           },
         },
       },
       classes: {
-        base: "pt-3 pb-1 block w-full h-12 px-4 mt-0 bg-background border rounded-md appearance-none focus:outline-none focus:ring-0 focus:shadow-borders-interactive-with-active border-border hover:bg-muted transition-all duration-300 ease-in-out text-[50px]",
+        base: "block h-12 w-full appearance-none rounded-xl border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1 transition-colors hover:border-cx-ink-3",
+        focus: "border-cx-accent ring-2 ring-cx-accent/25",
+        invalid: "border-cx-danger",
       },
       // Hide postal code since we already collect it in the billing address form
       hidePostalCode: true,
@@ -139,212 +140,155 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
     setError(null);
   }, [isOpen]);
 
+  const giftCardSummary = (
+    <SummaryBlock label="Payment method">
+      <p data-testid="payment-method-summary">Gift card</p>
+    </SummaryBlock>
+  );
+
   return (
-    <div className="bg-background">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <h2
-          className={cn(
-            "flex flex-row text-3xl font-medium gap-x-2 items-baseline",
-            {
-              "opacity-50 pointer-events-none select-none":
-                !isOpen && !paymentReady,
-            }
-          )}
-        >
-          Payment
-          {!isOpen && paymentReady && <CircleCheck className="hidden sm:block h-5 w-5" />}
-        </h2>
-        {!isOpen && paymentReady && (
-          <span>
-            <Button
+    <StepSection>
+      <StepHeader
+        step={3}
+        title="Payment"
+        done={!isOpen && !!paymentReady}
+        muted={!isOpen && !paymentReady}
+        action={
+          !isOpen && paymentReady ? (
+            <button
+              type="button"
               onClick={handleEdit}
               data-testid="edit-payment-button"
-              variant="outline"
-              size="sm"
+              className={secondaryPill}
             >
-              Update Payment
-            </Button>
-          </span>
-        )}
-      </div>
-      <div>
-        <div className={isOpen ? "block" : "hidden"}>
-          {!paidByGiftcard && availablePaymentMethods?.length > 0 && (
-            <>
-              <RadioGroup
-                value={selectedPaymentMethod}
-                onValueChange={setSelectedPaymentMethod}
-                className="space-y-2"
-              >
-                {availablePaymentMethods.map((method) => (
-                  <div
-                    key={method.id}
-                    className="relative"
-                  >
+              Edit
+            </button>
+          ) : null
+        }
+      />
+      <div className={isOpen ? "mt-6 block space-y-5" : "hidden"}>
+        {!paidByGiftcard && availablePaymentMethods?.length > 0 && (
+          <>
+            <RadioGroup
+              value={selectedPaymentMethod}
+              onValueChange={setSelectedPaymentMethod}
+              className={optionBand}
+              aria-label="Payment method"
+            >
+              {availablePaymentMethods.map((method) => {
+                const selected = selectedPaymentMethod === method.code
+                return (
+                  <div key={method.id} className="relative">
                     <RadioGroupItem
                       value={method.code}
                       id={method.id}
-                      className="sr-only" // Hide the radio button visually but keep it accessible
+                      className="sr-only"
                     />
-                    <Label
-                      htmlFor={method.id}
-                      className={cn(
-                        "flex items-center justify-between text-sm font-normal cursor-pointer py-4 border rounded-md px-8 transition-colors",
-                        {
-                          "border-primary bg-primary/5": selectedPaymentMethod === method.code,
-                          "border-border hover:border-primary/50": selectedPaymentMethod !== method.code,
-                        }
-                      )}
-                    >
-                      <div className="flex items-center gap-x-4">
-                        <div className={cn(
-                          "w-4 h-4 border-2 rounded-full flex items-center justify-center transition-colors",
-                          {
-                            "border-primary": selectedPaymentMethod === method.code,
-                            "border-border": selectedPaymentMethod !== method.code,
-                          }
-                        )}>
-                          {selectedPaymentMethod === method.code && (
-                            <div className="w-2 h-2 bg-primary rounded-full" />
-                          )}
-                        </div>
-                        <span className="text-sm font-normal">
+                    <Label htmlFor={method.id} className={optionRow(selected)}>
+                      <span className="flex min-w-0 items-center gap-3">
+                        <Radio checked={selected} />
+                        <span className="min-w-0 font-normal">
                           {paymentInfoMap[method.code]?.title || method.code}
                         </span>
-                      </div>
-                      <div className="flex items-center gap-x-3">
+                      </span>
+                      <span className="flex shrink-0 items-center gap-3">
                         {isSandboxMode && (
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <div className="w-5 h-5 flex items-center justify-center rounded-full bg-rose-400/15 text-rose-700 border border-rose-200">
-                                  <FlaskConical className="w-3 h-3" strokeWidth={2.5} />
-                                </div>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-cx-tint px-2 py-0.5 text-[11px] font-medium text-cx-accent">
+                                  <FlaskConical className="size-3" strokeWidth={2.5} aria-hidden="true" />
+                                  Test
+                                </span>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Sandbox environment – do not enter real payment info</p>
+                                <p>Sandbox: do not enter real payment details</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         )}
-                        <div className="w-5 h-5 flex items-center justify-center">
+                        <span className="flex size-5 items-center justify-center text-cx-ink-2">
                           {paymentInfoMap[method.code]?.icon}
-                        </div>
-                      </div>
+                        </span>
+                      </span>
                     </Label>
                   </div>
-                ))}
-              </RadioGroup>
-              {isStripePayment && stripeReady && (
-                <div className="mt-5 transition-all duration-150 ease-in-out">
-                  <p className="text-base font-semibold mb-1">
-                    Enter your card details:
-                  </p>
-                  <CardElement
-                    options={useOptions}
-                    onChange={(e) => {
-                      if (e.brand) {
-                        setCardBrand(e.brand.charAt(0).toUpperCase() + e.brand.slice(1));
-                      }
-                      setError(e.error?.message || null);
-                      setCardComplete(e.complete);
-                    }}
-                  />
-                </div>
-              )}
-            </>
-          )}
+                )
+              })}
+            </RadioGroup>
+            {isStripePayment && stripeReady && (
+              <div className="space-y-1.5">
+                <p className="text-[13px] font-medium text-cx-ink-2">Card details</p>
+                <CardElement
+                  options={useOptions}
+                  onChange={(e) => {
+                    if (e.brand) {
+                      setCardBrand(e.brand.charAt(0).toUpperCase() + e.brand.slice(1));
+                    }
+                    setError(e.error?.message || null);
+                    setCardComplete(e.complete);
+                  }}
+                />
+              </div>
+            )}
+          </>
+        )}
 
-          {paidByGiftcard && (
-            <div className="flex flex-col w-1/3">
-              <p className="text-base font-semibold mb-1">
-                Payment method
-              </p>
-              <p
-                className="text-base font-medium text-muted-foreground"
-                data-testid="payment-method-summary"
-              >
-                Gift card
-              </p>
-            </div>
-          )}
+        {paidByGiftcard && giftCardSummary}
 
-          <ErrorMessage
-            error={error}
-            data-testid="payment-method-error-message"
-          />
-
-          <Button
+        <div>
+          <button
+            type="button"
             onClick={handleSubmit}
-            size="lg"
             disabled={
               (!selectedPaymentMethod && !paidByGiftcard) ||
               !cart?.shippingMethods?.length ||
               isLoading
             }
             data-testid="submit-payment-button"
-            className="mt-6"
+            className="cx-btn w-full sm:w-auto"
           >
-            {isLoading && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin"/>}
+            {isLoading && <RiLoader2Fill className="size-4 animate-spin"/>}
             {isStripePayment && !cardComplete
               ? "Enter card details"
               : "Continue to review"}
-          </Button>
-        </div>
-
-        <div className={isOpen ? "hidden" : "block"}>
-          {cart && paymentReady && activeSession ? (
-            <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-x-8 w-full">
-              <div className="flex flex-col w-full sm:w-1/3">
-                <p className="text-sm font-medium mb-1">
-                  Payment method
-                </p>
-                <p
-                  className="text-sm text-muted-foreground"
-                  data-testid="payment-method-summary"
-                >
-                  {paymentInfoMap[selectedPaymentMethod]?.title ||
-                    selectedPaymentMethod}
-                </p>
-              </div>
-              <div className="flex flex-col w-full sm:w-1/3">
-                <p className="text-sm font-medium mb-1">
-                  Payment details
-                </p>
-                <div
-                  className="flex gap-2 text-sm text-muted-foreground items-center"
-                  data-testid="payment-details-summary"
-                >
-                  <div className="flex items-center h-7 w-fit p-2 bg-muted/40 border rounded-md">
-                    {paymentInfoMap[selectedPaymentMethod]?.icon || (
-                      <CreditCard />
-                    )}
-                  </div>
-                  <span>
-                    {isStripe(selectedPaymentMethod) && cardBrand
-                      ? cardBrand
-                      : "Another step will appear"}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ) : paidByGiftcard ? (
-            <div className="flex flex-col w-1/3">
-              <p className="text-base font-semibold mb-1">
-                Payment method
-              </p>
-              <p
-                className="text-base font-medium text-muted-foreground"
-                data-testid="payment-method-summary"
-              >
-                Gift card
-              </p>
-            </div>
-          ) : null}
+          </button>
+          <ErrorMessage
+            error={error}
+            data-testid="payment-method-error-message"
+          />
         </div>
       </div>
-      <Divider className="mt-8" />
-    </div>
+
+      <div className={isOpen ? "hidden" : "block"}>
+        {cart && paymentReady && activeSession ? (
+          <div className="mt-5 grid gap-5 sm:grid-cols-3">
+            <SummaryBlock label="Payment method">
+              <p data-testid="payment-method-summary">
+                {paymentInfoMap[selectedPaymentMethod]?.title ||
+                  selectedPaymentMethod}
+              </p>
+            </SummaryBlock>
+            <SummaryBlock label="Details">
+              <div className="flex items-center gap-2" data-testid="payment-details-summary">
+                <span className="flex h-7 items-center rounded-md bg-cx-well px-2 text-cx-ink-2">
+                  {paymentInfoMap[selectedPaymentMethod]?.icon || (
+                    <CreditCard className="size-4" aria-hidden="true" />
+                  )}
+                </span>
+                <span>
+                  {isStripe(selectedPaymentMethod) && cardBrand
+                    ? cardBrand
+                    : "Confirmed at review"}
+                </span>
+              </div>
+            </SummaryBlock>
+          </div>
+        ) : paidByGiftcard ? (
+          <div className="mt-5">{giftCardSummary}</div>
+        ) : null}
+      </div>
+    </StepSection>
   );
 };
 

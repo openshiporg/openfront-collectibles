@@ -7,9 +7,9 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Package, MapPin, Building2 } from "lucide-react";
+import { MoreVertical } from "lucide-react";
+import { Dot, type DotTone } from "../../components/vault-ui";
 import Link from "next/link";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 
@@ -75,10 +75,10 @@ export function ShippingOptionDetailsComponent({
   };
 
   // Determine status
-  const getStatus = (): { label: string; color: 'blue' | 'orange' | 'emerald' } => {
-    if (shippingOption.isReturn) return { label: 'RETURN', color: 'blue' };
-    if (shippingOption.adminOnly) return { label: 'ADMIN ONLY', color: 'orange' };
-    return { label: 'ACTIVE', color: 'emerald' };
+  const getStatus = (): { label: string; tone: DotTone } => {
+    if (shippingOption.isReturn) return { label: 'Return', tone: 'info' };
+    if (shippingOption.adminOnly) return { label: 'Admin only', tone: 'warn' };
+    return { label: 'Active', tone: 'ok' };
   };
 
   const status = getStatus();
@@ -87,135 +87,110 @@ export function ShippingOptionDetailsComponent({
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value={shippingOption.id} className="border-0">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full border-b relative min-h-[80px]">
-            <div className="flex items-start gap-4">
-              {/* Shipping Option Info */}
-              <div className="flex flex-col items-start text-left gap-2 sm:gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/dashboard/platform/shipping-options/${shippingOption.id}`}
-                    className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    {shippingOption.name}
-                  </Link>
-                  <span>‧</span>
-                  <span className="text-sm font-medium text-emerald-600">
-                    {formatPrice()}
+          <div className="flex items-start justify-between gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <Dot tone={status.tone} />
+                <Link
+                  href={`/dashboard/shipping-options/${shippingOption.id}`}
+                  className="text-sm font-semibold text-foreground hover:underline"
+                >
+                  {shippingOption.name}
+                </Link>
+                <span className="font-mono text-sm tabular-nums text-foreground">{formatPrice()}</span>
+                <span className="text-xs text-muted-foreground">{status.label}</span>
+              </div>
+
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span className="font-mono tabular-nums">{shippingOption.uniqueKey}</span>
+                <span className="capitalize">{shippingOption.priceType.replace('_', ' ')}</span>
+                {shippingOption.region && (
+                  <span>
+                    {shippingOption.region.name}{" "}
+                    <span className="font-mono uppercase tabular-nums">{shippingOption.region.code}</span>
                   </span>
-                </div>
-                
-                {/* Shipping Option Details */}
-                <div className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
-                  <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
-                    {shippingOption.uniqueKey}
-                  </span>
-                  <span>‧</span>
-                  <span className="capitalize">{shippingOption.priceType.replace('_', ' ')}</span>
-                  
-                  {shippingOption.region && (
-                    <>
-                      <span>‧</span>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{shippingOption.region.name} ({shippingOption.region.code})</span>
-                      </div>
-                    </>
-                  )}
-                  
-                  {shippingOption.fulfillmentProvider && (
-                    <>
-                      <span>‧</span>
-                      <div className="flex items-center gap-1">
-                        <Package className="w-3 h-3" />
-                        <span>{shippingOption.fulfillmentProvider.name}</span>
-                      </div>
-                    </>
-                  )}
-                  
-                  {shippingOption.shippingProfile && (
-                    <>
-                      <span>‧</span>
-                      <div className="flex items-center gap-1">
-                        <Building2 className="w-3 h-3" />
-                        <span>{shippingOption.shippingProfile.name}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
+                )}
+                {shippingOption.fulfillmentProvider && <span>{shippingOption.fulfillmentProvider.name}</span>}
+                {shippingOption.shippingProfile && <span>{shippingOption.shippingProfile.name}</span>}
               </div>
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-                <Badge
-                  color={status.color}
-                  className="text-[.6rem] sm:text-[.7rem] py-0 px-2 sm:px-3 tracking-wide font-medium rounded-md border h-6"
-                >
-                  {status.label}
-                </Badge>
-                
-                {/* Action buttons */}
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    onClick={() => setIsEditDrawerOpen(true)}
-                  >
-                    <MoreVertical className="stroke-muted-foreground" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
-                  >
-                    <AccordionTrigger className="py-0" />
-                  </Button>
-                </div>
-              </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                onClick={() => setIsEditDrawerOpen(true)}
+                aria-label="Edit"
+              >
+                <MoreVertical className="stroke-muted-foreground" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                asChild
+              >
+                <AccordionTrigger className="justify-center py-0" />
+              </Button>
             </div>
           </div>
-          
+
           <AccordionContent className="pb-0">
-            <div className="p-4 space-y-4 bg-muted/40">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Pricing Details */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-muted-foreground">Pricing</h4>
-                  <div className="space-y-1 text-sm">
-                    <div>Type: <span className="font-medium capitalize">{shippingOption.priceType.replace('_', ' ')}</span></div>
-                    {shippingOption.amount && (
-                      <div>Base Amount: <span className="font-medium">{formatPrice()}</span></div>
-                    )}
+            <div className="grid gap-5 border-t border-border bg-background/60 px-4 py-4 sm:grid-cols-3">
+              <section>
+                <h4 className="mb-2 text-xs font-semibold text-foreground">Pricing</h4>
+                <dl className="space-y-2 text-sm">
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Type</dt>
+                    <dd className="mt-0.5 capitalize text-foreground">{shippingOption.priceType.replace('_', ' ')}</dd>
                   </div>
-                </div>
+                  {shippingOption.amount && (
+                    <div>
+                      <dt className="text-xs text-muted-foreground">Base amount</dt>
+                      <dd className="mt-0.5 font-mono tabular-nums text-foreground">{formatPrice()}</dd>
+                    </div>
+                  )}
+                </dl>
+              </section>
 
-                {/* Configuration */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-muted-foreground">Configuration</h4>
-                  <div className="space-y-1 text-sm">
-                    <div>Return Option: <span className="font-medium">{shippingOption.isReturn ? 'Yes' : 'No'}</span></div>
-                    <div>Admin Only: <span className="font-medium">{shippingOption.adminOnly ? 'Yes' : 'No'}</span></div>
+              <section>
+                <h4 className="mb-2 text-xs font-semibold text-foreground">Configuration</h4>
+                <dl className="space-y-2 text-sm">
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Return option</dt>
+                    <dd className="mt-0.5 text-foreground">{shippingOption.isReturn ? 'Yes' : 'No'}</dd>
                   </div>
-                </div>
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Admin only</dt>
+                    <dd className="mt-0.5 text-foreground">{shippingOption.adminOnly ? 'Yes' : 'No'}</dd>
+                  </div>
+                </dl>
+              </section>
 
-                {/* Relationships */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-muted-foreground">Relationships</h4>
-                  <div className="space-y-1 text-sm">
-                    {shippingOption.region && (
-                      <div>Region: <span className="font-medium">{shippingOption.region.name}</span></div>
-                    )}
-                    {shippingOption.fulfillmentProvider && (
-                      <div>Provider: <span className="font-medium">{shippingOption.fulfillmentProvider.name}</span></div>
-                    )}
-                    {shippingOption.shippingProfile && (
-                      <div>Profile: <span className="font-medium">{shippingOption.shippingProfile.name}</span></div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <section>
+                <h4 className="mb-2 text-xs font-semibold text-foreground">Relationships</h4>
+                <dl className="space-y-2 text-sm">
+                  {shippingOption.region && (
+                    <div>
+                      <dt className="text-xs text-muted-foreground">Region</dt>
+                      <dd className="mt-0.5 text-foreground">{shippingOption.region.name}</dd>
+                    </div>
+                  )}
+                  {shippingOption.fulfillmentProvider && (
+                    <div>
+                      <dt className="text-xs text-muted-foreground">Provider</dt>
+                      <dd className="mt-0.5 text-foreground">{shippingOption.fulfillmentProvider.name}</dd>
+                    </div>
+                  )}
+                  {shippingOption.shippingProfile && (
+                    <div>
+                      <dt className="text-xs text-muted-foreground">Profile</dt>
+                      <dd className="mt-0.5 text-foreground">{shippingOption.shippingProfile.name}</dd>
+                    </div>
+                  )}
+                </dl>
+              </section>
             </div>
           </AccordionContent>
         </AccordionItem>

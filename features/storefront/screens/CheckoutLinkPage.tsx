@@ -4,9 +4,7 @@ import { openfrontClient } from "@/features/storefront/lib/config";
 import { getUser } from "@/features/storefront/lib/data/user";
 import { getAuthHeaders, setCartProof } from "@/features/storefront/lib/data/cookies";
 import { updateTag } from "next/cache";
-import { Button } from "@/components/ui/button";
-import Thumbnail from "@/features/storefront/modules/products/components/thumbnail";
-import Divider from "@/features/storefront/modules/common/components/divider";
+import CheckoutLinkCart, { CheckoutLinkMissing } from "@/features/storefront/modules/checkout/components/checkout-link-cart";
 
 export const metadata = {
   title: "Checkout Link",
@@ -43,27 +41,11 @@ async function CheckoutLinkContent({ cartId, countryCode }: { cartId: string, co
     cart = activeCart;
   } catch (error) {
     console.error('Error fetching cart:', error);
-    return (
-      <div className="flex flex-col gap-4 items-center justify-center min-h-[400px]">
-        <div className="text-6xl">🛒</div>
-        <h2 className="text-xl font-semibold text-gray-900">Cart Not Found</h2>
-        <p className="text-gray-600 text-center max-w-md">
-          The cart associated with this checkout link could not be found or may have expired.
-        </p>
-      </div>
-    );
+    return <CheckoutLinkMissing />;
   }
 
   if (!cart) {
-    return (
-      <div className="flex flex-col gap-4 items-center justify-center min-h-[400px]">
-        <div className="text-6xl">🛒</div>
-        <h2 className="text-xl font-semibold text-gray-900">Cart Not Found</h2>
-        <p className="text-gray-600 text-center max-w-md">
-          The cart associated with this checkout link could not be found or may have expired.
-        </p>
-      </div>
-    );
+    return <CheckoutLinkMissing />;
   }
 
   // Server action to connect cart to user and redirect to checkout
@@ -105,89 +87,19 @@ async function CheckoutLinkContent({ cartId, countryCode }: { cartId: string, co
     redirect(`/${countryCode}/checkout?step=payment`);
   }
 
-  const numberOfLines = cart.lineItems?.reduce((acc: number, item: any) => {
-    return acc + item.quantity;
-  }, 0) ?? 0;
-
-  const numberOfProducts = cart.lineItems?.length ?? 0;
-
   return (
-    <div className="w-full" data-testid="checkout-link-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl font-semibold">Complete Your Order</h1>
-        <p className="text-sm font-normal">
-          Review your cart and continue to secure checkout to complete your order.
-        </p>
-      </div>
-
-      <div>
-        <div className="flex flex-col gap-y-8 w-full">
-          <div className="border-b pb-6">
-            <div className="bg-background flex flex-col" data-testid="cart-card">
-              <div className="uppercase text-base leading-6 font-semibold mb-1">
-                CART #{cart.id.slice(-8).toUpperCase()}
-              </div>
-              <div className="flex items-center divide-x divide-gray-200 text-xs leading-5 font-normal text-foreground">
-                <span className="pr-2" data-testid="cart-total">
-                  {cart.total}
-                </span>
-                <span className="px-2" data-testid="cart-subtotal">
-                  Subtotal: {cart.subtotal}
-                </span>
-                <span className="px-2" data-testid="cart-shipping">
-                  Shipping: {cart.shipping}
-                </span>
-                <span className="pl-2">{`${numberOfLines} ${
-                  numberOfLines > 1 ? "items" : "item"
-                }`}</span>
-              </div>
-
-              {cart.lineItems && cart.lineItems.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 my-4">
-                  {cart.lineItems.slice(0, 3).map((item: any) => (
-                    <div
-                      key={item.id}
-                      className="flex flex-col gap-y-2"
-                      data-testid="cart-item"
-                    >
-                      <Thumbnail thumbnail={item.thumbnail} images={[]} size="full" />
-                      <div className="flex items-center text-xs leading-5 font-normal text-foreground">
-                        <span
-                          className="text-foreground font-semibold"
-                          data-testid="item-title"
-                        >
-                          {item.title}
-                        </span>
-                        <span className="ml-2">x</span>
-                        <span data-testid="item-quantity">{item.quantity}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {numberOfProducts > 3 && (
-                    <div className="w-full h-full flex flex-col items-center justify-center">
-                      <span className="text-xs leading-5 font-normal text-foreground">
-                        + {numberOfLines - 3}
-                      </span>
-                      <span className="text-xs leading-5 font-normal text-foreground">
-                        more
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="flex justify-end">
-                <form action={continueToCheckout}>
-                  <Button type="submit" data-testid="complete-checkout-button" variant="default" size="sm">
-                    Complete Checkout
-                  </Button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <CheckoutLinkCart
+      cart={cart}
+      title="Complete your order"
+      testId="checkout-link-page-wrapper"
+      actions={
+        <form action={continueToCheckout}>
+          <button type="submit" data-testid="complete-checkout-button" className="cx-btn w-full sm:w-auto">
+            Continue to checkout
+          </button>
+        </form>
+      }
+    />
   );
 }
 

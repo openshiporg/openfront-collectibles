@@ -1,5 +1,7 @@
 import { PageBreadcrumbs } from "@/features/dashboard/components/PageBreadcrumbs";
-import { Settings } from "lucide-react";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { Dot, ListBand, PageTitle } from "../../components/vault-ui";
 import { OAuthInstallDialog } from "../components/OAuthInstallDialog";
 
 interface PageProps {
@@ -47,29 +49,24 @@ export async function OrderManagementSystemPage({ searchParams }: PageProps) {
       />
 
       <div className="flex flex-col flex-1 min-h-0">
-        <div className="border-gray-200 dark:border-gray-800">
-          <div className="px-4 md:px-6 pt-4 md:pt-6 pb-4">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-              Order Management System
-            </h1>
-            <p className="text-muted-foreground">
-              OAuth authorization and app installation for order management systems
-            </p>
-          </div>
+        <div className="px-4 md:px-6 pt-4 md:pt-6 pb-4">
+          <PageTitle title="Order Management System" />
         </div>
 
-        <div className="flex-1 overflow-auto">
-          <div className="flex items-center justify-center h-full py-10">
-            <div className="text-center">
-              <div className="relative h-11 w-11 mx-auto mb-2">
-                <Settings className="w-11 h-11 text-gray-400" />
-              </div>
-              <p className="font-medium">Order Management System</p>
-              <p className="text-muted-foreground text-sm">
-                Configure OAuth applications and manage integrations
-              </p>
+        <div className="flex-1 overflow-auto px-4 pb-6 md:px-6">
+          <ListBand>
+            <div className="flex items-baseline gap-2.5 px-4 py-3 text-sm text-foreground">
+              <Dot tone={shouldShowInstall ? "info" : "muted"} />
+              {shouldShowInstall ? "Installation requested" : "No installation requested"}
             </div>
-          </div>
+            <Link
+              href="/dashboard/platform/apps"
+              className="group flex min-h-11 items-center justify-between gap-4 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-background/60"
+            >
+              Apps
+              <ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+            </Link>
+          </ListBand>
         </div>
       </div>
 

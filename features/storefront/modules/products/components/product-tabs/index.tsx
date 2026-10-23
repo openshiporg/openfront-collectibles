@@ -1,163 +1,40 @@
-"use client"
-
-import { useState } from "react"
-
-import Accordion from "./accordion"
-
-// Define inline types based on schema assumptions
-type Measurement = {
-  type: string;
-  value: string | number; // Assuming value can be string or number
-  unit: string;
-};
-
-type ProductVariantForTabs = {
-  id: string;
-  measurements?: Measurement[] | null;
-};
-
-type ProductTypeInfo = {
-  value: string;
-  // Add other fields if needed
-};
-
-type ProductTagInfo = {
-  id: string;
-  value: string;
-  // Add other fields if needed
-};
-
 type ProductForTabs = {
   id: string;
-  material?: string | null;
-  originCountry?: string | null; // Corrected name
-  productType?: ProductTypeInfo | null; // Corrected name and assumed structure
-  productVariants?: ProductVariantForTabs[] | null; // Corrected name
-  tags?: ProductTagInfo[] | null; // Assumed structure
+  productCollections?: { title?: string | null; handle?: string | null }[] | null;
+  productVariants?: { id: string; sku?: string | null; isUniqueCollectible?: boolean | null }[] | null;
 };
 
 type ProductTabsProps = {
-  product: ProductForTabs; // Use defined type
+  product: ProductForTabs;
 };
 
+/** Item facts as a recessed band of label/value rows. Only fields the record holds. */
 const ProductTabs = ({ product }: ProductTabsProps) => {
-  const [activeTab, setActiveTab] = useState(0)
+  const variants = product.productVariants || []
+  const single = variants.length === 1 ? variants[0] : null
+  const rows: { label: string; value: string; mono?: boolean }[] = []
 
-  const tabs = [
-    {
-      label: "Product Information",
-      component: <ProductInfoTab product={product} />,
-    },
-    {
-      label: "Shipping & Returns",
-      component: <ShippingInfoTab />,
-    },
-  ]
+  if (single?.sku) rows.push({ label: "SKU", value: single.sku, mono: true })
+  if (product.productCollections?.length) {
+    rows.push({
+      label: "Collection",
+      value: product.productCollections.map((c) => c.title).filter(Boolean).join(", "),
+    })
+  }
+  if (variants.length > 1) rows.push({ label: "Variants", value: String(variants.length), mono: true })
 
-  return (
-    <div className="w-full">
-      {/* Accordion for large screens */}
-      <div className="hidden lg:block">
-        <Accordion type="multiple">
-          {tabs.map((tab, i) => (
-            <Accordion.Item
-              key={i}
-              title={tab.label}
-              headingSize="medium"
-              value={tab.label}
-            >
-              {tab.component}
-            </Accordion.Item>
-          ))}
-        </Accordion>
-      </div>
-
-      {/* Regular tabs for medium and small screens */}
-      <div className="lg:hidden">
-        <div className="flex border-b border-gray-200">
-          {tabs.map((tab, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveTab(i)}
-              className={`flex-1 py-3 px-4 text-sm font-medium text-center transition-colors ${
-                activeTab === i
-                  ? "border-b-2 border-black text-black"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        <div className="pt-4">
-          {tabs[activeTab].component}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const ProductInfoTab = ({ product }: ProductTabsProps) => {
-  // Helper function to find measurement by type
-  const getMeasurement = (type: string) => {
-    const variant = product.productVariants?.[0]; // Using first variant for now
-    if (!variant?.measurements?.length) return null;
-
-    return variant.measurements.find((m: Measurement) => m.type === type); // Use Measurement type
-  };
-
-  // Get weight and dimensions measurements
-  const weightMeasurement = getMeasurement('weight');
-  const lengthMeasurement = getMeasurement('length');
-  const widthMeasurement = getMeasurement('width');
-  const heightMeasurement = getMeasurement('height');
-
-  // Format dimensions string if all dimensions exist
-  const dimensionsString = lengthMeasurement && widthMeasurement && heightMeasurement
-    ? `${lengthMeasurement.value}${lengthMeasurement.unit} x ${widthMeasurement.value}${widthMeasurement.unit} x ${heightMeasurement.value}${heightMeasurement.unit}`
-    : "-";
+  if (!rows.length) return null
 
   return (
-    <div className="text-xs leading-5 font-normal py-8">
-      <div className="grid grid-cols-2 gap-x-8">
-        <div className="flex flex-col gap-y-4">
-          <div>
-            <span className="font-semibold">Material</span>
-            <p>{product.material ? product.material : "-"}</p>
-          </div>
-          <div>
-            <span className="font-semibold">Country of origin</span>
-            <p>{product.originCountry ? product.originCountry : "-"}</p> {/* Corrected prop name */}
-          </div>
-          <div>
-            <span className="font-semibold">Type</span>
-            <p>{product.productType ? product.productType.value : "-"}</p> {/* Corrected prop name */}
-          </div>
+    <dl className="cx-band divide-y divide-cx-line overflow-hidden" data-testid="product-facts">
+      {rows.map((row) => (
+        <div key={row.label} className="flex items-baseline justify-between gap-4 px-4 py-3 text-[14px]">
+          <dt className="shrink-0 text-cx-ink-2">{row.label}</dt>
+          <dd className={row.mono ? "cx-num truncate text-[13px] text-cx-ink" : "truncate text-right text-cx-ink"}>{row.value}</dd>
         </div>
-        <div className="flex flex-col gap-y-4">
-          <div>
-            <span className="font-semibold">Weight</span>
-            <p>{weightMeasurement ? `${weightMeasurement.value} ${weightMeasurement.unit}` : "-"}</p>
-          </div>
-          <div>
-            <span className="font-semibold">Dimensions</span>
-            <p>{dimensionsString}</p>
-          </div>
-        </div>
-      </div>
-      {product.tags?.length ? (
-        <div>
-          <span className="font-semibold">Tags</span>
-        </div>
-      ) : null}
-    </div>
+      ))}
+    </dl>
   )
 }
-
-const ShippingInfoTab = () => (
-  <div className="text-xs leading-5 py-8">
-    <p>Shipping and return terms are not recorded for this item.</p>
-  </div>
-)
 
 export default ProductTabs

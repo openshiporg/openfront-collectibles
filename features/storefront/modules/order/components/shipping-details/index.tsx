@@ -1,7 +1,4 @@
-import { formatAmount } from "@/features/storefront/lib/util/prices";
-// Removed HttpTypes, Heading, Text imports
-
-import Divider from "@/features/storefront/modules/common/components/divider";
+import OrderSection, { Field } from "../section";
 
 // Define inline types based on GraphQL schema and component usage
 type CountryInfoForShipping = {
@@ -46,64 +43,38 @@ type ShippingDetailsProps = {
 };
 
 const ShippingDetails = ({ order }: ShippingDetailsProps) => {
+  const address = order.shippingAddress;
+
   return (
-    <div>
-      <h2 className="flex flex-row text-3xl font-medium my-6">Delivery</h2>
-      <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-x-8">
-        <div
-          className="flex flex-col w-full sm:w-1/3"
-          data-testid="shipping-address-summary"
-        >
-          <p className="text-sm font-medium text-foreground mb-1">
-            Shipping Address
+    <OrderSection title="Delivery">
+      <div className="grid gap-5 sm:grid-cols-3">
+        <Field label="Ship to" data-testid="shipping-address-summary">
+          <p className="text-cx-ink">
+            {address?.firstName} {address?.lastName}
           </p>
-          <p className="text-sm font-normal text-muted-foreground">
-            {order.shippingAddress?.firstName} {/* Corrected field names */}
-            {order.shippingAddress?.lastName}
+          <p>
+            {address?.address1} {address?.address2}
           </p>
-          <p className="text-sm font-normal text-muted-foreground">
-            {order.shippingAddress?.address1} {/* Corrected field names */}
-            {order.shippingAddress?.address2}
+          <p>
+            {address?.city}
+            {address?.province ? `, ${address.province}` : ""}
           </p>
-          <p className="text-sm font-normal text-muted-foreground">
-            {order.shippingAddress?.city}
-            {order.shippingAddress?.province
-              ? `, ${order.shippingAddress.province}`
-              : ""}
+          <p className="cx-num text-[13px]">
+            {address?.postalCode} {address?.country?.iso2?.toUpperCase()}
           </p>
-          <p className="text-sm font-normal text-muted-foreground">
-            {order.shippingAddress?.postalCode}{" "}
-            {order.shippingAddress?.country?.iso2?.toUpperCase()}{" "}
-            {/* Updated to American style */}
+        </Field>
+        <Field label="Contact" data-testid="shipping-contact-summary">
+          {address?.phone && <p className="cx-num text-[13px]">{address.phone}</p>}
+          <p className="break-all">{order.email}</p>
+        </Field>
+        <Field label="Method" data-testid="shipping-method-summary">
+          <p>
+            {order.shippingMethods?.[0]?.shippingOption?.name}{" "}
+            <span className="cx-num text-[13px] text-cx-ink">{order.shipping}</span>
           </p>
-        </div>
-
-        <div
-          className="flex flex-col w-full sm:w-1/3"
-          data-testid="shipping-contact-summary"
-        >
-          <p className="text-sm font-medium text-foreground mb-1">Contact</p>
-          <p className="text-sm font-normal text-muted-foreground">
-            {order.shippingAddress?.phone} {/* Corrected field name */}
-          </p>
-          <p className="text-sm font-normal text-muted-foreground">
-            {order.email}
-          </p>
-        </div>
-
-        <div
-          className="flex flex-col w-full sm:w-1/3"
-          data-testid="shipping-method-summary"
-        >
-          <p className="text-sm font-medium text-foreground mb-1">Method</p>
-          <p className="text-sm font-normal text-muted-foreground">
-            {order.shippingMethods?.[0]?.shippingOption?.name} ({order.shipping}
-            )
-          </p>
-        </div>
+        </Field>
       </div>
-      <Divider className="mt-8" />
-    </div>
+    </OrderSection>
   );
 };
 

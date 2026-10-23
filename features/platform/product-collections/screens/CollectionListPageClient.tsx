@@ -7,19 +7,13 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  CirclePlus,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '../../components/PlatformEmptyState'
 import { Button } from '@/components/ui/button'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
-import { PlatformFilterBar } from '../../components/PlatformFilterBar'
+import { PlatformFilterBar, platformCreateButtonClass } from '../../components/PlatformFilterBar'
+import { ListBand, PageTitle } from '../../components/vault-ui'
 import { CreateItemDrawerClientWrapper } from '@/features/platform/components/CreateItemDrawerClientWrapper'
 import { StatusTabs } from '../components/StatusTabs'
 import { CollectionDetailsComponent } from '../components/CollectionDetailsComponent'
@@ -47,27 +41,11 @@ interface CollectionListPageClientProps {
 }
 
 function EmptyStateDefault() {
-  return (
-    <EmptyState
-      title="No Collections Created"
-      description="You can create a new collection to get started."
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title="No collections" />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function CollectionListPageClient({
@@ -197,16 +175,7 @@ export function CollectionListPageClient({
     { type: 'page' as const, label: 'Collections' }
   ]
 
-  const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        Collections
-      </h1>
-      <p className="text-muted-foreground">
-        Create and manage collections
-      </p>
-    </div>
-  )
+  const header = <PageTitle title="Collections" />
 
   // Check if we have any active filters (search or actual filters)
   const hasFilters = !!searchString
@@ -223,9 +192,9 @@ export function CollectionListPageClient({
             <Button 
               onClick={() => setIsCreateDrawerOpen(true)}
               size="icon"
-              className="lg:px-4 lg:py-2 lg:w-auto rounded-lg"
+              className={platformCreateButtonClass}
             >
-              <CirclePlus />
+              <Plus />
               <span className="hidden lg:inline">Create {list.singular}</span>
             </Button>
           }
@@ -234,7 +203,7 @@ export function CollectionListPageClient({
 
 
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -258,10 +227,12 @@ export function CollectionListPageClient({
       ) : (
         <>
           {/* Data grid - full width */}
-          <div className="grid grid-cols-1 divide-y">
-            {data?.items?.map((collection: any) => (
-              <CollectionDetailsComponent key={collection.id} collection={collection} list={list} />
-            ))}
+          <div className="px-4 md:px-6 pb-6">
+            <ListBand>
+              {data?.items?.map((collection: any) => (
+                <CollectionDetailsComponent key={collection.id} collection={collection} list={list} />
+              ))}
+            </ListBand>
           </div>
           
           {/* Pagination */}

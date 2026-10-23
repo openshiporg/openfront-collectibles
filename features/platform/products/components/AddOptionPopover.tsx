@@ -37,9 +37,6 @@ export function AddOptionPopover({ onAdd }: { onAdd: (option: OptionForEditor) =
         <div className="grid gap-4">
           <div className="space-y-1">
             <h4 className="font-medium leading-none text-sm">Add new option</h4>
-            <p className="text-xs text-muted-foreground">
-              Create a new product option like size or color
-            </p>
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="title" className="text-xs">

@@ -1,5 +1,7 @@
 "use client";
 
+import { Pill, Track } from "@/features/platform/components/vault-ui";
+
 import { useState } from "react";
 import useSWR from "swr";
 import Image from "next/image";
@@ -225,7 +227,7 @@ export function ProviderTabContent({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground">
+        <h3 className="text-xs font-medium text-muted-foreground">
           Package Dimensions
         </h3>
         <DimensionsInput
@@ -235,7 +237,7 @@ export function ProviderTabContent({
       </div>
 
       <div className="space-y-2">
-        <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground">
+        <h3 className="text-xs font-medium text-muted-foreground">
           Package Weight
         </h3>
         <WeightInput weight={weight} setWeight={handleWeightChange} />
@@ -243,48 +245,25 @@ export function ProviderTabContent({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground">
+          <h3 className="text-xs font-medium text-muted-foreground">
             Shipping Rates
           </h3>
 
-          <div className="inline-flex -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse">
-            <Button
-              variant="outline"
-              className={`h-6 px-1.5 text-xs rounded-none shadow-none first:rounded-s-lg focus-visible:z-10 ${
-                sortBy === "carrier" ? "bg-accent" : ""
-              }`}
-              onClick={() => {
-                setSortBy("carrier");
-                setCurrentPage(1);
-              }}
-            >
-              Carrier
-            </Button>
-            <Button
-              variant="outline"
-              className={`h-6 px-1.5 text-xs rounded-none shadow-none focus-visible:z-10 ${
-                sortBy === "price" ? "bg-accent" : ""
-              }`}
-              onClick={() => {
-                setSortBy("price");
-                setCurrentPage(1);
-              }}
-            >
-              Price
-            </Button>
-            <Button
-              variant="outline"
-              className={`h-6 px-1.5 text-xs rounded-none shadow-none last:rounded-e-lg focus-visible:z-10 ${
-                sortBy === "speed" ? "bg-accent" : ""
-              }`}
-              onClick={() => {
-                setSortBy("speed");
-                setCurrentPage(1);
-              }}
-            >
-              Speed
-            </Button>
-          </div>
+          <Track label="Sort rates">
+            {(["carrier", "price", "speed"] as const).map((key) => (
+              <Pill
+                key={key}
+                active={sortBy === key}
+                className="min-h-7 px-2.5 text-xs"
+                onClick={() => {
+                  setSortBy(key);
+                  setCurrentPage(1);
+                }}
+              >
+                {key === "carrier" ? "Carrier" : key === "price" ? "Price" : "Speed"}
+              </Pill>
+            ))}
+          </Track>
         </div>
 
         {rateError && (
@@ -378,12 +357,12 @@ export function ProviderTabContent({
                                 {rate.service}
                               </div>
                               <div className="text-xs text-muted-foreground">
-                                {rate.carrier} • {rate.estimatedDays}{" "}
+                                {rate.carrier} · <span className="font-mono tabular-nums">{rate.estimatedDays}</span>{" "}
                                 {rate.estimatedDays === "1" ? "day" : "days"}
                               </div>
                             </div>
                           </div>
-                          <div className="font-medium">
+                          <div className="font-mono font-medium tabular-nums">
                             ${parseFloat(rate.price).toFixed(2)}
                           </div>
                         </div>

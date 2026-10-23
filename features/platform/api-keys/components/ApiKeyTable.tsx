@@ -52,7 +52,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Dot } from "@/features/platform/components/vault-ui"
 import MultipleSelector, { Option } from "@/components/ui/multiselect"
 import { EditItemDrawerClientWrapper } from "@/features/platform/components/EditItemDrawerClientWrapper"
 
@@ -178,27 +178,16 @@ export default function ApiKeyTable({ data }: ApiKeyTableProps) {
         const isExpired = apiKey.expiresAt && new Date() > new Date(apiKey.expiresAt)
         
         return (
-          <div className="space-y-1">
-            <div className="font-medium">{apiKey.name}</div>
-            <div className="text-xs text-muted-foreground">
-              <code className="bg-muted px-1 py-0.5 rounded text-xs">
-                {apiKey.tokenPreview}
-              </code>
+          <div className="space-y-0.5">
+            <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+              <Dot tone={isExpired ? "danger" : apiKey.status === "active" ? "ok" : apiKey.status === "revoked" ? "danger" : "muted"} />
+              <span className="text-sm font-semibold text-foreground">{apiKey.name}</span>
+              <span className="text-xs capitalize text-muted-foreground">{isExpired ? "Expired" : apiKey.status}</span>
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <Badge 
-                variant={apiKey.status === 'active' ? 'default' : 'secondary'}
-                className="text-xs"
-              >
-                {apiKey.status}
-              </Badge>
-              {isExpired && (
-                <Badge variant="destructive" className="text-xs">
-                  Expired
-                </Badge>
-              )}
-              <span className="text-muted-foreground">
-                {usageCount} request{usageCount !== 1 ? 's' : ''}
+            <div className="flex flex-wrap items-baseline gap-x-3 text-xs text-muted-foreground">
+              <span className="font-mono tabular-nums">{apiKey.tokenPreview}</span>
+              <span>
+                <span className="font-mono tabular-nums">{usageCount}</span> request{usageCount !== 1 ? 's' : ''}
               </span>
             </div>
           </div>
@@ -255,7 +244,7 @@ export default function ApiKeyTable({ data }: ApiKeyTableProps) {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="ghost" className="size-10 rounded-full p-0 sm:size-8">
                 <span className="sr-only">Open menu</span>
                 <MoreVerticalIcon className="h-4 w-4" />
               </Button>

@@ -1,269 +1,94 @@
 "use client"
 
-import clsx from "clsx"
-import {
-  LogOut,
-  ChevronDown,
-  User,
-  MapPin,
-  Package,
-  FileText,
-  Receipt,
-} from "lucide-react"
+import { LogOut } from "lucide-react"
 import { useParams, usePathname } from "next/navigation"
+import { useState } from "react"
 
-import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
 import { signOut } from "@/features/storefront/lib/data/user"
+import { PillLink, Track } from "@/features/storefront/modules/common/components/collectibles/track"
 
 // Define inline type based on GraphQL User schema
 type CustomerInfoForNav = {
   id: string;
-  firstName?: string | null; // Correct field name from schema
-  lastName?: string | null; // Correct field name from schema
+  firstName?: string | null;
+  lastName?: string | null;
 };
 
 type AccountNavProps = {
-  customer: CustomerInfoForNav | null; // Use updated type
+  customer: CustomerInfoForNav | null;
 };
 
-const AccountNav = ({
-  customer,
-}: AccountNavProps) => {
-  const params = useParams()
-  const route = usePathname()
+const LINKS = [
+  { href: "/account", label: "Overview", testId: "overview-link" },
+  { href: "/account/orders", label: "Orders", testId: "orders-link" },
+  { href: "/account/profile", label: "Profile", testId: "profile-link" },
+  { href: "/account/addresses", label: "Addresses", testId: "addresses-link" },
+  { href: "/account/invoicing", label: "Business account", testId: "invoicing-link" },
+  { href: "/account/invoices", label: "Invoices", testId: "invoices-link" },
+]
 
-  // Handle case where countryCode is missing or invalid
+const AccountNav = ({ customer }: AccountNavProps) => {
+  const params = useParams()
+  const route = usePathname() ?? ""
+  const [signingOut, setSigningOut] = useState(false)
+
   if (typeof params?.countryCode !== "string") {
-    // Or return a loading/error state, or disable links
     return null
   }
   const countryCode = params.countryCode
+  const current = route.split(`/${countryCode}`)[1] || "/"
+
+  const isActive = (href: string) =>
+    href === "/account" ? current === href : current === href || current.startsWith(`${href}/`)
 
   const handleLogout = async () => {
-    await signOut(countryCode)
+    setSigningOut(true)
+    try {
+      await signOut(countryCode)
+    } finally {
+      setSigningOut(false)
+    }
   }
 
+  const name = [customer?.firstName, customer?.lastName].filter(Boolean).join(" ")
+
   return (
-    <div>
-      <div className="sm:hidden" data-testid="mobile-account-nav">
-        {route !== `/${countryCode}/account` ? (
-          <LocalizedClientLink
-            href="/account"
-            className="flex min-h-11 items-center gap-x-2 text-xs leading-5 font-normal py-2"
-            data-testid="account-main-link"
-          >
-            <>
-              <ChevronDown className="transform rotate-90" />
-              <span>Account</span>
-            </>
-          </LocalizedClientLink>
-        ) : (
-          <>
-            <div className="text-2xl leading-[36px] font-semibold mb-4 px-8">
-              Hello {customer?.firstName}
-            </div>
-            <div className="text-sm leading-6 font-normal">
-              <ul>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/profile"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                    data-testid="profile-link"
-                  >
-                    <>
-                      <div className="flex items-center gap-x-2">
-                        <User size={20} />
-                        <span>Profile</span>
-                      </div>
-                      <ChevronDown className="transform -rotate-90" />
-                    </>
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/addresses"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                    data-testid="addresses-link"
-                  >
-                    <>
-                      <div className="flex items-center gap-x-2">
-                        <MapPin size={20} />
-                        <span>Addresses</span>
-                      </div>
-                      <ChevronDown className="transform -rotate-90" />
-                    </>
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/orders"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                    data-testid="orders-link"
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <Package size={20} />
-                      <span>Orders</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/invoicing"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                    data-testid="invoicing-link"
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <FileText size={20} />
-                      <span>Business Account</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/invoices"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                    data-testid="invoices-link"
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <Receipt size={20} />
-                      <span>Invoices</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
-                    onClick={handleLogout}
-                    data-testid="logout-button"
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <LogOut />
-                      <span>Log out</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </>
-        )}
-      </div>
-      <div className="hidden sm:block" data-testid="account-nav">
-        <div>
-          <div className="pb-4">
-            <h3 className="text-sm leading-6 font-semibold">Account</h3>
-          </div>
-          <div className="text-sm leading-6 font-normal">
-            <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
-              <li>
-                <AccountNavLink
-                  href="/account"
-                  route={route!}
-                  data-testid="overview-link"
-                >
-                  Overview
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/profile"
-                  route={route!}
-                  data-testid="profile-link"
-                >
-                  Profile
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/addresses"
-                  route={route!}
-                  data-testid="addresses-link"
-                >
-                  Addresses
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/orders"
-                  route={route!}
-                  data-testid="orders-link"
-                >
-                  Orders
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/invoicing"
-                  route={route!}
-                  data-testid="invoicing-link"
-                >
-                  Business Account
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/invoices"
-                  route={route!}
-                  data-testid="invoices-link"
-                >
-                  Invoices
-                </AccountNavLink>
-              </li>
-              <li className="text-grey-700">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  data-testid="logout-button"
-                  className="text-muted-foreground hover:text-foreground cursor-pointer"
-                >
-                  Log out
-                </button>
-              </li>
-            </ul>
-          </div>
+    <div data-testid="account-nav">
+      <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <div className="min-w-0">
+          <p className="cx-label">Account</p>
+          {name && (
+            <p className="mt-1 truncate font-cx-serif text-[28px] leading-[32px] tracking-[-0.01em] text-cx-ink sm:text-[34px] sm:leading-[38px]">
+              {name}
+            </p>
+          )}
         </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={signingOut}
+          data-testid="logout-button"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-[14px] text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink disabled:opacity-50"
+        >
+          <LogOut className="size-4" aria-hidden="true" />
+          {signingOut ? "Signing out" : "Sign out"}
+        </button>
       </div>
+      <nav aria-label="Account" className="mt-4" data-testid="mobile-account-nav">
+        <Track label="Account sections" className="w-full sm:w-auto">
+          {LINKS.map((link) => (
+            <PillLink
+              key={link.href}
+              href={link.href}
+              active={isActive(link.href)}
+              data-testid={link.testId}
+            >
+              {link.label}
+            </PillLink>
+          ))}
+        </Track>
+      </nav>
     </div>
-  )
-}
-
-type AccountNavLinkProps = {
-  href: string
-  route: string
-  children: React.ReactNode
-  "data-testid"?: string
-}
-
-const AccountNavLink = ({
-  href,
-  route,
-  children,
-  "data-testid": dataTestId,
-}: AccountNavLinkProps) => {
-  const params = useParams()
-
-  // Handle case where countryCode is missing or invalid in NavLink
-  if (typeof params?.countryCode !== "string") {
-    // Or return a disabled link, or null
-    return null
-  }
-  const countryCode = params.countryCode
-
-  const active = route.split(countryCode)[1] === href
-  return (
-    <LocalizedClientLink
-      href={href}
-      className={clsx("text-muted-foreground hover:text-foreground", {
-       "text-foreground font-semibold": active,
-      })}
-      data-testid={dataTestId}
-    >
-      {children}
-    </LocalizedClientLink>
   )
 }
 

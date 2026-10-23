@@ -42,10 +42,10 @@ const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
           onFocus={() => innerRef.current?.focus()}
           onBlur={() => innerRef.current?.blur()}
           className={cn( 
-            "relative flex items-center text-sm font-normal border border-border bg-muted rounded-md hover:bg-accent", // Use Tailwind classes
+            "relative flex h-12 items-center rounded-xl border border-cx-line bg-cx-surface text-[15px] text-cx-ink transition-colors hover:border-cx-ink-3 focus-within:border-cx-accent focus-within:ring-2 focus-within:ring-cx-accent/25",
             className,
             {
-              "text-muted-foreground": isPlaceholder, // Use Tailwind color
+              "text-cx-ink-3": isPlaceholder,
             }
           )}
         >
@@ -53,7 +53,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
             ref={innerRef}
             defaultValue={defaultValue}
             {...props}
-            className="appearance-none flex-1 bg-transparent border-none px-4 py-2.5 transition-colors duration-150 outline-none "
+            className="h-full flex-1 appearance-none border-none bg-transparent pl-4 pr-10 outline-none"
           >
             <option disabled value="">
               {placeholder}
@@ -61,7 +61,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
             {children}
           </select>
           <span className="absolute right-4 inset-y-0 flex items-center pointer-events-none ">
-            <ChevronsUpDown className="h-4 w-4" />
+            <ChevronsUpDown className="size-4 text-cx-ink-3" aria-hidden="true" />
           </span>
         </div>
       </div>

@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Package } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Dot, ListBand, SectionTitle } from '@/features/platform/components/vault-ui';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, SelectLabel } from '@/components/ui/select';
 import { ProviderActionsInline } from './ProviderActionsInline';
 import { ManualTabContent } from './ManualTabContent';
@@ -194,45 +193,31 @@ export function ShippingTabs({
 
   if (selectedItemsCount === 0) {
     return (
-      <Card className="bg-muted/10">
-        <div className="m-2 flex h-44 items-center justify-center rounded-lg border bg-muted/40">
-          <div className="text-center">
-            <Package
-              className="mx-auto h-7 w-7 text-muted-foreground/50"
-              aria-hidden="true"
-            />
-            <p className="mt-2 text-sm font-medium">
-              Please select at least 1 item to fulfill
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Select items from the list to begin fulfillment
-            </p>
-          </div>
-        </div>
-      </Card>
+      <section>
+        <SectionTitle>Shipment</SectionTitle>
+        <ListBand>
+          <div className="px-4 py-3 text-sm text-muted-foreground">Select at least 1 item to fulfill</div>
+        </ListBand>
+      </section>
     );
   }
 
   return (
-    <Card className="bg-muted/10">
-      <div className="space-y-1">
-        <p className="px-4 py-3 font-medium uppercase text-xs tracking-wider text-muted-foreground border-b">
-          Fulfilling {selectedItemsCount}{" "}
-          {selectedItemsCount === 1 ? "item" : "items"}...
-        </p>
-
-        <div className="p-4 space-y-4">
+    <section>
+      <SectionTitle meta={`${selectedItemsCount} ${selectedItemsCount === 1 ? "item" : "items"}`}>
+        Shipment
+      </SectionTitle>
+      <ListBand>
+        <div className="space-y-4 px-4 py-4">
           <div>
-            <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground">
-              Shipping Method
-            </h3>
+            <h3 className="text-xs font-medium text-muted-foreground">Shipping method</h3>
             <div className="flex items-start gap-2 mt-2">
               <div className="flex-1">
                 <Select
                   value={selectedTab}
                   onValueChange={setSelectedTab}
                 >
-                  <SelectTrigger className="gap-6 [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 text-xs font-medium h-8 rounded-lg text-foreground bg-background shadow-sm">
+                  <SelectTrigger className="gap-6 [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 text-sm font-medium h-9 max-sm:h-10 rounded-full text-foreground bg-background shadow-xs">
                     <SelectValue placeholder="Select shipping method" />
                   </SelectTrigger>
                   <SelectContent>
@@ -242,8 +227,8 @@ export function ShippingTabs({
                       </SelectLabel>
                       <SelectItem value="manual" className="text-xs font-medium">
                         <span className="flex items-center gap-2">
-                          <Package className="opacity-60" size={10} strokeWidth={2} />
-                          <span className="truncate uppercase tracking-wide opacity-75 font-medium">
+                          <Dot tone="muted" className="translate-y-0" />
+                          <span className="truncate font-medium">
                             Manual
                           </span>
                         </span>
@@ -256,7 +241,7 @@ export function ShippingTabs({
                         >
                           <span className="flex items-center gap-2">
                             <StatusIndicator provider={provider} />
-                            <span className="truncate uppercase tracking-wide opacity-75 font-medium">
+                            <span className="truncate font-medium">
                               {provider.name}
                             </span>
                           </span>
@@ -270,7 +255,7 @@ export function ShippingTabs({
                       </SelectLabel>
                       <SelectItem value="new" className="text-xs font-medium">
                         <span className="flex items-center gap-2">
-                          <span className="truncate uppercase tracking-wide opacity-75 font-medium">
+                          <span className="truncate font-medium">
                             Custom Provider
                           </span>
                         </span>
@@ -283,7 +268,7 @@ export function ShippingTabs({
                         >
                           <span className="flex items-center gap-2">
                             <StatusIndicator provider={preset} isPreset={true} />
-                            <span className="truncate uppercase tracking-wide opacity-75 font-medium">
+                            <span className="truncate font-medium">
                               {preset.name} Provider
                             </span>
                           </span>
@@ -353,7 +338,7 @@ export function ShippingTabs({
             ) : null}
           </div>
         </div>
-      </div>
-    </Card>
+      </ListBand>
+    </section>
   );
 }

@@ -36,3 +36,34 @@ export function formatGradingEvidence(item: {
     .filter(Boolean)
     .join(' · ');
 }
+
+/** Format integer minor units in their currency's own exponent. */
+export function formatMinorAmount(amountMinor: number, currencyCode: string, locale = 'en-US'): string {
+  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency: currencyCode });
+  const exponent = formatter.resolvedOptions().maximumFractionDigits ?? 2;
+  return formatter.format(amountMinor / 10 ** exponent);
+}
+
+/** Newest grading observation projected onto slab-label fields, or null when ungraded. */
+export function slabFromGrading(grading: any[] | undefined | null) {
+  const row = Array.isArray(grading) ? grading[0] : null;
+  if (!row || typeof row.reportedGrade !== 'string') return null;
+  const company = row.gradingCompany;
+  return {
+    company: (typeof company?.code === 'string' && company.code.trim()) || (typeof company?.name === 'string' && company.name.trim()) || null,
+    companyName: typeof company?.name === 'string' ? company.name : null,
+    grade: row.reportedGrade as string,
+    gradeLabel: typeof row.reportedLabel === 'string' ? row.reportedLabel : null,
+    certificate: typeof row.certificateReference === 'string' && row.certificateReference.trim()
+      ? row.certificateReference.trim().slice(0, 160)
+      : null,
+    verification: typeof row.verificationState === 'string' ? row.verificationState : null,
+    disclaimer: typeof row.disclaimer === 'string' ? row.disclaimer : null,
+  };
+}
+
+export function humanizeEvidence(value: unknown): string {
+  if (typeof value !== 'string' || !value) return '';
+  const text = value.replace(/_/g, ' ');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

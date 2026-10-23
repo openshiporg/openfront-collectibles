@@ -4,12 +4,15 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageContainer } from "../../../dashboard/components/PageContainer";
 import { Pagination } from "../../../dashboard/components/Pagination";
-import { PlatformFilterBar } from "../../components/PlatformFilterBar";
+import { PlatformFilterBar, platformCreateButtonClass } from "../../components/PlatformFilterBar";
+import { PlatformEmptyState } from "../../components/PlatformEmptyState";
+import { ListBand, PageTitle } from "../../components/vault-ui";
 import { StatusTabs } from "../components/StatusTabs";
 import { ShippingOptionDetailsComponent } from "../components/ShippingOptionDetailsComponent";
 import { CreateItemDrawerClientWrapper } from "../../components/CreateItemDrawerClientWrapper";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useListItemsQuery } from "../../../dashboard/hooks/useListItems.query";
 import { buildOrderByClause } from "../../../dashboard/lib/buildOrderByClause";
 import { buildWhereClause } from "../../../dashboard/lib/buildWhereClause";
@@ -173,35 +176,19 @@ export function ShippingOptionListPageClient({
 
   if (error) {
     return (
-      <PageContainer
-        header={
-          <>
-            <h1 className="text-2xl font-semibold tracking-tight">Shipping Options</h1>
-            <p className="text-sm text-muted-foreground">
-              Configure customer-facing shipping methods and pricing
-            </p>
-          </>
-        }
-      >
-        <div className="text-red-600">Error loading shipping options: {error}</div>
+      <PageContainer title="Shipping Options" header={<PageTitle title="Shipping Options" />}>
+        <div className="px-4 md:px-6">
+          <Alert variant="destructive">
+            <AlertDescription>Error loading shipping options: {error}</AlertDescription>
+          </Alert>
+        </div>
       </PageContainer>
     );
   }
 
   return (
     <>
-      <PageContainer
-        header={
-          <>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Shipping Options</h1>
-              <p className="text-sm text-muted-foreground">
-                Configure customer-facing shipping methods and pricing
-              </p>
-            </div>
-          </>
-        }
-      >
+      <PageContainer title="Shipping Options" header={<PageTitle title="Shipping Options" />}>
         <div>
           {/* Filter Bar */}
           <div className="px-4 md:px-6">
@@ -211,9 +198,9 @@ export function ShippingOptionListPageClient({
                 <Button 
                   onClick={() => setIsCreateDrawerOpen(true)}
                   size="icon"
-                  className="lg:px-4 lg:py-2 lg:w-auto rounded-lg"
+                  className={platformCreateButtonClass}
                 >
-                  <Plus className="size-4 lg:mr-2" />
+                  <Plus />
                   <span className="sr-only lg:not-sr-only lg:whitespace-nowrap">
                     Create Shipping Option
                   </span>
@@ -223,27 +210,22 @@ export function ShippingOptionListPageClient({
           </div>
 
           {/* Status Tabs */}
-          <div className="border-b">
-            <StatusTabs regionCounts={regionCounts} />
-          </div>
+          <StatusTabs regionCounts={regionCounts} />
 
           {/* Shipping Options List */}
-          <div className="space-y-4">
+          <div className="px-4 md:px-6 pb-6">
             {initialData.items.length > 0 ? (
-              initialData.items.map((shippingOption) => (
-                <ShippingOptionDetailsComponent
-                  key={shippingOption.id}
-                  shippingOption={shippingOption}
-                  list={list}
-                />
-              ))
+              <ListBand>
+                {initialData.items.map((shippingOption) => (
+                  <ShippingOptionDetailsComponent
+                    key={shippingOption.id}
+                    shippingOption={shippingOption}
+                    list={list}
+                  />
+                ))}
+              </ListBand>
             ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <div className="space-y-2">
-                  <p>No shipping options found</p>
-                  <p className="text-sm">Create your first shipping option to get started.</p>
-                </div>
-              </div>
+              <PlatformEmptyState title="No shipping options" />
             )}
           </div>
 

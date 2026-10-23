@@ -257,46 +257,35 @@ export function EditItemDrawerClient({
     <>
       <DrawerHeader className="flex-shrink-0">
         <DrawerTitle>Edit {list.singular}</DrawerTitle>
-        <div className="mt-2">
-          <div className="relative border rounded-md bg-muted/40 transition-all">
-            <div className="p-1 flex items-center gap-3">
-              <div className="flex gap-3 flex-1 min-w-0">
-                <div className="flex-shrink-0">
-                  <div className="bg-background shadow-xs border rounded-sm py-0.5 px-1 text-[.65rem] text-muted-foreground">
-                    ID
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-mono truncate">
-                    {itemId}
-                  </div>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-sm h-6 w-6 flex-shrink-0 relative"
-                onClick={handleCopy}
-                disabled={copied}
-              >
-                <div
-                  className={`transition-all duration-200 ${
-                    copied ? "scale-100 opacity-100" : "scale-0 opacity-0"
-                  }`}
-                >
-                  <Check className="size-3 text-emerald-500" />
-                </div>
-                <div
-                  className={`absolute transition-all duration-200 ${
-                    copied ? "scale-0 opacity-0" : "scale-100 opacity-100"
-                  }`}
-                >
-                  <Copy className="size-3" />
-                </div>
-                <span className="sr-only">{copied ? "Copied" : "Copy ID"}</span>
-              </Button>
+        <div className="mt-2 flex min-h-10 items-center gap-3 rounded-full bg-muted py-1 pl-4 pr-1 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] dark:bg-muted/60">
+          <span className="shrink-0 text-xs font-medium text-muted-foreground">ID</span>
+          <span className="min-w-0 flex-1 truncate font-mono text-xs tabular-nums text-foreground">
+            {itemId}
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="relative size-8 shrink-0 rounded-full hover:bg-background max-sm:size-10"
+            onClick={handleCopy}
+            disabled={copied}
+          >
+            <div
+              className={`transition-all duration-200 ${
+                copied ? "scale-100 opacity-100" : "scale-0 opacity-0"
+              }`}
+            >
+              <Check className="size-3.5 text-emerald-500" />
             </div>
-          </div>
+            <div
+              className={`absolute transition-all duration-200 ${
+                copied ? "scale-0 opacity-0" : "scale-100 opacity-100"
+              }`}
+            >
+              <Copy className="size-3.5" />
+            </div>
+            <span className="sr-only">{copied ? "Copied" : "Copy ID"}</span>
+          </Button>
         </div>
       </DrawerHeader>
       
@@ -313,9 +302,7 @@ export function EditItemDrawerClient({
           />
         </div>
 
-        <DrawerFooter className="flex-shrink-0 border-t !flex-col">
-
-          
+        <DrawerFooter className="flex-shrink-0 border-t border-border !flex-col">
           <div className="flex justify-between items-center w-full">
             {/* Reset and Delete icon buttons on the left */}
             <div className="flex gap-2">
@@ -323,7 +310,7 @@ export function EditItemDrawerClient({
               {hasChanges && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="icon" className="h-9 w-9">
+                    <Button variant="ghost" size="icon" aria-label="Reset changes" className="size-10 rounded-full bg-muted hover:bg-muted/80 dark:bg-muted/60">
                       <Undo2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
@@ -348,7 +335,7 @@ export function EditItemDrawerClient({
               {!list.hideDelete && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="icon" className="h-9 w-9">
+                    <Button variant="ghost" size="icon" aria-label="Delete" className="size-10 rounded-full bg-muted text-destructive hover:bg-muted/80 hover:text-destructive dark:bg-muted/60">
                       <RiDeleteBinLine className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
@@ -376,14 +363,14 @@ export function EditItemDrawerClient({
             </div>
 
             {/* Save and Cancel buttons on the right */}
-            <div className="flex gap-3 ml-auto">
-              <Button type="button" variant="outline" onClick={handleCancel}>
+            <div className="ml-auto flex gap-2">
+              <Button type="button" variant="ghost" className="h-10 rounded-full bg-muted px-4 hover:bg-muted/80 dark:bg-muted/60" onClick={handleCancel}>
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 disabled={saveState === 'saving' || !hasChanges}
-                className="min-w-[100px]"
+                className="h-10 min-w-[100px] rounded-full px-4"
               >
                 {saveState === 'saving' ? (
                   <>

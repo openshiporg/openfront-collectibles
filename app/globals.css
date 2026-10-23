@@ -1,25 +1,25 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: oklch(100% 0 0);
-  --color-foreground: oklch(9.65% 0 0);
-  --color-card: oklch(100% 0 0);
-  --color-card-foreground: oklch(9.65% 0 0);
-  --color-popover: oklch(100% 0 0);
-  --color-popover-foreground: oklch(9.65% 0 0);
-  --color-primary: oklch(9.65% 0 0);
-  --color-primary-foreground: oklch(98.04% 0 0);
-  --color-secondary: oklch(96.08% 0 0);
-  --color-secondary-foreground: oklch(9.65% 0 0);
-  --color-muted: oklch(96.08% 0 0);
-  --color-muted-foreground: oklch(45.47% 0.004 270.54);
-  --color-accent: oklch(96.08% 0 0);
-  --color-accent-foreground: oklch(9.65% 0 0);
-  --color-destructive: oklch(55.75% 0.224 29.23);
-  --color-destructive-foreground: oklch(98.04% 0 0);
-  --color-border: oklch(89.84% 0 0);
-  --color-input: oklch(89.84% 0 0);
-  --color-ring: oklch(9.65% 0 0);
+  --color-background: var(--sf-background, oklch(100% 0 0));
+  --color-foreground: var(--sf-foreground, oklch(9.65% 0 0));
+  --color-card: var(--sf-card, oklch(100% 0 0));
+  --color-card-foreground: var(--sf-card-foreground, oklch(9.65% 0 0));
+  --color-popover: var(--sf-popover, oklch(100% 0 0));
+  --color-popover-foreground: var(--sf-popover-foreground, oklch(9.65% 0 0));
+  --color-primary: var(--sf-primary, oklch(9.65% 0 0));
+  --color-primary-foreground: var(--sf-primary-foreground, oklch(98.04% 0 0));
+  --color-secondary: var(--sf-secondary, oklch(96.08% 0 0));
+  --color-secondary-foreground: var(--sf-secondary-foreground, oklch(9.65% 0 0));
+  --color-muted: var(--sf-muted, oklch(96.08% 0 0));
+  --color-muted-foreground: var(--sf-muted-foreground, oklch(45.47% 0.004 270.54));
+  --color-accent: var(--sf-accent, oklch(96.08% 0 0));
+  --color-accent-foreground: var(--sf-accent-foreground, oklch(9.65% 0 0));
+  --color-destructive: var(--sf-destructive, oklch(55.75% 0.224 29.23));
+  --color-destructive-foreground: var(--sf-destructive-foreground, oklch(98.04% 0 0));
+  --color-border: var(--sf-border, oklch(89.84% 0 0));
+  --color-input: var(--sf-input, oklch(89.84% 0 0));
+  --color-ring: var(--sf-ring, oklch(9.65% 0 0));
 
   --radius-lg: 0.5rem;
   --radius-md: calc(var(--radius-lg) - 2px);
@@ -36,5 +36,162 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+}
+
+/* Collectibles storefront: "catalogue & slab" tokens. See docs/design/collectibles-redesign-2026-10-23.md.
+   --cx-h is set per store from the saved logo colour on the .cx-sf wrapper. */
+@theme inline {
+  --color-cx-bg: #f3f0e8;
+  --color-cx-surface: #fffdf8;
+  --color-cx-well: #e8e3d7;
+  --color-cx-ink: #1a1712;
+  --color-cx-ink-2: #5a5348;
+  --color-cx-ink-3: #8c8477;
+  --color-cx-line: #d8d1c2;
+  --color-cx-vault: #201c16;
+  --color-cx-vault-2: #3a332a;
+  --color-cx-accent: hsl(var(--cx-h, 26) 64% 34%);
+  --color-cx-accent-soft: hsl(var(--cx-h, 26) 58% 62%);
+  --color-cx-tint: hsl(var(--cx-h, 26) 52% 91%);
+  --color-cx-danger: #a6302a;
+  --color-cx-ok: #2f6b3f;
+  --color-cx-warn: #9a5b12;
+  --font-cx: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-cx-serif: var(--cx-font-serif), ui-serif, Georgia, serif;
+  --font-cx-mono: var(--cx-font-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  .cx-sf {
+    --sf-background: #f3f0e8;
+    --sf-foreground: #1a1712;
+    --sf-card: #fffdf8;
+    --sf-card-foreground: #1a1712;
+    --sf-popover: #fffdf8;
+    --sf-popover-foreground: #1a1712;
+    --sf-primary: #1a1712;
+    --sf-primary-foreground: #fbf8f1;
+    --sf-secondary: #e8e3d7;
+    --sf-secondary-foreground: #1a1712;
+    --sf-muted: #e8e3d7;
+    --sf-muted-foreground: #5a5348;
+    --sf-accent: #e8e3d7;
+    --sf-accent-foreground: #1a1712;
+    --sf-border: #d8d1c2;
+    --sf-input: #d8d1c2;
+    --sf-ring: hsl(var(--cx-h, 26) 64% 34%);
+    background-color: #f3f0e8;
+    color: #1a1712;
+    font-family: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .cx-sf .cx-num,
+  .cx-sf .font-cx-mono {
+    font-family: var(--cx-font-mono), ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+  }
+
+  .cx-sf .font-cx-serif {
+    font-family: var(--cx-font-serif), ui-serif, Georgia, serif;
+    font-optical-sizing: auto;
+  }
+}
+
+@layer components {
+  /* Raised pill in a recessed track */
+  .cx-track {
+    display: inline-flex;
+    max-width: 100%;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 999px;
+    background: #e8e3d7;
+    box-shadow: inset 0 1px 2px rgb(26 23 18 / 0.1);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .cx-track::-webkit-scrollbar { display: none; }
+  .cx-pill {
+    display: inline-flex;
+    flex: none;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #5a5348;
+    white-space: nowrap;
+    transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+  }
+  .cx-pill:hover { color: #1a1712; }
+  .cx-pill[data-active="true"] {
+    background: #fffdf8;
+    color: #1a1712;
+    box-shadow: 0 1px 2px rgb(26 23 18 / 0.14), 0 0 0 0.5px rgb(26 23 18 / 0.08);
+  }
+  .cx-pill[data-active="true"]:disabled { color: #1a1712; text-decoration: none; cursor: default; }
+  .cx-pill:disabled,
+  .cx-pill[aria-disabled="true"] { color: #b4ac9e; text-decoration: line-through; cursor: not-allowed; }
+  .cx-pill:focus-visible { outline: 2px solid hsl(var(--cx-h, 26) 64% 34%); outline-offset: 1px; }
+  @media (max-width: 639px) {
+    .cx-pill { min-height: 40px; }
+  }
+
+  /* Primary and secondary in-page buttons */
+  .cx-btn {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 22px;
+    border-radius: 999px;
+    background: #1a1712;
+    color: #fbf8f1;
+    font-size: 15px;
+    font-weight: 500;
+    transition: opacity 150ms ease, transform 150ms ease;
+  }
+  .cx-btn:hover { opacity: 0.9; }
+  .cx-btn:active { transform: scale(0.98); }
+  .cx-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .cx-btn:focus-visible { outline: 2px solid hsl(var(--cx-h, 26) 64% 34%); outline-offset: 2px; }
+
+  /* Recessed band holding hairline rows */
+  .cx-band {
+    border-radius: 16px;
+    background: #e8e3d7;
+    box-shadow: inset 0 1px 2px rgb(26 23 18 / 0.07);
+  }
+
+  .cx-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    flex: none;
+    transform: translateY(-0.1em);
+  }
+
+  /* Small caps label, used for catalogue fields */
+  .cx-label {
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8c8477;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }

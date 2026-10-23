@@ -3,7 +3,8 @@ import { LOGIN_VIEW } from "@/features/storefront/modules/account/templates/logi
 import ErrorMessage from "@/features/storefront/modules/checkout/components/error-message" 
 import { SubmitButton } from "@/features/storefront/modules/checkout/components/submit-button" 
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
+import { cxInput, cxSubmit } from "@/features/storefront/modules/account/components/account-ui"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { useState } from "react"
 import { useActionState } from "react"
@@ -20,45 +21,42 @@ const Login = ({ setCurrentView }: Props) => {
 
   return (
     <div
-      className="max-w-sm w-full flex flex-col items-center"
+      className="flex w-full max-w-[400px] flex-col"
       data-testid="login-page"
     >
-      <h1 className="text-base leading-6 font-semibold uppercase mb-6">Welcome back</h1>
-      <p className="text-center text-sm leading-6 font-normal text-foreground mb-8">
-        Sign in to access an enhanced shopping experience.
-      </p>
-      <form className="w-full" action={formAction}>
-        <div className="flex flex-col w-full gap-y-2">
-          <div className="flex flex-col space-y-2">
-           
+      <p className="cx-label">Account</p>
+      <h1 className="mt-2 font-cx-serif text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[44px] sm:leading-[46px]">Sign in</h1>
+      <form className="mt-8 w-full" action={formAction}>
+        <div className="flex w-full flex-col gap-y-4">
+          <div className="flex flex-col gap-y-1.5">
+            <label htmlFor="email" className="text-[13px] font-medium text-cx-ink">Email</label>
             <Input
               id="email"
               aria-label="Email"
               name="email"
               type="email"
-              placeholder="Email"
               title="Enter a valid email address."
               autoComplete="email"
               required
               data-testid="email-input"
+              className={cxInput}
             />
           </div>
-          <div className="flex flex-col space-y-1.5">
-      
+          <div className="flex flex-col gap-y-1.5">
+            <label htmlFor="password" className="text-[13px] font-medium text-cx-ink">Password</label>
             <div className="relative">
               <Input
                 id="password"
                 aria-label="Password"
                 name="password"
                 type={isVisible ? "text" : "password"}
-                placeholder="Password"
                 autoComplete="current-password"
                 required
                 data-testid="password-input"
-                className="pe-12 md:pe-9"
+                className={cn(cxInput, "pe-12")}
               />
               <button
-                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-12 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                 type="button"
                 onClick={toggleVisibility}
                 aria-label={isVisible ? "Hide password" : "Show password"}
@@ -75,21 +73,21 @@ const Login = ({ setCurrentView }: Props) => {
           </div>
         </div>
         <ErrorMessage error={message} data-testid="login-error-message" />
-        <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
+        <SubmitButton data-testid="sign-in-button" className={cn(cxSubmit, "mt-6")}>
           Sign in
         </SubmitButton>
       </form>
-      <span className="text-center text-foreground text-xs leading-5 font-normal mt-6">
-        Not a member?{" "}
+      <div className="mt-6 flex items-center justify-between gap-3 border-t border-cx-line pt-4 text-[14px] text-cx-ink-2">
+        <span>No account</span>
         <button
+          type="button"
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="inline-flex min-h-11 min-w-11 items-center underline"
+          className="inline-flex min-h-11 items-center rounded-full px-3 font-medium text-cx-ink hover:bg-cx-well"
           data-testid="register-button"
         >
-          Join us
+          Create account
         </button>
-        .
-      </span>
+      </div>
     </div>
   )
 }

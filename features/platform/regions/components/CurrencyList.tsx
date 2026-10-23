@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { ListBand } from "../../components/vault-ui";
+import { PlatformEmptyState } from "../../components/PlatformEmptyState";
 import { PlatformFilterBar } from "../../components/PlatformFilterBar";
 import { CurrencyDetailsComponent } from "./CurrencyDetailsComponent";
 import { CreateCurrencyDrawer } from "./drawers/CreateCurrencyDrawer";
@@ -15,16 +17,12 @@ interface CurrencyListProps {
   list: any;
 }
 
-const statusConfig = {
-  active: { label: "Active", color: "emerald" },
-  unused: { label: "Unused", color: "zinc" },
-} as const;
 
 export function CurrencyList({ data, statusCounts, list }: CurrencyListProps) {
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2 px-4 pb-6 md:px-6">
       {/* Filter Bar */}
       <PlatformFilterBar 
         list={list}
@@ -33,8 +31,11 @@ export function CurrencyList({ data, statusCounts, list }: CurrencyListProps) {
         createLabel="Add Currency"
       />
 
-      {/* Currency Cards */}
-      <div className="grid grid-cols-1 divide-y">
+
+      {data.items.length === 0 ? (
+        <PlatformEmptyState title="No currencies" />
+      ) : (
+        <ListBand>
         {data.items.map((currency) => (
           <CurrencyDetailsComponent
             key={currency.id}
@@ -42,7 +43,8 @@ export function CurrencyList({ data, statusCounts, list }: CurrencyListProps) {
             list={list}
           />
         ))}
-      </div>
+        </ListBand>
+      )}
 
       {/* Create Drawer */}
       <CreateCurrencyDrawer

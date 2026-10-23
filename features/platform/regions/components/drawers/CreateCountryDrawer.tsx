@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { ListBand } from "../../../components/vault-ui";
 
 interface CreateCountryDrawerProps {
   open: boolean;
@@ -31,26 +32,25 @@ export function CreateCountryDrawer({ open, onClose }: CreateCountryDrawerProps)
           <div className="flex items-center justify-between">
             <div>
               <DrawerTitle>Create Country</DrawerTitle>
-              <DrawerDescription>
-                Add a new country to the system
-              </DrawerDescription>
+              <DrawerDescription className="sr-only">Create country</DrawerDescription>
             </div>
             <DrawerClose asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="size-10 rounded-full" aria-label="Close">
                 <X className="w-4 h-4" />
               </Button>
             </DrawerClose>
           </div>
         </DrawerHeader>
 
-        <div className="px-6 pb-6">
-          <div className="max-w-md mx-auto text-center space-y-4">
-            <p className="text-muted-foreground">
-              Country creation will be implemented using the EditItemDrawer pattern
-              with fields for ISO codes, display name, and region assignment.
-            </p>
-            <Button onClick={handleCreate}>
-              Implement with EditItemDrawer
+        <div className="px-4 pb-6 md:px-6">
+          <div className="mx-auto max-w-md space-y-4">
+            <ListBand>
+              <div className="px-4 py-4 text-sm text-muted-foreground">
+                Country creation is not available here.
+              </div>
+            </ListBand>
+            <Button onClick={handleCreate} className="h-10 w-full rounded-full">
+              Continue
             </Button>
           </div>
         </div>

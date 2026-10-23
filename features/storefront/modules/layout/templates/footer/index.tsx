@@ -1,97 +1,80 @@
-import { cn } from "@/lib/utils";
 import { getCategoriesList } from "@/features/storefront/lib/data/categories"
 import { getCollectionsList } from "@/features/storefront/lib/data/collections"
+import { listRegions } from "@/features/storefront/lib/data/regions"
 import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
 import Logo from "@/features/storefront/modules/layout/components/logo"
+import CountrySelect from "@/features/storefront/modules/layout/components/country-select"
 import { getStore } from "@/features/storefront/lib/data/store"
 
+function Column({ title, links }: { title: string; links: { title: string; href: string }[] }) {
+  if (!links.length) return null
+  return (
+    <div className="min-w-0">
+      <p className="cx-label !text-[#a39a8a]">{title}</p>
+      <ul className="mt-3 space-y-0.5">
+        {links.map((link) => (
+          <li key={link.href}>
+            <LocalizedClientLink
+              href={link.href}
+              className="inline-flex min-h-9 items-center text-[14px] text-[#d9d1c2] hover:text-white"
+            >
+              {link.title}
+            </LocalizedClientLink>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default async function Footer() {
-  const { collections } = await getCollectionsList(0, 6)
-  const { productCategories } = await getCategoriesList(0, 6)
-  const store = await getStore()
-  const storeName = store?.name || "Openfront Store"
+  const [{ collections }, { productCategories }, { regions }, store] = await Promise.all([
+    getCollectionsList(0, 6),
+    getCategoriesList(0, 12),
+    listRegions(),
+    getStore(),
+  ])
+  const storeName = store?.name || "Store"
+
+  const categoryLinks = (productCategories || [])
+    .filter((c: any) => !c.parentCategory)
+    .slice(0, 8)
+    .map((c: any) => ({ title: c.title, href: `/categories/${c.handle}` }))
+  const collectionLinks = (collections || []).map((c: any) => ({ title: c.title, href: `/collections/${c.handle}` }))
 
   return (
-    <footer className="border-t border-border w-full">
-      <div className="max-w-[1440px] mx-auto px-6 flex flex-col">
-        <div className="flex flex-col gap-y-6 sm:flex-row items-start justify-between py-40">
-          <div>
-            <Logo />
+    <footer className="mt-auto w-full bg-cx-vault text-[#f3eee3]">
+      <div className="mx-auto w-full max-w-[1320px] px-4 pb-10 pt-14 sm:px-6 sm:pt-16">
+        <div className="grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)]">
+          <div className="space-y-5">
+            <Logo size="lg" tone="paper" />
+            {regions && regions.length > 0 && (
+              <div className="max-w-[260px] space-y-1.5">
+                <p className="cx-label !text-[#a39a8a]">Ship to</p>
+                <CountrySelect regions={regions} />
+              </div>
+            )}
           </div>
-          <div className="text-xs leading-5 font-normal gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3">
-            {productCategories && productCategories?.length > 0 && (
-              <div className="flex flex-col gap-y-2">
-                <span className="text-[0.8125rem] leading-[1.375rem] font-medium text-foreground">
-                  Categories
-                </span>
-                <ul className="grid grid-cols-1 gap-2">
-                  {productCategories?.slice(0, 6).map((c: any) => {
-                    if (c.parentCategory) {
-                      return
-                    }
-
-                    const children =
-                      c.categoryChildren?.map((child: any) => ({
-                        title: child.title,
-                        handle: child.handle,
-                        id: child.id,
-                      })) || null
-
-                    return (
-                      <li className="flex flex-col text-muted-foreground text-[0.8125rem] leading-[1.375rem] font-normal" key={c.id}>
-                        <LocalizedClientLink
-                          className={cn("hover:text-foreground")}
-                          href={`/categories/${c.handle}`}>
-                          {c.title}
-                        </LocalizedClientLink>
-                        {children && (
-                          <ul className="grid grid-cols-1 ml-3 gap-2">
-                            {children &&
-                              children.map((child: any) => (
-                                <li key={child.id}>
-                                  <LocalizedClientLink className="hover:text-foreground" href={`/categories/${child.handle}`}>
-                                    {child.title}
-                                  </LocalizedClientLink>
-                                </li>
-                              ))}
-                          </ul>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-            {collections && collections.length > 0 && (
-              <div className="flex flex-col gap-y-2">
-                <span className="text-[0.8125rem] leading-[1.375rem] font-medium text-foreground">
-                  Collections
-                </span>
-                <ul
-                  className={cn("grid grid-cols-1 gap-2 text-muted-foreground text-[0.8125rem] leading-[1.375rem] font-normal", {
-                    "grid-cols-2": (collections?.length || 0) > 3,
-                  })}>
-                  {collections?.slice(0, 6).map((c: any) => (
-                    <li key={c.id}>
-                      <LocalizedClientLink className="hover:text-foreground" href={`/collections/${c.handle}`}>
-                        {c.title}
-                      </LocalizedClientLink>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+            <Column title="Categories" links={categoryLinks} />
+            <Column title="Collections" links={collectionLinks} />
+            <Column
+              title="Account"
+              links={[
+                { title: "Sign in", href: "/account" },
+                { title: "Orders", href: "/account/orders" },
+                { title: "Addresses", href: "/account/addresses" },
+                { title: "Cart", href: "/cart" },
+              ]}
+            />
           </div>
         </div>
-        <div className="flex w-full mb-16 justify-center text-muted-foreground">
-          <p className="text-[0.8125rem] leading-5 font-normal">
-            <span suppressHydrationWarning>
-              © {new Date().getFullYear()} {storeName}. All rights reserved.
-            </span>
+        <div className="mt-12 flex flex-col gap-2 border-t border-cx-vault-2 pt-5 text-[13px] text-[#a39a8a] sm:flex-row sm:items-center sm:justify-between">
+          <p suppressHydrationWarning>
+            © {new Date().getFullYear()} {storeName}
           </p>
         </div>
       </div>
     </footer>
-  );
+  )
 }

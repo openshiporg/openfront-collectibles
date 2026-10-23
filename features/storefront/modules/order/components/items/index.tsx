@@ -1,14 +1,5 @@
 import repeat from "@/features/storefront/lib/util/repeat"
-// Removed HttpTypes and Table imports from Medusa
-import {
-  Table,
-  TableBody,
-  // Import other Table parts if needed (e.g., TableRow, TableCell)
-} from "@/components/ui/table"; 
-
-import Divider from "@/features/storefront/modules/common/components/divider"
 import Item from "@/features/storefront/modules/order/components/item"
-import SkeletonLineItem from "@/features/storefront/modules/skeletons/components/skeleton-line-item"
 
 // Define inline types based on GraphQL schema and component usage
 export type OrderLineItem = {
@@ -40,31 +31,28 @@ export type ItemsProps = {
 const Items = ({ items, region }: ItemsProps) => {
 
   return (
-    <div className="flex flex-col">
-      <Divider className="!mb-0" />
-      <Table>
-        <TableBody data-testid="products-table"> 
-          {items?.length
-            ? items
-                .sort((a: OrderLineItem, b: OrderLineItem) => { // Use OrderLineItem type
-                  // Use correct property name
-                  return (a.createdAt ?? "") > (b.createdAt ?? "") ? -1 : 1; // Corrected field name
-                })
-                .map((item: OrderLineItem) => { // Use OrderLineItem type
-                  return (
-                    <Item
-                      key={item.id}
-                      item={item}
-                      region={region}
-                    />
-                  )
-                })
-            : repeat(5).map((i) => {
-                return <SkeletonLineItem key={i} />
-              })}
-        </TableBody>
-      </Table>
-    </div>
+    <ul className="cx-band divide-y divide-cx-line overflow-hidden" data-testid="products-table">
+      {items?.length
+        ? items
+            .sort((a: OrderLineItem, b: OrderLineItem) => {
+              return (a.createdAt ?? "") > (b.createdAt ?? "") ? -1 : 1;
+            })
+            .map((item: OrderLineItem) => {
+              return (
+                <Item
+                  key={item.id}
+                  item={item}
+                  region={region}
+                />
+              )
+            })
+        : repeat(3).map((i) => (
+            <li key={i} className="flex items-center gap-4 p-4">
+              <div className="size-16 animate-pulse rounded-[10px] bg-cx-line/60" />
+              <div className="h-4 flex-1 animate-pulse rounded bg-cx-line/60" />
+            </li>
+          ))}
+    </ul>
   )
 }
 

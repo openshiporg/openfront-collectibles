@@ -2,13 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { StoreIcon } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { CardElement } from '@stripe/react-stripe-js'
 import InvoicePaymentWrapper from "./invoice-payment-wrapper"
@@ -115,8 +111,8 @@ export default function InvoicePaymentDialog({
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to create invoice payment sessions"
+        title: "Invoice not created",
+        description: "Payment sessions could not be created"
       })
     } finally {
       setLoading(false)
@@ -169,8 +165,8 @@ export default function InvoicePaymentDialog({
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to change payment method"
+        title: "Payment method not changed",
+        description: "Try again"
       })
     } finally {
       setPaymentMethodSwitching(false)
@@ -230,122 +226,107 @@ export default function InvoicePaymentDialog({
     }
   }
 
+  const selectedSessionReady = invoice?.paymentCollection?.paymentSessions?.find(
+    (s: { isSelected: boolean; data?: { clientSecret?: string } }) => s.isSelected && s.data?.clientSecret
+  )
+
   // Single payment screen - like storefront checkout
   if (invoice && availablePaymentMethods.length > 0) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-2xl border-cx-line bg-cx-bg sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Pay Invoice #{invoice.invoiceNumber}</DialogTitle>
-            <DialogDescription>
-              Select payment method and complete payment
-            </DialogDescription>
+            <DialogTitle className="font-cx-serif text-[24px] font-normal leading-[28px] text-cx-ink">
+              Invoice <span className="cx-num text-[20px]">#{invoice.invoiceNumber}</span>
+            </DialogTitle>
+            <DialogDescription className="sr-only">Payment</DialogDescription>
           </DialogHeader>
 
           <InvoicePaymentWrapper invoice={invoice}>
-            <div className="space-y-4">
-              {/* Invoice Summary */}
-              <div className="p-4 border rounded-lg">
-                <h4 className="text-sm text-muted-foreground uppercase font-semibold tracking-wide mb-3">Invoice Summary</h4>
-                <div className="flex justify-between items-center mb-3">
-                  <span>Total: {invoice.formattedTotal}</span>
-                  <span className="text-sm text-gray-600">{invoice.itemCount} {invoice.itemCount === 1 ? 'order' : 'orders'}</span>
+            <div className="space-y-5">
+              <section>
+                <div className="flex items-baseline justify-between gap-3 pb-2">
+                  <span className="cx-label">Total</span>
+                  <span className="cx-num text-[13px] text-cx-ink-2">
+                    {invoice.itemCount} {invoice.itemCount === 1 ? 'order' : 'orders'}
+                  </span>
                 </div>
-                
-                {/* Orders list */}
-                <div className="overflow-y-auto space-y-2">
+                <p className="cx-num pb-3 text-[28px] leading-none text-cx-ink">{invoice.formattedTotal}</p>
+                <ul className="cx-band max-h-56 divide-y divide-cx-line overflow-y-auto">
                   {invoice.lineItems?.map((lineItem: any) => (
-                    <div 
-                      key={lineItem.id} 
-                      className="bg-muted/40 border rounded-md flex justify-between items-center p-3 cursor-pointer hover:bg-muted/60"
-                      onClick={() => window.open(`/account/orders/details/${lineItem.accountLineItem.order?.id}`, '_blank')}
-                    >
-                      <div className="grid grid-cols-3 text-xs leading-4 font-normal gap-x-3 flex-1">
-                        <span className="font-semibold text-gray-700">Date placed</span>
-                        <span className="font-semibold text-gray-700">Order number</span>
-                        <span className="font-semibold text-gray-700">Total amount</span>
-                        <span>{new Date(lineItem.accountLineItem.order.createdAt).toLocaleDateString()}</span>
-                        <span>#{lineItem.accountLineItem.order.displayId}</span>
-                        <span>{lineItem.accountLineItem.order.total}</span>
-                      </div>
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
+                    <li key={lineItem.id}>
+                      <a
+                        href={`/account/orders/details/${lineItem.accountLineItem.order?.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex min-h-12 items-center gap-3 px-4 py-2.5 text-[13px] hover:bg-cx-surface/60"
+                      >
+                        <span className="cx-num font-medium text-cx-ink">#{lineItem.accountLineItem.order.displayId}</span>
+                        <span className="flex-1 text-cx-ink-2">
+                          {new Date(lineItem.accountLineItem.order.createdAt).toLocaleDateString()}
+                        </span>
+                        <span className="cx-num text-cx-ink">{lineItem.accountLineItem.order.total}</span>
+                      </a>
+                    </li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              </section>
 
-              {/* Payment Method Card with Selection */}
-              <div className="p-4 border rounded-lg">
-                <h4 className="text-sm text-muted-foreground uppercase font-semibold tracking-wide mb-3">Payment Method</h4>
+              <section>
+                <p className="cx-label pb-2">Payment method</p>
                 <RadioGroup
                   value={selectedPaymentMethod}
                   onValueChange={handlePaymentMethodChange}
-                  className="space-y-2"
+                  className="cx-band gap-0 divide-y divide-cx-line overflow-hidden"
                 >
                   {availablePaymentMethods.map((method) => (
                     <div key={method.id} className="relative">
                       <RadioGroupItem value={method.code} id={method.id} className="sr-only" />
-                      <Label 
+                      <Label
                         htmlFor={method.id}
                         className={cn(
-                          "flex items-center justify-between text-sm font-normal cursor-pointer py-3 border rounded-md px-4 transition-colors min-w-0",
-                          {
-                            "border-primary bg-primary/5": selectedPaymentMethod === method.code,
-                            "border-border hover:border-primary/50": selectedPaymentMethod !== method.code,
-                          }
+                          "flex min-h-14 min-w-0 cursor-pointer items-center justify-between gap-3 px-4 py-3 text-[14px] font-normal transition-colors",
+                          selectedPaymentMethod === method.code ? "bg-cx-surface" : "hover:bg-cx-surface/50"
                         )}
                       >
-                        <div className="flex items-center gap-x-3 min-w-0 flex-1">
-                          <div className={cn(
-                            "w-4 h-4 border-2 rounded-full flex items-center justify-center transition-colors flex-shrink-0",
-                            {
-                              "border-primary": selectedPaymentMethod === method.code,
-                              "border-border": selectedPaymentMethod !== method.code,
-                            }
-                          )}>
-                            {selectedPaymentMethod === method.code && (
-                              <div className="w-2 h-2 bg-primary rounded-full" />
+                        <div className="flex min-w-0 flex-1 items-center gap-x-3">
+                          <span
+                            className={cn(
+                              "flex size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                              selectedPaymentMethod === method.code ? "border-cx-ink" : "border-cx-ink-3"
                             )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-sm font-medium truncate">
-                              {paymentInfoMap[method.code]?.title || method.code}
-                            </div>
-                            <div className="text-xs text-muted-foreground truncate">
-                              {method.code}
-                            </div>
-                          </div>
+                          >
+                            {selectedPaymentMethod === method.code && <span className="size-2 rounded-full bg-cx-ink" />}
+                          </span>
+                          <span className="truncate font-medium text-cx-ink">
+                            {paymentInfoMap[method.code]?.title || method.code}
+                          </span>
                         </div>
-                        <div className="flex items-center flex-shrink-0 ml-2">
+                        <div className="flex shrink-0 items-center">
                           {paymentInfoMap[method.code]?.icon}
                         </div>
                       </Label>
                     </div>
                   ))}
                 </RadioGroup>
-              </div>
-              
-              {/* Stripe card element - only show if Stripe is selected and has clientSecret */}
-              {isStripe(selectedPaymentMethod) && invoice?.paymentCollection?.paymentSessions?.find((s: { isSelected: boolean; data?: { clientSecret?: string } }) => s.isSelected && s.data?.clientSecret) && (
-                <div className="mt-5 transition-all duration-150 ease-in-out">
-                  <p className="text-base font-semibold mb-1">
-                    Enter your card details:
-                  </p>
+              </section>
+
+              {isStripe(selectedPaymentMethod) && selectedSessionReady && (
+                <section>
+                  <p className="cx-label pb-2">Card</p>
                   <CardElement
                     options={{
                       style: {
                         base: {
-                          fontFamily: "Inter, sans-serif",
-                          color: "#424270",
+                          fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                          color: "#1a1712",
                           "::placeholder": {
-                            color: "rgb(107 114 128)",
+                            color: "#8c8477",
                           },
                         },
                       },
                       classes: {
-                        base: "pt-3 pb-1 block w-full h-11 px-4 mt-0 bg-background border rounded-md appearance-none focus:outline-none focus:ring-0 focus:shadow-borders-interactive-with-active border-border hover:bg-muted transition-all duration-300 ease-in-out",
+                        base: "block h-12 w-full rounded-xl border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1",
                       },
                       // Hide postal code - billing address is already collected
                       hidePostalCode: true,
@@ -356,37 +337,30 @@ export default function InvoicePaymentDialog({
                     }}
                   />
                   {cardError && (
-                    <p className="text-sm text-red-500 mt-2">{cardError}</p>
+                    <p className="mt-2 text-[13px] text-cx-danger" role="alert">{cardError}</p>
                   )}
-                </div>
-              )}
-              
-              {/* Show loading state for Stripe when waiting for clientSecret */}
-              {isStripe(selectedPaymentMethod) && !invoice?.paymentCollection?.paymentSessions?.find((s: { isSelected: boolean; data?: { clientSecret?: string } }) => s.isSelected && s.data?.clientSecret) && (
-                <div className="mt-5">
-                  <p className="text-base font-semibold mb-1">Enter your card details:</p>
-                  <div className="h-11 bg-muted rounded animate-pulse"></div>
-                </div>
+                </section>
               )}
 
-
-              {/* Terms and Payment Button */}
-              <div className="text-sm text-muted-foreground mb-4">
-                By clicking Pay Invoice, you confirm payment for the selected orders.
-              </div>
+              {isStripe(selectedPaymentMethod) && !selectedSessionReady && (
+                <section>
+                  <p className="cx-label pb-2">Card</p>
+                  <div className="h-12 animate-pulse rounded-xl bg-cx-well" />
+                </section>
+              )}
 
               <div className="w-full">
                 {!selectedPaymentMethod ? (
-                  <div className="h-12 bg-muted rounded animate-pulse flex items-center justify-center">
-                    <span className="text-sm text-muted-foreground">Select a payment method</span>
+                  <div className="flex h-12 items-center justify-center rounded-full bg-cx-well text-[14px] text-cx-ink-2">
+                    Select a payment method
                   </div>
                 ) : paymentMethodSwitching ? (
-                  <div className="h-12 bg-muted rounded animate-pulse flex items-center justify-center">
-                    <RiLoader2Fill className="h-4 w-4 animate-spin mr-2" />
-                    <span className="text-sm text-muted-foreground">Loading payment method...</span>
+                  <div className="flex h-12 items-center justify-center gap-2 rounded-full bg-cx-well text-[14px] text-cx-ink-2">
+                    <RiLoader2Fill className="size-4 animate-spin" aria-hidden="true" />
+                    Loading payment method
                   </div>
                 ) : (
-                  <InvoicePaymentButton 
+                  <InvoicePaymentButton
                     invoice={invoice}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onPaymentSuccess={onClose}
@@ -404,55 +378,68 @@ export default function InvoicePaymentDialog({
   // Show region selection (like checkout shows cart items)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="rounded-2xl border-cx-line bg-cx-bg sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Select Invoice Region</DialogTitle>
-          <DialogDescription>
-            Choose which region's unpaid orders to pay
-          </DialogDescription>
+          <DialogTitle className="font-cx-serif text-[24px] font-normal leading-[28px] text-cx-ink">Pay balance</DialogTitle>
+          <DialogDescription className="text-[14px] text-cx-ink-2">Region</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           {unpaidLineItems.success && unpaidLineItems.regions?.length > 0 ? (
-            <RadioGroup value={selectedRegion || ""} onValueChange={handleRegionSelect}>
+            <RadioGroup
+              value={selectedRegion || ""}
+              onValueChange={handleRegionSelect}
+              className="cx-band gap-0 divide-y divide-cx-line overflow-hidden"
+            >
               {unpaidLineItems.regions.map((regionData: any) => (
-                <div key={regionData.region.id} className="flex items-center space-x-2 p-3 border rounded-lg">
-                  <RadioGroupItem value={regionData.region.id} id={regionData.region.id} />
-                  <Label htmlFor={regionData.region.id} className="flex-1 cursor-pointer">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <StoreIcon className="h-4 w-4" />
-                        <span className="font-medium">{regionData.region.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">
-                          {regionData.itemCount} {regionData.itemCount === 1 ? 'order' : 'orders'}
-                        </Badge>
-                        <span className="font-semibold text-green-600">
-                          {regionData.formattedTotalAmount}
-                        </span>
-                      </div>
-                    </div>
+                <div key={regionData.region.id} className="relative">
+                  <RadioGroupItem value={regionData.region.id} id={regionData.region.id} className="sr-only" />
+                  <Label
+                    htmlFor={regionData.region.id}
+                    className={cn(
+                      "flex min-h-14 cursor-pointer items-center gap-3 px-4 py-3 text-[14px] font-normal",
+                      selectedRegion === regionData.region.id ? "bg-cx-surface" : "hover:bg-cx-surface/50"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "flex size-4 shrink-0 items-center justify-center rounded-full border-2",
+                        selectedRegion === regionData.region.id ? "border-cx-ink" : "border-cx-ink-3"
+                      )}
+                    >
+                      {selectedRegion === regionData.region.id && <span className="size-2 rounded-full bg-cx-ink" />}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium text-cx-ink">{regionData.region.name}</span>
+                      <span className="cx-num block text-[12px] text-cx-ink-2">
+                        {regionData.itemCount} {regionData.itemCount === 1 ? 'order' : 'orders'}
+                      </span>
+                    </span>
+                    <span className="cx-num shrink-0 text-cx-ink">{regionData.formattedTotalAmount}</span>
                   </Label>
                 </div>
               ))}
             </RadioGroup>
           ) : (
-            <div className="text-center py-8 text-gray-500">
-              No unpaid orders found
-            </div>
+            <div className="cx-band px-5 py-6 text-[14px] text-cx-ink-2">No unpaid orders</div>
           )}
 
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={onClose}>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex min-h-12 items-center justify-center rounded-full px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
+            >
               Cancel
-            </Button>
-            <Button 
+            </button>
+            <button
+              type="button"
+              className="cx-btn"
               onClick={handleCreateInvoiceWithPaymentSessions}
               disabled={!selectedRegion || loading}
             >
-              {loading ? "Creating..." : "Continue to Payment"}
-            </Button>
+              {loading ? "Creating invoice" : "Continue"}
+            </button>
           </div>
         </div>
       </DialogContent>

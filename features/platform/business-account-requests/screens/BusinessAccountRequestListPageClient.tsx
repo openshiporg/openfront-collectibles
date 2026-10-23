@@ -7,19 +7,13 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  CirclePlus,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '../../components/PlatformEmptyState'
 import { Button } from '@/components/ui/button'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
-import { PlatformFilterBar } from '../../components/PlatformFilterBar'
+import { PlatformFilterBar, platformCreateButtonClass } from '../../components/PlatformFilterBar'
+import { ListBand, PageTitle } from '../../components/vault-ui'
 import { StatusTabs } from '../components/StatusTabs'
 import { BusinessAccountRequestDetailsComponent } from '../components/BusinessAccountRequestDetailsComponent'
 import { Pagination } from '../../../dashboard/components/Pagination'
@@ -51,27 +45,11 @@ interface BusinessAccountRequestListPageClientProps {
 }
 
 function EmptyStateDefault() {
-  return (
-    <EmptyState
-      title="No Account Requests Found"
-      description="There are no account requests matching your current filters."
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title="No account requests" />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function BusinessAccountRequestListPageClient({
@@ -205,16 +183,7 @@ export function BusinessAccountRequestListPageClient({
     { type: 'page' as const, label: 'Account Requests' }
   ]
 
-  const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        Account Requests
-      </h1>
-      <p className="text-muted-foreground">
-        Review customer requests for invoicing access
-      </p>
-    </div>
-  )
+  const header = <PageTitle title="Account Requests" />
 
   // Check if we have any active filters (search or actual filters)
   const hasFilters = !!searchString
@@ -231,9 +200,9 @@ export function BusinessAccountRequestListPageClient({
             <Button 
               onClick={() => setIsCreateDrawerOpen(true)}
               size="icon"
-              className="lg:px-4 lg:py-2 lg:w-auto rounded-lg"
+              className={platformCreateButtonClass}
             >
-              <CirclePlus />
+              <Plus />
               <span className="hidden lg:inline">Create {list.singular}</span>
             </Button>
           }
@@ -242,13 +211,11 @@ export function BusinessAccountRequestListPageClient({
 
       {/* Status Tabs */}
       {statusCounts && (
-        <div className="border-b">
-          <StatusTabs statusCounts={statusCounts} />
-        </div>
+        <StatusTabs statusCounts={statusCounts} />
       )}
 
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -272,10 +239,12 @@ export function BusinessAccountRequestListPageClient({
       ) : (
         <>
           {/* Data grid - full width */}
-          <div className="grid grid-cols-1 divide-y">
-            {data?.items?.map((user: any) => (
-              <BusinessAccountRequestDetailsComponent key={user.id} businessAccountRequest={user} list={list} />
-            ))}
+          <div className="px-4 md:px-6 pb-6">
+            <ListBand>
+              {data?.items?.map((user: any) => (
+                <BusinessAccountRequestDetailsComponent key={user.id} businessAccountRequest={user} list={list} />
+              ))}
+            </ListBand>
           </div>
           
           {/* Pagination */}

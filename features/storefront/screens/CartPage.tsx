@@ -22,13 +22,13 @@ export function CartLoading() {
 
 export function CartNotFound() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
-      <h1 className="text-2xl font-semibold text-foreground">Page not found</h1>
-      <p className="text-xs font-normal text-foreground">
-        The cart you tried to access does not exist. Clear your cookies and try
-        again.
-      </p>
-      <InteractiveLink href="/">Go to frontpage</InteractiveLink>
+    <div className="mx-auto flex min-h-[60vh] w-full max-w-[1320px] flex-col justify-center gap-5 px-4 py-24 sm:px-6">
+      <span className="cx-num text-[13px] text-cx-ink-3">404</span>
+      <h1 className="font-cx-serif text-[40px] leading-[44px] tracking-[-0.015em] text-cx-ink">Cart not found</h1>
+      <p className="text-[15px] text-cx-ink-2">Clear your cookies and try again.</p>
+      <div>
+        <InteractiveLink href="/store">Browse all items</InteractiveLink>
+      </div>
     </div>
   )
 }

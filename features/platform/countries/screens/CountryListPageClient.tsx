@@ -7,17 +7,11 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '../../components/PlatformEmptyState'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
-import { PlatformFilterBar } from '../../components/PlatformFilterBar'
+import { PlatformFilterBar, platformCreateButtonClass } from '../../components/PlatformFilterBar'
+import { ListBand, PageTitle } from '../../components/vault-ui'
 import { CountryDetailsComponent } from '../components/CountryDetailsComponent'
 import { Pagination } from '../../../dashboard/components/Pagination'
 import { FilterList } from '../../../dashboard/components/FilterList'
@@ -41,27 +35,11 @@ interface CountryListPageClientProps {
 }
 
 function EmptyStateDefault() {
-  return (
-    <EmptyState
-      title="No Countries Created"
-      description="You can create a new country to get started."
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title="No countries" />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function CountryListPageClient({
@@ -175,16 +153,7 @@ export function CountryListPageClient({
     { type: 'page' as const, label: 'Countries' }
   ]
 
-  const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        Countries
-      </h1>
-      <p className="text-muted-foreground">
-        Create and manage countries
-      </p>
-    </div>
-  )
+  const header = <PageTitle title="Countries" />
 
   // Check if we have any active filters (search or actual filters)
   const hasFilters = !!searchString
@@ -200,7 +169,7 @@ export function CountryListPageClient({
 
 
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -224,10 +193,12 @@ export function CountryListPageClient({
       ) : (
         <>
           {/* Data grid - full width */}
-          <div className="grid grid-cols-1 divide-y">
-            {data?.items?.map((country: any) => (
-              <CountryDetailsComponent key={country.id} country={country} list={list} />
-            ))}
+          <div className="px-4 md:px-6 pb-6">
+            <ListBand>
+              {data?.items?.map((country: any) => (
+                <CountryDetailsComponent key={country.id} country={country} list={list} />
+              ))}
+            </ListBand>
           </div>
           
           {/* Pagination */}

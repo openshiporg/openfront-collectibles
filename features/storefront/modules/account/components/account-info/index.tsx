@@ -1,5 +1,3 @@
-import { Badge } from "@/components/ui/badge" // Shadcn Badge
-import { Button } from "@/components/ui/button" // Shadcn Button
 import {
   Collapsible,
   CollapsibleContent,
@@ -28,7 +26,7 @@ const AccountInfo = ({
   isSuccess,
   isError,
   clearState,
-  errorMessage = "An error occurred, please try again",
+  errorMessage = "Update failed. Try again.",
   children,
   'data-testid': dataTestid
 }: AccountInfoProps) => {
@@ -48,88 +46,76 @@ const AccountInfo = ({
   }, [isSuccess, close])
 
   return (
-    <div className="text-xs font-normal" data-testid={dataTestid}> 
-      <div className="flex items-end justify-between">
-        <div className="flex flex-col">
-          <span className="uppercase text-foreground">{label}</span> 
-          <div className="flex items-center flex-1 basis-0 justify-end gap-x-4">
+    <div className="px-4 py-4 sm:px-5" data-testid={dataTestid}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <span className="cx-label">{label}</span>
+          <div className="min-w-0 text-[15px] text-cx-ink">
             {typeof currentInfo === "string" ? (
-              <span className="font-semibold" data-testid="current-info">{currentInfo}</span>
+              <span className="break-words" data-testid="current-info">{currentInfo}</span>
             ) : (
               currentInfo
             )}
           </div>
         </div>
-        <div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 px-2 text-xs"
-            onClick={handleToggle}
-            type={state ? "reset" : "button"}
-            data-testid="edit-button"
-            data-active={state}
-          >
-            {state ? "Cancel" : "Edit"}
-          </Button>
-        </div>
+        <button
+          className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-cx-surface px-4 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] hover:bg-cx-bg data-[active=true]:bg-transparent data-[active=true]:shadow-none data-[active=true]:text-cx-ink-2"
+          onClick={handleToggle}
+          type={state ? "reset" : "button"}
+          data-testid="edit-button"
+          data-active={state}
+        >
+          {state ? "Cancel" : "Edit"}
+        </button>
       </div>
 
-      {/* Success state - using regular div with custom animation */}
-      <div 
-        className={cn( 
-          "transition-all duration-300 ease-in-out overflow-hidden",
-          {
-            "max-h-[1000px] opacity-100": isSuccess,
-            "max-h-0 opacity-0": !isSuccess,
-          }
-        )}
-        data-testid="success-message"
-      >
-        <Badge className="p-2 my-4" variant="default"> 
-          <span>{label} updated succesfully</span>
-        </Badge>
-      </div>
-
-      {/* Error state - using regular div with custom animation */}
       <div
-        className={cn( 
-          "transition-all duration-300 ease-in-out overflow-hidden",
-          {
-            "max-h-[1000px] opacity-100": isError,
-            "max-h-0 opacity-0": !isError,
-          }
-        )}
-        data-testid="error-message"
+        className={cn("overflow-hidden transition-all duration-300 ease-in-out", {
+          "max-h-[200px] opacity-100": isSuccess,
+          "max-h-0 opacity-0": !isSuccess,
+        })}
+        data-testid="success-message"
+        role="status"
       >
-        <Badge className="p-2 my-4" variant="destructive">
-          <span>{errorMessage}</span>
-        </Badge>
+        <p className="mt-3 inline-flex items-baseline gap-2 text-[13px] text-cx-ok">
+          <span className="cx-dot bg-cx-ok" aria-hidden="true" />
+          {label} updated
+        </p>
       </div>
 
-      {/* Proper Collapsible component for the edit form */}
+      <div
+        className={cn("overflow-hidden transition-all duration-300 ease-in-out", {
+          "max-h-[200px] opacity-100": isError,
+          "max-h-0 opacity-0": !isError,
+        })}
+        data-testid="error-message"
+        role="alert"
+      >
+        <p className="mt-3 inline-flex items-baseline gap-2 text-[13px] text-cx-danger">
+          <span className="cx-dot bg-cx-danger" aria-hidden="true" />
+          {errorMessage}
+        </p>
+      </div>
+
       <Collapsible open={state}>
         <CollapsibleContent
-          className={cn( 
-            "transition-all duration-300 ease-in-out overflow-visible",
-            {
-              "max-h-[1000px] opacity-100": state,
-              "max-h-0 opacity-0": !state,
-            }
-          )}
+          className={cn("overflow-visible transition-all duration-300 ease-in-out", {
+            "max-h-[1000px] opacity-100": state,
+            "max-h-0 opacity-0": !state,
+          })}
         >
-          <div className="flex flex-col gap-y-2 py-4">
+          <div className="flex flex-col gap-4 pt-4">
             <div>{children}</div>
-            <div className="flex items-center justify-end mt-2">
-              <Button
-                disabled={pending} // Disable button when pending
-                className="w-full sm:max-w-[140px]"
+            <div className="flex justify-end">
+              <button
+                disabled={pending}
+                className="cx-btn w-full sm:w-auto sm:min-w-[140px]"
                 type="submit"
                 data-testid="save-button"
               >
-                {pending && <RiLoader2Fill className="animate-spin"/>}
+                {pending && <RiLoader2Fill className="size-4 animate-spin" aria-hidden="true" />}
                 Save
-              </Button>
+              </button>
             </div>
           </div>
         </CollapsibleContent>

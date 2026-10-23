@@ -1,26 +1,26 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useMemo, useState } from "react"
-import { isEqual } from "lodash"
-import { retrievePricedProductByHandle } from "../../../../lib/data/products"
+import { useEffect, useRef, useState } from "react"
 
-// Define inline type based on GraphQL Image schema and component usage
-type ImageInfo = {
-  id: string;
-  url?: string | null;
-  // Add other fields if needed, e.g., altText
-  altText?: string | null; // Example, adjust based on actual schema/usage
-};
+import { cn } from "@/lib/utils"
 
 type ImageGalleryProps = {
   images: any[];
   handle: string;
   region: any;
+  /** Shown in serif on the no-photo art. */
+  title?: string;
+  /** Small caps label on the no-photo art. */
+  label?: string | null;
 };
 
-const ImageGallery = ({ images, handle, region }: ImageGalleryProps) => {
+const srcOf = (image: any) => image?.image?.url || image?.imagePath || image?.url || null
+
+const ImageGallery = ({ images, title, label }: ImageGalleryProps) => {
   const [selectedVariant, setSelectedVariant] = useState<any>(null)
+  const [active, setActive] = useState(0)
+  const scroller = useRef<HTMLDivElement>(null)
 
   // Listen for variant changes from ProductActions
   useEffect(() => {
@@ -32,39 +32,83 @@ const ImageGallery = ({ images, handle, region }: ImageGalleryProps) => {
     return () => window.removeEventListener('variantChange', handleVariantChange)
   }, [])
 
-  // Sort images by order field first, then apply variant logic
   const sortedImages = [...images].sort((a, b) => (a.order || 0) - (b.order || 0))
 
-  // Determine which images to show - prioritize variant primary image if selected
-  const displayImages = selectedVariant?.primaryImage
-    ? [selectedVariant.primaryImage, ...sortedImages.filter(img => img.id !== selectedVariant.primaryImage.id)]
-    : sortedImages
+  // A selected variant's primary image leads the gallery.
+  const displayImages = (
+    selectedVariant?.primaryImage
+      ? [selectedVariant.primaryImage, ...sortedImages.filter(img => img.id !== selectedVariant.primaryImage.id)]
+      : sortedImages
+  ).filter((image) => srcOf(image))
+
+  useEffect(() => {
+    setActive(0)
+    scroller.current?.scrollTo({ left: 0 })
+  }, [selectedVariant?.id])
+
+  const goTo = (index: number) => {
+    setActive(index)
+    const el = scroller.current
+    if (el) el.scrollTo({ left: el.clientWidth * index, behavior: "smooth" })
+  }
+
+  if (displayImages.length === 0) {
+    return (
+      <div className="relative flex aspect-[4/5] w-full flex-col justify-end gap-2 overflow-hidden rounded-[14px] bg-cx-tint p-6 sm:p-10">
+        {label && <span className="cx-label">{label}</span>}
+        {title && (
+          <span className="max-w-[18ch] font-cx-serif text-[32px] leading-[36px] tracking-[-0.01em] text-cx-ink sm:text-[44px] sm:leading-[48px]">
+            {title}
+          </span>
+        )}
+      </div>
+    )
+  }
 
   return (
-    <div className="flex items-start relative">
-      <div className="flex flex-col flex-1 sm:mx-16 gap-y-4">
-        {displayImages.map((image, index) => {
-          return (
-            <div
-              key={image.id}
-              className="relative aspect-[29/34] w-full overflow-hidden bg-muted"
-              id={image.id}
-            >
-              <Image
-                src={image?.image?.url || image?.imagePath || "/images/placeholder.svg"}
-                priority={index <= 2 ? true : false}
-                className="absolute inset-0 rounded-rounded"
-                alt={image?.altText || `Product image ${index + 1}`}
-                fill
-                sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
-                style={{
-                  objectFit: "cover",
-                }}
-              />
-            </div>
-          )
-        })}
+    <div className="flex flex-col gap-3 lg:flex-row-reverse lg:items-start">
+      <div
+        ref={scroller}
+        className="no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto rounded-[14px] bg-cx-well"
+        onScroll={(event) => {
+          const el = event.currentTarget
+          const index = Math.round(el.scrollLeft / Math.max(el.clientWidth, 1))
+          if (index !== active) setActive(index)
+        }}
+        aria-label="Item photos"
+      >
+        {displayImages.map((image, index) => (
+          <div key={image.id ?? index} className="relative aspect-[4/5] w-full shrink-0 snap-center" id={image.id}>
+            <Image
+              src={srcOf(image)}
+              priority={index === 0}
+              className="object-cover"
+              alt={image?.altText || (title ? `${title}, photo ${index + 1}` : `Photo ${index + 1}`)}
+              fill
+              sizes="(max-width: 1024px) 100vw, 700px"
+            />
+          </div>
+        ))}
       </div>
+      {displayImages.length > 1 && (
+        <div className="no-scrollbar flex gap-2 overflow-x-auto lg:w-[72px] lg:shrink-0 lg:flex-col">
+          {displayImages.map((image, index) => (
+            <button
+              key={image.id ?? index}
+              type="button"
+              onClick={() => goTo(index)}
+              aria-label={`Show photo ${index + 1}`}
+              aria-current={active === index}
+              className={cn(
+                "relative size-16 shrink-0 overflow-hidden rounded-[10px] bg-cx-well ring-1 transition lg:size-[72px]",
+                active === index ? "ring-2 ring-cx-ink" : "ring-cx-line opacity-70 hover:opacity-100"
+              )}
+            >
+              <Image src={srcOf(image)} alt="" fill sizes="72px" className="object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { cn } from "@/lib/utils"
+"use client"
+
+import { Track, PillButton } from "@/features/storefront/modules/common/components/collectibles/track"
 
 type FilterRadioGroupProps = {
   title: string
@@ -13,6 +13,7 @@ type FilterRadioGroupProps = {
   "data-testid"?: string
 }
 
+/** Single-choice filter as raised pills in a recessed track. */
 const FilterRadioGroup = ({
   title,
   items,
@@ -21,42 +22,20 @@ const FilterRadioGroup = ({
   "data-testid": dataTestId,
 }: FilterRadioGroupProps) => {
   return (
-    <div className="flex gap-x-3 flex-col gap-y-3">
-      <p className="text-xs font-medium leading-5 text-muted-foreground">{title}</p>
-      <RadioGroup data-testid={dataTestId} onValueChange={handleChange} value={value}>
+    <div className="flex min-w-0 items-center gap-3" data-testid={dataTestId}>
+      <span className="cx-label hidden shrink-0 sm:inline">{title}</span>
+      <Track label={title}>
         {items?.map((i) => (
-          <div
+          <PillButton
             key={i.value}
-            className={cn(
-              "relative flex gap-2 rounded-md py-1.5 pr-3 text-sm transition cursor-pointer",
-              i.value === value
-                ? "pl-4 rounded bg-white text-blue-600 shadow ring-1 ring-gray-200 dark:bg-gray-900 dark:text-blue-500 dark:ring-gray-800"
-                : "pl-4 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            )}
+            active={i.value === value}
             onClick={() => handleChange(i.value)}
+            data-testid="radio-label"
           >
-            {i.value === value && (
-              <div
-                className="absolute left-1.5 top-1/2 h-5 w-px -translate-y-1/2 bg-blue-500 dark:bg-blue-500"
-                aria-hidden="true"
-              />
-            )}
-            <RadioGroupItem
-              id={i.value}
-              value={i.value}
-              className="sr-only"
-            />
-            <Label
-              htmlFor={i.value}
-              className="text-sm leading-5 !transform-none hover:cursor-pointer"
-              data-testid="radio-label"
-              data-active={i.value === value}
-            >
-              {i.label}
-            </Label>
-          </div>
+            {i.label}
+          </PillButton>
         ))}
-      </RadioGroup>
+      </Track>
     </div>
   )
 }

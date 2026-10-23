@@ -34,13 +34,13 @@ const ProfileName: React.FC<MyInformationProps> = ({ customer }) => {
       <AccountInfo
         label="Name"
         
-        currentInfo={`${customer.firstName} ${customer.lastName}`}
+        currentInfo={[customer.firstName, customer.lastName].filter(Boolean).join(" ") || "Not set"}
         isSuccess={successState}
         isError={!!state?.error}
         clearState={clearState}
         data-testid="account-name-editor"
       >
-        <div className="grid grid-cols-2 gap-x-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Input
             label="First name"
             name="firstName" 

@@ -3,9 +3,9 @@ import { startOnboarding, completeOnboarding } from '../actions/onboarding';
 import { SECTION_DEFINITIONS } from '../config/templates';
 import { TemplateType, OnboardingStep } from './useOnboardingState';
 import {
-  DEFAULT_STORE_LOGO_COLOR,
-  DEFAULT_STORE_LOGO_ICON,
-} from '../../store-settings/lib/store-logo';
+  COLLECTIBLES_LOGO_COLOR,
+  COLLECTIBLES_LOGO_ICON,
+} from '@/features/storefront/lib/collectibles-brand';
 
 const GRAPHQL_ENDPOINT = '/api/graphql';
 
@@ -104,8 +104,8 @@ export function useOnboardingApi({
       defaultCurrencyCode: 'usd',
       homepageTitle: 'Modern Apparel Store',
       homepageDescription: 'Quality clothing and unique designs.',
-      logoIcon: DEFAULT_STORE_LOGO_ICON,
-      logoColor: DEFAULT_STORE_LOGO_COLOR,
+      logoIcon: COLLECTIBLES_LOGO_ICON,
+      logoColor: COLLECTIBLES_LOGO_COLOR,
       ...(data.store || {}),
     };
 

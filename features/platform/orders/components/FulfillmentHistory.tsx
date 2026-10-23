@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ChevronUp, ChevronDown, ArrowUpRight } from 'lucide-react';
 import { ProductImage } from '../../components/ProductImage';
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Dot, ListBand, SectionTitle } from '@/features/platform/components/vault-ui';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -51,7 +50,6 @@ interface FulfillmentHistoryProps {
   onDelete: (id: string) => void;
 }
 import { cn } from '@/lib/utils';
-import { badgeVariants } from '@/components/ui/badge-button';
 
 export function FulfillmentHistory({
   fulfillments,
@@ -123,311 +121,205 @@ export function FulfillmentHistory({
     };
   }>) => {
     return items.map((item) => (
-      <div
-        key={item.id}
-        className="flex items-start space-x-4 border-t first:border-t-0 p-2"
-      >
-        <div className="h-16 w-16 flex-shrink-0">
+      <div key={item.id} className="flex items-start gap-3 px-3 py-2.5">
+        <div className="size-10 shrink-0 overflow-hidden rounded-md bg-muted">
           <ProductImage
             src={item.lineItem.thumbnail}
             alt={item.lineItem.title}
-            width={64}
-            height={64}
-            className="h-16 w-16"
+            width={40}
+            height={40}
+            className="size-10"
           />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-start gap-4">
-            <div>
-              <h4 className="font-medium text-sm">{item.lineItem.title}</h4>
-              {item.lineItem.variantTitle && (
-                <p className="text-xs text-muted-foreground mb-1">
-                  {item.lineItem.variantTitle}
-                </p>
-              )}
-              <div className="flex items-center gap-2">
-                {item.lineItem.sku && (
-                  <p className="text-xs text-muted-foreground">
-                    SKU: {item.lineItem.sku}
-                  </p>
-                )}
-                <div
-                  className={cn(
-                    badgeVariants({ color: 'blue' }),
-                    'border py-0 text-[11px] uppercase font-medium tracking-wide rounded-full'
-                  )}
-                >
-                  {item.quantity} Fulfilled
-                </div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm font-medium mt-0.5">
-                {item.quantity} × {item.lineItem.formattedUnitPrice}
-              </div>
-            </div>
-          </div>
+        <div className="min-w-0 flex-1">
+          <h4 className="text-sm font-medium text-foreground">{item.lineItem.title}</h4>
+          {item.lineItem.variantTitle && (
+            <p className="font-mono text-xs tabular-nums text-foreground/80">{item.lineItem.variantTitle}</p>
+          )}
+          {item.lineItem.sku && (
+            <p className="font-mono text-[11px] tabular-nums text-muted-foreground">SKU {item.lineItem.sku}</p>
+          )}
+        </div>
+        <div className="shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
+          <span className="text-sm text-foreground">{item.quantity}</span> x {item.lineItem.formattedUnitPrice}
         </div>
       </div>
     ));
   };
 
-  return (
-    <Card className="sm:mx-auto bg-muted/10">
-      <div className="p-6">
-        <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground">
-          Fulfillment overview
-        </h3>
-        <div className="relative mt-6">
-          <Progress
-            value={fulfilledPercentage}
-            className="h-2 [&>div]:bg-blue-500"
-          />
-        </div>
-        <ul role="list" className="mt-4 flex items-center justify-between">
-          <li className="flex space-x-2.5">
-            <span className="flex w-0.5 bg-blue-500" aria-hidden={true} />
-            <div className="space-y-0.5">
-              <p className="text-sm text-muted-foreground">Fulfilled</p>
-              <p className="font-semibold text-gray-900 dark:text-gray-50">
-                {lineItemStats.fulfilled}{' '}
-                <span className="font-normal text-muted-foreground">
-                  ({fulfilledPercentage.toFixed(1)}%)
-                </span>
-              </p>
-            </div>
-          </li>
-          <li className="flex space-x-2.5">
-            <div className="space-y-0.5 text-right">
-              <p className="text-sm text-muted-foreground">Open</p>
-              <p className="font-semibold text-gray-900 dark:text-gray-50">
-                {totalUnfulfilled}{' '}
-                <span className="font-normal text-muted-foreground">
-                  ({openPercentage.toFixed(1)}%)
-                </span>
-              </p>
-            </div>
-            <span
-              className="flex w-0.5 bg-gray-200 dark:bg-gray-800"
-              aria-hidden={true}
-            />
-          </li>
-        </ul>
+  const textAction =
+    'inline-flex min-h-8 cursor-pointer items-center text-sm font-medium text-muted-foreground hover:text-foreground max-sm:min-h-10';
 
-        <div className="mt-6 space-y-1">
-          <div className="hidden sm:flex items-center justify-between px-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <div className="w-[40%]">Fulfillments</div>
-            <div className="w-[35%] text-left pl-4">Created</div>
-            <div className="w-[25%] text-right">Actions</div>
+  return (
+    <section>
+      <SectionTitle meta={filteredFulfillments.length}>Fulfilments</SectionTitle>
+      <ListBand>
+        <div className="px-4 py-3">
+          <div className="h-1.5 overflow-hidden rounded-full bg-background ring-1 ring-inset ring-border">
+            <div className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400" style={{ width: `${fulfilledPercentage}%` }} />
           </div>
-          
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
-            {filteredFulfillments.map((fulfillment) => (
-              <div 
-                key={fulfillment.id} 
-                className={cn(
-                  'py-2 transition-opacity duration-200',
-                  fulfillment.canceledAt && !expandedFulfillments.includes(fulfillment.id) && 'opacity-50 hover:opacity-100'
-                )}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 gap-2 sm:gap-0">
-                  <div className="flex flex-col sm:flex-row sm:items-center w-full sm:w-[40%]">
-                    <div className="hidden sm:flex sm:items-center sm:mr-2 flex-shrink-0">
-                      <Button
-                        variant={fulfillment.canceledAt ? "destructive" : "default"}
-                        size="sm"
-                        onClick={() => toggleFulfillment(fulfillment.id)}
-                        className="shadow-none rounded-sm h-5 w-10 text-xs flex items-center gap-1.5 p-0"
-                      >
-                        {fulfillment.items?.reduce(
-                          (sum: number, item: { quantity: number }) => sum + item.quantity,
-                          0
-                        ) || 0}
-                        {expandedFulfillments.includes(fulfillment.id) ? (
-                          <ChevronUp className="size-3" />
-                        ) : (
-                          <ChevronDown className="size-3" />
-                        )}
-                      </Button>
-                    </div>
-                    <div className="space-y-0.5 sm:space-y-0 w-full min-w-0">
-                      <div className="flex sm:hidden text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                        ID
-                      </div>
-                      <div className="flex items-center justify-between sm:justify-start w-full gap-2">
-                        <div className="min-w-0 flex-1">
-                          <Link 
-                            href={`/dashboard/fulfillments/${fulfillment.id}`}
-                            className="text-muted-foreground hover:underline text-sm font-medium truncate block"
-                          >
-                            {fulfillment.id}
-                          </Link>
-                        </div>
-                        <Button
-                          variant={fulfillment.canceledAt ? "destructive" : "default"}
-                          size="sm"
-                          onClick={() => toggleFulfillment(fulfillment.id)}
-                          className="sm:hidden shadow-none rounded-sm h-5 w-10 text-xs flex items-center gap-1.5 p-0 flex-shrink-0"
-                        >
-                          {fulfillment.items?.reduce(
-                            (sum: number, item: { quantity: number }) => sum + item.quantity,
-                            0
-                          ) || 0}
-                          {expandedFulfillments.includes(fulfillment.id) ? (
-                            <ChevronUp className="size-3" />
-                          ) : (
-                            <ChevronDown className="size-3" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
+          <dl className="mt-3 flex items-baseline justify-between gap-4 text-sm">
+            <div className="flex items-baseline gap-2">
+              <Dot tone="ok" />
+              <dt className="text-muted-foreground">Fulfilled</dt>
+              <dd className="font-mono tabular-nums text-foreground">
+                {lineItemStats.fulfilled}{' '}
+                <span className="text-muted-foreground">{fulfilledPercentage.toFixed(1)}%</span>
+              </dd>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <Dot tone="warn" />
+              <dt className="text-muted-foreground">Open</dt>
+              <dd className="font-mono tabular-nums text-foreground">
+                {totalUnfulfilled}{' '}
+                <span className="text-muted-foreground">{openPercentage.toFixed(1)}%</span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        {filteredFulfillments.map((fulfillment) => {
+          const count =
+            fulfillment.items?.reduce(
+              (sum: number, item: { quantity: number }) => sum + item.quantity,
+              0
+            ) || 0;
+          const expanded = expandedFulfillments.includes(fulfillment.id);
+          const label = fulfillment.shippingLabels?.[0];
+          return (
+            <div
+              key={fulfillment.id}
+              className={cn(
+                'px-4 py-3 transition-opacity duration-200',
+                fulfillment.canceledAt && !expanded && 'opacity-60 hover:opacity-100'
+              )}
+            >
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <Link
+                      href={`/dashboard/fulfillments/${fulfillment.id}`}
+                      className="min-w-0 truncate font-mono text-sm tabular-nums text-foreground hover:underline underline-offset-4"
+                    >
+                      {fulfillment.id}
+                    </Link>
+                    <span className="inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
+                      <Dot tone={fulfillment.canceledAt ? 'danger' : 'ok'} />
+                      {fulfillment.canceledAt ? 'Cancelled' : 'Fulfilled'}
+                    </span>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-0 w-full sm:w-[35%]">
-                    <div className="flex sm:hidden text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Created
-                    </div>
-                    <div className="text-left text-sm text-foreground/70 sm:pl-4">
-                      {formatDate(fulfillment.createdAt.toString())}
-                    </div>
-                  </div>
-                  <div className="space-y-0.5 sm:space-y-0 w-full sm:w-[25%]">
-                    <div className="flex sm:hidden text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Actions
-                    </div>
-                    <div className="flex items-center sm:justify-end gap-4">
-                      {!fulfillment.canceledAt ? (
-                        <>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <span className="cursor-pointer text-muted-foreground font-medium text-sm h-auto p-0">
-                                Cancel
-                              </span>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[250px] p-3" side="left">
-                              <div className="space-y-2.5">
-                                <div className="space-y-1">
-                                  <p className="text-[13px] font-medium">
-                                    Cancel fulfillment?
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    This action cannot be undone.
-                                  </p>
-                                </div>
-                                <div className="flex justify-end">
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    className="h-6 text-xs"
-                                    onClick={() => onDelete(fulfillment.id)}
-                                  >
-                                    Cancel fulfillment
-                                  </Button>
-                                </div>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                          {fulfillment.shippingLabels?.[0] && (
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <span className="cursor-pointer font-medium text-sm h-auto p-0 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">
-                                  Label
-                                </span>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-[280px] p-3" side="left">
-                                <div className="space-y-2.5">
-                                  <div className="space-y-1">
-                                    <p className="text-[13px] font-medium">
-                                      Shipping Label
-                                    </p>
-                                    {fulfillment.shippingLabels[0].carrier && (
-                                      <p className="text-xs text-muted-foreground">
-                                        Carrier: <span className="font-medium">{fulfillment.shippingLabels[0].carrier.toUpperCase()}</span>
-                                      </p>
-                                    )}
-                                    {fulfillment.shippingLabels[0].trackingNumber && (
-                                      <p className="text-xs text-muted-foreground break-all">
-                                        Tracking: <span className="font-medium">{fulfillment.shippingLabels[0].trackingNumber}</span>
-                                      </p>
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col gap-2">
-                                    {fulfillment.shippingLabels[0].trackingUrl && (
-                                      <Link
-                                        href={fulfillment.shippingLabels[0].trackingUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs text-indigo-500 hover:text-indigo-600 flex items-center gap-1"
-                                      >
-                                        Track Package <ArrowUpRight className="h-3 w-3" />
-                                      </Link>
-                                    )}
-                                    {fulfillment.shippingLabels[0].labelUrl && (
-                                      <Link
-                                        href={fulfillment.shippingLabels[0].labelUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center justify-center rounded-md text-xs font-medium h-7 px-3 bg-primary text-primary-foreground hover:bg-primary/90"
-                                      >
-                                        Download Label
-                                      </Link>
-                                    )}
-                                  </div>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-sm text-destructive font-medium">
-                            Cancelled
-                          </span>
-                          {fulfillment.shippingLabels?.[0] && (
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <span className="cursor-pointer text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm h-auto p-0">
-                                  Label
-                                </span>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-[280px] p-3" side="left">
-                                <div className="space-y-2.5">
-                                  <div className="space-y-1">
-                                    <p className="text-[13px] font-medium">
-                                      Cancelled Shipping Label
-                                    </p>
-                                    {fulfillment.shippingLabels[0].carrier && (
-                                      <p className="text-xs text-muted-foreground">
-                                        Carrier: <span className="font-medium">{fulfillment.shippingLabels[0].carrier.toUpperCase()}</span>
-                                      </p>
-                                    )}
-                                    {fulfillment.shippingLabels[0].trackingNumber && (
-                                      <p className="text-xs text-muted-foreground break-all">
-                                        Tracking: <span className="font-medium">{fulfillment.shippingLabels[0].trackingNumber}</span>
-                                      </p>
-                                    )}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    This label has been cancelled and is no longer valid.
-                                  </div>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          )}
-                        </>
-                      )}
-                    </div>
+                  <div className="mt-0.5 font-mono text-xs tabular-nums text-muted-foreground">
+                    {formatDate(fulfillment.createdAt.toString())}
                   </div>
                 </div>
-                {expandedFulfillments.includes(fulfillment.id) && (
-                  <div className="bg-muted/40 rounded-md border shadow-inner mt-4">
-                    {renderFulfillmentItems(fulfillment.items || [])}
-                  </div>
-                )}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <button
+                    type="button"
+                    onClick={() => toggleFulfillment(fulfillment.id)}
+                    aria-expanded={expanded}
+                    className="inline-flex min-h-8 items-center gap-1.5 rounded-full bg-background px-3 text-xs font-medium text-foreground shadow-xs ring-1 ring-border max-sm:min-h-10"
+                  >
+                    <span className="font-mono tabular-nums">{count}</span>
+                    {count === 1 ? 'item' : 'items'}
+                    {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+                  </button>
+                  {!fulfillment.canceledAt && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button type="button" className={textAction}>
+                          Cancel
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[250px] p-3" side="left">
+                        <div className="space-y-2.5">
+                          <div className="space-y-1">
+                            <p className="text-[13px] font-medium">
+                              Cancel fulfillment?
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              This action cannot be undone.
+                            </p>
+                          </div>
+                          <div className="flex justify-end">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="h-8 rounded-full text-xs"
+                              onClick={() => onDelete(fulfillment.id)}
+                            >
+                              Cancel fulfillment
+                            </Button>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                  {label && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button type="button" className={textAction}>
+                          Label
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[280px] p-3" side="left">
+                        <div className="space-y-2.5">
+                          <div className="space-y-1">
+                            <p className="text-[13px] font-medium">
+                              {fulfillment.canceledAt ? 'Cancelled shipping label' : 'Shipping label'}
+                            </p>
+                            {label.carrier && (
+                              <p className="text-xs text-muted-foreground">
+                                Carrier <span className="font-medium text-foreground">{label.carrier.toUpperCase()}</span>
+                              </p>
+                            )}
+                            {label.trackingNumber && (
+                              <p className="break-all text-xs text-muted-foreground">
+                                Tracking <span className="font-mono tabular-nums text-foreground">{label.trackingNumber}</span>
+                              </p>
+                            )}
+                          </div>
+                          {fulfillment.canceledAt ? (
+                            <div className="text-xs text-muted-foreground">Label cancelled</div>
+                          ) : (
+                            <div className="flex flex-col gap-2">
+                              {label.trackingUrl && (
+                                <Link
+                                  href={label.trackingUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-xs font-medium text-foreground hover:underline underline-offset-4"
+                                >
+                                  Track package <ArrowUpRight className="size-3" />
+                                </Link>
+                              )}
+                              {label.labelUrl && (
+                                <Link
+                                  href={label.labelUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex h-8 items-center justify-center gap-1 rounded-full bg-foreground px-3 text-xs font-medium text-background hover:bg-foreground/90"
+                                >
+                                  Download label <ArrowUpRight className="size-3" />
+                                </Link>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </Card>
+              {expanded && (
+                <ListBand className="mt-3 bg-background">
+                  {renderFulfillmentItems(fulfillment.items || [])}
+                </ListBand>
+              )}
+            </div>
+          );
+        })}
+      </ListBand>
+    </section>
   );
+
 }

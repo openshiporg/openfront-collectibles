@@ -88,7 +88,6 @@ export function RegionCreateDrawer({
     return availablePresets.map(region => ({
       value: region.code,
       label: region.name,
-      flag: getRegionIcon(region.code),
     }))
   }
 
@@ -106,7 +105,6 @@ export function RegionCreateDrawer({
     return region?.countries.map((country: any) => ({
       value: country.iso2,
       label: country.displayName,
-      flag: country.flag,
     })) || []
   }
 
@@ -196,48 +194,18 @@ export function RegionCreateDrawer({
     }
   }, [loading, onClose])
 
-  // Get region icons/emojis
-  const getRegionIcon = (regionCode: string) => {
-    const iconMap: Record<string, string> = {
-      'us': '🇺🇸',
-      'na': '🇺🇸',
-      'eu': '🇪🇺', 
-      'uk': '🇬🇧',
-      'ca': '🇨🇦',
-      'au': '🇦🇺',
-      'apac': '🇦🇺',
-      'jp': '🇯🇵',
-      'japan': '🇯🇵',
-      'kr': '🇰🇷',
-      'south_korea': '🇰🇷',
-      'sg': '🇸🇬',
-      'singapore': '🇸🇬',
-      'in': '🇮🇳',
-      'india': '🇮🇳',
-      'br': '🇧🇷',
-      'latam': '🇧🇷',
-      'mx': '🇲🇽',
-      'nordics': '🇸🇪',
-      'mena': '🇦🇪',
-      'africa': '🇿🇦',
-      'china': '🇨🇳'
-    }
-    return iconMap[regionCode] || '🌍'
-  }
 
   return (
     <Drawer open={open} onOpenChange={(open) => { if (!open) handleClose() }}>
       <DrawerContent>
-        <DrawerHeader className="flex-shrink-0">
-          <DrawerTitle>Create New Region</DrawerTitle>
-          <DrawerDescription>
-            Select a region preset and customize the configuration for your market
-          </DrawerDescription>
+        <DrawerHeader className="flex-shrink-0 border-b border-border">
+          <DrawerTitle className="text-lg font-semibold tracking-tight">Create New Region</DrawerTitle>
+          <DrawerDescription className="sr-only">Create region</DrawerDescription>
         </DrawerHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6">
+            <div className="mx-auto max-w-xl space-y-5">
               {/* Region Preset Selection */}
               <div>
                 <SingleSelect
@@ -314,7 +282,8 @@ export function RegionCreateDrawer({
             <div className="flex gap-2 justify-end">
               <Button 
                 type="button" 
-                variant="outline" 
+                variant="ghost"
+                className="h-10 rounded-full bg-muted px-4 hover:bg-muted/80"
                 onClick={handleClose}
                 disabled={loading}
               >
@@ -323,7 +292,7 @@ export function RegionCreateDrawer({
               <Button 
                 type="submit" 
                 disabled={loading || !selectedPreset || !selectedCurrency || selectedCountries.length === 0}
-                className="min-w-[120px]"
+                className="h-10 min-w-[120px] rounded-full px-4"
               >
                 {loading ? (
                   <>

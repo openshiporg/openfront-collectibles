@@ -1,26 +1,18 @@
-import { Button } from "@/components/ui/button" // Shadcn Button
 import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
 import LinkStatus from "@/features/storefront/modules/common/components/link-status"
 
 const SignInPrompt = () => {
   return (
-    <div className="bg-background flex items-center justify-between">
-      <div>
-        <h2 className="text-lg font-medium">
-          Already have an account?
-        </h2>
-        <p className="text-sm font-normal text-muted-foreground mt-1">
-          Sign in for a better experience.
-        </p>
-      </div>
-      <div>
-        <LocalizedClientLink href="/account">
-          <Button variant="outline" data-testid="sign-in-button">
-            <LinkStatus />
-            Sign in
-          </Button>
-        </LocalizedClientLink>
-      </div>
+    <div className="flex flex-col gap-3 rounded-2xl bg-cx-surface p-4 ring-1 ring-cx-line sm:flex-row sm:items-center sm:justify-between">
+      <h2 className="text-[15px] font-medium text-cx-ink">Already have an account?</h2>
+      <LocalizedClientLink
+        href="/account"
+        data-testid="sign-in-button"
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-cx-well px-5 text-[14px] font-medium text-cx-ink shadow-[inset_0_1px_2px_rgb(26_23_18/0.08)] hover:bg-cx-line/70"
+      >
+        <LinkStatus />
+        Sign in
+      </LocalizedClientLink>
     </div>
   )
 }

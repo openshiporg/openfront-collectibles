@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ReturnsSection } from "./ReturnsSection";
 import { ClaimsSection } from "./ClaimsSection";
-import { Button } from "@/components/ui/button";
+import { Count, ListBand, Pill, Track } from "@/features/platform/components/vault-ui";
 import { MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
@@ -11,13 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 
 interface OrderSectionTabsProps {
@@ -39,7 +32,7 @@ export const OrderSectionTabs = ({ order }: OrderSectionTabsProps) => {
   const tabs = [
     { 
       key: 'lineItems' as TabType, 
-      label: `Line Items`,
+      label: `Line items`,
       count: lineItemsCount,
       data: order.lineItems || []
     },
@@ -58,7 +51,6 @@ export const OrderSectionTabs = ({ order }: OrderSectionTabsProps) => {
   ];
 
   const [activeTab, setActiveTab] = useState<TabType>('lineItems');
-  const activeTabData = tabs.find(tab => tab.key === activeTab);
 
   const handleEditLineItem = (lineItemId: string) => {
     setEditLineItemId(lineItemId);
@@ -67,157 +59,83 @@ export const OrderSectionTabs = ({ order }: OrderSectionTabsProps) => {
 
   return (
     <>
-      {/* Responsive Tabs Navigation */}
-      <div className="bg-muted/40">
-        {/* Desktop: Horizontal Tab Buttons */}
-        <div className="hidden md:flex items-center gap-3 px-4 pt-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              className={`relative z-10 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-300 border ${
-                activeTab === tab.key 
-                  ? 'bg-background border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100' 
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-background/50'
-              }`}
-            >
-              <div className="flex items-center gap-1.5">
-                <span>
-                  {tab.key === 'lineItems' && 'Line Items'}
-                  {tab.key === 'returns' && 'Returns'}
-                  {tab.key === 'claims' && 'Claims'}
-                </span>
-                <span className="rounded-sm bg-muted border px-1.5 py-0 text-[10px] leading-[14px] font-medium text-muted-foreground inline-flex items-center h-[18px] -mr-1 -mr-1">
-                  {tab.count}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
+      <div className="space-y-3 border-b border-border bg-muted/30 px-4 py-3 md:px-6">
+        {tabs.length > 1 && (
+          <Track label="Order sections">
+            {tabs.map((tab) => (
+              <Pill key={tab.key} active={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
+                {tab.label} <Count>{tab.count}</Count>
+              </Pill>
+            ))}
+          </Track>
+        )}
 
-        {/* Mobile: Select Dropdown */}
-        <div className="md:hidden px-4 py-2">
-          <div className="w-fit">
-            <Select value={activeTab} onValueChange={(value: TabType) => setActiveTab(value)}>
-              <SelectTrigger className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-background border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 h-auto w-auto">
-                <div className="flex items-center gap-1.5">
-                  <SelectValue />
-                  <span className="rounded-sm bg-muted border px-1.5 py-0 text-[10px] leading-[14px] font-medium text-muted-foreground inline-flex items-center h-[18px] -mr-1">
-                    ({activeTabData?.count || 0})
-                  </span>
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                {tabs.map((tab) => (
-                  <SelectItem key={tab.key} value={tab.key} className="text-xs">
-                    {tab.key === 'lineItems' && 'Line Items'}
-                    {tab.key === 'returns' && 'Returns'}
-                    {tab.key === 'claims' && 'Claims'}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-      
-      {/* Tab Content Area */}
-      <div className="bg-muted/40">
         {activeTab === 'lineItems' && lineItemsCount > 0 && (
-          <div className="px-4 py-2">
-            <div className="space-y-2">
-              {(order.lineItems || []).map((item: any) => (
-                <div
-                  key={item.id}
-                  className="border p-2 bg-background rounded-md flex flex-col sm:flex-row gap-4 relative"
-                >
-                  <div className="flex-shrink-0">
-                    <div className="size-12 bg-gray-100 rounded-md overflow-hidden">
-                      {item.thumbnail ? (
-                        <img
-                          src={item.thumbnail}
-                          alt={item.title}
-                          className="size-12 object-cover"
-                        />
-                      ) : (
-                        <div className="size-12 bg-gray-200 flex items-center justify-center">
-                          <span className="text-gray-400 text-xs">No Image</span>
-                        </div>
-                      )}
-                    </div>
+          <ListBand className="bg-background">
+            {(order.lineItems || []).map((item: any) => {
+              const spec = item.variantData?.title || item.variantTitle;
+              const sku = item.sku || item.variantData?.sku;
+              return (
+                <div key={item.id} className="flex items-start gap-3 px-3 py-2.5">
+                  <div className="size-10 shrink-0 overflow-hidden rounded-md bg-muted">
+                    {item.thumbnail && (
+                      <img src={item.thumbnail} alt={item.title} className="size-10 object-cover" />
+                    )}
                   </div>
-                  <div className="grid flex-grow">
-                    <span className="text-sm font-medium">{item.title}</span>
-                    {item.variantData?.title && (
-                      <div className="text-xs text-muted-foreground font-medium">
-                        {item.variantData.title}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium text-foreground">{item.title}</div>
+                    {spec && <div className="font-mono text-xs tabular-nums text-foreground/80">{spec}</div>}
+                    {(sku || item.variantData?.barcode) && (
+                      <div className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                        {sku && <>SKU {sku}</>}
+                        {sku && item.variantData?.barcode && <span className="mx-1.5">·</span>}
+                        {item.variantData?.barcode && <>Barcode {item.variantData.barcode}</>}
                       </div>
                     )}
-                    <div className="text-xs text-muted-foreground">
-                      {item.sku ? `SKU: ${item.sku}` : item.variantData?.sku ? `SKU: ${item.variantData.sku}` : ''}
-                      {item.variantData?.barcode && (
-                        <> | Barcode: {item.variantData.barcode}</>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <p className="text-xs font-medium">
-                        Quantity: {item.quantity}
-                      </p>
-                      <div className="flex flex-col">
-                        <div className="text-xs">
-                          {item.formattedTotal || ""}
-                          {item.quantity > 1 && item.formattedUnitPrice && (
-                            <span className="text-muted-foreground ml-1">
-                              ({item.formattedUnitPrice} × {item.quantity})
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                  </div>
+                  <div className="shrink-0 text-right font-mono text-xs tabular-nums">
+                    <div className="text-sm text-foreground">{item.formattedTotal || ""}</div>
+                    <div className="text-muted-foreground">
+                      {item.quantity}
+                      {item.formattedUnitPrice && <> x {item.formattedUnitPrice}</>}
                     </div>
                   </div>
-                  <div className="absolute top-2 right-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                        >
-                          <MoreVertical className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditLineItem(item.id)}>
-                          Edit Line Item
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="Line item actions"
+                        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground max-sm:size-10"
+                      >
+                        <MoreVertical className="size-3.5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEditLineItem(item.id)}>
+                        Edit Line Item
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-              ))}
-            </div>
-          </div>
+              );
+            })}
+          </ListBand>
         )}
-        
+
         {activeTab === 'returns' && returnsCount > 0 && (
-          <div className="px-4 py-2">
-            <ReturnsSection 
-              order={order} 
-              returns={order.returns || []} 
-              totalItems={returnsCount}
-            />
-          </div>
+          <ReturnsSection
+            order={order}
+            returns={order.returns || []}
+            totalItems={returnsCount}
+          />
         )}
-        
+
         {activeTab === 'claims' && claimsCount > 0 && (
-          <div className="px-4 py-2">
-            <ClaimsSection 
-              order={order} 
-              claims={order.claimOrders || []} 
-              totalItems={claimsCount}
-            />
-          </div>
+          <ClaimsSection
+            order={order}
+            claims={order.claimOrders || []}
+            totalItems={claimsCount}
+          />
         )}
       </div>
 

@@ -7,9 +7,9 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Layers, Archive } from "lucide-react";
+import { MoreVertical } from "lucide-react";
+import { Dot } from "@/features/platform/components/vault-ui";
 import Link from "next/link";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 import { ProductImage } from "../../components/ProductImage";
@@ -82,123 +82,90 @@ export function ProductDetailsComponent({
     product.productImages?.[0]?.image?.url ||
     product.productImages?.[0]?.imagePath;
 
+  const stockTone =
+    variantCount === 0 ? "muted" : totalInventory <= 0 ? "danger" : "ok";
+  const iconButton =
+    "inline-flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground [&_svg]:size-3.5 max-sm:size-10";
+
   return (
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value={product.id} className="border-0">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full border-b relative min-h-[120px]">
-            <div className="flex items-start gap-4">
-              {/* Product Image */}
-              <div className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 overflow-hidden">
+          <div className="flex w-full items-start justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
+            <div className="flex min-w-0 flex-1 items-start gap-3">
+              <div className="size-12 shrink-0 overflow-hidden rounded-md bg-muted md:size-14">
                 <ProductImage
                   src={imageUrl}
                   alt={product.title}
-                  width={80}
-                  height={80}
-                  className="w-full h-full"
+                  width={56}
+                  height={56}
+                  className="h-full w-full"
                 />
               </div>
 
-              {/* Product Info */}
-              <div className="flex flex-col items-start text-left gap-2 sm:gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <Link
                     href={`/dashboard/platform/products/${product.id}`}
-                    className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400"
+                    className="text-sm font-medium text-foreground hover:underline underline-offset-4"
                   >
                     {product.title}
                   </Link>
-                  <span>‧</span>
-
-                  <span className="text-sm font-medium">
-                    <span className="text-muted-foreground/75">
-                      {new Date(product.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </span>
+                  <StatusBadge status={product.status as any} />
+                  {product.isGiftcard && (
+                    <span className="text-xs text-muted-foreground">Gift card</span>
+                  )}
                 </div>
-
                 {product.subtitle && (
-                  <p className="text-sm text-muted-foreground">
-                    {product.subtitle}
-                  </p>
+                  <p className="truncate text-xs text-muted-foreground">{product.subtitle}</p>
                 )}
-                {product.handle && (
-                  <span className="text-muted-foreground text-xs">
-                    {product.handle}
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                  <span className="inline-flex items-baseline gap-1.5">
+                    <Dot tone={stockTone} />
+                    <span className="font-mono tabular-nums text-foreground">{totalInventory}</span>
+                    in stock
                   </span>
-                )}
-                <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1.5">
-                    <Layers className="size-3" />
-                    <span className="font-medium">{variantCount}</span>
-                    <span>variants</span>
-                  </div>
-                  <span>‧</span>
-
-                  <div className="flex items-center gap-1.5">
-                    <Archive className="size-3" />
-                    <span className="font-medium">{totalInventory}</span>
-                    <span>in stock</span>
-                  </div>
-                  <span>‧</span>
-
+                  <span>
+                    <span className="font-mono tabular-nums text-foreground">{variantCount}</span> variants
+                  </span>
                   {imageCount > 0 && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-medium">{imageCount}</span>
-                      <span>image{imageCount > 1 ? "s" : ""}</span>
-                    </div>
+                    <span>
+                      <span className="font-mono tabular-nums text-foreground">{imageCount}</span> image{imageCount > 1 ? "s" : ""}
+                    </span>
                   )}
-                  {product.productType && (
-                    <Badge variant="secondary" className="text-xs">
-                      {product.productType.value}
-                    </Badge>
-                  )}
+                  {product.productType && <span>{product.productType.value}</span>}
+                  {product.handle && <span className="font-mono">{product.handle}</span>}
+                  <span className="font-mono tabular-nums">
+                    {new Date(product.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-                <StatusBadge status={product.status as any} />
-                {product.isGiftcard && (
-                  <Badge variant="outline" className="text-xs">
-                    Gift Card
-                  </Badge>
-                )}
-                {/* Single buttons container */}
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    onClick={() => setIsEditDrawerOpen(true)}
-                  >
-                    <MoreVertical className="stroke-muted-foreground" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
-                  >
-                    <AccordionTrigger className="py-0" />
-                  </Button>
-                </div>
-              </div>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                type="button"
+                aria-label="Edit product"
+                className={iconButton}
+                onClick={() => setIsEditDrawerOpen(true)}
+              >
+                <MoreVertical />
+              </button>
+              <Button variant="secondary" size="icon" className={iconButton} asChild>
+                <AccordionTrigger className="py-0" />
+              </Button>
             </div>
           </div>
           <AccordionContent className="pb-0">
             {variantCount > 0 ? (
               <ProductSectionTabs product={product} />
             ) : (
-              <div className="px-4 md:px-6 py-4 border-b">
-                <p className="text-sm text-muted-foreground">
-                  No variants configured
-                </p>
+              <div className="border-b border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground md:px-6">
+                No variants
               </div>
             )}
           </AccordionContent>

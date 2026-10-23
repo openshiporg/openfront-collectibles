@@ -74,8 +74,9 @@ export async function ProductPage(props: Props) {
         product={product}
         region={region}
         countryCode={countryCode}
+        collectibleListing={collectibleListing}
       >
-      <CollectibleEvidencePanel result={collectibleListing} unavailable={collectibleEvidenceUnavailable} />
+        <CollectibleEvidencePanel result={collectibleListing} unavailable={collectibleEvidenceUnavailable} />
       </ProductTemplate>
     </>
   )

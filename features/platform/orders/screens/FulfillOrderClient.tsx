@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Triangle, Square, Circle, CircleSlash } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { Dot, ListBand } from '@/features/platform/components/vault-ui';
 import { Button } from '@/components/ui/button';
 import { UnfulfilledItems } from '../components/UnfulfilledItems';
 import { FulfillmentHistory } from '../components/FulfillmentHistory';
@@ -73,76 +74,67 @@ export function FulfillOrderClient({ order }: FulfillOrderClientProps) {
   const isFullyFulfilled = unfulfilledItems.length === 0;
 
   return (
-    <div className="bg-muted/5">
-      <div className="max-w-6xl p-4 md:p-6">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Button variant="link" className="p-0 h-5">
-              <Link
-                href={`/dashboard/platform/orders/${order.id}`}
-                className="flex items-center text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Order Details
-              </Link>
-            </Button>
+    <div>
+      <div className="max-w-6xl space-y-8 p-4 pb-10 md:p-6">
+        <div className="space-y-3">
+          <Link
+            href={`/dashboard/platform/orders/${order.id}`}
+            className="inline-flex min-h-8 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" />
+            Order <span className="font-mono tabular-nums">#{order.displayId}</span>
+          </Link>
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">Fulfill order</h1>
+              <span className="inline-flex items-baseline gap-1.5 text-sm text-muted-foreground">
+                <Dot tone={isFullyFulfilled ? 'ok' : 'warn'} />
+                {isFullyFulfilled ? 'Fulfilled' : (
+                  <><span className="font-mono tabular-nums">{unfulfilledItems.length}</span> unfulfilled</>
+                )}
+              </span>
+            </div>
+            <div className="font-mono text-sm tabular-nums text-muted-foreground">
+              {new Date(order.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })}
+            </div>
           </div>
-          <h1 className="text-2xl font-semibold">Fulfill Order</h1>
-          <p className="text-sm text-muted-foreground">
-            Order #{order.displayId} •{" "}
-            {new Date(order.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            })}
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-8 space-y-6">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div className="min-w-0 space-y-8 lg:col-span-8">
             {isFullyFulfilled ? (
-              <div className="flex h-44 items-center justify-center rounded-lg border bg-muted/40 p-4 my-3">
-                <div className="text-center">
-                  <div className="relative h-11 w-11 mx-auto mb-2">
-                    <Triangle className="absolute left-1 top-1 w-4 h-4 fill-indigo-200 stroke-indigo-400 dark:stroke-indigo-600 dark:fill-indigo-950 rotate-[90deg]" />
-                    <Square className="absolute right-[.2rem] top-1 w-4 h-4 fill-orange-300 stroke-orange-500 dark:stroke-amber-600 dark:fill-amber-950 rotate-[30deg]" />
-                    <Circle className="absolute bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 fill-emerald-200 stroke-emerald-400 dark:stroke-emerald-600 dark:fill-emerald-900" />
-                  </div>
-                  <p className="mt-2 text-sm font-medium">
-                    All items have been fulfilled
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Check fulfillments below for details
-                  </p>
+              <ListBand>
+                <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                  <span className="flex items-baseline gap-2.5 text-sm text-foreground">
+                    <Dot tone="ok" />
+                    All items fulfilled
+                  </span>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="[&_svg]:size-3 h-7 mt-2"
+                      <button
+                        type="button"
+                        className="inline-flex min-h-9 items-center rounded-full bg-background px-4 text-sm font-medium text-foreground shadow-xs ring-1 ring-border disabled:opacity-50 max-sm:min-h-10"
                         disabled={isLoading}
                       >
-                        <CircleSlash className="mr-1" />
-                        Start Over
-                      </Button>
+                        Start over
+                      </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[250px] p-3" side="bottom">
                       <div className="space-y-2.5">
-                        <div className="space-y-1">
-                          <p className="text-[13px] font-medium">
-                            Cancel all fulfillments?
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            This will cancel all active fulfillments.
-                          </p>
-                        </div>
+                        <p className="text-[13px] font-medium">
+                          Cancel all fulfillments?
+                        </p>
                         <div className="flex justify-end">
                           <Button
                             variant="destructive"
                             size="sm"
-                            className="h-6 text-xs"
+                            className="h-8 rounded-full text-xs"
                             onClick={handleCancelAll}
                             disabled={isLoading}
                           >
@@ -153,7 +145,7 @@ export function FulfillOrderClient({ order }: FulfillOrderClientProps) {
                     </PopoverContent>
                   </Popover>
                 </div>
-              </div>
+              </ListBand>
             ) : (
               <UnfulfilledItems
                 items={unfulfilledItems}
@@ -178,7 +170,7 @@ export function FulfillOrderClient({ order }: FulfillOrderClientProps) {
           </div>
 
           {!isFullyFulfilled && (
-            <div className="lg:col-span-4 space-y-6">
+            <div className="min-w-0 space-y-6 lg:col-span-4">
               <div className="lg:sticky lg:top-6">
                 <ShippingTabs
                   order={order}

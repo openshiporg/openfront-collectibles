@@ -3,26 +3,11 @@
 import React from "react";
 import Link from "next/link";
 import { PageBreadcrumbs } from "@/features/dashboard/components/PageBreadcrumbs";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { 
-  ArrowLeft, 
-  User, 
-  MapPin, 
-  Mail, 
-  Building, 
-  Phone, 
-  ShoppingBag, 
-  CreditCard, 
-  Truck, 
-  Package, 
-  Zap, 
-  Calculator,
-  Check
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { ListBand, PageTitle, Pill, SectionTitle, Track } from "@/features/platform/components/vault-ui";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CustomerSearchCombobox } from "../components/CustomerSearchCombobox";
@@ -33,7 +18,6 @@ import { CreateItemDrawer } from "@/features/dashboard/views/relationship/client
 import { getCustomer } from "../actions/customers";
 import { getRegionByCountry, getActiveCartPaymentProviders } from "../actions/regions";
 
-const Card = "div";
 
 type LineItem = {
   id: string;
@@ -331,312 +315,200 @@ export function OrdersCreatePage() {
           { type: 'page', label: 'Create Order' },
         ]}
       />
-      <div className="bg-muted/5">
-        <div className="max-w-6xl p-4 md:p-6">
-          {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Button variant="link" className="p-0 h-5">
-                <Link
-                  href="/dashboard/platform/orders"
-                  className="flex items-center text-muted-foreground hover:text-foreground"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Orders
-                </Link>
-              </Button>
-            </div>
-          <h1 className="text-2xl font-semibold">Create Order</h1>
-          <p className="text-sm text-muted-foreground">
-            Create a new order for a customer
-          </p>
+      <div className="max-w-6xl space-y-8 p-4 pb-10 md:p-6">
+        <div className="space-y-3">
+          <Link
+            href="/dashboard/platform/orders"
+            className="inline-flex min-h-8 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" />
+            Orders
+          </Link>
+          <PageTitle
+            title="Create order"
+            tone={cartId ? "info" : undefined}
+            state={cartId ? "Cart created" : undefined}
+          />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-8 space-y-6">
-            {/* Line Items */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div className="min-w-0 space-y-8 lg:col-span-8">
             <LineItemsManager
               lineItems={lineItems}
               onLineItemsChange={setLineItems}
             />
 
-            {/* Order Summary */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Calculator className="size-3.5 opacity-70" />
-                  Order Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-3 text-sm">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Items Subtotal</span>
-                    <span>{formatPrice(subtotal)}</span>
+            <section>
+              <SectionTitle>Totals</SectionTitle>
+              <ListBand>
+                {[
+                  ["Subtotal", formatPrice(subtotal)],
+                  ["Shipping", formatPrice(shippingCost)],
+                  ["Tax", formatPrice(taxAmount)],
+                ].map(([name, value]) => (
+                  <div key={name} className="flex justify-between gap-4 px-4 py-2.5 text-sm">
+                    <span className="text-muted-foreground">{name}</span>
+                    <span className="font-mono tabular-nums text-foreground">{value}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span>{formatPrice(shippingCost)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Tax Total</span>
-                    <span>{formatPrice(taxAmount)}</span>
-                  </div>
-                  <hr className="my-2" />
-                  <div className="flex justify-between font-medium">
-                    <span>Total</span>
-                    <span>{formatPrice(total)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Total Paid</span>
-                    <span>€0.00</span>
-                  </div>
+                ))}
+                <div className="flex justify-between gap-4 px-4 py-3 text-sm font-semibold">
+                  <span className="text-foreground">Total</span>
+                  <span className="font-mono tabular-nums text-foreground">{formatPrice(total)}</span>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex justify-between gap-4 px-4 py-2.5 text-sm">
+                  <span className="text-muted-foreground">Paid</span>
+                  <span className="font-mono tabular-nums text-foreground">€0.00</span>
+                </div>
+              </ListBand>
+            </section>
 
-            {/* Payment Selection */}
             {cartId && availablePaymentMethods.length > 0 && (
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Package className="size-3.5 opacity-70" />
-                  Payment & Order Options
-                </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  {/* Order Creation Mode */}
-                  <div className="space-y-4 mb-10">
-                    <Label className="text-sm font-medium">Order Creation Mode</Label>
-                    <RadioGroup 
-                      value={orderCreationMode} 
-                      onValueChange={(value) => setOrderCreationMode(value as "draft" | "immediate")}
-                      className="space-y-3"
-                    >
-                      {/* Draft Order Card */}
-                      <div className="relative">
-                        <RadioGroupItem
-                          value="draft"
-                          id="draft-mode"
-                          className="peer sr-only"
+              <section>
+                <SectionTitle>Payment</SectionTitle>
+                <ListBand>
+                  <div className="space-y-4 px-4 py-4">
+                    <div className="space-y-2">
+                      <div className="text-xs font-medium text-muted-foreground">Mode</div>
+                      <Track label="Order creation mode">
+                        <Pill active={orderCreationMode === "draft"} onClick={() => setOrderCreationMode("draft")}>
+                          Draft with payment link
+                        </Pill>
+                        <Pill active={orderCreationMode === "immediate"} onClick={() => setOrderCreationMode("immediate")}>
+                          Charge now
+                        </Pill>
+                      </Track>
+                    </div>
+
+                    {orderCreationMode === "draft" && (
+                      <div className="flex min-h-10 items-center gap-2">
+                        <Switch
+                          id="email-customer"
+                          checked={customerEmailForPayment}
+                          onCheckedChange={setCustomerEmailForPayment}
                         />
-                        <Label
-                          htmlFor="draft-mode"
-                          className="flex cursor-pointer items-start gap-4 rounded-lg border border-muted p-4 hover:bg-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                        >
-                          <div className="grid gap-2">
-                            <div className="flex items-center gap-2">
-                              <div className="text-sm font-medium">Create Draft Order</div>
-                              <div className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                                Recommended
-                              </div>
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              Creates order in "Pending Payment" status and emails customer a secure payment link
-                            </div>
-                          </div>
+                        <Label htmlFor="email-customer" className="text-sm">
+                          Email customer payment instructions
                         </Label>
                       </div>
+                    )}
 
-                      {/* Immediate Payment Card */}
-                      <div className="relative">
-                        <RadioGroupItem
-                          value="immediate"
-                          id="immediate-mode"
-                          className="peer sr-only"
+                    {orderCreationMode === "immediate" && (
+                      <div className="space-y-2">
+                        <div className="text-xs font-medium text-muted-foreground">Payment method</div>
+                        <AdminPaymentSelection
+                          availablePaymentMethods={availablePaymentMethods}
+                          selectedPaymentMethod={selectedPaymentMethod}
+                          onPaymentMethodChange={setSelectedPaymentMethod}
                         />
-                        <Label
-                          htmlFor="immediate-mode"
-                          className="flex cursor-pointer items-start gap-4 rounded-lg border border-muted p-4 hover:bg-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                        >
-                          <div className="grid gap-2">
-                            <div className="text-sm font-medium">Process Payment Immediately</div>
-                            <div className="text-xs text-muted-foreground">
-                              Admin processes payment using selected method below
-                            </div>
-                          </div>
-                        </Label>
                       </div>
-                    </RadioGroup>
-                  </div>
+                    )}
 
-                  {/* Customer Email Option for Draft Mode */}
-                  {orderCreationMode === "draft" && (
-                    <div className="mt-4 flex items-center space-x-2">
-                      <Switch
-                        id="email-customer"
-                        checked={customerEmailForPayment}
-                        onCheckedChange={setCustomerEmailForPayment}
-                      />
-                      <Label htmlFor="email-customer" className="text-sm">
-                        Email customer payment instructions
-                      </Label>
-                    </div>
-                  )}
-
-                  {/* Payment Method Selection - Only show for immediate mode */}
-                  {orderCreationMode === "immediate" && (
-                    <div className="mt-6 space-y-3 border-t pt-4">
-                      <div className="text-sm font-medium">Payment Method</div>
-                      <AdminPaymentSelection
-                        availablePaymentMethods={availablePaymentMethods}
-                        selectedPaymentMethod={selectedPaymentMethod}
-                        onPaymentMethodChange={setSelectedPaymentMethod}
-                      />
-                    </div>
-                  )}
-
-                  {/* Single Action Button */}
-                  <div className="mt-6">
                     {orderCreationMode === "draft" ? (
-                      <Button 
+                      <Button
                         onClick={handleCreateDraftOrder}
-                        className="w-full"
-                        size="lg"
+                        className="h-11 w-full rounded-full"
                         disabled={isCreatingOrder}
                       >
                         {isCreatingOrder ? "Creating Order..." : "Create Draft Order"}
                       </Button>
                     ) : (
-                      <Button 
+                      <Button
                         onClick={handlePlaceOrder}
-                        className="w-full"
-                        size="lg"
+                        className="h-11 w-full rounded-full"
                         disabled={isCreatingOrder || !selectedPaymentMethod}
                       >
-                        <Check className="mr-1.5 size-4" />
                         {isCreatingOrder ? "Processing Payment..." : "Place Order"}
                       </Button>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </ListBand>
+              </section>
             )}
           </div>
 
-          {/* Right Column - Customer Info */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Customer Selection */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <User className="size-3.5 opacity-70" />
-                  Customer
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <CustomerSearchCombobox
-                  value={selectedCustomerId || undefined}
-                  onValueChange={handleCustomerChange}
-                  selectedCustomer={selectedCustomer}
-                  label=""
-                  placeholder="Search customers..."
-                  className="space-y-0"
-                  onCreateCustomer={handleCreateCustomer}
-                />
+          <div className="min-w-0 space-y-8 lg:col-span-4">
+            <section>
+              <SectionTitle>Customer</SectionTitle>
+              <ListBand>
+                <div className="px-4 py-3">
+                  <CustomerSearchCombobox
+                    value={selectedCustomerId || undefined}
+                    onValueChange={handleCustomerChange}
+                    selectedCustomer={selectedCustomer}
+                    label=""
+                    placeholder="Search customers..."
+                    className="space-y-0"
+                    onCreateCustomer={handleCreateCustomer}
+                  />
+                </div>
                 {selectedCustomer && (
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center space-x-3 text-foreground/75">
-                      <User className="h-4 w-4" />
-                      <span className="text-sm">
-                        {selectedCustomer.firstName} {selectedCustomer.lastName}
-                      </span>
+                  <div className="px-4 py-3">
+                    <div className="text-sm font-medium text-foreground">
+                      {selectedCustomer.firstName} {selectedCustomer.lastName}
                     </div>
-                    <div className="flex items-center space-x-3 text-foreground/75">
-                      <Phone className="h-4 w-4" />
-                      <span className="text-sm">
-                        {selectedCustomer.phone || "No phone number"}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-3 text-foreground/75">
-                      <ShoppingBag className="h-4 w-4" />
-                      <span className="text-sm">
-                        {selectedCustomer.orders?.length || 0} Orders
-                      </span>
+                    <div className="mt-0.5 flex flex-wrap gap-x-3 font-mono text-xs tabular-nums text-muted-foreground">
+                      <span>{selectedCustomer.phone || "No phone number"}</span>
+                      <span>{selectedCustomer.orders?.length || 0} orders</span>
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </ListBand>
+            </section>
 
-            {/* Shipping Address */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Truck className="size-3.5 opacity-70" />
-                  Shipping Address
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                {selectedCustomer ? (
-                  <AddressSelectCombobox
-                    addresses={selectedCustomer.addresses || []}
-                    value={selectedShippingAddressId || undefined}
-                    onValueChange={handleShippingAddressChange}
-                    selectedAddress={selectedShippingAddress}
-                    label=""
-                    placeholder="Search addresses..."
-                    customerId={selectedCustomerId || undefined}
-                    onAddressCreated={handleAddressCreated}
-                    onCreateAddress={handleCreateAddress}
-                    className="space-y-0"
-                  />
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Select a customer first
-                  </p>
-                )}
+            <section>
+              <SectionTitle>Shipping address</SectionTitle>
+              <ListBand>
+                <div className="px-4 py-3">
+                  {selectedCustomer ? (
+                    <AddressSelectCombobox
+                      addresses={selectedCustomer.addresses || []}
+                      value={selectedShippingAddressId || undefined}
+                      onValueChange={handleShippingAddressChange}
+                      selectedAddress={selectedShippingAddress}
+                      label=""
+                      placeholder="Search addresses..."
+                      customerId={selectedCustomerId || undefined}
+                      onAddressCreated={handleAddressCreated}
+                      onCreateAddress={handleCreateAddress}
+                      className="space-y-0"
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Select a customer first</p>
+                  )}
+                </div>
                 {selectedShippingAddress && (
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center space-x-3 text-foreground/75">
-                      <User className="h-4 w-4" />
-                      <span className="text-sm">
-                        {selectedShippingAddress.firstName} {selectedShippingAddress.lastName}
-                      </span>
+                  <div className="space-y-0.5 px-4 py-3 text-sm">
+                    <div className="font-medium text-foreground">
+                      {selectedShippingAddress.firstName} {selectedShippingAddress.lastName}
                     </div>
                     {selectedShippingAddress.company && (
-                      <div className="flex items-center space-x-3 text-foreground/75">
-                        <Building className="h-4 w-4" />
-                        <span className="text-sm">
-                          {selectedShippingAddress.company}
-                        </span>
-                      </div>
+                      <div className="text-muted-foreground">{selectedShippingAddress.company}</div>
                     )}
-                    <div className="flex items-start space-x-3 text-foreground/75">
-                      <MapPin className="h-4 w-4" />
-                      <div className="flex flex-col text-sm">
-                        <span>{selectedShippingAddress.address1}</span>
-                        {selectedShippingAddress.address2 && (
-                          <span>{selectedShippingAddress.address2}</span>
-                        )}
-                        <span>
-                          {[
-                            selectedShippingAddress.city,
-                            selectedShippingAddress.province,
-                            selectedShippingAddress.postalCode,
-                          ]
-                            .filter(Boolean)
-                            .join(", ")}
-                        </span>
-                        <span>{selectedShippingAddress.country?.name}</span>
-                      </div>
+                    <div className="text-muted-foreground">{selectedShippingAddress.address1}</div>
+                    {selectedShippingAddress.address2 && (
+                      <div className="text-muted-foreground">{selectedShippingAddress.address2}</div>
+                    )}
+                    <div className="text-muted-foreground">
+                      {[
+                        selectedShippingAddress.city,
+                        selectedShippingAddress.province,
+                        selectedShippingAddress.postalCode,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
                     </div>
+                    {selectedShippingAddress.country?.name && (
+                      <div className="text-muted-foreground">{selectedShippingAddress.country.name}</div>
+                    )}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </ListBand>
+            </section>
 
-            {/* Billing Address */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <CreditCard className="size-3.5 opacity-70" />
-                  Billing Address
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center space-x-2">
+            <section>
+              <SectionTitle>Billing address</SectionTitle>
+              <ListBand>
+                <div className="flex min-h-12 items-center gap-2 px-4 py-3">
                   <Switch
                     id="same-as-shipping"
                     checked={sameAsShippingAddress}
@@ -646,48 +518,38 @@ export function OrdersCreatePage() {
                     Same as shipping address
                   </Label>
                 </div>
-                
                 {!sameAsShippingAddress && selectedCustomer ? (
-                  <AddressSelectCombobox
-                    addresses={selectedCustomer.addresses || []}
-                    value={selectedBillingAddressId || undefined}
-                    onValueChange={handleBillingAddressChange}
-                    selectedAddress={selectedBillingAddress}
-                    label=""
-                    placeholder="Search addresses..."
-                    customerId={selectedCustomerId || undefined}
-                    onAddressCreated={handleAddressCreated}
-                    onCreateAddress={handleCreateAddress}
-                    className="space-y-0"
-                  />
-                ) : sameAsShippingAddress && selectedShippingAddress ? (
-                  <p className="text-sm text-foreground/75">
-                    Same as shipping address
-                  </p>
-                ) : !selectedCustomer ? (
-                  <p className="text-sm text-muted-foreground">
-                    Select a customer first
-                  </p>
+                  <div className="px-4 py-3">
+                    <AddressSelectCombobox
+                      addresses={selectedCustomer.addresses || []}
+                      value={selectedBillingAddressId || undefined}
+                      onValueChange={handleBillingAddressChange}
+                      selectedAddress={selectedBillingAddress}
+                      label=""
+                      placeholder="Search addresses..."
+                      customerId={selectedCustomerId || undefined}
+                      onAddressCreated={handleAddressCreated}
+                      onCreateAddress={handleCreateAddress}
+                      className="space-y-0"
+                    />
+                  </div>
+                ) : sameAsShippingAddress && selectedShippingAddress ? null : !selectedCustomer ? (
+                  <div className="px-4 py-3 text-sm text-muted-foreground">Select a customer first</div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Select a shipping address first
-                  </p>
+                  <div className="px-4 py-3 text-sm text-muted-foreground">Select a shipping address first</div>
                 )}
-              </CardContent>
-            </Card>
+              </ListBand>
+            </section>
 
-            {/* Create Cart Button - Only show when cart hasn't been created yet */}
             {selectedCustomer && selectedShippingAddress && lineItems.length > 0 && !cartId && (
-              <Button 
+              <Button
                 onClick={handleCreateCart}
-                className="w-full"
-                size="lg"
+                className="h-11 w-full rounded-full"
               >
                 Create Cart
               </Button>
             )}
           </div>
-        </div>
         </div>
       </div>
 

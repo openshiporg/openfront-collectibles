@@ -1,11 +1,10 @@
-
 const SkeletonProductPreview = () => {
   return (
-    <div className="animate-pulse">
-      <div className="aspect-[9/16] w-full bg-gray-100" />
-      <div className="flex justify-between text-sm leading-6 font-normal mt-2">
-        <div className="w-2/5 h-6 bg-gray-100"></div>
-        <div className="w-1/5 h-6 bg-gray-100"></div>
+    <div className="animate-pulse space-y-3">
+      <div className="aspect-[4/5] w-full rounded-[14px] bg-cx-well" />
+      <div className="space-y-2">
+        <div className="h-4 w-4/5 rounded bg-cx-well" />
+        <div className="h-3.5 w-1/3 rounded bg-cx-well" />
       </div>
     </div>
   )

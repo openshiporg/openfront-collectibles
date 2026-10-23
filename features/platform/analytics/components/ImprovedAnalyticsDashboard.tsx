@@ -58,7 +58,7 @@ export function ImprovedAnalyticsDashboard({
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
       {/* Revenue & Orders Chart */}
       <RevenueOrderChart
@@ -69,11 +69,11 @@ export function ImprovedAnalyticsDashboard({
       />
 
       {/* Charts Grid */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-8 md:grid-cols-2">
         {/* Top Products Bar List */}
         <ProductPerformanceBarList
           data={topProductsData}
-          title="Top Products"
+          title="Top products"
           description="Best performing products by revenue and quantity sold"
           currencySymbol={currencySymbol}
         />
@@ -85,13 +85,13 @@ export function ImprovedAnalyticsDashboard({
             value: category.revenue,
             color: CHART_COLORS[index % CHART_COLORS.length],
           }))}
-          title="Category Performance"
+          title="Categories"
           description="Revenue distribution by product category"
         />
       </div>
 
       {/* Additional Metrics */}
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <FulfillmentAnalytics fulfillmentMetrics={fulfillmentMetrics} />
 
         <CartAnalytics cartMetrics={cartMetrics} />

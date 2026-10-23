@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { isEqual } from "lodash";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -8,7 +7,6 @@ import { useIntersection } from "../../../../lib/hooks/use-in-view";
 import { addToCart } from "@/features/storefront/lib/data/cart";
 // Removed HttpTypes import
 import { getProductPrice } from "@/features/storefront/lib/util/get-product-price";
-import Divider from "../../../common/components/divider";
 import OptionSelect from "./option-select";
 import ProductPrice from "../product-price";
 import MobileActions from "./mobile-actions";
@@ -151,7 +149,7 @@ export default function ProductActions({ product, region, disabled, onVariantCha
     try {
       await addToCart({ variantId: variant.id, quantity: 1, countryCode });
     } catch {
-      setCartError('Could not add this item to your cart. Please try again.');
+      setCartError('Could not add this item to your cart.');
     } finally {
       setIsAdding(false);
     }
@@ -173,41 +171,41 @@ export default function ProductActions({ product, region, disabled, onVariantCha
 
   const canAddToCart = !disabled && !isAdding && inStock && isValidVariant;
 
+  const buttonLabel = !variant && !hasOnlyOneVariant
+    ? "Select an option"
+    : !inStock
+    ? "Unavailable"
+    : "Add to cart";
+
   return (
     <>
-      <div className="flex flex-col gap-y-2" ref={actionsRef}>
-        <div>
-          {variants?.length > 1 && (
-            <div className="flex flex-col gap-y-4">
-              {(product.productOptions || []).map((option: any) => (
-                <div key={option.id}>
-                  <OptionSelect
-                    option={option}
-                    current={options[option.id]}
-                    updateOption={updateOptions}
-                    title={option.title}
-                  />
-                </div>
-              ))}
-              <Divider />
-            </div>
-          )}
-        </div>
-
+      <div className="flex flex-col gap-4" ref={actionsRef}>
         <ProductPrice product={product} variant={variant} region={region} />
-        <Button
+        {variants?.length > 1 && (
+          <div className="flex flex-col gap-4">
+            {(product.productOptions || []).map((option: any) => (
+              <OptionSelect
+                key={option.id}
+                option={option}
+                current={options[option.id]}
+                updateOption={updateOptions}
+                title={option.title}
+                disabled={!!disabled || isAdding}
+              />
+            ))}
+          </div>
+        )}
+        <button
+          type="button"
           onClick={handleAddToCart}
           disabled={!canAddToCart || !variant || (!hasOnlyOneVariant && !isValidVariant)}
-          className="w-full h-10"
+          className="cx-btn w-full"
+          data-testid="add-product-button"
         >
-          {isAdding && <RiLoader2Fill className="animate-spin" />}
-          {!variant && !hasOnlyOneVariant
-            ? "Select variant"
-            : !inStock
-            ? "Out of stock"
-            : "Add to cart"}
-        </Button>
-        {cartError && <p className="text-xs text-destructive" role="alert">{cartError}</p>}
+          {isAdding && <RiLoader2Fill className="size-4 animate-spin" aria-hidden="true" />}
+          {isAdding ? "Adding" : buttonLabel}
+        </button>
+        {cartError && <p className="text-[13px] text-cx-danger" role="alert">{cartError}</p>}
         <MobileActions
           product={product}
           variant={variant}

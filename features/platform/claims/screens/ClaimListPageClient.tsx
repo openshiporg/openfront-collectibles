@@ -7,17 +7,11 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '../../components/PlatformEmptyState'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
 import { PlatformFilterBar } from '../../components/PlatformFilterBar'
+import { ListBand, PageTitle } from '../../components/vault-ui'
 import { StatusTabs } from '../../components/StatusTabs'
 import { ClaimDetailsComponent } from '../components/ClaimDetailsComponent'
 import { Pagination } from '../../../dashboard/components/Pagination'
@@ -44,27 +38,11 @@ interface ClaimListPageClientProps {
 }
 
 function EmptyStateDefault() {
-  return (
-    <EmptyState
-      title="No Claims Created"
-      description="You can create a new claim to get started."
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title="No claims" />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function ClaimListPageClient({
@@ -179,16 +157,7 @@ export function ClaimListPageClient({
     { type: 'page' as const, label: 'Claims' }
   ]
 
-  const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        Claims
-      </h1>
-      <p className="text-muted-foreground">
-        Create and manage claims
-      </p>
-    </div>
-  )
+  const header = <PageTitle title="Claims" />
 
   // Check if we have any active filters (search or actual filters)
   const hasFilters = !!searchString
@@ -205,7 +174,7 @@ export function ClaimListPageClient({
       {/* Note: ClaimOrder doesn't have status field, so no StatusTabs */}
 
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -229,10 +198,12 @@ export function ClaimListPageClient({
       ) : (
         <>
           {/* Data grid - full width */}
-          <div className="grid grid-cols-1 divide-y">
-            {data?.items?.map((claim: any) => (
-              <ClaimDetailsComponent key={claim.id} claim={claim} list={list} />
-            ))}
+          <div className="px-4 md:px-6 pb-6">
+            <ListBand>
+              {data?.items?.map((claim: any) => (
+                <ClaimDetailsComponent key={claim.id} claim={claim} list={list} />
+              ))}
+            </ListBand>
           </div>
           
           {/* Pagination */}

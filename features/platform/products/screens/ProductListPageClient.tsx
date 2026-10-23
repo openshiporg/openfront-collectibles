@@ -7,15 +7,8 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { ListBand, PageTitle } from '@/features/platform/components/vault-ui'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
 import { PlatformFilterBar } from '../../components/PlatformFilterBar'
 import { StatusTabs } from '../components/StatusTabs'
@@ -49,25 +42,26 @@ interface ProductListPageClientProps {
 
 function EmptyStateDefault() {
   return (
-    <EmptyState
-      title="No Products Created"
-      description="You can create a new product to get started."
-      icons={[Triangle, Square, Circle]}
-    />
+    <ListBand>
+      <div className="px-4 py-4 text-sm text-muted-foreground">No products</div>
+    </ListBand>
   )
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
   return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
+    <ListBand>
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
+        <span className="text-muted-foreground">No matching products</span>
+        <button
+          type="button"
+          onClick={onResetFilters}
+          className="inline-flex min-h-9 items-center rounded-full bg-background px-4 text-sm font-medium text-foreground shadow-xs ring-1 ring-border max-sm:min-h-10"
+        >
+          Reset filters
+        </button>
+      </div>
+    </ListBand>
   )
 }
 
@@ -218,14 +212,14 @@ export function ProductListPageClient({
   ]
 
   const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        Products
-      </h1>
-      <p className="text-muted-foreground">
-        Create and manage products
-      </p>
-    </div>
+    <PageTitle
+      title="Products"
+      meta={statusCounts ? (
+        <span className="font-mono tabular-nums">
+          {statusCounts.published} published · {statusCounts.draft} draft
+        </span>
+      ) : undefined}
+    />
   )
 
   // Check if we have any active filters (search or actual filters)
@@ -241,14 +235,10 @@ export function ProductListPageClient({
       </div>
 
       {/* Status Tabs */}
-      {statusCounts && (
-        <div className="border-b">
-          <StatusTabs statusCounts={statusCounts} />
-        </div>
-      )}
+      {statusCounts && <StatusTabs statusCounts={statusCounts} />}
 
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -262,17 +252,17 @@ export function ProductListPageClient({
           </Alert>
         </div>
       ) : isEmpty ? (
-        <div className="px-4 md:px-6">
+        <div className="px-4 md:px-6 py-4">
           <EmptyStateDefault />
         </div>
       ) : data?.count === 0 ? (
-        <div className="px-4 md:px-6">
+        <div className="px-4 md:px-6 py-4">
           <EmptyStateSearch onResetFilters={handleResetFilters} />
         </div>
       ) : (
         <>
           {/* Data table - full width */}
-          <div className="grid grid-cols-1 divide-y">
+          <div className="grid grid-cols-1 border-t border-border">
             {data?.items?.map((product: any) => (
               <ProductDetailsComponent key={product.id} product={product} list={list} />
             ))}

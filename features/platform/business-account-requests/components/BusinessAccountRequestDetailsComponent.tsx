@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,36 +19,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  MoreVertical, 
-  Building, 
-  Mail, 
-  Calendar, 
-  DollarSign, 
-  Users, 
-  Check,
-  CheckCircle,
-  XCircle,
-  Clock,
-  AlertCircle
-} from "lucide-react";
+import { MoreVertical, Check, CheckCircle, XCircle } from "lucide-react";
+import { Dot, SectionTitle, type DotTone } from "../../components/vault-ui";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 import { updateBusinessAccountRequestStatus } from "../actions";
 import { toast } from "@/components/ui/use-toast";
 
-const statusColors = {
-  "pending": "yellow",
-  "approved": "emerald", 
-  "not_approved": "red",
-  "requires_info": "orange"
-} as const;
-
-const statusIconColors = {
-  "pending": "text-yellow-500",
-  "approved": "text-emerald-500", 
-  "not_approved": "text-red-500",
-  "requires_info": "text-orange-500"
-} as const;
+const statusTones: Record<string, DotTone> = {
+  pending: "info",
+  approved: "ok",
+  not_approved: "danger",
+  requires_info: "warn",
+};
 
 interface BusinessAccountRequest {
   id: string;
@@ -111,22 +92,6 @@ export function BusinessAccountRequestDetailsComponent({
     return volumeMap[volume] || volume;
   };
 
-  const getStatusIcon = (status: string) => {
-    const iconColorClass = statusIconColors[status as keyof typeof statusIconColors] || "text-gray-500";
-    switch (status) {
-      case 'pending':
-        return <Clock className={`h-4 w-4 ${iconColorClass}`} />;
-      case 'approved':
-        return <CheckCircle className={`h-4 w-4 ${iconColorClass}`} />;
-      case 'not_approved':
-        return <XCircle className={`h-4 w-4 ${iconColorClass}`} />;
-      case 'requires_info':
-        return <AlertCircle className={`h-4 w-4 ${iconColorClass}`} />;
-      default:
-        return <Clock className={`h-4 w-4 ${iconColorClass}`} />;
-    }
-  };
-
   const handleReviewSubmit = async (action: 'approved' | 'rejected') => {
     setIsSubmitting(true);
     try {
@@ -164,169 +129,153 @@ export function BusinessAccountRequestDetailsComponent({
 
   return (
     <>
-      <div className="p-6 border-l-4 border-l-transparent hover:border-l-blue-500 hover:bg-muted/50 transition-all">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
-              <Mail className="h-5 w-5 text-muted-foreground" />
-              <h3 className="text-lg font-semibold truncate">
-                {businessAccountRequest.user 
-                  ? `${businessAccountRequest.user.name} • ${businessAccountRequest.user.email}`
-                  : "User Information Unavailable"
-                }
-              </h3>
-            </div>
-
-            <div className="text-sm text-muted-foreground mt-3">
-              <div className="flex items-center gap-2 mb-2">
-                <Building className="h-4 w-4" />
-                <span>{businessAccountRequest.businessName}</span>
-              </div>
-              <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="h-4 w-4" />
-                <span>{businessAccountRequest.formattedRequestedCredit} credit requested</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>Submitted {new Date(businessAccountRequest.submittedAt).toLocaleDateString()}</span>
-              </div>
-              {businessAccountRequest.reviewNotes && (
-                <div className="mt-3 p-3 bg-muted/50 rounded-md">
-                  <p className="text-sm font-medium text-foreground mb-1">Review Notes</p>
-                  <p className="text-sm">{businessAccountRequest.reviewNotes}</p>
-                </div>
-              )}
-            </div>
+      <div className="flex items-start justify-between gap-3 px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+            <Dot tone={statusTones[businessAccountRequest.status] || "muted"} />
+            <h3 className="text-sm font-semibold text-foreground">{businessAccountRequest.businessName}</h3>
+            <span className="text-xs text-muted-foreground">{businessAccountRequest.statusLabel}</span>
           </div>
 
-          <div className="flex flex-col justify-between h-full">
-            <div className="flex items-center gap-2">
-              <Badge
-                color={statusColors[businessAccountRequest.status as keyof typeof statusColors] || "zinc"}
-                className="text-[.6rem] sm:text-[.7rem] py-0 px-2 sm:px-3 tracking-wide font-medium rounded-md border h-6"
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span className="min-w-0 truncate">
+              {businessAccountRequest.user
+                ? `${businessAccountRequest.user.name} (${businessAccountRequest.user.email})`
+                : "User information unavailable"
+              }
+            </span>
+            <span>
+              <span className="font-mono tabular-nums text-foreground">{businessAccountRequest.formattedRequestedCredit}</span> requested
+            </span>
+            <span>
+              Submitted <span className="font-mono tabular-nums">{new Date(businessAccountRequest.submittedAt).toLocaleDateString()}</span>
+            </span>
+          </div>
+          {businessAccountRequest.reviewNotes && (
+            <p className="mt-2 border-l-2 border-border pl-3 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">Review notes</span> {businessAccountRequest.reviewNotes}
+            </p>
+          )}
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1">
+          {businessAccountRequest.status === 'pending' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+              aria-label="Review"
+              onClick={() => setIsReviewDialogOpen(true)}
+            >
+              <Check className="stroke-muted-foreground" />
+            </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                aria-label="Actions"
               >
-                {businessAccountRequest.statusLabel.toUpperCase()}
-              </Badge>
-              
-              <div className="flex items-center gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      className="border [&_svg]:size-3 h-6 w-6"
-                    >
-                      <MoreVertical className="stroke-muted-foreground" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
-                      Edit Request
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
-                      Delete Request
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                {businessAccountRequest.status === 'pending' && (
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    onClick={() => setIsReviewDialogOpen(true)}
-                  >
-                    <Check className="stroke-muted-foreground" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
+                <MoreVertical className="stroke-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
+                Edit Request
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600">
+                Delete Request
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       
       <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-h-[90dvh] max-w-2xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="pb-4 border-b">Review Account Request - {businessAccountRequest.businessName}</DialogTitle>
+            <DialogTitle>Review {businessAccountRequest.businessName}</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-6 pt-4">
-            <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-5">
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
               <div>
-                <Label className="font-medium">Business Name</Label>
-                <p className="text-sm">{businessAccountRequest.businessName}</p>
+                <dt className="text-xs text-muted-foreground">Business name</dt>
+                <dd className="mt-0.5 text-foreground">{businessAccountRequest.businessName}</dd>
               </div>
               <div>
-                <Label className="font-medium">Business Type</Label>
-                <p className="text-sm">{getBusinessTypeLabel(businessAccountRequest.businessType)}</p>
+                <dt className="text-xs text-muted-foreground">Business type</dt>
+                <dd className="mt-0.5 text-foreground">{getBusinessTypeLabel(businessAccountRequest.businessType)}</dd>
               </div>
-              <div>
-                <Label className="font-medium">Contact</Label>
-                <div className="text-sm">
+              <div className="min-w-0">
+                <dt className="text-xs text-muted-foreground">Contact</dt>
+                <dd className="mt-0.5 text-foreground">
                   {businessAccountRequest.user ? (
                     <>
-                      <p>{businessAccountRequest.user.name}</p>
-                      <p className="text-muted-foreground">{businessAccountRequest.user.email}</p>
+                      <span className="block">{businessAccountRequest.user.name}</span>
+                      <span className="block truncate text-muted-foreground">{businessAccountRequest.user.email}</span>
                     </>
                   ) : (
-                    <p className="text-muted-foreground">User information unavailable</p>
+                    <span className="text-muted-foreground">User information unavailable</span>
                   )}
-                </div>
+                </dd>
               </div>
               <div>
-                <Label className="font-medium">Monthly Volume</Label>
-                <p className="text-sm">{getVolumeLabel(businessAccountRequest.monthlyOrderVolume)}</p>
+                <dt className="text-xs text-muted-foreground">Monthly volume</dt>
+                <dd className="mt-0.5 font-mono tabular-nums text-foreground">{getVolumeLabel(businessAccountRequest.monthlyOrderVolume)}</dd>
               </div>
               <div>
-                <Label className="font-medium">Requested Credit</Label>
-                <p className="text-sm">{businessAccountRequest.formattedRequestedCredit}</p>
+                <dt className="text-xs text-muted-foreground">Requested credit</dt>
+                <dd className="mt-0.5 font-mono tabular-nums text-foreground">{businessAccountRequest.formattedRequestedCredit}</dd>
               </div>
               <div>
-                <Label className="font-medium">Submitted</Label>
-                <p className="text-sm">{new Date(businessAccountRequest.submittedAt).toLocaleString()}</p>
+                <dt className="text-xs text-muted-foreground">Submitted</dt>
+                <dd className="mt-0.5 font-mono tabular-nums text-foreground">{new Date(businessAccountRequest.submittedAt).toLocaleString()}</dd>
               </div>
-            </div>
+            </dl>
 
             <div>
-              <Label className="font-medium">Business Description</Label>
-              <p className="text-sm mt-1">{businessAccountRequest.businessDescription}</p>
+              <SectionTitle>Business description</SectionTitle>
+              <p className="text-sm text-foreground">{businessAccountRequest.businessDescription}</p>
             </div>
 
-            <div className="space-y-4 border-t pt-4">
-              <div>
-                <Label htmlFor="approvedCredit">Approved Credit Limit (USD)</Label>
+            <div className="space-y-4 border-t border-border pt-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="approvedCredit">Approved credit limit (USD)</Label>
                 <Input
                   id="approvedCredit"
                   type="number"
+                  className="font-mono tabular-nums"
                   placeholder={(businessAccountRequest.requestedCreditLimit / 100).toString()}
                   value={approvedCredit}
                   onChange={(e) => setApprovedCredit(e.target.value)}
                 />
               </div>
-              
-              <div>
-                <Label htmlFor="reviewNotes">Review Notes</Label>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="reviewNotes">Review notes</Label>
                 <Textarea
                   id="reviewNotes"
-                  placeholder="Add any notes about this decision..."
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                 />
               </div>
 
-              <div className="flex gap-2">
-                <Button 
+              <div className="flex flex-wrap gap-2">
+                <Button
                   onClick={() => handleReviewSubmit('approved')}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="h-10 rounded-full px-5"
                   disabled={isSubmitting}
                 >
                   <CheckCircle className="h-4 w-4 mr-1" />
                   Approve Request
                 </Button>
-                <Button 
+                <Button
                   variant="destructive"
                   onClick={() => handleReviewSubmit('rejected')}
+                  className="h-10 rounded-full px-5"
                   disabled={isSubmitting}
                 >
                   <XCircle className="h-4 w-4 mr-1" />

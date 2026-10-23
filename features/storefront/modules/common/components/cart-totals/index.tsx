@@ -1,11 +1,4 @@
 "use client";
-import { Info } from "lucide-react";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
 import React from "react";
 
 interface CartTotalsProps {
@@ -19,6 +12,18 @@ interface CartTotalsProps {
   } | null;
 }
 
+function Row({ label, value, credit }: { label: string; value: React.ReactNode; credit?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <dt className="text-cx-ink-2">{label}</dt>
+      <dd className={credit ? "cx-num text-cx-ok" : "cx-num text-cx-ink"}>
+        {credit ? "− " : ""}
+        {value}
+      </dd>
+    </div>
+  );
+}
+
 const CartTotals = ({ data }: CartTotalsProps) => {
   if (!data) {
     return null;
@@ -26,53 +31,17 @@ const CartTotals = ({ data }: CartTotalsProps) => {
 
   return (
     <div>
-      <div className="flex flex-col gap-y-2 text-base font-medium text-muted-foreground">
-        <div className="flex items-center justify-between">
-          <span className="flex gap-x-2 items-center">
-            Subtotal
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="w-4 h-4 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  Cart total excluding shipping and taxes.
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </span>
-          <span>{data.subtotal}</span>
-        </div>
-
-        {data.discount && data.discount !== "0" && (
-          <div className="flex justify-between">
-            <span>Discount</span>
-            <span className="text-blue-600">- {data.discount}</span>
-          </div>
-        )}
-
-        {data.giftCardTotal && data.giftCardTotal !== "0" && (
-          <div className="flex justify-between">
-            <span>Gift card</span>
-            <span className="text-blue-600">- {data.giftCardTotal}</span>
-          </div>
-        )}
-        <div className="flex items-center justify-between">
-          <span>Shipping</span>
-          <span>{data.shipping}</span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="flex gap-x-1 items-center">Taxes</span>
-          <span>{data.tax}</span>
-        </div>
+      <dl className="space-y-2 text-[14px]">
+        <Row label="Subtotal" value={data.subtotal} />
+        {data.discount && data.discount !== "0" && <Row label="Discount" value={data.discount} credit />}
+        {data.giftCardTotal && data.giftCardTotal !== "0" && <Row label="Gift card" value={data.giftCardTotal} credit />}
+        <Row label="Shipping" value={data.shipping} />
+        <Row label="Taxes" value={data.tax} />
+      </dl>
+      <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-cx-line pt-4">
+        <span className="text-[15px] font-medium text-cx-ink">Total</span>
+        <span className="cx-num text-[22px] text-cx-ink">{data.total}</span>
       </div>
-      <div className="h-px w-full border-b my-4" />
-      <div className="flex items-center justify-between mb-2 text-base font-medium">
-        <span>Total</span>
-        <span className="text-2xl font-semibold">{data.total}</span>
-      </div>
-      <div className="h-px w-full border-b mt-4" />
     </div>
   );
 };

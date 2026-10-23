@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Region, getRegionFlag } from '../lib/analyticsHelpers';
+import { Region } from '../lib/analyticsHelpers';
 
 interface RegionalSelectorProps {
   regions: Region[];
@@ -32,12 +32,12 @@ export function RegionalSelector({ regions, selectedRegion, className }: Regiona
 
   const getDisplayValue = () => {
     if (!selectedRegion || selectedRegion === 'all') {
-      return 'All Regions';
+      return 'All regions';
     }
     
     const region = regions.find(r => r.code === selectedRegion);
     if (region) {
-      return `${getRegionFlag(region.code)} ${region.name} (${region.currency.symbol}${region.currency.code.toUpperCase()})`;
+      return `${region.name} (${region.currency.code.toUpperCase()})`;
     }
     
     return 'Select Region';
@@ -45,25 +45,21 @@ export function RegionalSelector({ regions, selectedRegion, className }: Regiona
 
   return (
     <Select value={selectedRegion || 'all'} onValueChange={handleRegionChange}>
-      <SelectTrigger className={className}>
-        <SelectValue placeholder="All Regions">
+      <SelectTrigger className={`h-10 rounded-full bg-background ${className ?? ''}`}>
+        <SelectValue placeholder="All regions">
           {getDisplayValue()}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">
-          <div className="flex items-center gap-2">
-            <span>🌍</span>
-            <span>All Regions</span>
-          </div>
+          All regions
         </SelectItem>
         {regions.map((region) => (
           <SelectItem key={region.id} value={region.code}>
             <div className="flex items-center gap-2">
-              <span>{getRegionFlag(region.code)}</span>
               <span>{region.name}</span>
-              <span className="text-muted-foreground">
-                ({region.currency.symbol}{region.currency.code.toUpperCase()})
+              <span className="font-mono text-muted-foreground">
+                {region.currency.code.toUpperCase()}
               </span>
             </div>
           </SelectItem>

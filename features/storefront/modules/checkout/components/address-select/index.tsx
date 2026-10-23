@@ -105,7 +105,7 @@ const AddressSelect = ({
       >
         <SelectTrigger
           id={id}
-          className="bg-muted/40 h-auto ps-3 text-left [&>span]:flex [&>span]:items-center [&>span]:gap-2"
+          className="h-auto min-h-12 rounded-xl border-cx-line bg-cx-surface ps-4 py-2.5 text-left text-cx-ink [&>span]:flex [&>span]:items-center [&>span]:gap-2"
         >
           <SelectValue
             placeholder="Choose an address"
@@ -116,15 +116,15 @@ const AddressSelect = ({
                  {selectedAddress.firstName} {selectedAddress.lastName}
                </span>
                {selectedAddress.company && (
-                 <span className="text-muted-foreground text-xs">
+                 <span className="text-cx-ink-2 text-xs">
                    {selectedAddress.company}
                  </span>
                )}
-               <span className="text-sm text-muted-foreground">
+               <span className="text-sm text-cx-ink-2">
                  {formatAddressLine(selectedAddress)}
                </span>
                {selectedAddress.phone && (
-                 <span className="text-xs text-muted-foreground">
+                 <span className="text-xs text-cx-ink-2">
                    {selectedAddress.phone}
                  </span>
                )}
@@ -147,15 +147,15 @@ const AddressSelect = ({
                   {address.firstName} {address.lastName}
                 </span>
                 {address.company && (
-                  <span className="text-muted-foreground text-xs">
+                  <span className="text-cx-ink-2 text-xs">
                     {address.company}
                   </span>
                 )}
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-cx-ink-2">
                   {formatAddressLine(address)}
                 </span>
                 {address.phone && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-cx-ink-2">
                     {address.phone}
                   </span>
                 )}

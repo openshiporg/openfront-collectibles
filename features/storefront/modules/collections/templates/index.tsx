@@ -1,11 +1,11 @@
 import { Suspense } from "react"
 
 import SkeletonProductGrid from "@/features/storefront/modules/skeletons/templates/skeleton-product-grid"
-import RefinementList from "@/features/storefront/modules/store/components/refinement-list"
+import BrowseHeader from "@/features/storefront/modules/store/components/browse-header"
 import { SortOptions } from "@/features/storefront/modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@/features/storefront/modules/store/templates/paginated-products"
-// Removed unused HttpTypes import
-import type { StorefrontCollection } from "@/features/storefront/types" // Add import
+import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
+import type { StorefrontCollection } from "@/features/storefront/types"
 
 export default function CollectionTemplate({
   sortBy,
@@ -14,7 +14,7 @@ export default function CollectionTemplate({
   countryCode,
 }: {
   sortBy?: SortOptions
-  collection: StorefrontCollection // Update type here
+  collection: StorefrontCollection
   page?: string
   countryCode: string
 }) {
@@ -22,27 +22,32 @@ export default function CollectionTemplate({
   const sort = sortBy || "created_at"
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start py-6 max-w-[1440px] w-full mx-auto px-6 gap-8">
-      <RefinementList sortBy={sort} />
-      <div className="w-full">
-        <div className="mb-8 text-3xl font-semibold">
-          <h1>{collection.title}</h1>
-        </div>
-        <Suspense
-          fallback={
-            <SkeletonProductGrid
-              numberOfProducts={collection.products?.length}
-            />
-          }
-        >
-          <PaginatedProducts
-            sortBy={sort}
-            page={pageNumber}
-            collectionId={collection.id}
-            countryCode={countryCode}
+    <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 sm:px-6" data-testid="collection-container">
+      <BrowseHeader
+        title={collection.title}
+        sortBy={sort}
+        showCategories={false}
+        eyebrow={
+          <LocalizedClientLink href="/store" className="inline-flex min-h-11 items-center hover:text-cx-ink">
+            Collection
+          </LocalizedClientLink>
+        }
+      />
+      <Suspense
+        fallback={
+          <SkeletonProductGrid
+            numberOfProducts={collection.products?.length || 8}
           />
-        </Suspense>
-      </div>
+        }
+      >
+        <PaginatedProducts
+          sortBy={sort}
+          page={pageNumber}
+          collectionId={collection.id}
+          countryCode={countryCode}
+          label={collection.title}
+        />
+      </Suspense>
     </div>
   )
 }

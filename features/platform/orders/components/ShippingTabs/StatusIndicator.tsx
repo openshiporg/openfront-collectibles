@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { Dot } from '@/features/platform/components/vault-ui';
 import type { ShippingProvider } from '../../types';
 
 interface StatusIndicatorProps {
@@ -10,19 +10,8 @@ interface StatusIndicatorProps {
 
 export function StatusIndicator({ provider, isPreset }: StatusIndicatorProps) {
   if (isPreset && !provider?.isActive) {
-    return (
-      <span className="inline-block w-2.5 h-2.5 rounded-full border-2 bg-zinc-200 border-zinc-300" />
-    );
+    return <Dot tone="muted" className="translate-y-0" />;
   }
 
-  return (
-    <span
-      className={cn(
-        'inline-block w-2.5 h-2.5 rounded-full border-2',
-        provider?.isActive
-          ? 'bg-green-500 border-green-300'
-          : 'bg-red-500 border-red-300'
-      )}
-    />
-  );
+  return <Dot tone={provider?.isActive ? 'ok' : 'danger'} className="translate-y-0" />;
 }

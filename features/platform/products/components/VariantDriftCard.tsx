@@ -1,5 +1,6 @@
 import { parseMajorToMinor, formatMinorToMajor } from '@/features/lib/minor-units';
 import type { PriceFormProps, PriceDraft, VariantForEditor, PendingVariantCardProps, VariantDriftCardProps } from '../types/variant';
+import { Dot, Pill, Track } from "@/features/platform/components/vault-ui";
 import { Button } from "@/components/ui/button";
 import { Package, X, Info, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -88,7 +89,7 @@ const PendingPriceForm = ({ region, initialPrice, onSave, onCancel }: PriceFormP
                   setAmount(val);
                 }
               }}
-              className="peer ps-5 pe-10 h-8 text-sm"
+              className="peer ps-5 pe-10 h-9 font-mono text-sm tabular-nums"
               placeholder="Enter price"
             />
             <span className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 text-xs">
@@ -111,7 +112,7 @@ const PendingPriceForm = ({ region, initialPrice, onSave, onCancel }: PriceFormP
                   setCompareAmount(val);
                 }
               }}
-              className="peer ps-5 pe-10 h-8 text-sm"
+              className="peer ps-5 pe-10 h-9 font-mono text-sm tabular-nums"
               placeholder="0.00"
             />
             <span className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 text-xs">
@@ -148,9 +149,9 @@ function PendingVariantCard({
   renderOptionValue = (ov) => (
     <Badge
       color="zinc"
-      className="uppercase rounded-md border text-[.65rem] py-[.0625rem] px-1.5 font-medium"
+      className="rounded-full bg-muted px-2 py-0.5 font-mono text-[11px] font-medium tabular-nums"
     >
-      <span className="opacity-80 mr-1">{ov.option}:</span>
+      <span className="mr-1 font-sans opacity-70">{ov.option}</span>
       {ov.label}
     </Badge>
   ),
@@ -205,7 +206,7 @@ function PendingVariantCard({
   };
 
   return (
-    <div className="border border-dashed rounded-lg bg-muted/40">
+    <div className="rounded-xl border border-dashed border-border bg-background">
       <div className="p-4">
         <div className="flex justify-between">
           <div className="flex gap-3">
@@ -213,7 +214,7 @@ function PendingVariantCard({
               <Package className="h-6 w-6 text-foreground/60" />
             </div>
             <div>
-              <div className="text-sm font-medium">{variant.title}</div>
+              <div className="font-mono text-sm font-medium tabular-nums">{variant.title}</div>
               <div>
                 {Boolean(variant.productOptionValues?.length) && (
                   <div className="flex flex-wrap gap-2">
@@ -230,7 +231,7 @@ function PendingVariantCard({
                 )}
               </div>
               <div className="space-y-0.5 mt-2">
-                <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+                <div className="text-[11px] font-medium text-muted-foreground">
                   Prices (Pending)
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -252,9 +253,9 @@ function PendingVariantCard({
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-6 cursor-pointer flex items-center gap-1 px-2 rounded-md text-xs hover:bg-accent border-dashed"
+                              className="h-7 cursor-pointer flex items-center gap-1 px-2.5 rounded-full font-mono text-xs tabular-nums hover:bg-accent border-dashed"
                             >
-                              <span className="uppercase font-bold text-[0.6rem] text-muted-foreground mr-0.5">
+                              <span className="font-mono uppercase text-[10px] text-muted-foreground mr-0.5">
                                 {region.currency.code}
                               </span>
                               <span>
@@ -305,12 +306,12 @@ function PendingVariantCard({
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-6 gap-1 uppercase tracking-wide border border-dashed px-2 rounded-md text-xs"
+                            className="h-7 gap-1 border border-dashed px-2.5 rounded-full text-xs"
                           >
-                            <span className="uppercase font-bold text-[0.6rem] text-muted-foreground mr-0.5">
+                            <span className="font-mono uppercase text-[10px] text-muted-foreground mr-0.5">
                               {region.currency.code}
                             </span>
-                            {region.currency.symbol} ADD
+                            Add
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-80 p-0 bg-card" align="end">
@@ -340,7 +341,7 @@ function PendingVariantCard({
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-6 w-6 [&_svg]:size-3"
+                    className="size-8 rounded-full [&_svg]:size-3.5 max-sm:size-10"
                   >
                     <MoreHorizontal />
                   </Button>
@@ -444,17 +445,15 @@ function PendingVariantCard({
                 variant="outline"
                 size="icon"
                 onClick={() => onDelete?.(variant)}
-                className="h-6 w-6 [&_svg]:size-4 text-muted-foreground hover:text-destructive"
+                className="size-8 rounded-full [&_svg]:size-4 text-muted-foreground hover:text-destructive max-sm:size-10"
               >
                 <X />
               </Button>
             </div>
-            <Badge
-              color="emerald"
-              className="mt-4 py-0.5 text-xs rounded-full border uppercase font-medium tracking-wide"
-            >
-              PENDING
-            </Badge>
+            <span className="mt-4 inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
+              <Dot tone="ok" />
+              Pending
+            </span>
           </div>
         </div>
       </div>
@@ -499,74 +498,41 @@ export function VariantDriftCard({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <h3 className="font-medium uppercase text-xs tracking-wider text-muted-foreground">
-          All Changes
-        </h3>
-        <Tooltip>
-          <TooltipTrigger>
-            <Info className="size-4 text-muted-foreground" />
-          </TooltipTrigger>
-          <TooltipContent className="text-xs max-w-[300px]">
-            We&apos;ve found changes in option values that affect your variants.
-            Here&apos;s a summary of the variants that need to be added,
-            removed, or unchanged.
-          </TooltipContent>
-        </Tooltip>
-      </div>
-
-      {/* Tab-based UI */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="flex items-end justify-between">
-          <ScrollArea>
-            <TabsList className="relative h-auto w-full gap-0.5 bg-transparent p-0">
-              {localVariants.length > 0 && (
-                <TabsTrigger
-                  value="added"
-                  className="bg-muted overflow-hidden rounded-b-none border-x border-t py-2 data-[state=active]:z-10 data-[state=active]:shadow-none"
-                >
-                  <div className="h-3 w-3 rounded-full bg-emerald-700 dark:bg-emerald-400 border-emerald-200 dark:border-emerald-800/50 border-3 animate-pulse -ms-0.5 me-1.5" />
-                  {localVariants.length} added
-                </TabsTrigger>
-              )}
-              {variantsToDelete.length > 0 && (
-                <TabsTrigger
-                  value="removed"
-                  className="bg-muted overflow-hidden rounded-b-none border-x border-t py-2 data-[state=active]:z-10 data-[state=active]:shadow-none"
-                >
-                  <div className="h-3 w-3 rounded-full bg-rose-700 dark:bg-rose-400 border-rose-200 dark:border-rose-800/50 border-3 animate-pulse -ms-0.5 me-1.5" />
-                  {variantsToDelete.length} removed
-                </TabsTrigger>
-              )}
-              {unchangedVariants.length > 0 && (
-                <TabsTrigger
-                  value="unchanged"
-                  className="bg-muted overflow-hidden rounded-b-none border-x border-t py-2 data-[state=active]:z-10 data-[state=active]:shadow-none"
-                >
-                  <div className="h-3 w-3 rounded-full bg-zinc-700 dark:bg-zinc-400 border-zinc-200 dark:border-zinc-800/50 border-3 animate-pulse -ms-0.5 me-1.5" />
-                  {unchangedVariants.length} unchanged
-                </TabsTrigger>
-              )}
-              <div className="overflow-hidden p-1">
-                <Button
-                  onClick={() => onSaveChanges(localVariants)}
-                  size="sm"
-                  className="h-6 text-xs"
-                >
-                  Accept
-                </Button>
-              </div>
-            </TabsList>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
-        <div className="mt-0 border rounded-b-lg p-2">
-          {/* Tab Content */}
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Track label="Variant changes">
           {localVariants.length > 0 && (
-            <TabsContent value="added" className="mt-0">
-              <div className="space-y-4">
+            <Pill active={activeTab === "added"} onClick={() => setActiveTab("added")}>
+              <Dot tone="ok" className="translate-y-0" />
+              <span className="font-mono tabular-nums">{localVariants.length}</span> added
+            </Pill>
+          )}
+          {variantsToDelete.length > 0 && (
+            <Pill active={activeTab === "removed"} onClick={() => setActiveTab("removed")}>
+              <Dot tone="danger" className="translate-y-0" />
+              <span className="font-mono tabular-nums">{variantsToDelete.length}</span> removed
+            </Pill>
+          )}
+          {unchangedVariants.length > 0 && (
+            <Pill active={activeTab === "unchanged"} onClick={() => setActiveTab("unchanged")}>
+              <Dot tone="muted" className="translate-y-0" />
+              <span className="font-mono tabular-nums">{unchangedVariants.length}</span> unchanged
+            </Pill>
+          )}
+        </Track>
+        <Button
+          onClick={() => onSaveChanges(localVariants)}
+          size="sm"
+          className="h-9 rounded-full px-4 max-sm:h-10"
+        >
+          Accept
+        </Button>
+      </div>
+      <div>
+          {/* Tab Content */}
+          {localVariants.length > 0 && activeTab === "added" && (
+            <div>
+              <div className="space-y-3">
                 {localVariants.map((variant: any) => (
                   <PendingVariantCard
                     key={variant.id}
@@ -577,12 +543,12 @@ export function VariantDriftCard({
                   />
                 ))}
               </div>
-            </TabsContent>
+            </div>
           )}
 
-          {variantsToDelete.length > 0 && (
-            <TabsContent value="removed" className="mt-0">
-              <div className="space-y-4">
+          {variantsToDelete.length > 0 && activeTab === "removed" && (
+            <div>
+              <div className="space-y-3">
                 {variantsToDelete.map((variant: any) => (
                   <DeleteVariantCard
                     key={variant.id}
@@ -592,23 +558,23 @@ export function VariantDriftCard({
                   />
                 ))}
               </div>
-            </TabsContent>
+            </div>
           )}
 
-          {unchangedVariants.length > 0 && (
-            <TabsContent value="unchanged" className="mt-0">
-              <div className="space-y-4">
+          {unchangedVariants.length > 0 && activeTab === "unchanged" && (
+            <div>
+              <div className="space-y-3">
                 {unchangedVariants.map((variant: any) => (
                   <div
                     key={variant.id}
-                    className="border rounded-lg bg-muted/40 p-4"
+                    className="rounded-xl bg-background p-4 ring-1 ring-border"
                   >
                     <div className="flex gap-3">
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border bg-background">
                         <Package className="h-6 w-6 text-foreground/60" />
                       </div>
                       <div className="space-y-2">
-                        <div className="text-sm font-medium">
+                        <div className="font-mono text-sm font-medium tabular-nums">
                           {variant.title}
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -617,10 +583,10 @@ export function VariantDriftCard({
                               <Badge
                                 key={i}
                                 color="zinc"
-                                className="uppercase rounded-md border text-[.65rem] py-[.0625rem] px-1.5 font-medium"
+                                className="rounded-full bg-muted px-2 py-0.5 font-mono text-[11px] font-medium tabular-nums"
                               >
-                                <span className="opacity-80 mr-1">
-                                  {ov.productOption.title}:
+                                <span className="mr-1 font-sans opacity-70">
+                                  {ov.productOption.title}
                                 </span>
                                 {ov.value}
                               </Badge>
@@ -632,10 +598,9 @@ export function VariantDriftCard({
                   </div>
                 ))}
               </div>
-            </TabsContent>
+            </div>
           )}
-        </div>
-      </Tabs>
+      </div>
     </div>
   );
 }

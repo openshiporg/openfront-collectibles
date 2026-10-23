@@ -1,45 +1,33 @@
 import { cn } from "@/lib/utils";
+import { Dot, type DotTone } from "@/features/platform/components/vault-ui";
 
-const statusConfig = {
-  pending: {
-    label: "Pending",
-    dotClass: "bg-blue-500 dark:bg-blue-400 outline-3 -outline-offset-1 outline-blue-100 dark:outline-blue-900/50"
-  },
-  completed: {
-    label: "Completed", 
-    dotClass: "bg-green-500 dark:bg-green-400 outline-3 -outline-offset-1 outline-green-100 dark:outline-green-900/50"
-  },
-  archived: {
-    label: "Archived",
-    dotClass: "bg-zinc-500 dark:bg-zinc-400 outline-3 -outline-offset-1 outline-zinc-100 dark:outline-zinc-900/50"
-  },
-  canceled: {
-    label: "Canceled",
-    dotClass: "bg-red-500 dark:bg-red-400 outline-3 -outline-offset-1 outline-red-100 dark:outline-red-900/50"
-  },
-  requires_action: {
-    label: "Requires Action",
-    dotClass: "bg-orange-500 dark:bg-orange-400 outline-3 -outline-offset-1 outline-orange-100 dark:outline-orange-900/50"
-  },
-} as const;
+export const orderStatusConfig = {
+  pending: { label: "Pending", tone: "info" },
+  completed: { label: "Completed", tone: "ok" },
+  archived: { label: "Archived", tone: "muted" },
+  canceled: { label: "Canceled", tone: "danger" },
+  requires_action: { label: "Requires action", tone: "warn" },
+} as const satisfies Record<string, { label: string; tone: DotTone }>;
 
-interface StatusBadgeProps {
-  status: keyof typeof statusConfig;
+export function orderStatusTone(status?: string): DotTone {
+  return orderStatusConfig[status as keyof typeof orderStatusConfig]?.tone ?? "muted";
 }
 
-export function StatusBadge({ status }: StatusBadgeProps) {
-  const config = statusConfig[status];
-  
+export function orderStatusLabel(status?: string): string {
+  return orderStatusConfig[status as keyof typeof orderStatusConfig]?.label ?? (status ?? "Unknown");
+}
+
+interface StatusBadgeProps {
+  status: keyof typeof orderStatusConfig;
+  className?: string;
+}
+
+/** Status label with its dot. Place on a title line (`items-baseline`). */
+export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
-    <div className={cn(
-      "inline-flex w-max items-center gap-2 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
-      "rounded-full bg-muted border shadow-xs"
-    )}>
-      <span className={cn(
-        "inline-block size-2 shrink-0 rounded-full outline",
-        config.dotClass
-      )} />
-      {config.label}
-    </div>
+    <span className={cn("inline-flex items-baseline gap-1.5 text-xs font-medium text-muted-foreground", className)}>
+      <Dot tone={orderStatusTone(status)} />
+      {orderStatusLabel(status)}
+    </span>
   );
 }

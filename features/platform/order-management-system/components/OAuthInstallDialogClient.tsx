@@ -10,7 +10,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { CircleCheck, Loader2, Settings } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { Dot, ListBand } from '../../components/vault-ui';
 import { createOAuthToken, denyOAuthApp } from '../actions/oauth';
 
 interface OAuthParams {
@@ -90,47 +91,40 @@ export const OAuthInstallDialogClient: React.FC<OAuthInstallDialogClientProps> =
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()} modal>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <div className="flex items-center gap-3">
-            {/* <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-              <Settings className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            </div> */}
-            <div>
-              <DialogTitle>
-                {initialData.success && initialData.app 
-                  ? `Install ${initialData.app.name}` 
-                  : 'Installation Required'}
-              </DialogTitle>
-              <p className="text-sm text-muted-foreground">
-                {initialData.success 
-                  ? 'Review the permissions being requested' 
-                  : 'Unable to process authorization'}
-              </p>
-            </div>
-          </div>
+          <DialogTitle>
+            {initialData.success && initialData.app
+              ? `Install ${initialData.app.name}`
+              : 'Installation Required'}
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            {initialData.success
+              ? 'Requested permissions'
+              : 'Unable to process authorization'}
+          </p>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className="py-2">
           {!initialData.success ? (
-            <div className="text-center py-4">
-              <p className="text-red-600 dark:text-red-400">{initialData.error}</p>
+            <div className="flex items-baseline gap-2.5 rounded-xl bg-muted/40 px-4 py-3 text-sm text-foreground ring-1 ring-inset ring-border/60">
+              <Dot tone="danger" />
+              <span className="text-destructive">{initialData.error}</span>
             </div>
           ) : initialData.app ? (
             <>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                This application is requesting access to your OpenFront store with the following permissions:
-              </p>
-              
-              <div className="border shadow-inner bg-muted/40 rounded-lg p-4 space-y-2">
+              <ListBand>
                 {initialData.requestedScopes?.map((scope) => (
-                  <div key={scope} className="flex items-center gap-2">
-                    <CircleCheck className="w-4 h-4 text-green-600" />
-                    <span className="text-sm">{getScopeDescription(scope)}</span>
+                  <div key={scope} className="flex items-baseline justify-between gap-3 px-4 py-2.5">
+                    <span className="inline-flex items-baseline gap-2.5 text-sm text-foreground">
+                      <Dot tone="ok" />
+                      {getScopeDescription(scope)}
+                    </span>
+                    <span className="font-mono text-[11px] text-muted-foreground">{scope}</span>
                   </div>
                 ))}
-              </div>
+              </ListBand>
 
               {initialData.app.description && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
+                <p className="mt-4 text-sm text-muted-foreground">
                   {initialData.app.description}
                 </p>
               )}
@@ -141,16 +135,16 @@ export const OAuthInstallDialogClient: React.FC<OAuthInstallDialogClientProps> =
         <DialogFooter>
           <div className="flex gap-2 w-full">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={handleClose}
-              className="flex-1"
+              className="h-10 flex-1 rounded-full bg-muted"
             >
               Cancel
             </Button>
             <Button
               onClick={handleAuthorize}
               disabled={isProcessing || !initialData.success}
-              className="flex-1"
+              className="h-10 flex-1 rounded-full"
             >
               {isProcessing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               Install

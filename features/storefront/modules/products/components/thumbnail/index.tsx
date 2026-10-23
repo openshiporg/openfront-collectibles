@@ -10,6 +10,10 @@ type ThumbnailProps = {
   size?: "small" | "medium" | "large" | "full" | "square";
   isFeatured?: boolean;
   className?: string;
+  /** Shown in serif when there is no photo. */
+  title?: string | null;
+  /** Small caps label above the title when there is no photo (category or collection). */
+  label?: string | null;
   "data-testid"?: string;
 };
 
@@ -19,6 +23,8 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   size = "small",
   isFeatured,
   className,
+  title,
+  label,
   "data-testid": dataTestid,
 }) => {
   const initialImage =
@@ -26,17 +32,16 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
     images?.[0]?.url ||
     images?.[0]?.image?.url ||
     images?.[0]?.imagePath ||
-    "/images/placeholder.svg";
+    null;
 
   return (
     <div
       className={cn(
-        "relative w-full overflow-hidden p-4 bg-muted shadow-sm rounded-lg group-hover:shadow-md transition-shadow ease-in-out duration-150",
+        "relative w-full overflow-hidden rounded-[14px] bg-cx-well shadow-[inset_0_1px_2px_rgb(26_23_18/0.07)]",
         className,
         {
-          "aspect-[11/14]": isFeatured,
-          "aspect-[9/16]": !isFeatured && size !== "square",
-          "aspect-[1/1]": size === "square",
+          "aspect-[4/5]": isFeatured || (size !== "square" && size !== "small"),
+          "aspect-square": size === "square" || size === "small",
           "w-[180px]": size === "small",
           "w-[290px]": size === "medium",
           "w-[440px]": size === "large",
@@ -45,28 +50,28 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       )}
       data-testid={dataTestid}
     >
-      <ImageOrPlaceholder image={initialImage} size={size} />
-    </div>
-  )
-}
-
-const ImageOrPlaceholder = ({
-  image,
-  size,
-}: Pick<ThumbnailProps, "size"> & { image?: string }) => {
-  return image ? (
-    <Image
-      src={image}
-      alt="Thumbnail"
-      className="absolute inset-0 object-cover object-center"
-      draggable={false}
-      sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
-      fill
-      suppressHydrationWarning
-    />
-  ) : (
-    <div className="w-full h-full absolute inset-0 flex items-center justify-center">
-      <PlaceholderImage size={size === "small" ? 16 : 24} />
+      {initialImage ? (
+        <Image
+          src={initialImage}
+          alt={title || "Item photo"}
+          className="absolute inset-0 object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+          draggable={false}
+          sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
+          fill
+          suppressHydrationWarning
+        />
+      ) : title ? (
+        <div className="absolute inset-0 flex flex-col justify-end gap-1.5 bg-cx-tint p-4">
+          {label && <span className="cx-label">{label}</span>}
+          <span className="line-clamp-4 font-cx-serif text-[18px] leading-[22px] text-cx-ink sm:text-[20px] sm:leading-[24px]">
+            {title}
+          </span>
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-cx-ink-3">
+          <PlaceholderImage size={size === "small" ? 16 : 24} />
+        </div>
+      )}
     </div>
   )
 }

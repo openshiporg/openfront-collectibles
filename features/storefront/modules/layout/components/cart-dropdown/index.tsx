@@ -7,7 +7,6 @@ import LineItemOptions from "@/features/storefront/modules/common/components/lin
 import LineItemPrice from "@/features/storefront/modules/common/components/line-item-price"
 import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
 import Thumbnail from "@/features/storefront/modules/products/components/thumbnail"
-import { Button } from "@/components/ui/button";
 import { deleteLineItem } from "@/features/storefront/lib/data/cart";
 
 interface CartItem {
@@ -88,103 +87,87 @@ const CartDropdown = ({
   return (
     // TODO: Remove suppressHydrationWarning when React 19.2.0 useId bug is fixed upstream
     // Known issue: https://github.com/radix-ui/primitives/issues/3700
-    // Radix UI generates different IDs on server vs client in React 19.2.0 (Next.js 16+)
-    <div className="h-full z-50" suppressHydrationWarning>
+    <div className="z-50" suppressHydrationWarning>
       <Popover open={cartDropdownOpen} onOpenChange={setCartDropdownOpen}>
-        <div className="relative h-full" onMouseEnter={openAndCancel} onMouseLeave={close}>
+        <div className="relative" onMouseEnter={openAndCancel} onMouseLeave={close}>
           <PopoverTrigger asChild>
-              <LocalizedClientLink className="flex min-h-11 min-w-11 md:min-h-0 md:min-w-0 h-full items-center justify-center hover:text-foreground" href="/cart">
-                {`Cart`}
-                {totalItems > 0 && (
-                  <span className="ml-2 inline-flex items-center justify-center rounded-full bg-muted text-foreground/60 border text-[.5rem] font-bold h-4 w-4">
-                    {totalItems}
-                  </span>
-                )}
-              </LocalizedClientLink>
+            <LocalizedClientLink
+              className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-[14px] font-medium text-cx-ink hover:bg-cx-well"
+              href="/cart"
+              data-testid="nav-cart-link"
+            >
+              Cart
+              <span
+                className={
+                  totalItems > 0
+                    ? "cx-num inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-cx-ink px-1.5 text-[11px] text-cx-bg"
+                    : "cx-num text-[12px] text-cx-ink-3"
+                }
+              >
+                {totalItems}
+              </span>
+            </LocalizedClientLink>
           </PopoverTrigger>
           <PopoverContent
-            className="hidden sm:block absolute top-[calc(100%+1px)] right-0 bg-background border-x border-b w-[420px] text-foreground p-0"
-            sideOffset={4}
+            className="hidden w-[400px] overflow-hidden rounded-2xl border border-cx-line bg-cx-surface p-0 text-cx-ink shadow-[0_24px_48px_-24px_rgb(26_23_18/0.4)] sm:block"
+            sideOffset={8}
             align="end"
             onMouseEnter={openAndCancel}
             onMouseLeave={close}
           >
-            {/* <div className="p-4 flex items-center justify-center border-b">
-              <h3 className="text-lg font-medium">Cart</h3>
-            </div> */}
             {cartState && cartState.lineItems?.length ? (
               <>
-                <div className="overflow-y-scroll max-h-[402px] px-4 py-6 grid grid-cols-1 gap-y-6 no-scrollbar">
+                <div className="no-scrollbar max-h-[380px] divide-y divide-cx-line overflow-y-auto">
                   {cartState.lineItems
                     .sort((a: CartItem, b: CartItem) => {
                       return a.created_at > b.created_at ? -1 : 1
                     })
                     .map((item: CartItem) => (
-                      <div className="grid grid-cols-[122px_1fr] gap-x-4" key={item.id}>
-                        <LocalizedClientLink href={`/products/${item.productVariant.product.handle}`} className="w-28">
+                      <div className="grid grid-cols-[72px_1fr] gap-x-3 p-4" key={item.id}>
+                        <LocalizedClientLink href={`/products/${item.productVariant.product.handle}`} className="w-[72px]">
                           <Thumbnail thumbnail={item.thumbnail} size="square" />
                         </LocalizedClientLink>
-                        <div className="flex flex-col">
-                          <div className="flex flex-col flex-1">
-                            <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4">
-                                <h3 className="text-sm overflow-hidden text-ellipsis">
-                                  <LocalizedClientLink href={`/products/${item.productVariant.product.handle}`}>
-                                    {item.title}
-                                  </LocalizedClientLink>
-                                </h3>
-                                {item.productVariant.title && <p className="text-muted-foreground text-xs">{item.productVariant.title}</p>}
-                                <LineItemOptions variant={item.productVariant} variantTitle={item.variantTitle}/>
-                                <div className="mt-2 flex items-center gap-2">
-                                  <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                                    Quantity: {item.quantity}
-                                  </span>
-                                  <span className="text-muted-foreground">·</span>
-                                  <DeleteButton id={item.id} />
-                                </div>
-                              </div>
-                              <div className="flex justify-end">
-                                <LineItemPrice item={item} />
-                              </div>
+                        <div className="flex min-w-0 items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <h3 className="truncate font-cx-serif text-[16px] leading-[20px]">
+                              <LocalizedClientLink href={`/products/${item.productVariant.product.handle}`}>
+                                {item.title}
+                              </LocalizedClientLink>
+                            </h3>
+                            {item.productVariant.title && <p className="truncate text-[12px] text-cx-ink-2">{item.productVariant.title}</p>}
+                            <LineItemOptions variant={item.productVariant} variantTitle={item.variantTitle}/>
+                            <div className="mt-1.5 flex items-center gap-2 text-[12px] text-cx-ink-2">
+                              <span className="cx-num">Qty {item.quantity}</span>
+                              <span aria-hidden="true">·</span>
+                              <DeleteButton id={item.id} />
                             </div>
                           </div>
-                          {/* <div><Button size="icon"><Trash2 /></Button></div> */}
+                          <div className="cx-num shrink-0 text-[13px]">
+                            <LineItemPrice item={item} />
+                          </div>
                         </div>
                       </div>
                     ))}
                 </div>
-                <div className="p-4 flex flex-col gap-y-4 border-t mt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-foreground font-semibold">
-                      Subtotal{" "}
-                      <span className="font-normal text-muted-foreground">(excl. taxes)</span>
+                <div className="space-y-3 border-t border-cx-line bg-cx-bg p-4">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-[14px] font-medium">
+                      Subtotal <span className="font-normal text-cx-ink-3">excl. tax</span>
                     </span>
-                    <span className="text-lg">
-                      {cartState.subtotal}
-                    </span>
+                    <span className="cx-num text-[16px]">{cartState.subtotal}</span>
                   </div>
-                  <LocalizedClientLink href="/cart" passHref>
-                    <Button className="w-full" size="lg">
-                      <LinkStatus />
-                      Go to cart
-                    </Button>
+                  <LocalizedClientLink href="/cart" className="cx-btn w-full" onClick={close}>
+                    <LinkStatus />
+                    View cart
                   </LocalizedClientLink>
                 </div>
               </>
             ) : (
-              <div className="flex py-16 flex-col gap-y-4 items-center justify-center">
-                <div className="border text-sm bg-muted/40 flex items-center justify-center w-6 h-6 rounded-full text-white">
-                  <span>0</span>
-                </div>
-                <span className="text-muted-foreground/80">Your shopping bag is empty.</span>
-                <div>
-                  <LocalizedClientLink href="/store">
-                    <>
-                      <span className="sr-only">Go to all products page</span>
-                      <Button onClick={close}>Explore products</Button>
-                    </>
-                  </LocalizedClientLink>
-                </div>
+              <div className="flex flex-col items-start gap-4 p-6">
+                <p className="font-cx-serif text-[20px]">Your cart is empty</p>
+                <LocalizedClientLink href="/store" className="cx-btn" onClick={close}>
+                  Browse items
+                </LocalizedClientLink>
               </div>
             )}
           </PopoverContent>
@@ -211,10 +194,10 @@ const DeleteButton = ({
   return (
     <button
       onClick={() => handleDelete(id)}
-      className="cursor-pointer text-xs font-medium uppercase tracking-wide text-rose-700/70 hover:text-rose-600"
+      className="cursor-pointer text-[12px] font-medium text-cx-danger hover:underline"
       disabled={isDeleting}
     >
-      {isDeleting ? "Removing..." : "Remove"}
+      {isDeleting ? "Removing" : "Remove"}
     </button>
   );
 };

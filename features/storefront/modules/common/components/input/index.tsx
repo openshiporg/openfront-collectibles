@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label"
 import { Input as BaseInput } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import React, { useEffect, useImperativeHandle, useState } from "react"
+import React, { useEffect, useId, useImperativeHandle, useState } from "react"
 
 import Eye from "@/features/storefront/modules/common/icons/eye"
 import EyeOff from "@/features/storefront/modules/common/icons/eye-off"
@@ -36,26 +36,32 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     useImperativeHandle(ref, () => inputRef.current!)
 
+    const generatedId = useId()
+    const inputId = props.id || `${name}-${generatedId}`
+
     return (
-      <div className="flex flex-col w-full">
-        {topLabel && (
-          <Label className="mb-2 text-xs font-medium leading-5">{topLabel}</Label>
-        )}
-        <div className="flex relative z-0 w-full text-sm font-normal leading-5"> 
+      <div className="flex w-full flex-col gap-1.5">
+        <Label htmlFor={inputId} className="text-[13px] font-medium leading-[18px] text-cx-ink-2">
+          {topLabel || label}
+          {required && <span className="text-cx-ink-3"> *</span>}
+        </Label>
+        <div className="relative w-full">
           <BaseInput
             type={inputType}
             name={name}
-            placeholder={placeholder || label}
+            placeholder={placeholder}
             required={required}
-            className="block w-full h-auto appearance-none rounded-md border border-border bg-background px-4 py-3 focus:outline-none focus:ring-0 hover:bg-accent"
+            className="block h-12 w-full appearance-none rounded-xl border border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink shadow-none transition-colors placeholder:text-cx-ink-3 hover:border-cx-ink-3 focus-visible:border-cx-accent focus-visible:ring-2 focus-visible:ring-cx-accent/25 aria-invalid:border-cx-danger"
             {...props}
+            id={inputId}
             ref={inputRef}
           />
           {type === "password" && (
             <button
               type="button"
+              aria-label={showPassword ? "Hide password" : "Show password"}
               onClick={() => setShowPassword(!showPassword)}
-              className="text-muted-foreground px-4 focus:outline-none transition-all duration-150 outline-none focus:text-foreground absolute right-0 top-3"
+              className="absolute inset-y-0 right-0 inline-flex w-12 items-center justify-center text-cx-ink-3 outline-none transition-colors hover:text-cx-ink focus-visible:text-cx-ink"
             >
               {showPassword ? <Eye /> : <EyeOff />}
             </button>

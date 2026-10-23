@@ -3,31 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  AlertCircle,
-  ArrowLeft,
-  Clock,
-  Container,
-  Mail,
-  MapPin,
-  Phone,
-  Calculator,
-  ShoppingBag,
-  User,
-  Building,
-  CreditCard,
-  Truck,
-  History as HistoryIcon
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dot, ListBand, SectionTitle } from "@/features/platform/components/vault-ui";
+import { StatusBadge } from "../components/StatusBadge";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 
-
-const Card = "div";
 
 interface ExtendedOrder {
   id: string;
@@ -50,6 +31,25 @@ interface ExtendedOrder {
     phone?: string;
     orders?: { id: string }[];
   };
+  fulfillmentStatus?: string;
+  billingAddress?: ExtendedOrder["shippingAddress"];
+  fulfillments?: Array<{
+    id: string;
+    createdAt: string;
+    canceledAt?: string | null;
+    fulfillmentItems?: Array<{
+      id: string;
+      quantity: number;
+      lineItem?: { id: string; title: string; variantTitle?: string };
+    }>;
+    shippingLabels?: Array<{
+      id: string;
+      labelUrl?: string;
+      trackingNumber?: string;
+      trackingUrl?: string;
+      carrier?: string;
+    }>;
+  }>;
   shippingAddress?: {
     id: string;
     firstName: string;
@@ -111,298 +111,317 @@ export function OrderPageClient({
 
   if (!order) {
     return (
-      <Badge color="rose" className="items-start gap-4 border p-4">
-        <AlertCircle className="h-5 w-5" />
-        <div className="flex flex-col">
-          <h2 className="uppercase tracking-wide font-medium">Not Found</h2>
-          <span>Order not found or you don&apos;t have access.</span>
-        </div>
-      </Badge>
+      <div className="p-4 md:p-6">
+        <ListBand>
+          <div className="flex items-baseline gap-2.5 px-4 py-3 text-sm text-foreground">
+            <Dot tone="danger" />
+            Order not found or you don&apos;t have access.
+          </div>
+        </ListBand>
+      </div>
     );
   }
 
   const { lineItems = [] } = order;
+  const paymentCaptured = order.paymentDetails?.[0]?.status === "captured";
+  const formatDate = (value?: string) =>
+    value
+      ? new Date(value).toLocaleString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        })
+      : "No date";
+  const itemCount = lineItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const ship = order.shippingAddress;
+  const bill = order.billingAddress;
+  const fulfillments = order.fulfillments || [];
+  const editButton =
+    "inline-flex min-h-7 items-center rounded-full bg-muted px-3 text-xs font-medium text-foreground hover:bg-muted/70 max-sm:min-h-10";
+
+  const renderAddress = (address: NonNullable<ExtendedOrder["shippingAddress"]>) => (
+    <div className="space-y-0.5 px-4 py-3 text-sm">
+      <div className="font-medium text-foreground">
+        {[address.firstName, address.lastName].filter(Boolean).join(" ")}
+      </div>
+      {address.company && <div className="text-muted-foreground">{address.company}</div>}
+      <div className="text-muted-foreground">{address.address1}</div>
+      {address.address2 && <div className="text-muted-foreground">{address.address2}</div>}
+      <div className="text-muted-foreground">
+        {[address.city, address.province].filter(Boolean).join(", ")}{" "}
+        {address.postalCode && <span className="font-mono tabular-nums">{address.postalCode}</span>}
+      </div>
+      {address.country?.name && <div className="text-muted-foreground">{address.country.name}</div>}
+      {address.phone && <div className="font-mono text-xs tabular-nums text-muted-foreground">{address.phone}</div>}
+    </div>
+  );
 
   return (
-    <div className="bg-muted/5">
-      <div className="max-w-6xl p-4 md:p-6">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Button variant="link" className="p-0 h-5">
-              <Link
-                href="/dashboard/platform/orders"
-                className="flex items-center text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Orders
-              </Link>
-            </Button>
+    <div>
+      <div className="max-w-6xl space-y-8 p-4 pb-10 md:p-6">
+        <div className="space-y-3">
+          <Link
+            href="/dashboard/platform/orders"
+            className="inline-flex min-h-8 items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" />
+            Orders
+          </Link>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h1 className="font-mono text-2xl font-semibold tracking-tight tabular-nums text-foreground">
+                  #{order.displayId}
+                </h1>
+                <StatusBadge status={order.status as any} className="text-sm" />
+                {order.fulfillmentStatus && (
+                  <span className="text-sm text-muted-foreground">
+                    {order.fulfillmentStatus.replaceAll("_", " ")}
+                  </span>
+                )}
+              </div>
+              <div className="font-mono text-sm tabular-nums text-muted-foreground">
+                {formatDate(order.createdAt)}
+              </div>
+            </div>
+            <Link
+              href={`/dashboard/platform/orders/${order.id}/fulfill`}
+              className="inline-flex min-h-10 items-center rounded-full bg-foreground px-5 text-sm font-medium text-background hover:bg-foreground/90"
+            >
+              Fulfill items
+            </Link>
           </div>
-          <h1 className="text-2xl font-semibold">Order Details</h1>
-          <p className="text-sm text-muted-foreground">
-            Order #{order.displayId} •{" "}
-            {order.createdAt ? new Date(order.createdAt).toLocaleString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-              hour12: true,
-            }) : "No date"}
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-8 space-y-6">
-            {/* Line Items Card */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <ShoppingBag className="size-3.5 opacity-70" />
-                  Line Items
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="py-2 px-3 divide-y">
-                  {lineItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-start space-x-4 py-3 p-2"
-                    >
-                      <div className="h-16 w-16 bg-muted/10 rounded-md flex-shrink-0 flex items-center justify-center">
-                        {item.thumbnail ? (
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div className="min-w-0 space-y-8 lg:col-span-8">
+            <section>
+              <SectionTitle meta={`${itemCount} ${itemCount === 1 ? "item" : "items"}`}>Line items</SectionTitle>
+              <ListBand>
+                {lineItems.length === 0 && (
+                  <div className="px-4 py-3 text-sm text-muted-foreground">No line items</div>
+                )}
+                {lineItems.map((item) => {
+                  const spec = item.variantTitle || item.variantData?.title;
+                  return (
+                    <div key={item.id} className="flex items-start gap-3 px-4 py-3">
+                      <div className="size-12 shrink-0 overflow-hidden rounded-md bg-muted">
+                        {item.thumbnail && (
                           <Image
                             src={item.thumbnail}
                             alt={item.title}
-                            width={64}
-                            height={64}
-                            className="object-cover rounded-md"
+                            width={48}
+                            height={48}
+                            className="size-12 object-cover"
                           />
-                        ) : (
-                          <div className="h-16 w-16 bg-muted rounded-md" />
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-col">
-                          <div className="flex flex-col">
-                            <div className="flex items-start justify-between">
-                              <div className="space-y-2">
-                                <div>
-                                  <span className="font-medium text-sm">
-                                    {item.title}
-                                  </span>
-                                  {item.variantTitle && (
-                                    <div className="text-xs text-muted-foreground">
-                                      {item.variantTitle}
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-2 mt-1">
-                                  {item.sku && (
-                                    <p className="text-xs text-muted-foreground">
-                                      SKU: {item.sku}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="text-xs text-muted-foreground whitespace-nowrap">
-                                  {item.quantity} × {item.formattedUnitPrice}
-                                </div>
-                                <div className="text-sm font-medium whitespace-nowrap">
-                                  {item.formattedTotal}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-foreground">{item.title}</div>
+                        {spec && <div className="font-mono text-xs tabular-nums text-foreground/80">{spec}</div>}
+                        {item.sku && (
+                          <div className="font-mono text-[11px] tabular-nums text-muted-foreground">SKU {item.sku}</div>
+                        )}
+                      </div>
+                      <div className="shrink-0 text-right font-mono tabular-nums">
+                        <div className="text-sm font-medium text-foreground">{item.formattedTotal}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {item.quantity} x {item.formattedUnitPrice}
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-                <div className="flex justify-end p-4 border-t">
-                  <Link href={`/dashboard/platform/orders/${order.id}/fulfill`}>
-                    <Button className="group relative pe-11" size="sm">
-                      Fulfill Items
-                      <span className="pointer-events-none absolute inset-y-0 end-0 flex w-8 items-center justify-center bg-primary-foreground/15">
-                        <Container
-                          className="opacity-60"
-                          size={14}
-                          strokeWidth={2}
-                          aria-hidden="true"
-                        />
-                      </span>
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+                  );
+                })}
+              </ListBand>
+            </section>
 
-            {/* Payment Card */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Calculator className="size-3.5 opacity-70" />
-                  {order.paymentDetails?.[0]?.status === "captured"
-                    ? "Payment Complete"
-                    : "Payment Processing"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-3 text-sm">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Items Subtotal</span>
-                    <span>{order.subtotal}</span>
+            <section>
+              <SectionTitle
+                meta={
+                  <span className="inline-flex items-baseline gap-1.5 font-sans">
+                    <Dot tone={paymentCaptured ? "ok" : "warn"} />
+                    {paymentCaptured ? "Payment complete" : "Payment processing"}
+                  </span>
+                }
+              >
+                Totals
+              </SectionTitle>
+              <ListBand>
+                {[
+                  ["Subtotal", order.subtotal],
+                  ["Shipping", order.shipping],
+                  ["Tax", order.tax],
+                ].map(([name, value]) => (
+                  <div key={name} className="flex justify-between gap-4 px-4 py-2.5 text-sm">
+                    <span className="text-muted-foreground">{name}</span>
+                    <span className="font-mono tabular-nums text-foreground">{value}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span>{order.shipping}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Tax Total</span>
-                    <span>{order.tax}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between font-medium">
-                    <span>Total</span>
-                    <span>{order.total}</span>
-                  </div>
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Total Paid</span>
-                    <span>{order.formattedTotalPaid}</span>
-                  </div>
+                ))}
+                <div className="flex justify-between gap-4 px-4 py-3 text-sm font-semibold">
+                  <span className="text-foreground">Total</span>
+                  <span className="font-mono tabular-nums text-foreground">{order.total}</span>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex justify-between gap-4 px-4 py-2.5 text-sm">
+                  <span className="text-muted-foreground">Paid</span>
+                  <span className="font-mono tabular-nums text-foreground">{order.formattedTotalPaid}</span>
+                </div>
+              </ListBand>
+            </section>
 
-            {/* Activity Log Card */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <HistoryIcon className="size-3.5 opacity-70" />
-                  Activity Log
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Checkbox 
-                    id="show-comments" 
-                    checked={showComments}
-                    onCheckedChange={(checked) => setShowComments(checked === true)}
-                  />
-                  <label htmlFor="show-comments" className="text-sm">
-                    Include Notes
-                  </label>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-3">
-                <div className="space-y-4">
-                  {order.events?.filter((event) =>
-                    showComments ? true : event.type !== 'NOTE_ADDED'
-                  ).map((event) => (
-                    <div key={event.id} className="flex gap-4 text-sm">
-                      <Clock className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-medium">{event.type}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {event.createdAt ? new Date(event.createdAt).toLocaleString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hour12: true,
-                          }) : "No date"}
-                          {event.user?.name && ` by ${event.user.name}`}
-                        </p>
+            {fulfillments.length > 0 && (
+              <section>
+                <SectionTitle meta={fulfillments.length}>Fulfilments</SectionTitle>
+                <ListBand>
+                  {fulfillments.map((fulfillment, index) => (
+                    <div key={fulfillment.id} className="px-4 py-3">
+                      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        <span className="text-sm font-medium text-foreground">
+                          Shipment <span className="font-mono tabular-nums">#{index + 1}</span>
+                        </span>
+                        <span className="inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
+                          <Dot tone={fulfillment.canceledAt ? "danger" : "ok"} />
+                          {fulfillment.canceledAt ? "Canceled" : "Fulfilled"}
+                        </span>
+                        <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                          {formatDate(fulfillment.createdAt)}
+                        </span>
                       </div>
+                      {fulfillment.fulfillmentItems?.length ? (
+                        <ul className="mt-1.5 space-y-0.5 text-xs">
+                          {fulfillment.fulfillmentItems.map((fi) => (
+                            <li key={fi.id} className="flex flex-wrap items-baseline gap-x-2">
+                              <span className="text-foreground">{fi.lineItem?.title}</span>
+                              {fi.lineItem?.variantTitle && (
+                                <span className="font-mono tabular-nums text-muted-foreground">{fi.lineItem.variantTitle}</span>
+                              )}
+                              <span className="font-mono tabular-nums text-muted-foreground">x{fi.quantity}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                      {fulfillment.shippingLabels?.map((label) => (
+                        <div key={label.id} className="mt-1.5 flex flex-wrap items-baseline gap-x-3 text-xs">
+                          {label.carrier && <span className="text-muted-foreground">{label.carrier}</span>}
+                          {label.trackingNumber && (
+                            label.trackingUrl ? (
+                              <a
+                                href={label.trackingUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-baseline gap-1 font-mono tabular-nums text-foreground hover:underline underline-offset-4"
+                              >
+                                {label.trackingNumber}
+                                <ArrowUpRight className="size-3 self-center" />
+                              </a>
+                            ) : (
+                              <span className="font-mono tabular-nums text-foreground">{label.trackingNumber}</span>
+                            )
+                          )}
+                          {label.labelUrl && (
+                            <a
+                              href={label.labelUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-baseline gap-1 text-foreground hover:underline underline-offset-4"
+                            >
+                              Label
+                              <ArrowUpRight className="size-3 self-center" />
+                            </a>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
+                </ListBand>
+              </section>
+            )}
+
+            <section>
+              <SectionTitle
+                meta={
+                  <label htmlFor="show-comments" className="inline-flex cursor-pointer items-center gap-2 font-sans text-xs">
+                    <Checkbox
+                      id="show-comments"
+                      checked={showComments}
+                      onCheckedChange={(checked) => setShowComments(checked === true)}
+                    />
+                    Include notes
+                  </label>
+                }
+              >
+                Activity
+              </SectionTitle>
+              <ListBand>
+                {!order.events?.filter((event) => (showComments ? true : event.type !== 'NOTE_ADDED')).length && (
+                  <div className="px-4 py-3 text-sm text-muted-foreground">No activity</div>
+                )}
+                {order.events?.filter((event) =>
+                  showComments ? true : event.type !== 'NOTE_ADDED'
+                ).map((event) => (
+                  <div key={event.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 px-4 py-2.5 text-sm">
+                    <span className="flex items-baseline gap-2.5 text-foreground">
+                      <Dot tone="muted" />
+                      {event.type}
+                    </span>
+                    <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                      {formatDate(event.createdAt)}
+                      {event.user?.name && <span className="font-sans"> by {event.user.name}</span>}
+                    </span>
+                  </div>
+                ))}
+              </ListBand>
+            </section>
           </div>
 
-          <div className="lg:col-span-4 space-y-6">
-            {/* Customer Card */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <User className="size-3.5 opacity-70" />
-                  Customer
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-3 text-foreground/75">
-                    <User className="h-4 w-4" />
-                    <span className="text-sm">{order.user?.name || "Guest"}</span>
+          <div className="min-w-0 space-y-8 lg:col-span-4">
+            <section>
+              <SectionTitle>Customer</SectionTitle>
+              <ListBand>
+                <div className="px-4 py-3">
+                  <div className="text-sm font-medium text-foreground">{order.user?.name || "Guest"}</div>
+                  <div className="mt-0.5 font-mono text-xs tabular-nums text-muted-foreground">
+                    {order.user?.orders?.length || 1} order{order.user?.orders?.length !== 1 ? "s" : ""}
                   </div>
-                  <div className="flex items-center space-x-3 text-foreground/75">
-                    <Phone className="h-4 w-4" />
-                    <span className="text-sm">
+                </div>
+                <div className="flex items-center justify-between gap-3 px-4 py-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm text-foreground">{order.email}</div>
+                    <div className="font-mono text-xs tabular-nums text-muted-foreground">
                       {order.user?.phone || "No phone number"}
-                    </span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-3 text-foreground/75">
-                    <ShoppingBag className="h-4 w-4" />
-                    <span className="text-sm">
-                      {order.user?.orders?.length || 1} Order
-                      {order.user?.orders?.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
+                  <button
+                    type="button"
+                    className={editButton}
+                    onClick={() => setEditDrawerConfig({
+                      open: true,
+                      listKey: "users",
+                      itemId: order.user?.id as string,
+                      fields: ["email"]
+                    })}
+                  >
+                    Edit
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
+              </ListBand>
+            </section>
 
-            {/* Contact Information Card */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-2 border-b">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Mail className="size-3.5 opacity-70" />
-                  Contact Information
-                </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-muted-foreground h-6 font-semibold text-[11px] uppercase px-1.5 tracking-wide"
-                  onClick={() => setEditDrawerConfig({
-                    open: true,
-                    listKey: "users",
-                    itemId: order.user?.id as string,
-                    fields: ["email"]
-                  })}
-                >
-                  Edit
-                </Button>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-3 text-foreground/75">
-                    <Mail className="h-4 w-4" />
-                    <span className="text-sm">{order.email}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Shipping Address Card */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-2 border-b">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <Truck className="size-3.5 opacity-70" />
-                  Shipping Address
-                </CardTitle>
-                {order.shippingAddress?.id && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-muted-foreground h-6 font-semibold text-[11px] uppercase px-1.5 tracking-wide"
+            <section>
+              <SectionTitle
+                meta={order.shippingAddress?.id ? (
+                  <button
+                    type="button"
+                    className={`${editButton} font-sans`}
                     onClick={() => setEditDrawerConfig({
                       open: true,
                       listKey: "addresses",
                       itemId: order.shippingAddress!.id as string,
                       fields: [
                         "firstName",
-                        "lastName", 
+                        "lastName",
                         "company",
                         "address1",
                         "address2",
@@ -415,79 +434,30 @@ export function OrderPageClient({
                     })}
                   >
                     Edit
-                  </Button>
+                  </button>
+                ) : undefined}
+              >
+                Shipping address
+              </SectionTitle>
+              <ListBand>
+                {ship ? renderAddress(ship) : (
+                  <div className="px-4 py-3 text-sm text-muted-foreground">No shipping address</div>
                 )}
-              </CardHeader>
-              <CardContent className="p-4">
-                {order.shippingAddress ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-3 text-foreground/75">
-                      <User className="h-4 w-4" />
-                      <span className="text-sm">
-                        {[
-                          order.shippingAddress.firstName,
-                          order.shippingAddress.lastName,
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                      </span>
-                    </div>
-                    {order.shippingAddress.company && (
-                      <div className="flex items-center space-x-3 text-foreground/75">
-                        <Building className="h-4 w-4" />
-                        <span className="text-sm">
-                          {order.shippingAddress.company}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-start space-x-3 text-foreground/75">
-                      <MapPin className="h-4 w-4" />
-                      <div className="flex flex-col text-sm">
-                        <span>{order.shippingAddress.address1}</span>
-                        {order.shippingAddress.address2 && (
-                          <span>{order.shippingAddress.address2}</span>
-                        )}
-                        <span>
-                          {[
-                            order.shippingAddress.city,
-                            order.shippingAddress.province,
-                            order.shippingAddress.postalCode,
-                          ]
-                            .filter(Boolean)
-                            .join(", ")}
-                        </span>
-                        {order.shippingAddress.country?.name && (
-                          <span>{order.shippingAddress.country.name}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No shipping address
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+              </ListBand>
+            </section>
 
-            {/* Billing Address Card */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <CardTitle className="font-medium uppercase text-xs tracking-wider text-muted-foreground flex items-center gap-2">
-                  <CreditCard className="size-3.5 opacity-70" />
-                  Billing Address
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <p className="text-sm text-foreground/75">
-                  Same as shipping address
-                </p>
-              </CardContent>
-            </Card>
+            <section>
+              <SectionTitle>Billing address</SectionTitle>
+              <ListBand>
+                {bill && bill.id !== ship?.id ? renderAddress(bill) : (
+                  <div className="px-4 py-3 text-sm text-muted-foreground">Same as shipping address</div>
+                )}
+              </ListBand>
+            </section>
           </div>
         </div>
       </div>
-      
+
       {/* Single Edit Drawer */}
       {editDrawerConfig.open && editDrawerConfig.itemId && (
         <EditItemDrawerClientWrapper

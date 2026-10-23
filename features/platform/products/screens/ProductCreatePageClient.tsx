@@ -8,11 +8,11 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertTriangle, Check, Package, Image, Box, Tag, Building, Info } from 'lucide-react'
+import { AlertTriangle, Check } from 'lucide-react'
+import { Dot, ListBand, PageTitle, Pill, SectionTitle, Track } from '@/features/platform/components/vault-ui'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -36,7 +36,6 @@ import { createProductVariant } from '../actions/variants'
 import { generateUniqueProductHandle } from '../actions'
 import { useRegions } from '../hooks/useProductData'
 
-const Card = 'div'
 
 interface ProductCreatePageClientProps {
   listKey: string
@@ -415,16 +414,19 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
     })
   }, [variantMode, defaultVariantRegions])
 
+  const panel = 'rounded-xl bg-muted/40 p-4 ring-1 ring-inset ring-border/60 md:p-5'
+  const fieldLabel = 'text-xs font-medium text-muted-foreground'
+
   return (
     <>
-      <div className="min-h-screen bg-muted/5 pb-20 font-sans selection:bg-indigo-500/30">
-      {/* Premium Glassmorphic Header */}
-      <div className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-          <PageBreadcrumbs 
-            items={breadcrumbItems} 
+      <div className="min-h-screen pb-20">
+      <div className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+          <PageBreadcrumbs
+            items={breadcrumbItems}
             actions={
               <Button
                 size="sm"
+                className="rounded-full"
                 onClick={prepareCreateDialog}
                 disabled={isCreating}
               >
@@ -434,15 +436,10 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
             }
           />
       </div>
-      
+
       <main className="max-w-6xl p-4 md:p-6">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Create {list.singular}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Add a new {list.singular.toLowerCase()} to your catalog.
-          </p>
+          <PageTitle title={`Create ${list.singular.toLowerCase()}`} />
         </div>
 
         {/* GraphQL errors */}
@@ -450,7 +447,7 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
           <Alert variant="destructive" className="mb-8">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              {createItem.error.networkError?.message || 
+              {createItem.error.networkError?.message ||
                createItem.error.graphQLErrors?.[0]?.message ||
                'An error occurred while creating the item'
               }
@@ -458,353 +455,220 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
           </Alert>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
-          {/* Main Content - Left Column */}
-          <div className="flex-1 w-full space-y-8">
-            
-            {/* General Info */}
+        <div className="flex flex-col items-start gap-8 lg:flex-row">
+          <div className="w-full min-w-0 flex-1 space-y-8">
+
             {Object.keys(fieldsSplit.generalFields).length > 0 && (
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Package className="size-4 opacity-70 text-muted-foreground" />
-                    <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">General Information</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
+              <section>
+                <SectionTitle>Details</SectionTitle>
+                <div className={panel}>
                   <Fields {...createItem.props} fields={fieldsSplit.generalFields} view="createView" groups={list.groups} />
-                </CardContent>
-              </Card>
+                </div>
+              </section>
             )}
 
-            {/* Media */}
-            {Object.keys(fieldsSplit.mediaFields).length > 0 && (
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Image className="size-4 opacity-70 text-muted-foreground" />
-                    <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Media Gallery</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <Fields {...createItem.props} fields={fieldsSplit.mediaFields} view="createView" groups={list.groups} />
-                </CardContent>
-              </Card>
-            )}
+            <section>
+              <SectionTitle>Variants and pricing</SectionTitle>
+              <div className={`${panel} space-y-6`}>
+                <Track label="Variant mode">
+                  <Pill active={variantMode === 'default'} onClick={() => setVariantMode('default')}>
+                    Single variant
+                  </Pill>
+                  <Pill active={variantMode === 'multiple'} onClick={() => setVariantMode('multiple')}>
+                    Multiple variants
+                  </Pill>
+                </Track>
 
-            {/* Variants configuration */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <div className="flex items-center gap-2">
-                  <Box className="size-4 opacity-70 text-muted-foreground" />
-                  <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Variants & Pricing</span>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="p-6 border-b border-border/40 bg-muted/10">
-                  <div className="grid gap-4 sm:grid-cols-2 w-full">
-                    <button
-                      type="button"
-                      onClick={() => setVariantMode('default')}
-                      className={`rounded-xl border p-4 text-left transition-all ${
-                        variantMode === 'default'
-                          ? 'border-indigo-500 bg-indigo-500/5 ring-1 ring-indigo-500/20 shadow-sm'
-                          : 'border-border bg-background hover:bg-muted/50 hover:border-border/80'
-                      }`}
-                    >
-                      <div className="font-medium text-sm">Default Variant</div>
-                      <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                        Best for simple products with one price, one SKU, and no options.
-                      </p>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setVariantMode('multiple')}
-                      className={`rounded-xl border p-4 text-left transition-all ${
-                        variantMode === 'multiple'
-                          ? 'border-indigo-500 bg-indigo-500/5 ring-1 ring-indigo-500/20 shadow-sm'
-                          : 'border-border bg-background hover:bg-muted/50 hover:border-border/80'
-                      }`}
-                    >
-                      <div className="font-medium text-sm">Multiple Variants</div>
-                      <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                        Use options like size or color and manage generated variant combinations.
-                      </p>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  {variantMode === 'default' ? (
-                    <div className="space-y-8">
-                      <div className="grid gap-6 sm:grid-cols-2">
-                        <div className="space-y-2">
-                          <Label htmlFor="default-variant-title" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Variant title</Label>
-                          <Input
-                            id="default-variant-title"
-                            value={defaultVariant.title}
-                            onChange={(e) => setDefaultVariant((prev) => ({ ...prev, title: e.target.value }))}
-                            placeholder="Default Title"
-                            className="h-10 transition-colors focus-visible:ring-indigo-500"
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="default-variant-sku" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">SKU</Label>
-                          <Input
-                            id="default-variant-sku"
-                            value={defaultVariant.sku}
-                            onChange={(e) => setDefaultVariant((prev) => ({ ...prev, sku: e.target.value }))}
-                            placeholder="SKU-001"
-                            className="h-10 transition-colors focus-visible:ring-indigo-500"
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="default-variant-stock" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Inventory quantity</Label>
-                          <Input
-                            id="default-variant-stock"
-                            type="number"
-                            min="0"
-                            value={defaultVariant.inventoryQuantity}
-                            onChange={(e) => setDefaultVariant((prev) => ({ ...prev, inventoryQuantity: e.target.value }))}
-                            className="h-10 transition-colors focus-visible:ring-indigo-500"
-                          />
-                        </div>
+                {variantMode === 'default' ? (
+                  <div className="space-y-6">
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="default-variant-title" className={fieldLabel}>Variant title</Label>
+                        <Input
+                          id="default-variant-title"
+                          value={defaultVariant.title}
+                          onChange={(e) => setDefaultVariant((prev) => ({ ...prev, title: e.target.value }))}
+                          placeholder="Default Title"
+                          className="h-10 bg-background"
+                        />
                       </div>
 
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4 ring-1 ring-foreground/5 transition-colors hover:bg-muted/40 dark:ring-white/10">
-                          <div>
-                            <div className="font-medium text-sm">Manage inventory</div>
-                            <p className="text-xs text-muted-foreground mt-1">Track stock for this default variant.</p>
-                          </div>
-                          <Switch
-                            checked={defaultVariant.manageInventory}
-                            onCheckedChange={(checked) => setDefaultVariant((prev) => ({ ...prev, manageInventory: checked }))}
-                            className="data-[state=checked]:bg-indigo-600"
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between rounded-xl bg-muted/30 p-4 ring-1 ring-foreground/5 transition-colors hover:bg-muted/40 dark:ring-white/10">
-                          <div>
-                            <div className="font-medium text-sm">Allow backorders</div>
-                            <p className="text-xs text-muted-foreground mt-1">Allow purchases when inventory reaches zero.</p>
-                          </div>
-                          <Switch
-                            checked={defaultVariant.allowBackorder}
-                            onCheckedChange={(checked) => setDefaultVariant((prev) => ({ ...prev, allowBackorder: checked }))}
-                            className="data-[state=checked]:bg-indigo-600"
-                          />
-                        </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="default-variant-sku" className={fieldLabel}>SKU</Label>
+                        <Input
+                          id="default-variant-sku"
+                          value={defaultVariant.sku}
+                          onChange={(e) => setDefaultVariant((prev) => ({ ...prev, sku: e.target.value }))}
+                          placeholder="SKU-001"
+                          className="h-10 bg-background font-mono"
+                        />
                       </div>
 
-                      <div className="space-y-4 pt-4 border-t border-border/40">
-                        <div>
-                          <h4 className="font-medium text-sm">Regional pricing</h4>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Set prices for the regions you want to sell in. Leave blank to add later.
-                          </p>
-                        </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="default-variant-stock" className={fieldLabel}>Inventory quantity</Label>
+                        <Input
+                          id="default-variant-stock"
+                          type="number"
+                          min="0"
+                          value={defaultVariant.inventoryQuantity}
+                          onChange={(e) => setDefaultVariant((prev) => ({ ...prev, inventoryQuantity: e.target.value }))}
+                          className="h-10 bg-background font-mono tabular-nums"
+                        />
+                      </div>
+                    </div>
 
-                        <div className="space-y-3">
-                          {regionsLoading ? (
-                            <div className="rounded-xl border border-dashed border-border/60 p-6 text-center text-sm text-muted-foreground">
-                              Loading regions…
-                            </div>
-                          ) : regionsError ? (
-                            <div className="rounded-xl border border-dashed border-destructive/50 bg-destructive/5 p-6 text-center text-sm text-destructive">
-                              Failed to load regions. You can still create the product and add pricing later.
-                            </div>
-                          ) : defaultVariant.prices.length > 0 ? defaultVariant.prices.map((price, index) => {
+                    <ListBand className="bg-background">
+                      <label className="flex min-h-12 cursor-pointer items-center justify-between gap-3 px-4 py-2.5">
+                        <span className="text-sm font-medium text-foreground">Manage inventory</span>
+                        <Switch
+                          checked={defaultVariant.manageInventory}
+                          onCheckedChange={(checked) => setDefaultVariant((prev) => ({ ...prev, manageInventory: checked }))}
+                        />
+                      </label>
+                      <label className="flex min-h-12 cursor-pointer items-center justify-between gap-3 px-4 py-2.5">
+                        <span className="text-sm font-medium text-foreground">Allow backorders</span>
+                        <Switch
+                          checked={defaultVariant.allowBackorder}
+                          onCheckedChange={(checked) => setDefaultVariant((prev) => ({ ...prev, allowBackorder: checked }))}
+                        />
+                      </label>
+                    </ListBand>
+
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-semibold text-foreground">Regional pricing</h3>
+                      {regionsLoading ? (
+                        <ListBand className="bg-background">
+                          <div className="px-4 py-3 text-sm text-muted-foreground">Loading regions…</div>
+                        </ListBand>
+                      ) : regionsError ? (
+                        <ListBand className="bg-background">
+                          <div className="flex items-baseline gap-2.5 px-4 py-3 text-sm text-foreground">
+                            <Dot tone="danger" />
+                            Failed to load regions
+                          </div>
+                        </ListBand>
+                      ) : defaultVariant.prices.length > 0 ? (
+                        <ListBand className="bg-background">
+                          {defaultVariant.prices.map((price, index) => {
                             const regionMeta = defaultVariantRegions.find((region: { regionCode: string; label: string; currencyCode: string; currencySymbol: string }) => region.regionCode === price.regionCode)
                             const currencySymbol = (regionMeta?.currencySymbol || '').trim() || price.currencyCode
                             const isNoDivisionCurrency = NO_DIVISION_CURRENCIES.includes(price.currencyCode.toLowerCase())
 
                             return (
-                              <div key={`${price.regionCode}-${index}`} className="rounded-xl bg-muted/30 p-4 ring-1 ring-foreground/5 dark:ring-white/10">
-                                <div className="flex flex-wrap items-start justify-between gap-3">
-                                  <div className="space-y-1">
-                                    <div className="font-medium text-sm">{regionMeta?.label || price.regionCode}</div>
-                                    <p className="text-xs text-muted-foreground">
-                                      Set the base and compare-at price for this region.
-                                    </p>
-                                  </div>
-                                  <div className="inline-flex items-center gap-2 rounded-md bg-gradient-to-b from-muted to-muted/70 px-2.5 py-1.5 text-xs ring-1 ring-foreground/5 dark:from-muted/70 dark:to-muted/30 dark:ring-white/10">
-                                    <span className="text-sm leading-none text-muted-foreground">{currencySymbol}</span>
-                                    <span className="font-semibold tabular-nums">{price.currencyCode}</span>
+                              <div key={`${price.regionCode}-${index}`} className="grid gap-3 px-4 py-3 sm:grid-cols-[minmax(0,10rem)_1fr_1fr] sm:items-end">
+                                <div className="flex items-baseline gap-2 sm:pb-2.5">
+                                  <span className="text-sm font-medium text-foreground">{regionMeta?.label || price.regionCode}</span>
+                                  <span className="font-mono text-xs tabular-nums text-muted-foreground">{price.currencyCode}</span>
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label className={fieldLabel}>Price</Label>
+                                  <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-muted-foreground">
+                                      {currencySymbol}
+                                    </div>
+                                    <Input
+                                      type="text"
+                                      inputMode={isNoDivisionCurrency ? 'numeric' : 'decimal'}
+                                      autoComplete="off"
+                                      value={price.amount}
+                                      onChange={(e) => updateDefaultVariantPrice(index, 'amount', e.target.value, price.currencyCode)}
+                                      placeholder={isNoDivisionCurrency ? '0' : '0.00'}
+                                      className="h-10 bg-background pl-9 font-mono text-sm tabular-nums"
+                                    />
                                   </div>
                                 </div>
-
-                                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                                  <div className="space-y-2">
-                                    <Label className="text-xs text-muted-foreground">Price</Label>
-                                    <div className="relative rounded-lg bg-background ring-1 ring-foreground/5 transition-[box-shadow] focus-within:ring-2 focus-within:ring-indigo-500/20 dark:ring-white/10 dark:focus-within:ring-indigo-500/30">
-                                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-medium text-muted-foreground">
-                                        {currencySymbol}
-                                      </div>
-                                      <Input
-                                        type="text"
-                                        inputMode={isNoDivisionCurrency ? 'numeric' : 'decimal'}
-                                        autoComplete="off"
-                                        value={price.amount}
-                                        onChange={(e) => updateDefaultVariantPrice(index, 'amount', e.target.value, price.currencyCode)}
-                                        placeholder={isNoDivisionCurrency ? '0' : '0.00'}
-                                        className="h-11 border-0 bg-transparent pl-9 pr-16 text-sm tabular-nums shadow-none focus-visible:border-transparent focus-visible:ring-0"
-                                      />
-                                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                        <span className="rounded-md bg-gradient-to-b from-muted to-muted/70 px-2 py-1 text-[11px] font-medium text-muted-foreground ring-1 ring-foreground/5 dark:from-muted/70 dark:to-muted/30 dark:ring-white/10">
-                                          {price.currencyCode}
-                                        </span>
-                                      </div>
+                                <div className="space-y-1.5">
+                                  <Label className={fieldLabel}>Compare-at price</Label>
+                                  <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-muted-foreground">
+                                      {currencySymbol}
                                     </div>
-                                  </div>
-
-                                  <div className="space-y-2">
-                                    <Label className="text-xs text-muted-foreground">Compare-at price</Label>
-                                    <div className="relative rounded-lg bg-background ring-1 ring-foreground/5 transition-[box-shadow] focus-within:ring-2 focus-within:ring-indigo-500/20 dark:ring-white/10 dark:focus-within:ring-indigo-500/30">
-                                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-medium text-muted-foreground">
-                                        {currencySymbol}
-                                      </div>
-                                      <Input
-                                        type="text"
-                                        inputMode={isNoDivisionCurrency ? 'numeric' : 'decimal'}
-                                        autoComplete="off"
-                                        value={price.compareAmount}
-                                        onChange={(e) => updateDefaultVariantPrice(index, 'compareAmount', e.target.value, price.currencyCode)}
-                                        placeholder="Optional"
-                                        className="h-11 border-0 bg-transparent pl-9 pr-16 text-sm tabular-nums shadow-none focus-visible:border-transparent focus-visible:ring-0"
-                                      />
-                                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                        <span className="rounded-md bg-gradient-to-b from-muted to-muted/70 px-2 py-1 text-[11px] font-medium text-muted-foreground ring-1 ring-foreground/5 dark:from-muted/70 dark:to-muted/30 dark:ring-white/10">
-                                          {price.currencyCode}
-                                        </span>
-                                      </div>
-                                    </div>
+                                    <Input
+                                      type="text"
+                                      inputMode={isNoDivisionCurrency ? 'numeric' : 'decimal'}
+                                      autoComplete="off"
+                                      value={price.compareAmount}
+                                      onChange={(e) => updateDefaultVariantPrice(index, 'compareAmount', e.target.value, price.currencyCode)}
+                                      placeholder="Optional"
+                                      className="h-10 bg-background pl-9 font-mono text-sm tabular-nums"
+                                    />
                                   </div>
                                 </div>
                               </div>
                             )
-                          }) : (
-                            <div className="rounded-xl border border-dashed border-border/60 p-6 text-center text-sm text-muted-foreground">
-                              No regions found yet. You can still create the product and add pricing later.
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                          })}
+                        </ListBand>
+                      ) : (
+                        <ListBand className="bg-background">
+                          <div className="px-4 py-3 text-sm text-muted-foreground">No regions</div>
+                        </ListBand>
+                      )}
                     </div>
-                  ) : (
-                    <div className="pt-2">
-                      <Alert className="mb-6 bg-indigo-500/5 text-indigo-700 border-indigo-500/20 dark:text-indigo-400">
-                        <Info className="size-4" />
-                        <AlertDescription>
-                          Multiple variants use your existing options-and-combinations flow. Create the product first, then continue managing options, variants, and pricing on the product page.
-                        </AlertDescription>
-                      </Alert>
-                      <div className="border border-border/40 rounded-xl bg-background overflow-hidden p-6">
-                        <VariantsTab product={{}} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-          </div>
-
-          {/* Sidebar - Right Column */}
-          <aside className="w-full lg:w-[320px] flex-shrink-0 space-y-6 lg:sticky lg:top-24">
-            
-            {/* Status & Pricing Info */}
-            <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                <div className="flex items-center gap-2">
-                  <Tag className="size-4 opacity-70 text-muted-foreground" />
-                  <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Status</span>
-                </div>
-              </CardHeader>
-              <CardContent className="p-5 space-y-5">
-                {Object.keys(fieldsSplit.statusFields).length > 0 && (
-                  <div className="space-y-3">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product Status</Label>
-                    <div className="[&_label]:hidden">
-                      <Fields
-                        {...createItem.props}
-                        fields={fieldsSplit.statusFields}
-                        view="createView"
-                        groups={list.groups}
-                        isRequireds={{ ...createItem.props.isRequireds, status: true }}
-                      />
-                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-xl bg-background p-4 ring-1 ring-border md:p-5">
+                    <VariantsTab product={{}} />
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </section>
 
-            {Object.keys(fieldsSplit.discountTaxFields).length > 0 && (
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Tag className="size-4 opacity-70 text-muted-foreground" />
-                    <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Discounts</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-5 space-y-4">
-                  <div className="rounded-xl border border-dashed border-border/60 bg-muted/10 p-4">
-                    <div className="font-medium text-sm text-foreground">Configure discounts after the product is created</div>
-                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                      Product-specific discount targeting depends on the saved product record. Create the product first, then use the Discounts area to add this product to a promotion condition or review eligibility from the product page.
-                    </p>
-                  </div>
+            {Object.keys(fieldsSplit.mediaFields).length > 0 && (
+              <section>
+                <SectionTitle>Media</SectionTitle>
+                <div className={panel}>
+                  <Fields {...createItem.props} fields={fieldsSplit.mediaFields} view="createView" groups={list.groups} />
+                </div>
+              </section>
+            )}
+          </div>
 
-                  <div className="space-y-3">
-                    <div className="space-y-3 pt-1">
-                      <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Discount eligibility</Label>
-                      <Fields
-                        {...createItem.props}
-                        fields={Object.fromEntries(
-                          Object.entries(fieldsSplit.discountTaxFields).filter(([, field]) => field.path === 'discountable')
-                        )}
-                        view="createView"
-                        groups={list.groups}
-                      />
-                    </div>
-
-                    <Alert className="bg-indigo-500/5 text-indigo-700 border-indigo-500/20 dark:text-indigo-400">
-                      <Info className="size-4" />
-                      <AlertDescription>
-                        Shared discount codes, rule logic, schedules, regions, and tax-rate records are managed after creation so this page stays focused on product setup.
-                      </AlertDescription>
-                    </Alert>
-                  </div>
-                </CardContent>
-              </Card>
+          <aside className="w-full min-w-0 flex-shrink-0 space-y-8 lg:sticky lg:top-24 lg:w-[320px]">
+            {Object.keys(fieldsSplit.statusFields).length > 0 && (
+              <section>
+                <SectionTitle>Status</SectionTitle>
+                <div className={`${panel} [&_label]:hidden`}>
+                  <Fields
+                    {...createItem.props}
+                    fields={fieldsSplit.statusFields}
+                    view="createView"
+                    groups={list.groups}
+                    isRequireds={{ ...createItem.props.isRequireds, status: true }}
+                  />
+                </div>
+              </section>
             )}
 
-            {/* Organization */}
             {Object.keys(fieldsSplit.organizationFields).length > 0 && (
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Building className="size-4 opacity-70 text-muted-foreground" />
-                    <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Organization</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-5">
+              <section>
+                <SectionTitle>Organization</SectionTitle>
+                <div className={panel}>
                   <Fields {...createItem.props} fields={fieldsSplit.organizationFields} view="createView" groups={list.groups} />
-                </CardContent>
-              </Card>
+                </div>
+              </section>
+            )}
+
+            {Object.keys(fieldsSplit.discountTaxFields).length > 0 && (
+              <section>
+                <SectionTitle>Discounts</SectionTitle>
+                <div className={panel}>
+                  <Fields
+                    {...createItem.props}
+                    fields={Object.fromEntries(
+                      Object.entries(fieldsSplit.discountTaxFields).filter(([, field]) => field.path === 'discountable')
+                    )}
+                    view="createView"
+                    groups={list.groups}
+                  />
+                </div>
+              </section>
             )}
 
             {Object.keys(fieldsSplit.sidebarFields).length > 0 && (
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardContent className="p-5">
-                  <Fields {...createItem.props} fields={fieldsSplit.sidebarFields} view="createView" groups={list.groups} />
-                </CardContent>
-              </Card>
+              <div className={panel}>
+                <Fields {...createItem.props} fields={fieldsSplit.sidebarFields} view="createView" groups={list.groups} />
+              </div>
             )}
-
           </aside>
         </div>
       </main>
@@ -814,8 +678,8 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create</DialogTitle>
-            <DialogDescription>
-              Choose a status and confirm the handle before creating it.
+            <DialogDescription className="sr-only">
+              Status and handle
             </DialogDescription>
           </DialogHeader>
 
@@ -836,9 +700,6 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
                   <SelectItem value="rejected">Rejected</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                New items default to draft unless you choose a different status here.
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -850,10 +711,7 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
                 onBlur={handleHandleBlur}
                 placeholder="auto-generated-from-title"
               />
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs text-muted-foreground">
-                  If left blank, we’ll generate a unique handle from the title.
-                </p>
+              <div className="flex items-center justify-end gap-3">
                 <Button
                   type="button"
                   size="sm"

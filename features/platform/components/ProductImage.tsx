@@ -36,7 +36,7 @@ export function ProductImage({
   const FallbackIcon = () => (
     <div 
       className={cn(
-        "flex items-center justify-center bg-muted rounded-sm",
+        "flex items-center justify-center rounded-md bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)]",
         className
       )}
       style={{ width, height }}
@@ -60,7 +60,7 @@ export function ProductImage({
       width={width}
       height={height}
       className={cn(
-        "object-cover rounded-sm",
+        "rounded-md object-cover",
         className
       )}
       onError={() => setHasError(true)}

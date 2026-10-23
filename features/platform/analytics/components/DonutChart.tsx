@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartPanel } from "./MetricBand";
 import { formatCurrency, formatPercentage } from "../lib/analyticsHelpers";
 
 interface DonutChartData {
@@ -60,14 +60,7 @@ export function DonutChart({
   };
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          {description}
-        </p>
-      </CardHeader>
-      <CardContent>
+    <ChartPanel title={title} className={className}>
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           {/* Donut Chart */}
           <div className="relative mx-auto lg:mx-0">
@@ -98,7 +91,7 @@ export function DonutChart({
             {/* Center Total */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <div className="text-2xl font-semibold">
+                <div className="font-mono text-2xl font-semibold tabular-nums">
                   {formatCurrency(calculatedTotal * 100)}
                 </div>
               </div>
@@ -114,15 +107,15 @@ export function DonutChart({
                     className="w-4 h-4 rounded-sm flex-shrink-0" 
                     style={{ backgroundColor: item.color }}
                   />
-                  <span className="text-sm text-gray-900 dark:text-gray-50 truncate">
+                  <span className="text-sm text-foreground truncate">
                     {item.name}
                   </span>
                 </div>
                 <div className="flex flex-col items-end flex-shrink-0">
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-50 whitespace-nowrap">
+                  <span className="font-mono text-sm font-medium tabular-nums text-foreground whitespace-nowrap">
                     {formatCurrency(item.value * 100)}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                  <span className="font-mono text-xs tabular-nums text-muted-foreground whitespace-nowrap">
                     ({item.percentage.toFixed(1)}%)
                   </span>
                 </div>
@@ -130,7 +123,6 @@ export function DonutChart({
             ))}
           </div>
         </div>
-      </CardContent>
-    </Card>
+    </ChartPanel>
   );
 }

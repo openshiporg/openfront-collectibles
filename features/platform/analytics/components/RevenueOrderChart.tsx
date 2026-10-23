@@ -3,13 +3,13 @@
 import { useId, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Pill, Track } from "@/features/platform/components/vault-ui";
+import { ChartPanel } from "./MetricBand";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
 } from "@/components/ui/chart";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatCurrency, formatNumber } from "../lib/analyticsHelpers";
 
 interface RevenueOrderChartProps {
@@ -94,43 +94,16 @@ export function RevenueOrderChart({
   const lastDate = timeSeriesData[timeSeriesData.length - 1]?.date as string;
 
   return (
-    <Card className="gap-4">
-      <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <div className="space-y-0.5">
-            <CardTitle>Sales Overview</CardTitle>
-            <div className="font-semibold text-2xl">
-              {metricView === "revenue" ? `${currencySymbol}${(totalRevenue / 100).toFixed(2)}` : formatNumber(totalOrders)}
-            </div>
-          </div>
-          <div className="bg-black/5 dark:bg-white/10 inline-flex h-6 rounded-md p-0.5 shrink-0">
-            <RadioGroup
-              value={metricView}
-              onValueChange={setMetricView}
-              className="group text-xs after:border after:border-border after:bg-background has-focus-visible:after:border-ring has-focus-visible:after:ring-ring/50 relative inline-grid grid-cols-[1fr_1fr] items-center gap-0 font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-sm after:shadow-xs after:transition-[translate,box-shadow] after:duration-300 after:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] has-focus-visible:after:ring-[3px] data-[state=revenue]:after:translate-x-0 data-[state=orders]:after:translate-x-full"
-              data-state={metricView}
-            >
-              <label className="group-data-[state=orders]:text-muted-foreground/50 relative z-10 inline-flex h-full min-w-6 cursor-pointer items-center justify-center px-1.5 whitespace-nowrap transition-colors select-none">
-                Revenue
-                <RadioGroupItem
-                  id={`${id}-revenue`}
-                  value="revenue"
-                  className="sr-only"
-                />
-              </label>
-              <label className="group-data-[state=revenue]:text-muted-foreground/50 relative z-10 inline-flex h-full min-w-6 cursor-pointer items-center justify-center px-1.5 whitespace-nowrap transition-colors select-none">
-                Orders
-                <RadioGroupItem 
-                  id={`${id}-orders`} 
-                  value="orders" 
-                  className="sr-only" 
-                />
-              </label>
-            </RadioGroup>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
+    <ChartPanel
+      title="Sales"
+      value={metricView === "revenue" ? `${currencySymbol}${(totalRevenue / 100).toFixed(2)}` : formatNumber(totalOrders)}
+      control={
+        <Track label="Sales metric">
+          <Pill active={metricView === "revenue"} onClick={() => setMetricView("revenue")}>Revenue</Pill>
+          <Pill active={metricView === "orders"} onClick={() => setMetricView("orders")}>Orders</Pill>
+        </Track>
+      }
+    >
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-60 w-full"
@@ -195,7 +168,6 @@ export function RevenueOrderChart({
             />
           </AreaChart>
         </ChartContainer>
-      </CardContent>
-    </Card>
+    </ChartPanel>
   );
 }

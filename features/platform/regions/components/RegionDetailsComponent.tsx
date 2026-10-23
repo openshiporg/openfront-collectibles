@@ -7,17 +7,9 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import Link from "next/link";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 import { ItemPagination } from "../../orders/components/ItemPagination";
-import { cn } from "@/lib/utils";
+import { Count, Dot, ListBand, Pill, Track } from "../../components/vault-ui";
 
 interface Region {
   id: string;
@@ -67,84 +59,6 @@ interface RegionDetailsComponentProps {
 
 type TabType = 'currency' | 'countries' | 'payment' | 'fulfillment';
 
-// Square component for currency symbols
-const Square = ({
-  className,
-  children,
-}: {
-  className?: string
-  children: React.ReactNode
-}) => (
-  <span
-    data-square
-    className={cn(
-      "bg-indigo-400/20 text-indigo-500 flex size-5 items-center justify-center rounded text-xs font-medium border",
-      className
-    )}
-    aria-hidden="true"
-  >
-    {children}
-  </span>
-)
-
-// Get country flag from react-flags or fallback to emoji
-function getCountryFlag(countryCode: string): string {
-  const flagMap: Record<string, string> = {
-    'us': '🇺🇸',
-    'ca': '🇨🇦',
-    'gb': '🇬🇧',
-    'de': '🇩🇪',
-    'fr': '🇫🇷',
-    'es': '🇪🇸',
-    'it': '🇮🇹',
-    'nl': '🇳🇱',
-    'be': '🇧🇪',
-    'at': '🇦🇹',
-    'pt': '🇵🇹',
-    'dk': '🇩🇰',
-    'se': '🇸🇪',
-    'fi': '🇫🇮',
-    'no': '🇳🇴',
-    'ie': '🇮🇪',
-    'lu': '🇱🇺',
-    'ch': '🇨🇭',
-    'au': '🇦🇺',
-    'nz': '🇳🇿',
-    'sg': '🇸🇬',
-    'hk': '🇭🇰',
-    'jp': '🇯🇵',
-    'kr': '🇰🇷',
-    'tw': '🇹🇼',
-    'mx': '🇲🇽',
-    'br': '🇧🇷',
-    'ar': '🇦🇷',
-    'cl': '🇨🇱',
-    'co': '🇨🇴',
-    'pe': '🇵🇪',
-    'uy': '🇺🇾',
-    'ec': '🇪🇨',
-    'ae': '🇦🇪',
-    'sa': '🇸🇦',
-    'qa': '🇶🇦',
-    'kw': '🇰🇼',
-    'bh': '🇧🇭',
-    'om': '🇴🇲',
-    'il': '🇮🇱',
-    'tr': '🇹🇷',
-    'za': '🇿🇦',
-    'ng': '🇳🇬',
-    'ke': '🇰🇪',
-    'eg': '🇪🇬',
-    'ma': '🇲🇦',
-    'gh': '🇬🇭',
-    'in': '🇮🇳',
-    'cn': '🇨🇳',
-    'is': '🇮🇸'
-  };
-  
-  return flagMap[countryCode.toLowerCase()] || '🏳️';
-}
-
 interface TabContentProps {
   items: any[];
   currentPage: number;
@@ -165,11 +79,13 @@ function TabContent({ items, currentPage, itemsPerPage, renderItem }: TabContent
           {items.length} items
         </div>
       )}
-      {paginatedItems.map((item, index) => (
-        <div key={index} className="border p-3 bg-background rounded-sm">
-          {renderItem(item, index)}
-        </div>
-      ))}
+      <ListBand>
+        {paginatedItems.map((item, index) => (
+          <div key={index} className="px-3 py-2">
+            {renderItem(item, index)}
+          </div>
+        ))}
+      </ListBand>
     </div>
   );
 }
@@ -250,149 +166,91 @@ export function RegionDetailsComponent({
 
   const activeTabData = tabs.find(tab => tab.key === activeTab);
 
+  const tabLabels: Record<TabType, string> = {
+    currency: 'Currency',
+    countries: 'Countries',
+    payment: 'Payment Providers',
+    fulfillment: 'Fulfillment Providers',
+  };
+  const rowIcon = "size-10 shrink-0 rounded-full sm:size-8 [&_svg]:size-4";
+
   return (
     <>
       <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value={region.id} className="border-0 border-b">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full relative min-h-[80px]">
-            <div className="flex items-start gap-4">
-              {/* Region Info */}
-              <div className="flex flex-col items-start text-left gap-2 sm:gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/dashboard/platform/regions/${region.id}`}
-                    className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    {region.name} ({region.code})
-                  </Link>
-                  <span>‧</span>
-                  <span className="text-sm font-medium">
-                    <span className="text-muted-foreground/75">
-                      {new Date(region.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </span>
-                </div>
-                
-                {/* Region Summary */}
-                <div className="flex flex-wrap items-center gap-1.5 text-sm">
-                  <span className="font-medium">{region.currency.symbol} {region.currency.code.toUpperCase()}</span>
-                  <span>‧</span>
-                  <span className="text-muted-foreground">{region.countries.length} {region.countries.length === 1 ? 'country' : 'countries'}</span>
-                  <span>‧</span>
-                  <span className="text-muted-foreground">Tax Rate: {(region.taxRate * 100).toFixed(1)}%</span>
-                </div>
+        <AccordionItem value={region.id} className="border-0">
+          <div className="flex items-start justify-between gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <Dot tone={isActive ? "ok" : "muted"} />
+                <Link
+                  href={`/dashboard/platform/regions/${region.id}`}
+                  className="text-sm font-semibold text-foreground hover:underline"
+                >
+                  {region.name}
+                </Link>
+                <span className="font-mono text-xs uppercase tabular-nums text-muted-foreground">{region.code}</span>
+                <span className="text-xs text-muted-foreground">{isActive ? "Active" : "Inactive"}</span>
+              </div>
+
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span className="font-mono tabular-nums text-foreground">
+                  {region.currency.symbol} {region.currency.code.toUpperCase()}
+                </span>
+                <span>
+                  <span className="font-mono tabular-nums">{region.countries.length}</span>{" "}
+                  {region.countries.length === 1 ? 'country' : 'countries'}
+                </span>
+                <span>
+                  Tax <span className="font-mono tabular-nums">{(region.taxRate * 100).toFixed(1)}%</span>
+                </span>
+                <span className="font-mono tabular-nums">
+                  {new Date(region.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-                <Badge
-                  color={isActive ? "emerald" : "zinc"}
-                  className="text-[.6rem] sm:text-[.7rem] py-0 px-2 sm:px-3 tracking-wide font-medium rounded-md border h-6"
-                >
-                  {isActive ? "ACTIVE" : "INACTIVE"}
-                </Badge>
-                
-                {/* Action buttons */}
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="border [&_svg]:size-3 h-6 w-6"
-                      >
-                        <MoreVertical className="stroke-muted-foreground" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
-                        Edit Region
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
-                  >
-                    <AccordionTrigger className="py-0" />
+            <div className="flex shrink-0 items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className={rowIcon} aria-label="Actions">
+                    <MoreVertical className="stroke-muted-foreground" />
                   </Button>
-                </div>
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
+                    Edit Region
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button variant="ghost" size="icon" className={rowIcon} asChild>
+                <AccordionTrigger className="justify-center py-0" />
+              </Button>
             </div>
           </div>
           <AccordionContent className="pb-0">
-            {/* Responsive Tabs Navigation */}
-            <div className="bg-muted/40">
-              {/* Desktop: Horizontal Tab Buttons */}
-              <div className="hidden md:flex items-center gap-3 px-4 pt-2">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`relative z-10 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-300 border ${
-                      activeTab === tab.key 
-                        ? 'bg-background border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100' 
-                        : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-background/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <span>
-                        {tab.key === 'currency' && 'Currency'}
-                        {tab.key === 'countries' && 'Countries'}
-                        {tab.key === 'payment' && 'Payment Providers'}
-                        {tab.key === 'fulfillment' && 'Fulfillment Providers'}
-                      </span>
-                      <span className="rounded-sm bg-muted border px-1.5 py-0 text-[10px] leading-[14px] font-medium text-muted-foreground inline-flex items-center h-[18px] -mr-1">
-                        {tab.count}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
+            <div className="space-y-3 border-t border-border bg-background/60 px-4 py-4">
+              {tabs.length > 0 && (
+                <Track label="Region details">
+                  {tabs.map((tab) => (
+                    <Pill
+                      key={tab.key}
+                      active={activeTab === tab.key}
+                      onClick={() => setActiveTab(tab.key)}
+                    >
+                      {tabLabels[tab.key]} <Count>{tab.count}</Count>
+                    </Pill>
+                  ))}
+                </Track>
+              )}
 
-              {/* Mobile: Select Dropdown */}
-              <div className="md:hidden px-4 py-2">
-                <div className="w-fit">
-                  <Select value={activeTab} onValueChange={(value: TabType) => setActiveTab(value)}>
-                    <SelectTrigger className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-background border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 h-auto w-auto">
-                      <div className="flex items-center gap-1.5">
-                        <SelectValue />
-                        <span className="rounded-sm bg-muted border px-1.5 py-0 text-[10px] leading-[14px] font-medium text-muted-foreground inline-flex items-center h-[18px] -mr-1">
-                          ({activeTabData?.count || 0})
-                        </span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {tabs.map((tab) => (
-                        <SelectItem key={tab.key} value={tab.key} className="text-xs">
-                          {tab.key === 'currency' && 'Currency'}
-                          {tab.key === 'countries' && 'Countries'}
-                          {tab.key === 'payment' && 'Payment Providers'}
-                          {tab.key === 'fulfillment' && 'Fulfillment Providers'}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-            
-            {/* Tab Content Area */}
-            <div className="bg-muted/40">
               {activeTabData && (
                 <>
-                  {/* Pagination for active tab */}
                   {activeTabData.count > itemsPerPage && (
-                    <div className="flex justify-between items-center p-4 pb-2">
-                      <div />
+                    <div className="flex justify-end">
                       <ItemPagination
                         currentPage={currentPages[activeTab]}
                         totalItems={activeTabData.count}
@@ -402,183 +260,127 @@ export function RegionDetailsComponent({
                     </div>
                   )}
 
-                  <div className="px-4 py-2">
-                    {/* Currency Tab */}
-                    {activeTab === 'currency' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {currencyData.slice(
-                          (currentPages.currency - 1) * itemsPerPage,
-                          currentPages.currency * itemsPerPage
-                        ).map((currency, index) => (
-                          <div key={index} className="rounded-md border bg-background p-3 shadow-sm">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <Square className="shrink-0">{currency.symbol}</Square>
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium truncate">{currency.code.toUpperCase()}</div>
-                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                    <span className="truncate">Tax Rate: {(currency.taxRate * 100).toFixed(1)}%</span>
-                                    <span>‧</span>
-                                    <span className="truncate">{currency.automaticTaxes ? 'automatic taxes' : 'no automatic taxes'}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 shrink-0"
-                                  >
-                                    <MoreVertical className="h-3 w-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => setEditCurrencyOpen(true)}>
-                                    Edit Currency
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                  <ListBand>
+                    {activeTab === 'currency' &&
+                      currencyData.slice(
+                        (currentPages.currency - 1) * itemsPerPage,
+                        currentPages.currency * itemsPerPage
+                      ).map((currency, index) => (
+                        <div key={index} className="flex items-center justify-between gap-3 px-3 py-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-baseline gap-2 text-sm">
+                              <span className="font-mono tabular-nums text-muted-foreground">{currency.symbol}</span>
+                              <span className="font-mono font-medium tabular-nums text-foreground">{currency.code.toUpperCase()}</span>
+                            </div>
+                            <div className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                              <span>Tax <span className="font-mono tabular-nums">{(currency.taxRate * 100).toFixed(1)}%</span></span>
+                              <span>{currency.automaticTaxes ? 'Automatic taxes' : 'No automatic taxes'}</span>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                          <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className={rowIcon} aria-label="Actions">
+                        <MoreVertical className="stroke-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => setEditCurrencyOpen(true)}>
+                        Edit Currency
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                        </div>
+                      ))}
 
-                    {/* Countries Tab */}
-                    {activeTab === 'countries' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {region.countries.slice(
-                          (currentPages.countries - 1) * itemsPerPage,
-                          currentPages.countries * itemsPerPage
-                        ).map((country, index) => (
-                          <div key={index} className="rounded-md border bg-background p-3 shadow-sm">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <span className="text-2xl shrink-0">{getCountryFlag(country.iso2)}</span>
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium truncate">{country.displayName}</div>
-                                  <div className="text-xs text-muted-foreground truncate">
-                                    {country.iso2.toUpperCase()}
-                                  </div>
-                                </div>
-                              </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 shrink-0"
-                                  >
-                                    <MoreVertical className="h-3 w-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => {
-                                    setEditCountryId(country.id);
-                                    setEditCountryOpen(true);
-                                  }}>
-                                    Edit Country
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
+                    {activeTab === 'countries' &&
+                      region.countries.slice(
+                        (currentPages.countries - 1) * itemsPerPage,
+                        currentPages.countries * itemsPerPage
+                      ).map((country, index) => (
+                        <div key={index} className="flex items-center justify-between gap-3 px-3 py-2">
+                          <div className="flex min-w-0 flex-1 items-baseline gap-2.5 text-sm">
+                            <span className="w-6 shrink-0 font-mono text-xs uppercase tabular-nums text-muted-foreground">{country.iso2}</span>
+                            <span className="truncate text-foreground">{country.displayName}</span>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                          <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className={rowIcon} aria-label="Actions">
+                        <MoreVertical className="stroke-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => {
+                          setEditCountryId(country.id);
+                          setEditCountryOpen(true);
+                        }}>
+                        Edit Country
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                        </div>
+                      ))}
 
-                    {/* Payment Providers Tab */}
-                    {activeTab === 'payment' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {paymentProviders.slice(
-                          (currentPages.payment - 1) * itemsPerPage,
-                          currentPages.payment * itemsPerPage
-                        ).map((provider, index) => (
-                          <div key={index} className="rounded-md border bg-background p-3 shadow-sm">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium truncate">{provider.name}</div>
-                                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                    <div className={`w-2 h-2 rounded-full shrink-0 ${
-                                      provider.isInstalled ? 'bg-green-500' : 'bg-red-500'
-                                    }`}></div>
-                                    <span className="truncate">
-                                      {provider.isInstalled ? 'installed' : 'not installed'}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-6 w-6"
-                                    >
-                                      <MoreVertical className="h-3 w-3" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => {
-                                      setEditPaymentId(provider.id);
-                                      setEditPaymentOpen(true);
-                                    }}>
-                                      Edit Payment Provider
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
+                    {activeTab === 'payment' &&
+                      paymentProviders.slice(
+                        (currentPages.payment - 1) * itemsPerPage,
+                        currentPages.payment * itemsPerPage
+                      ).map((provider, index) => (
+                        <div key={index} className="flex items-center justify-between gap-3 px-3 py-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-baseline gap-2 text-sm">
+                              <Dot tone={provider.isInstalled ? "ok" : "danger"} />
+                              <span className="truncate text-foreground">{provider.name}</span>
+                            </div>
+                            <div className="mt-0.5 text-xs text-muted-foreground">
+                              {provider.isInstalled ? 'Installed' : 'Not installed'}
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                          <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className={rowIcon} aria-label="Actions">
+                        <MoreVertical className="stroke-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => {
+                          setEditPaymentId(provider.id);
+                          setEditPaymentOpen(true);
+                        }}>
+                        Edit Payment Provider
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                        </div>
+                      ))}
 
-                    {/* Fulfillment Providers Tab */}
-                    {activeTab === 'fulfillment' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {fulfillmentProviders.slice(
-                          (currentPages.fulfillment - 1) * itemsPerPage,
-                          currentPages.fulfillment * itemsPerPage
-                        ).map((provider, index) => (
-                          <div key={index} className="rounded-md border bg-background p-3 shadow-sm">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium truncate">{provider.name}</div>
-                                  <div className="text-xs text-muted-foreground truncate">
-                                    {provider.code}
-                                  </div>
-                                </div>
-                              </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 shrink-0"
-                                  >
-                                    <MoreVertical className="h-3 w-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => {
-                                    setEditFulfillmentId(provider.id);
-                                    setEditFulfillmentOpen(true);
-                                  }}>
-                                    Edit Fulfillment Provider
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
+                    {activeTab === 'fulfillment' &&
+                      fulfillmentProviders.slice(
+                        (currentPages.fulfillment - 1) * itemsPerPage,
+                        currentPages.fulfillment * itemsPerPage
+                      ).map((provider, index) => (
+                        <div key={index} className="flex items-center justify-between gap-3 px-3 py-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-sm text-foreground">{provider.name}</div>
+                            <div className="mt-0.5 truncate font-mono text-xs text-muted-foreground">{provider.code}</div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                          <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className={rowIcon} aria-label="Actions">
+                        <MoreVertical className="stroke-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => {
+                          setEditFulfillmentId(provider.id);
+                          setEditFulfillmentOpen(true);
+                        }}>
+                        Edit Fulfillment Provider
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                        </div>
+                      ))}
+                  </ListBand>
                 </>
               )}
             </div>

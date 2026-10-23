@@ -1,7 +1,7 @@
 import { getProductsList } from "@/features/storefront/lib/data/products"
 import { StoreCollection, StoreRegion } from "@/features/storefront/types/storefront"
 
-import InteractiveLink from "@/features/storefront/modules/common/components/interactive-link"
+import SectionHead from "@/features/storefront/modules/common/components/collectibles/section-head"
 import ProductPreview from "@/features/storefront/modules/products/components/product-preview"
 
 export default async function ProductRail({
@@ -21,26 +21,20 @@ export default async function ProductRail({
   })
   const pricedProducts = products
 
-  if (!pricedProducts) {
+  if (!pricedProducts?.length) {
     return null
   }
 
   return (
-    <div className="max-w-[1440px] w-full mx-auto px-6 py-12 sm:py-24">
-      <div className="flex justify-between mb-8">
-        <span className="text-lg leading-8 font-normal">{collection.title}</span>
-        <InteractiveLink href={`/collections/${collection.handle}`}>
-          View all
-        </InteractiveLink>
-      </div>
-      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-6">
-        {pricedProducts &&
-          pricedProducts.map((product: any) => (
-            <li key={product.id}>
-              <ProductPreview productPreview={product} region={region} isFeatured />
-            </li>
-          ))}
+    <section className="space-y-6 pt-16 sm:pt-20">
+      <SectionHead title={collection.title} href={`/collections/${collection.handle}`} />
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 md:grid-cols-3 lg:grid-cols-4">
+        {pricedProducts.slice(0, 8).map((product: any) => (
+          <li key={product.id}>
+            <ProductPreview productPreview={product} region={region} isFeatured label={collection.title} />
+          </li>
+        ))}
       </ul>
-    </div>
+    </section>
   )
 }

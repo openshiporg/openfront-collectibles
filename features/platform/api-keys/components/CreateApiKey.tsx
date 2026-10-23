@@ -20,6 +20,7 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@
 import { XIcon, ChevronDown } from "lucide-react";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { createApiKey } from "../actions/getApiKeys";
+import { platformCreateButtonClass } from "../../components/PlatformFilterBar";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -139,7 +140,7 @@ function ScopesMultiSelect({
     <div className="relative" ref={commandRef}>
       <div
         className={cn(
-          "border-input ring-offset-background focus-within:ring-ring flex min-h-11 w-full items-center justify-between rounded-md border bg-transparent px-4 py-2 focus-within:ring-2 focus-within:ring-offset-2 text-left",
+          "ring-offset-background focus-within:ring-ring flex min-h-11 w-full items-center justify-between rounded-xl bg-muted px-4 py-2 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] focus-within:ring-2 focus-within:ring-offset-2 text-left",
           isDisabled && "cursor-not-allowed opacity-50"
         )}
         onClick={() => {
@@ -153,7 +154,7 @@ function ScopesMultiSelect({
           {value.map((option) => (
             <div
               key={option.value}
-              className="animate-fadeIn bg-background text-secondary-foreground relative inline-flex h-7 cursor-default items-center rounded-md border ps-2 pe-7 text-xs font-medium transition-all disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 max-w-full"
+              className="animate-fadeIn bg-background text-foreground relative inline-flex h-7 cursor-default items-center rounded-full ps-2.5 pe-7 font-mono text-xs font-medium shadow-[0_1px_2px_rgb(0_0_0/0.12)] dark:bg-zinc-800 transition-all disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 max-w-full"
             >
               <span className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px]">{option.label}</span>
               {!isDisabled && (
@@ -163,7 +164,7 @@ function ScopesMultiSelect({
                     e.stopPropagation();
                     handleRemove(option);
                   }}
-                  className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-md border border-transparent p-0 outline-hidden transition-[color,box-shadow] outline-none focus-visible:ring-[3px]"
+                  className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-full border border-transparent p-0 outline-hidden transition-[color,box-shadow] outline-none focus-visible:ring-[3px]"
                 >
                   <XIcon className="h-3 w-3" />
                 </button>
@@ -383,11 +384,11 @@ export function CreateApiKey() {
       }
     }}>
       <DialogTrigger asChild>
-        <Button 
+        <Button
           size="icon"
-          className="lg:px-4 lg:py-2 lg:w-auto rounded-lg"
+          className={platformCreateButtonClass}
         >
-          <Plus className="h-4 w-4" />
+          <Plus />
           <span className="hidden lg:inline">Create API Key</span>
         </Button>
       </DialogTrigger>
@@ -396,19 +397,19 @@ export function CreateApiKey() {
           <>
             <DialogHeader>
               <DialogTitle>Create API Key</DialogTitle>
-              <DialogDescription>
-                Create a new API key for programmatic access to Openfront. Choose the minimum permissions needed.
+              <DialogDescription className="sr-only">
+                Name, scopes and expiration
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">
-                    Name <span className="text-red-500">*</span>
+                    Name <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="name"
-                    placeholder="e.g., Production Bot, Analytics Dashboard"
+                    placeholder="Production bot"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     required
@@ -417,7 +418,7 @@ export function CreateApiKey() {
 
                 <div className="grid gap-2">
                   <Label>
-                    Scopes <span className="text-red-500">*</span>
+                    Scopes <span className="text-destructive">*</span>
                   </Label>
                   <ScopesMultiSelect
                     value={formData.scopes}
@@ -425,9 +426,6 @@ export function CreateApiKey() {
                     onChange={handleScopeChange}
                     placeholder="Select scopes for this API key"
                   />
-                  <p className="text-muted-foreground mt-2 text-xs">
-                    Select the minimum permissions needed for this API key
-                  </p>
                 </div>
 
                 <div className="grid gap-2">
@@ -440,10 +438,10 @@ export function CreateApiKey() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={handleClose}>
+                <Button type="button" variant="ghost" className="h-10 rounded-full bg-muted px-4" onClick={handleClose}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading} className="h-10 rounded-full px-4">
                   {loading ? "Creating..." : "Create API Key"}
                 </Button>
               </DialogFooter>
@@ -454,43 +452,30 @@ export function CreateApiKey() {
             <DialogHeader>
               <DialogTitle>API Key Created</DialogTitle>
               <DialogDescription>
-                Your API key has been created. Copy it now - you won't be able to see it again.
+                Shown once. Copy it now.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <div className="bg-muted/50 border rounded-md">
-                  <div className="p-1 flex items-center gap-3">
-                    <div className="flex gap-3 flex-1 min-w-0">
-                      <div className="flex-shrink-0">
-                        <div className="bg-background shadow-xs border rounded-sm py-0.5 px-1 text-[.65rem] text-muted-foreground font-medium">
-                          KEY
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-mono truncate max-w-[200px]">
-                          {createdToken}
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-sm h-6 w-6 flex-shrink-0"
-                      onClick={copyToClipboard}
-                    >
-                      <Copy className="size-3" />
-                      <span className="sr-only">Copy API Key</span>
-                    </Button>
-                  </div>
+                <div className="flex items-center gap-2 rounded-full bg-muted py-1 pl-4 pr-1 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)]">
+                  <span className="text-xs font-medium text-muted-foreground">Key</span>
+                  <span className="min-w-0 flex-1 truncate font-mono text-sm tabular-nums text-foreground">
+                    {createdToken}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-10 shrink-0 rounded-full bg-background shadow-[0_1px_2px_rgb(0_0_0/0.12)] sm:size-8 dark:bg-zinc-800"
+                    onClick={copyToClipboard}
+                  >
+                    <Copy className="size-4" />
+                    <span className="sr-only">Copy API Key</span>
+                  </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Make sure to copy your API key now. You won't be able to see it again!
-                </p>
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleClose}>
+              <Button onClick={handleClose} className="h-10 rounded-full px-4">
                 Done
               </Button>
             </DialogFooter>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { ListBand } from "../../components/vault-ui";
+import { PlatformEmptyState } from "../../components/PlatformEmptyState";
 import { PlatformFilterBar } from "../../components/PlatformFilterBar";
 import { RegionDetailsComponent } from "./RegionDetailsComponent";
 import { CreateItemDrawerClientWrapper } from "@/features/platform/components/CreateItemDrawerClientWrapper";
@@ -17,10 +19,6 @@ interface RegionListProps {
   list: any;
 }
 
-const statusConfig = {
-  active: { label: "Active", color: "emerald" },
-  inactive: { label: "Inactive", color: "zinc" },
-} as const;
 
 export function RegionList({ data, statusCounts, list }: RegionListProps) {
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
@@ -42,7 +40,7 @@ export function RegionList({ data, statusCounts, list }: RegionListProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2 px-4 pb-6 md:px-6">
       {/* Filter Bar with Custom Create Button */}
       <PlatformFilterBar 
         list={list}
@@ -51,8 +49,11 @@ export function RegionList({ data, statusCounts, list }: RegionListProps) {
         }
       />
 
-      {/* Region Cards */}
-      <div className="grid grid-cols-1 divide-y">
+
+      {data.items.length === 0 ? (
+        <PlatformEmptyState title="No regions" />
+      ) : (
+        <ListBand>
         {data.items.map((region) => (
           <RegionDetailsComponent
             key={region.id}
@@ -60,7 +61,8 @@ export function RegionList({ data, statusCounts, list }: RegionListProps) {
             list={list}
           />
         ))}
-      </div>
+        </ListBand>
+      )}
 
       {/* Create Drawers */}
       <CreateItemDrawerClientWrapper

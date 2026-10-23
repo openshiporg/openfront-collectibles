@@ -1,4 +1,5 @@
 import type { PricingRegion, VariantForEditor, OptionValueRenderer } from '../types/variant';
+import { Dot } from "@/features/platform/components/vault-ui";
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -28,9 +29,9 @@ export function DeleteVariantCard({
   renderOptionValue = (ov) => (
     <Badge
       color="zinc"
-      className="uppercase rounded-md border text-[.65rem] py-[.0625rem] px-1.5 font-medium"
+      className="rounded-full bg-muted px-2 py-0.5 font-mono text-[11px] font-medium tabular-nums"
     >
-      <span className="opacity-80 mr-1">{ov.option}:</span>
+      <span className="mr-1 font-sans opacity-70">{ov.option}</span>
       {ov.label}
     </Badge>
   ),
@@ -46,7 +47,7 @@ export function DeleteVariantCard({
               </div>
               <div className="space-y-2">
                 <div>
-                  <div className="text-sm font-medium">{variant.title}</div>
+                  <div className="font-mono text-sm font-medium tabular-nums">{variant.title}</div>
                   {Boolean(variant.productOptionValues?.length) && (
                     <div className="flex flex-wrap gap-2">
                       {variant.productOptionValues?.map((ov, i) => (
@@ -62,7 +63,7 @@ export function DeleteVariantCard({
                   )}
                 </div>
                 <div className="space-y-0.5">
-                  <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+                  <div className="text-[11px] font-medium text-muted-foreground">
                     Prices
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -77,7 +78,7 @@ export function DeleteVariantCard({
                             key={region.code}
                             className="h-6 flex items-center gap-1 px-2 rounded-md text-xs border"
                           >
-                            <span className="uppercase font-bold text-[0.6rem] text-muted-foreground mr-0.5">
+                            <span className="font-mono uppercase text-[10px] text-muted-foreground mr-0.5">
                               {region.currency.code}
                             </span>
                             <span>
@@ -102,16 +103,14 @@ export function DeleteVariantCard({
                 variant="outline"
                 size="sm"
                 onClick={onKeepVariant}
-                className="h-7 uppercase text-xs tracking-wide"
+                className="h-8 rounded-full px-3.5 text-xs max-sm:h-10"
               >
-                Keep Variant
+                Keep variant
               </Button>
-              <Badge
-                color="rose"
-                className="mt-4 py-0.5 text-xs rounded-full border uppercase font-medium tracking-wide"
-              >
-                TO BE DELETED
-              </Badge>
+              <span className="mt-4 inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
+                <Dot tone="danger" />
+                To be deleted
+              </span>
             </div>
           </div>
         </div>
@@ -119,7 +118,7 @@ export function DeleteVariantCard({
         <AccordionContent className="px-4 pb-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-3">
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 SKU
               </div>
               <div className="text-sm tabular-nums font-medium">
@@ -127,7 +126,7 @@ export function DeleteVariantCard({
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 Stock
               </div>
               <div className="text-sm tabular-nums font-medium">
@@ -135,7 +134,7 @@ export function DeleteVariantCard({
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 Barcode
               </div>
               <div className="text-sm tabular-nums">
@@ -143,19 +142,19 @@ export function DeleteVariantCard({
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 EAN
               </div>
               <div className="text-sm tabular-nums">{variant.ean || "-"}</div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 UPC
               </div>
               <div className="text-sm tabular-nums">{variant.upc || "-"}</div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 Material
               </div>
               <div className="text-sm">{variant.material || "-"}</div>

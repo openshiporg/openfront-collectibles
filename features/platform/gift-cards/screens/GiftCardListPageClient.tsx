@@ -7,19 +7,13 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { 
-  SearchX,
-  Plus,
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '../../components/PlatformEmptyState'
 import { Button } from '@/components/ui/button'
 import { PageContainer } from '../../../dashboard/components/PageContainer'
-import { PlatformFilterBar } from '../../components/PlatformFilterBar'
+import { PlatformFilterBar, platformCreateButtonClass } from '../../components/PlatformFilterBar'
+import { ListBand, PageTitle } from '../../components/vault-ui'
 import { StatusTabs } from '../components/StatusTabs'
 import { GiftCardDetailsComponent } from '../components/GiftCardDetailsComponent'
 import { Pagination } from '../../../dashboard/components/Pagination'
@@ -49,27 +43,11 @@ interface GiftCardListPageClientProps {
 }
 
 function EmptyStateDefault() {
-  return (
-    <EmptyState
-      title="No Gift Cards Created"
-      description="You can create a new gift card to get started."
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title="No gift cards" />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function GiftCardListPageClient({
@@ -195,19 +173,10 @@ export function GiftCardListPageClient({
   const breadcrumbs = [
     { type: 'link' as const, label: 'Dashboard', href: basePath },
     { type: 'page' as const, label: 'Platform' },
-    { type: 'page' as const, label: 'GiftCards' }
+    { type: 'page' as const, label: 'Gift Cards' }
   ]
 
-  const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-        GiftCards
-      </h1>
-      <p className="text-muted-foreground">
-        Create and manage giftcards
-      </p>
-    </div>
-  )
+  const header = <PageTitle title="Gift Cards" />
 
   // Check if we have any active filters (search or actual filters)
   const hasFilters = !!searchString
@@ -216,7 +185,7 @@ export function GiftCardListPageClient({
 
   return (
     <>
-    <PageContainer title="GiftCards" header={header} breadcrumbs={breadcrumbs}>
+    <PageContainer title="Gift Cards" header={header} breadcrumbs={breadcrumbs}>
       {/* Filter Bar - includes search, filters, sorting, and create button */}
       <div className="px-4 md:px-6">
         <PlatformFilterBar 
@@ -225,9 +194,9 @@ export function GiftCardListPageClient({
             <Button 
               onClick={() => setIsCreateDrawerOpen(true)}
               size="icon"
-              className="lg:px-4 lg:py-2 lg:w-auto rounded-lg"
+              className={platformCreateButtonClass}
             >
-              <Plus className="size-4 lg:mr-2" />
+              <Plus />
               <span className="sr-only lg:not-sr-only lg:whitespace-nowrap">
                 Create Gift Card
               </span>
@@ -238,16 +207,11 @@ export function GiftCardListPageClient({
 
       {/* Status Tabs */}
       {statusCounts && (
-        <div className="border-b">
-          <StatusTabs 
-            statusCounts={statusCounts}
-
-          />
-        </div>
+        <StatusTabs statusCounts={statusCounts} />
       )}
 
       {/* Active Filters */}
-      <div className="px-4 md:px-6 border-b">
+      <div className="px-4 md:px-6">
         <FilterList list={list} />
       </div>
 
@@ -271,10 +235,12 @@ export function GiftCardListPageClient({
       ) : (
         <>
           {/* Data grid - full width */}
-          <div className="grid grid-cols-1 divide-y">
-            {data?.items?.map((giftcard: any) => (
-              <GiftCardDetailsComponent key={giftcard.id} giftcard={giftcard} list={list} />
-            ))}
+          <div className="px-4 md:px-6 pb-6">
+            <ListBand>
+              {data?.items?.map((giftcard: any) => (
+                <GiftCardDetailsComponent key={giftcard.id} giftcard={giftcard} list={list} />
+              ))}
+            </ListBand>
           </div>
           
           {/* Pagination */}

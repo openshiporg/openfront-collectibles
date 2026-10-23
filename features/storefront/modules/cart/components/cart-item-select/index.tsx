@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { Minus, Plus } from "lucide-react"
 import {
   forwardRef,
   useCallback,
@@ -85,7 +85,16 @@ const CartItemSelect = forwardRef<HTMLInputElement, CartItemSelectProps>(
     }, [handleIncrement, handleDecrement])
 
     return (
-      <div className={cn("flex items-center", className)}>
+      <div className={cn("cx-track items-center", className)}>
+        <button
+          type="button"
+          aria-label="Decrease quantity"
+          className="inline-flex size-9 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40 max-sm:size-10"
+          onClick={handleDecrement}
+          disabled={value !== undefined && value <= min}
+        >
+          <Minus className="size-3.5" aria-hidden="true" />
+        </button>
         <input
           ref={innerRef}
           type="number"
@@ -94,29 +103,18 @@ const CartItemSelect = forwardRef<HTMLInputElement, CartItemSelectProps>(
           step={step}
           value={value ?? ""}
           onChange={handleInputChange}
-          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex-1 px-2 text-center outline-none focus:ring-2 focus:ring-ring border border-input rounded-l-md h-9"
+          className="cx-num h-9 w-10 rounded-full bg-cx-surface text-center text-[14px] text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] outline-none [appearance:textfield] focus-visible:ring-2 focus-visible:ring-cx-accent max-sm:h-10 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           {...props}
         />
-        <div className="flex flex-col h-9">
-          <button
-            type="button"
-            aria-label="Increase quantity"
-            className="flex-1 flex items-center justify-center px-2 border border-l-0 border-b-[0.5px] border-input rounded-tr-md hover:bg-accent disabled:opacity-50"
-            onClick={handleIncrement}
-            disabled={value !== undefined && value >= max}
-          >
-            <ChevronUp className="w-3 h-3" />
-          </button>
-          <button
-            type="button"
-            aria-label="Decrease quantity"
-            className="flex-1 flex items-center justify-center px-2 border border-l-0 border-t-[0.5px] border-input rounded-br-md hover:bg-accent disabled:opacity-50"
-            onClick={handleDecrement}
-            disabled={value !== undefined && value <= min}
-          >
-            <ChevronDown className="w-3 h-3" />
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-label="Increase quantity"
+          className="inline-flex size-9 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40 max-sm:size-10"
+          onClick={handleIncrement}
+          disabled={value !== undefined && value >= max}
+        >
+          <Plus className="size-3.5" aria-hidden="true" />
+        </button>
       </div>
     )
   }

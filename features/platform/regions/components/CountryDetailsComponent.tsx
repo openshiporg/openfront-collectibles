@@ -7,7 +7,6 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,9 +14,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, MapPin, Edit, Trash } from "lucide-react";
+import { MoreVertical, Edit, Trash } from "lucide-react";
 import Link from "next/link";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
+import { Dot } from "../../components/vault-ui";
 import { Country } from "../actions/country-actions";
 
 interface CountryDetailsComponentProps {
@@ -28,128 +28,101 @@ interface CountryDetailsComponentProps {
 export function CountryDetailsComponent({ country, list }: CountryDetailsComponentProps) {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
-  const statusColor = country.region ? "emerald" : "zinc";
-  const statusText = country.region ? "ASSIGNED" : "UNASSIGNED";
+  const statusTone = country.region ? "ok" : "muted";
+  const statusText = country.region ? "Assigned" : "Unassigned";
 
   return (
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value={country.id} className="border-0">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full border-b relative min-h-[80px]">
-            <div className="flex items-start gap-4">
-              {/* Country Flag/Icon */}
-              <div className="w-12 h-12 flex-shrink-0 bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-muted-foreground" />
+          <div className="flex items-start justify-between gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <Dot tone={statusTone} />
+                <Link
+                  href={`/dashboard/platform/regions?tab=countries&focus=${country.id}`}
+                  className="text-sm font-semibold text-foreground hover:underline"
+                >
+                  {country.displayName}
+                </Link>
+                <span className="font-mono text-xs uppercase tabular-nums text-muted-foreground">{country.iso2}</span>
+                <span className="text-xs text-muted-foreground">{statusText}</span>
               </div>
 
-              {/* Country Info */}
-              <div className="flex flex-col items-start text-left gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/dashboard/platform/regions?tab=countries&focus=${country.id}`}
-                    className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    {country.displayName}
-                  </Link>
-                  <span>‧</span>
-                  <span className="text-sm text-muted-foreground font-mono">
-                    {country.iso2}
-                  </span>
-                  <span>‧</span>
-                  <span className="text-sm text-muted-foreground">
-                    {new Date(country.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                  <span className="font-mono">{country.iso3}</span>
-                  <span>‧</span>
-                  <span className="font-mono">#{country.numCode}</span>
-                  {country.region && (
-                    <>
-                      <span>‧</span>
-                      <Badge variant="secondary" className="text-xs">
-                        {country.region.name}
-                      </Badge>
-                    </>
-                  )}
-                </div>
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span className="font-mono uppercase tabular-nums">{country.iso3}</span>
+                <span className="font-mono tabular-nums">#{country.numCode}</span>
+                {country.region && <span className="text-foreground">{country.region.name}</span>}
+                <span className="font-mono tabular-nums">
+                  {new Date(country.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-                <Badge
-                  color={statusColor}
-                  className="text-[.6rem] sm:text-[.7rem] py-0 px-2 sm:px-3 tracking-wide font-medium rounded-md border h-6"
-                >
-                  {statusText}
-                </Badge>
-
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="border [&_svg]:size-3 h-6 w-6"
-                      >
-                        <MoreVertical className="stroke-muted-foreground" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit Country
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        <Trash className="w-4 h-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
+            <div className="flex shrink-0 items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
+                    className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                    aria-label="Actions"
                   >
-                    <AccordionTrigger className="py-0" />
+                    <MoreVertical className="stroke-muted-foreground" />
                   </Button>
-                </div>
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Country
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-destructive">
+                    <Trash className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                asChild
+              >
+                <AccordionTrigger className="justify-center py-0" />
+              </Button>
             </div>
           </div>
 
           <AccordionContent className="pb-0">
-            <div className="px-4 md:px-6 py-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="border-t border-border bg-background/60 px-4 py-4">
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-4">
                 <div>
-                  <span className="text-muted-foreground">Full Name:</span>
-                  <span className="ml-2 font-medium">{country.name}</span>
+                  <dt className="text-xs text-muted-foreground">Full name</dt>
+                  <dd className="mt-0.5 text-foreground">{country.name}</dd>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">ISO3 Code:</span>
-                  <span className="ml-2 font-medium font-mono">{country.iso3}</span>
+                  <dt className="text-xs text-muted-foreground">ISO3</dt>
+                  <dd className="mt-0.5 font-mono uppercase tabular-nums text-foreground">{country.iso3}</dd>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Numeric Code:</span>
-                  <span className="ml-2 font-medium">{country.numCode}</span>
+                  <dt className="text-xs text-muted-foreground">Numeric code</dt>
+                  <dd className="mt-0.5 font-mono tabular-nums text-foreground">{country.numCode}</dd>
                 </div>
                 {country.region && (
                   <div>
-                    <span className="text-muted-foreground">Region:</span>
-                    <Badge variant="secondary" className="ml-2">
-                      {country.region.name} ({country.region.currency.code})
-                    </Badge>
+                    <dt className="text-xs text-muted-foreground">Region</dt>
+                    <dd className="mt-0.5 text-foreground">
+                      {country.region.name}{" "}
+                      <span className="font-mono tabular-nums text-muted-foreground">{country.region.currency.code}</span>
+                    </dd>
                   </div>
                 )}
-              </div>
+              </dl>
             </div>
           </AccordionContent>
         </AccordionItem>

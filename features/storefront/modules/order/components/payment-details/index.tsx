@@ -1,5 +1,5 @@
 import { paymentInfoMap } from "@/features/storefront/lib/constants";
-import Divider from "@/features/storefront/modules/common/components/divider";
+import OrderSection, { Field } from "../section";
 
 import { StoreOrder } from "@/features/storefront/types/storefront";
 
@@ -10,43 +10,30 @@ const PaymentDetails = ({ order }: { order: StoreOrder }) => {
   );
   const provider = paymentSession?.paymentProvider;
 
-  return (
-    <div>
-      <h2 className="flex flex-row text-3xl font-medium my-6">Payment</h2>
-      <div>
-        {payment && provider?.code && (
-          <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-x-8 w-full">
-            <div className="flex flex-col w-full sm:w-1/3">
-              <p className="text-sm font-medium text-foreground mb-1">
-                Payment Method
-              </p>
-              <p className="text-sm font-normal text-muted-foreground">
-                {paymentInfoMap[provider.code]?.title}
-              </p>
-            </div>
-            <div className="flex flex-col w-full sm:w-2/3">
-              <p className="text-sm font-medium text-foreground mb-1">
-                Payment Details
-              </p>
-              <div className="flex items-center text-sm font-normal text-muted-foreground">
-                <div className="flex items-center h-7 w-fit mr-4">
-                  {paymentInfoMap[provider.code]?.icon}
-                </div>
-                <p>
-                  {provider.code === "stripe" && payment.data?.cardLast4
-                    ? `**** **** **** ${payment.data?.cardLast4}`
-                    : `${order.total} paid at ${new Date(
-                        payment.createdAt
-                      ).toString()}`}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+  if (!payment || !provider?.code) return null;
 
-      <Divider className="mt-8" />
-    </div>
+  return (
+    <OrderSection title="Payment">
+      <div className="grid gap-5 sm:grid-cols-3">
+        <Field label="Method">
+          <p>{paymentInfoMap[provider.code]?.title || provider.code}</p>
+        </Field>
+        <Field label="Details">
+          <div className="flex items-center gap-2">
+            {paymentInfoMap[provider.code]?.icon && (
+              <span className="flex h-7 items-center rounded-md bg-cx-well px-2 text-cx-ink-2">
+                {paymentInfoMap[provider.code]?.icon}
+              </span>
+            )}
+            <span className="cx-num text-[13px]">
+              {provider.code === "stripe" && payment.data?.cardLast4
+                ? `•••• ${payment.data?.cardLast4}`
+                : `${order.total} · ${new Date(payment.createdAt).toLocaleDateString()}`}
+            </span>
+          </div>
+        </Field>
+      </div>
+    </OrderSection>
   );
 };
 

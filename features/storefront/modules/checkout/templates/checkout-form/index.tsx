@@ -45,24 +45,11 @@ export default async function CheckoutForm({ cart, customer }: CheckoutFormProps
   }
 
   return (
-    <div>
-      <div className="w-full grid grid-cols-1 gap-y-8">
-        <div>
-          <Addresses cart={cart} customer={customer} />
-        </div>
-
-        <div>
-          <Shipping cart={cart} availableShippingMethods={availableShippingMethods} />
-        </div>
-
-        <div>
-          <Payment cart={cart} availablePaymentMethods={availablePaymentMethods} />
-        </div>
-
-        <div>
-          <Review cart={cart} />
-        </div>
-      </div>
+    <div className="flex w-full flex-col gap-4">
+      <Addresses cart={cart} customer={customer} />
+      <Shipping cart={cart} availableShippingMethods={availableShippingMethods} />
+      <Payment cart={cart} availablePaymentMethods={availablePaymentMethods} />
+      <Review cart={cart} />
     </div>
   );
 }

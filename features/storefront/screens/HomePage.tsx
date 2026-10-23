@@ -1,7 +1,10 @@
 import { Metadata } from "next"
 
 import FeaturedProducts from "@/features/storefront/modules/home/components/featured-products"
-import Hero from "@/features/storefront/modules/home/components/hero"
+import Masthead from "@/features/storefront/modules/home/components/masthead"
+import CategoryIndex from "@/features/storefront/modules/home/components/category-index"
+import RecentListings from "@/features/storefront/modules/home/components/recent-listings"
+import { getCategoriesList } from "@/features/storefront/lib/data/categories"
 import { getCollectionsListByRegion } from "@/features/storefront/lib/data/collections"
 import { getRegion } from "@/features/storefront/lib/data/regions"
 import { getStore } from "@/features/storefront/lib/data/store"
@@ -24,28 +27,31 @@ export async function HomePage(props: {
   const { countryCode } = params
 
   const region: StoreRegion | undefined = await getRegion(countryCode)
-  const store = await getStore()
 
-  const { collections }: { collections: StoreCollection[] } = region
-    ? await getCollectionsListByRegion(0, 3, region.id)
-    : { collections: [] }
-
-  if (!collections || !region) {
+  if (!region) {
     return null
   }
 
+  const [store, { collections }, { productCategories }] = await Promise.all([
+    getStore(),
+    getCollectionsListByRegion(0, 3, region.id) as Promise<{ collections: StoreCollection[] }>,
+    getCategoriesList(0, 24),
+  ])
+
+  const categories = (productCategories || [])
+    .filter((c: any) => !c.parentCategory)
+    .map((c: any) => ({ id: c.id, title: c.title, handle: c.handle }))
+
   return (
-    <>
-      <Hero
-        title={store?.homepageTitle}
-        description={store?.homepageDescription}
-        logoColor={store?.logoColor}
-      />
-      <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
+    <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 sm:px-6">
+      <Masthead title={store?.homepageTitle || store?.name} description={store?.homepageDescription} />
+      <CategoryIndex categories={categories} />
+      <RecentListings countryCode={countryCode} locale={region.locale} />
+      {collections?.length > 0 && (
+        <ul className="flex flex-col">
           <FeaturedProducts collections={collections} region={region} />
         </ul>
-      </div>
-    </>
+      )}
+    </div>
   )
 }

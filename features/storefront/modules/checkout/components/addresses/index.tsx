@@ -2,14 +2,12 @@
 
 import { setAddresses } from "@/features/storefront/lib/data/cart";
 import compareAddresses from "@/features/storefront/lib/util/compare-addresses";
-import { CircleCheck } from "lucide-react";
-import Divider from "@/features/storefront/modules/common/components/divider";
 import { useState } from "react";
 import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation";
 import BillingAddress from "../billing-address";
 import ErrorMessage from "../error-message";
 import ShippingAddress from "../shipping-address";
-import { Button } from "@/components/ui/button";
+import StepHeader, { StepSection, SummaryBlock, secondaryPill } from "../step-header";
 import { RiLoader2Fill } from "@remixicon/react";
 
 const Addresses = ({
@@ -122,146 +120,91 @@ const Addresses = ({
     }
   };
 
+  const addressLines = (address: any) => (
+    <>
+      <p className="text-cx-ink">
+        {address?.firstName} {address?.lastName}
+      </p>
+      <p>
+        {address?.address1} {address?.address2}
+      </p>
+      <p>
+        {address?.city}
+        {address?.province && `, ${address.province}`}
+      </p>
+      <p className="cx-num text-[13px]">
+        {address?.postalCode} {address?.countryCode?.toUpperCase()}
+      </p>
+    </>
+  );
+
   return (
-    <div className="bg-background">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <h2 className="flex flex-row text-3xl font-medium gap-x-2 items-baseline">
-          Shipping Address
-          {!isOpen && <CircleCheck className="hidden sm:block h-5 w-5" />}
-        </h2>
-        {!isOpen && cart?.shippingAddress && (
-          <p>
-            <Button
+    <StepSection>
+      <StepHeader
+        step={1}
+        title="Shipping address"
+        done={!isOpen}
+        action={
+          !isOpen && cart?.shippingAddress ? (
+            <button
+              type="button"
               onClick={handleEdit}
               data-testid="edit-address-button"
-              variant="outline"
-              size="sm"
+              className={secondaryPill}
             >
-              Update Address
-            </Button>
-          </p>
-        )}
-      </div>
+              Edit
+            </button>
+          ) : null
+        }
+      />
       {isOpen ? (
-        <form onSubmit={handleSubmit}>
-          <div className="pb-8">
-            <ShippingAddress
-              customer={customer}
-              checked={sameAsBilling}
-              onChange={toggleSameAsBilling}
-              cart={cart}
-              countryCode={params?.countryCode as string}
-            />
+        <form onSubmit={handleSubmit} className="mt-6">
+          <ShippingAddress
+            customer={customer}
+            checked={sameAsBilling}
+            onChange={toggleSameAsBilling}
+            cart={cart}
+            countryCode={params?.countryCode as string}
+          />
 
-            {!sameAsBilling && (
-              <div>
-                <h2 className="text-3xl font-medium gap-x-4 pb-6 pt-8">
-                  Billing address
-                </h2>
-
-                <BillingAddress cart={cart} />
-              </div>
-            )}
-            <Button
-              size="lg"
-              className="mt-6"
-              data-testid="submit-address-button"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />}
-              Continue to delivery
-            </Button>
-            <ErrorMessage error={error} data-testid="address-error-message" />
-          </div>
+          {!sameAsBilling && (
+            <div className="mt-8 border-t border-cx-line pt-6">
+              <h3 className="pb-5 font-cx-serif text-[22px] leading-[26px] text-cx-ink">Billing address</h3>
+              <BillingAddress cart={cart} />
+            </div>
+          )}
+          <button
+            className="cx-btn mt-6 w-full sm:w-auto"
+            data-testid="submit-address-button"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading && <RiLoader2Fill className="size-4 animate-spin" />}
+            Continue to delivery
+          </button>
+          <ErrorMessage error={error} data-testid="address-error-message" />
         </form>
       ) : (
-        <div>
-          <div className="text-xs font-normal">
-            {cart && cart.shippingAddress ? (
-              <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-x-8">
-                <div
-                  className="flex flex-col w-full sm:w-1/3"
-                  data-testid="shipping-address-summary"
-                >
-                  <p className="text-sm font-medium text-foreground mb-1">
-                    Shipping Address
-                  </p>
-                  <p className="text-sm font-normal text-muted-foreground">
-                    {cart.shippingAddress.firstName}{" "}
-                    {cart.shippingAddress.lastName}
-                  </p>
-                  <p className="text-sm font-normal text-muted-foreground">
-                    {cart.shippingAddress.address1}{" "}
-                    {cart.shippingAddress.address2}
-                  </p>
-                  <p className="text-sm font-normal text-muted-foreground">
-                    {cart.shippingAddress.city}
-                    {cart.shippingAddress.province && `, ${cart.shippingAddress.province}`}
-                  </p>
-                  <p className="text-sm font-normal text-muted-foreground">
-                    {cart.shippingAddress.postalCode} {cart.shippingAddress.countryCode?.toUpperCase()}
-                  </p>
-                </div>
-
-                <div
-                  className="flex flex-col w-full sm:w-1/3"
-                  data-testid="shipping-contact-summary"
-                >
-                  <p className="text-sm font-medium text-foreground mb-1">
-                    Contact
-                  </p>
-                  <p className="text-sm font-normal text-muted-foreground">
-                    {cart.shippingAddress.phone}
-                  </p>
-                  <p className="text-sm font-normal text-muted-foreground">
-                    {cart.email}
-                  </p>
-                </div>
-
-                <div
-                  className="flex flex-col w-full sm:w-1/3"
-                  data-testid="billing-address-summary"
-                >
-                  <p className="text-sm font-medium text-foreground mb-1">
-                    Billing Address
-                  </p>
-
-                  {sameAsBilling ? (
-                    <p className="text-sm font-normal text-muted-foreground">
-                      Billing and delivery address are the same.
-                    </p>
-                  ) : (
-                    <>
-                      <p className="text-sm font-normal text-muted-foreground">
-                        {cart.billingAddress?.firstName}{" "}
-                        {cart.billingAddress?.lastName}
-                      </p>
-                      <p className="text-sm font-normal text-muted-foreground">
-                        {cart.billingAddress?.address1}{" "}
-                        {cart.billingAddress?.address2}
-                      </p>
-                      <p className="text-sm font-normal text-muted-foreground">
-                        {cart.billingAddress?.city}
-                        {cart.billingAddress?.province && `, ${cart.billingAddress.province}`}
-                      </p>
-                      <p className="text-sm font-normal text-muted-foreground">
-                        {cart.billingAddress?.postalCode} {cart.billingAddress?.countryCode?.toUpperCase()}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div>
-                <RiLoader2Fill className="animate-spin h-5 w-5" />
-              </div>
-            )}
-          </div>
+        <div className="mt-5">
+          {cart && cart.shippingAddress ? (
+            <div className="grid gap-5 sm:grid-cols-3">
+              <SummaryBlock label="Ship to" data-testid="shipping-address-summary">
+                {addressLines(cart.shippingAddress)}
+              </SummaryBlock>
+              <SummaryBlock label="Contact" data-testid="shipping-contact-summary">
+                {cart.shippingAddress.phone && <p className="cx-num text-[13px]">{cart.shippingAddress.phone}</p>}
+                <p className="break-all">{cart.email}</p>
+              </SummaryBlock>
+              <SummaryBlock label="Billing" data-testid="billing-address-summary">
+                {sameAsBilling ? <p>Same as shipping</p> : addressLines(cart.billingAddress)}
+              </SummaryBlock>
+            </div>
+          ) : (
+            <RiLoader2Fill className="size-5 animate-spin text-cx-ink-3" />
+          )}
         </div>
       )}
-      <Divider className="mt-8" />
-    </div>
+    </StepSection>
   );
 };
 

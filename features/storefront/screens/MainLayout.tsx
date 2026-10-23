@@ -1,7 +1,8 @@
 import Footer from "@/features/storefront/modules/layout/templates/footer"
 import Nav from "@/features/storefront/modules/layout/templates/nav"
 import { Metadata } from "next"
-import InteractiveLink from "@/features/storefront/modules/common/components/interactive-link"
+import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
+import CollectiblesShell from "@/features/storefront/modules/layout/components/collectibles-shell"
 import StorefrontServer from "./StorefrontServer"
 
 export async function MainLayout({ children }: { children: React.ReactNode }) {
@@ -13,26 +14,31 @@ export async function MainLayout({ children }: { children: React.ReactNode }) {
       prefetchCollections={true}
       prefetchCategories={true}
     >
-      <Nav />
-      {children}
-      <Footer />
+      <CollectiblesShell>
+        <Nav />
+        <main className="min-h-[60vh] flex-1">{children}</main>
+        <Footer />
+      </CollectiblesShell>
     </StorefrontServer>
   )
 }
 
 export const MainNotFoundMetadata: Metadata = {
-  title: "404",
-  description: "Something went wrong",
+  title: "Page not found",
 }
 
 export function MainNotFound() {
   return (
-    <div className="flex flex-col gap-4 items-center justify-center min-h-[calc(100vh-64px)]">
-      <h1 className="text-2xl font-semibold text-foreground">Page not found</h1>
-      <p className="text-xs font-normal text-foreground">
-        The page you tried to access does not exist.
-      </p>
-      <InteractiveLink href="/">Go to frontpage</InteractiveLink>
+    <div className="mx-auto flex min-h-[60vh] w-full max-w-[1320px] flex-col justify-center gap-5 px-4 py-24 sm:px-6">
+      <span className="cx-num text-[13px] text-cx-ink-3">404</span>
+      <h1 className="font-cx-serif text-[40px] leading-[44px] tracking-[-0.015em] text-cx-ink sm:text-[56px] sm:leading-[58px]">
+        Page not found
+      </h1>
+      <div className="mt-2">
+        <LocalizedClientLink href="/store" className="cx-btn">
+          Browse all items
+        </LocalizedClientLink>
+      </div>
     </div>
   )
 }

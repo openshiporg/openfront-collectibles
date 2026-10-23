@@ -264,12 +264,12 @@ export function MediaTab({ product: initialProduct }: MediaTabProps) {
             <ImageIcon className="size-4 opacity-60" />
           </div>
           <p className="mb-1.5 text-sm font-medium">Drop your images here</p>
-          <p className="text-muted-foreground text-xs">
-            SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
+          <p className="font-mono text-xs tabular-nums text-muted-foreground">
+            SVG, PNG, JPG, GIF · {maxSizeMB} MB
           </p>
           <Button
             variant="outline"
-            className="mt-4"
+            className="mt-4 rounded-full"
             onClick={openFileDialog}
             disabled={isLoading}
           >
@@ -292,9 +292,9 @@ export function MediaTab({ product: initialProduct }: MediaTabProps) {
       {/* Combined image gallery (remote + uploading) */}
       {combinedImages.length > 0 && (
         <div className="space-y-2">
-          <div className="flex flex-col gap-1 mb-4">
-            <h3 className="text-base font-medium">Product Images</h3>
-            <span className="text-xs uppercase opacity-60">Drag to reorder</span>
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h3 className="text-sm font-semibold text-foreground">Images</h3>
+            <span className="font-mono text-xs tabular-nums text-muted-foreground">{combinedImages.length}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">

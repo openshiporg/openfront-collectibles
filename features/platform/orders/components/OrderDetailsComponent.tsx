@@ -7,7 +7,6 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { Dot } from "@/features/platform/components/vault-ui";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 import { ReturnsSection } from "./ReturnsSection";
 import { ClaimsSection } from "./ClaimsSection";
@@ -25,14 +24,6 @@ import { CreateClaimModal } from "./modals/CreateClaimModal";
 import { CreateReturnModal } from "./modals/CreateReturnModal";
 import { OrderSectionTabs } from "./OrderSectionTabs";
 import { StatusBadge } from "./StatusBadge";
-
-const statusColors = {
-  pending: "blue",
-  completed: "emerald",
-  archived: "zinc",
-  canceled: "rose",
-  requires_action: "orange",
-} as const;
 
 interface OrderDetailsComponentProps {
   order: any;
@@ -65,119 +56,107 @@ export const OrderDetailsComponent = ({
     }
   };
 
+  const ship = order.shippingAddress;
+  const shipTo = ship
+    ? [
+        [ship.firstName, ship.lastName].filter(Boolean).join(" "),
+        [ship.city, ship.province].filter(Boolean).join(", "),
+        ship.postalCode,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : null;
+  const itemCount = (order.lineItems || []).reduce(
+    (sum: number, item: any) => sum + (item.quantity || 0),
+    0
+  );
+  const iconButton =
+    "inline-flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground [&_svg]:size-3.5 max-sm:size-10";
+
   return (
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value={order.id} className="border-0">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full border-b relative min-h-[120px]">
-            <div className="flex flex-col items-start text-left gap-2 sm:gap-1.5">
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+          <div className="flex w-full items-start justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <Link
                   href={`/dashboard/platform/orders/${order.id}`}
-                  className="uppercase font-medium text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                  className="font-mono text-sm font-medium tabular-nums text-foreground hover:underline underline-offset-4"
                 >
                   #{order.displayId}
                 </Link>
-                <span className="text-xs font-medium">
-                  <span className="text-muted-foreground/75">
-                    {new Date(order.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
+                <StatusBadge status={order.status} />
+                {order.returns?.length > 0 && (
+                  <span className="inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
+                    <Dot tone="info" />
+                    <span className="font-mono tabular-nums">{order.returns.length}</span>
+                    {order.returns.length > 1 ? "returns" : "return"}
                   </span>
-                  {order.user && (
-                    <>
-                      <span className="mx-1.5">‧</span>
-                      <Link
-                        href={`/dashboard/platform/users/${order.user.id}`}
-                        className="text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 group inline-flex items-center gap-1"
-                      >
-                        {order.user.name || order.user.email}
-                        <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
-                      </Link>
-                    </>
-                  )}
-                </span>
+                )}
+                {currentAction && (
+                  <span className="inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
+                    <Dot tone="muted" className="animate-pulse" />
+                    {getLoadingText(currentAction)}
+                  </span>
+                )}
               </div>
-
-              {order.shippingAddress && (
-                <div className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  <p>
-                    {order.shippingAddress.firstName}{" "}
-                    {order.shippingAddress.lastName}
-                  </p>
-                  <p>{order.shippingAddress.address1}</p>
-                  {order.shippingAddress.address2 && (
-                    <p>{order.shippingAddress.address2}</p>
-                  )}
-                  <p>
-                    {order.shippingAddress.city}, {order.shippingAddress.province}{" "}
-                    {order.shippingAddress.postalCode}
-                  </p>
-                  {order.shippingAddress.phone && (
-                    <p>{order.shippingAddress.phone}</p>
-                  )}
-                </div>
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                <span className="font-mono tabular-nums">
+                  {new Date(order.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+                </span>
+                {order.user && (
+                  <Link
+                    href={`/dashboard/platform/users/${order.user.id}`}
+                    className="min-w-0 truncate text-foreground hover:underline underline-offset-4"
+                  >
+                    {order.user.name || order.user.email}
+                  </Link>
+                )}
+              </div>
+              {shipTo && (
+                <div className="mt-0.5 truncate text-xs text-muted-foreground">{shipTo}</div>
               )}
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-                <StatusBadge status={order.status} />
-                {order.returns?.length > 0 && (
-                  <Badge
-                    color="blue"
-                    className="text-[.6rem] sm:text-[.7rem] py-0 px-2 sm:px-3 tracking-wide font-medium rounded-md border h-6"
-                  >
-                    {order.returns.length} RETURN{order.returns.length > 1 ? 'S' : ''}
-                  </Badge>
+            <div className="flex shrink-0 flex-col items-end gap-2">
+              <div className="text-right">
+                {order.total && (
+                  <div className="font-mono text-sm font-medium tabular-nums text-foreground">{order.total}</div>
                 )}
-                {currentAction && (
-                  <Badge
-                    color="zinc"
-                    className="uppercase tracking-wide font-medium text-xs flex items-center gap-1.5 border py-0.5"
-                  >
-                    <div className="size-3.5 shrink-0 animate-spin" />
-                    {getLoadingText(currentAction)}
-                  </Badge>
-                )}
-                {/* Single buttons container */}
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="border [&_svg]:size-3 h-6 w-6"
-                      >
-                        <MoreVertical className="stroke-muted-foreground" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
-                        Edit Order
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setIsClaimModalOpen(true)}>
-                        Start Claim
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setIsReturnModalOpen(true)}>
-                        Start Return
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
-                  >
-                    <AccordionTrigger className="py-0" />
-                  </Button>
-                  {renderButtons && renderButtons()}
+                <div className="font-mono text-xs tabular-nums text-muted-foreground">
+                  {itemCount} {itemCount === 1 ? "item" : "items"}
                 </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button type="button" aria-label="Order actions" className={iconButton}>
+                      <MoreVertical />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
+                      Edit Order
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setIsClaimModalOpen(true)}>
+                      Start Claim
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setIsReturnModalOpen(true)}>
+                      Start Return
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button variant="secondary" size="icon" className={iconButton} asChild>
+                  <AccordionTrigger className="py-0" />
+                </Button>
+                {renderButtons && renderButtons()}
               </div>
             </div>
           </div>

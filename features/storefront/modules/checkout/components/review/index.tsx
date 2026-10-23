@@ -1,8 +1,7 @@
 "use client"
 
-import { cn } from "@/lib/utils"
-
 import PaymentButton from "../payment-button"
+import StepHeader, { StepSection } from "../step-header"
 import { useSearchParams } from "next/navigation"
 
 const Review = ({ cart }: { cart: any }) => {
@@ -14,41 +13,26 @@ const Review = ({ cart }: { cart: any }) => {
     cart?.giftCard && cart?.giftCard?.length > 0 && cart?.total === 0
 
   const previousStepsCompleted =
-    cart?.shippingAddress && // Check shippingAddress
-    cart?.shippingMethods?.length > 0 && // Check shippingMethods
-    (cart?.paymentCollection || paidByGiftcard) // Check paymentCollection
+    cart?.shippingAddress &&
+    cart?.shippingMethods?.length > 0 &&
+    (cart?.paymentCollection || paidByGiftcard)
 
   return (
-    <div className="bg-background">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <h2 // Use h2
-          className={cn(
-            "flex flex-row text-3xl font-medium gap-x-2 items-baseline", // Use Tailwind class
-            {
-              // Disable if not open OR previous steps not completed
-              "opacity-50 pointer-events-none select-none": !isOpen || !previousStepsCompleted,
-            }
-          )}
-        >
-          Review
-        </h2>
-      </div>
+    <StepSection>
+      <StepHeader step={4} title="Review" muted={!isOpen || !previousStepsCompleted} />
       {isOpen && previousStepsCompleted && (
-        <>
-          <div className="flex items-start gap-x-1 w-full mb-6">
-            <div className="w-full">
-              <p className="text-sm text-foreground mb-1">
-                By clicking the Place Order button, you confirm that you have
-                read, understand and accept our Terms of Use, Terms of Sale and
-                Returns Policy and acknowledge that you have read Openfront
-                Store&apos;s Privacy Policy.
-              </p>
-            </div>
+        <div className="mt-6 space-y-5">
+          <div className="flex items-baseline justify-between gap-4 rounded-xl bg-cx-well px-4 py-3">
+            <span className="text-[14px] text-cx-ink-2">Order total</span>
+            <span className="cx-num text-[18px] text-cx-ink">{cart?.total}</span>
           </div>
+          <p className="text-[13px] leading-[20px] text-cx-ink-2">
+            Placing the order accepts the store&apos;s terms of sale, returns policy and privacy policy.
+          </p>
           <PaymentButton cart={cart} data-testid="submit-order-button" />
-        </>
+        </div>
       )}
-    </div>
+    </StepSection>
   )
 }
 

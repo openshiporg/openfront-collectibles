@@ -21,6 +21,7 @@ export default async function PaginatedProducts({
   categoryId,
   productsIds,
   countryCode,
+  label,
 }: {
   sortBy?: SortOptions
   page: number
@@ -28,6 +29,7 @@ export default async function PaginatedProducts({
   categoryId?: string
   productsIds?: string[]
   countryCode: string
+  label?: string | null
 }) {
   const queryParams: GetProductsListParams = {
     limit: PRODUCT_LIMIT,
@@ -82,18 +84,27 @@ export default async function PaginatedProducts({
 
   return (
     <>
-      <ul
-        className="grid grid-cols-2 w-full md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-6"
-        data-testid="products-list"
-      >
-        {products.map((p: any) => {
-          return (
-            <li key={p.id}>
-              <ProductPreview productPreview={p as any} region={region as any} />
-            </li>
-          )
-        })}
-      </ul>
+      <p className="cx-num mb-4 text-[12px] text-cx-ink-3" data-testid="products-count">
+        {count} {count === 1 ? "item" : "items"}
+      </p>
+      {products.length === 0 ? (
+        <div className="cx-band flex min-h-48 flex-col items-start justify-center gap-4 p-6">
+          <p className="font-cx-serif text-[22px] text-cx-ink">No items here yet</p>
+        </div>
+      ) : (
+        <ul
+          className="grid w-full grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 md:grid-cols-3 lg:grid-cols-4"
+          data-testid="products-list"
+        >
+          {products.map((p: any) => {
+            return (
+              <li key={p.id}>
+                <ProductPreview productPreview={p as any} region={region as any} label={label} />
+              </li>
+            )
+          })}
+        </ul>
+      )}
       {totalPages > 1 && (
         <Pagination
           data-testid="product-pagination"

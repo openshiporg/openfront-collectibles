@@ -68,7 +68,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
 
   const currentInfo = useMemo(() => {
     if (!billingAddress) {
-      return "No billing address"
+      return "Not set"
     }
 
     const country =
@@ -77,12 +77,12 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
       )?.label || billingAddress.country?.iso2?.toUpperCase()
 
     return (
-      <div className="flex flex-col font-semibold" data-testid="current-info">
+      <div className="flex flex-col leading-6" data-testid="current-info">
         <span>
           {/* Updated props */}
           {billingAddress.firstName} {billingAddress.lastName}
         </span>
-        <span>{billingAddress.company}</span>
+        {billingAddress.company && <span>{billingAddress.company}</span>}
         <span>
           {/* Updated props */}
           {billingAddress.address1}
@@ -110,8 +110,8 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
         clearState={clearState}
         data-testid="account-billing-address-editor"
       >
-        <div className="grid grid-cols-1 gap-y-2">
-          <div className="grid grid-cols-2 gap-x-2">
+        <div className="grid grid-cols-1 gap-y-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Input
               label="First name"
               name="first_name"
@@ -146,7 +146,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
             defaultValue={billingAddress?.address2 || undefined} 
             data-testid="billing-address-2-input"
           />
-          <div className="grid grid-cols-[144px_1fr] gap-x-2">
+          <div className="grid grid-cols-[120px_1fr] gap-3 sm:grid-cols-[144px_1fr]">
             <Input
               label="Postal code"
               name="postal_code"
@@ -174,7 +174,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
             required
             data-testid="billing-country-code-select"
           >
-            <option value="">-</option>
+            <option value="">Country</option>
             {regionOptions.map((option, i) => {
               return (
                 <option key={i} value={option?.value}>

@@ -7,9 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CirclePlus, FileText, Sparkles, ChevronDown } from "lucide-react";
+import { Plus, FileText, Sparkles, ChevronDown } from "lucide-react";
+import { platformCreateButtonClass } from "../../components/PlatformFilterBar";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
 
 interface CreateRegionDropdownProps {
   onCreateClick: (mode: 'scratch' | 'popular') => void;
@@ -20,14 +20,12 @@ export function CreateRegionDropdown({ onCreateClick }: CreateRegionDropdownProp
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className={cn(
-            buttonVariants({ size: "icon" }),
-            "lg:px-4 lg:py-2 lg:w-auto rounded-lg gap-2"
-          )}
+          size="icon"
+          className={cn(platformCreateButtonClass, "gap-1.5")}
         >
-          <CirclePlus className="h-4 w-4" />
+          <Plus />
           <span className="hidden lg:inline">Add Region</span>
-          <ChevronDown className="h-3 w-3 hidden lg:inline" />
+          <ChevronDown className="hidden lg:inline" />
         </Button>
       </DropdownMenuTrigger>
       
@@ -36,9 +34,6 @@ export function CreateRegionDropdown({ onCreateClick }: CreateRegionDropdownProp
           <FileText className="w-4 h-4 mr-3" />
           <div className="flex flex-col">
             <span className="font-medium">Create from Scratch</span>
-            <span className="text-xs text-muted-foreground">
-              Configure everything manually
-            </span>
           </div>
         </DropdownMenuItem>
         
@@ -46,9 +41,6 @@ export function CreateRegionDropdown({ onCreateClick }: CreateRegionDropdownProp
           <Sparkles className="w-4 h-4 mr-3" />
           <div className="flex flex-col">
             <span className="font-medium">Add Popular Regions</span>
-            <span className="text-xs text-muted-foreground">
-              Quick setup with templates
-            </span>
           </div>
         </DropdownMenuItem>
       </DropdownMenuContent>

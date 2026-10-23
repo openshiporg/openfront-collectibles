@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useActionState } from "react"
 import { Pencil, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox" // Added Checkbox
 import { Label } from "@/components/ui/label" // Added Label
 import { RiLoader2Fill } from "@remixicon/react"
@@ -68,29 +67,29 @@ const EditAddress: React.FC<EditAddressProps> = ({
     <>
       <div
         className={cn(
-          "border rounded-lg p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors",
-          {
-            "border-gray-900": isActive,
-          }
+          "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5",
+          { "bg-cx-surface/60": isActive }
         )}
         data-testid="address-container"
       >
-        <div className="flex flex-col">
-          <h3
-            className="text-left text-sm leading-6 font-semibold"
-            data-testid="address-name"
-          >
-            {address.firstName} {address.lastName}
-          </h3>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-baseline gap-x-2.5">
+            <h3 className="font-cx-serif text-[18px] leading-[24px] text-cx-ink" data-testid="address-name">
+              {address.firstName} {address.lastName}
+            </h3>
+            {address.isBilling && (
+              <span className="inline-flex items-baseline gap-1.5 text-[13px] text-cx-ink-2">
+                <span className="cx-dot bg-cx-accent" aria-hidden="true" />
+                Default billing
+              </span>
+            )}
+          </div>
           {address.company && (
-            <p
-              className="text-[0.8125rem] leading-5 font-normal text-foreground"
-              data-testid="address-company"
-            >
+            <p className="text-[14px] text-cx-ink-2" data-testid="address-company">
               {address.company}
             </p>
           )}
-          <div className="flex flex-col text-left text-sm leading-6 font-normal mt-2">
+          <div className="mt-1 flex flex-col text-[14px] leading-6 text-cx-ink-2">
             <span data-testid="address-address">
               {address.address1}
               {address.address2 && <span>, {address.address2}</span>}
@@ -103,25 +102,26 @@ const EditAddress: React.FC<EditAddressProps> = ({
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-x-4">
-          <Button
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
             onClick={open}
-            variant="outline"
             data-testid="address-edit-button"
-            size="sm"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-cx-surface px-4 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] hover:bg-cx-bg"
           >
-            <Pencil />
+            <Pencil className="size-4" aria-hidden="true" />
             Edit
-          </Button>
-          <Button
+          </button>
+          <button
+            type="button"
             onClick={removeAddress}
-            variant="destructive"
+            disabled={removing}
             data-testid="address-delete-button"
-            size="sm"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[14px] font-medium text-cx-danger hover:bg-cx-surface disabled:opacity-50"
           >
-            {removing ? <RiLoader2Fill className="animate-spin" /> : <Trash2 />}
-            Remove
-          </Button>
+            {removing ? <RiLoader2Fill className="size-4 animate-spin" aria-hidden="true" /> : <Trash2 className="size-4" aria-hidden="true" />}
+            {removing ? "Removing" : "Remove"}
+          </button>
         </div>
       </div>
 
@@ -132,8 +132,8 @@ const EditAddress: React.FC<EditAddressProps> = ({
         <form action={formAction}>
           <input type="hidden" name="addressId" value={address.id} />
           <Modal.Body>
-            <div className="grid grid-cols-1 gap-y-2">
-              <div className="grid grid-cols-2 gap-x-2">
+            <div className="grid grid-cols-1 gap-y-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Input
                   label="First name"
                   name="first_name"
@@ -181,7 +181,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 defaultValue={address.city || undefined}
                 data-testid="city-input"
               />
-              <div className="grid grid-cols-2 gap-x-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Input
                   label="State / Province"
                   name="province"
@@ -216,7 +216,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 />
                 <Label
                   htmlFor="is_billing"
-                  className="!text-[0.8125rem] leading-5 font-normal text-foreground"
+                  className="text-[14px] font-normal text-cx-ink"
                   data-testid="billing-label"
                 >
                   Set as default billing address
@@ -231,23 +231,22 @@ const EditAddress: React.FC<EditAddressProps> = ({
               />
             </div>
             {formState.error && (
-              <div className="text-rose-500 text-xs leading-5 font-normal py-2">
+              <div className="py-2 text-[13px] text-cx-danger" role="alert">
                 {formState.error}
               </div>
             )}
           </Modal.Body>
           <Modal.Footer>
-            <div className="flex gap-3 mt-6">
-              <Button
+            <div className="mt-6 flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
                 type="reset"
-                variant="secondary"
                 onClick={close}
-                className="h-10"
+                className="inline-flex min-h-12 items-center justify-center rounded-full px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
                 data-testid="cancel-button"
               >
                 Cancel
-              </Button>
-              <SubmitButton data-testid="save-button">Save</SubmitButton>
+              </button>
+              <SubmitButton data-testid="save-button" className="h-12 rounded-full px-6 text-[15px]">Save</SubmitButton>
             </div>
           </Modal.Footer>
         </form>

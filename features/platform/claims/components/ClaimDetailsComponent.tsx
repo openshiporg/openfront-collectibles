@@ -7,16 +7,11 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import Link from "next/link";
+import { Dot } from "../../components/vault-ui";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
-
-const statusColors = {
-  "active": "emerald",
-  "inactive": "zinc"
-} as const;
 
 interface Claim {
   id: string;
@@ -41,86 +36,67 @@ export function ClaimDetailsComponent({
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value={claim.id} className="border-0">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full border-b relative min-h-[80px]">
-            <div className="flex items-start gap-4">
-              {/* Claim Info */}
-              <div className="flex flex-col items-start text-left gap-2 sm:gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/dashboard/platform/claims/${claim.id}`}
-                    className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    Claim {claim.id.slice(-8)}
-                  </Link>
-                  <span>‧</span>
-                  <span className="text-sm font-medium">
-                    <span className="text-muted-foreground/75">
-                      {new Date(claim.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </span>
-                </div>
-                
-                {/* Add more fields display here as needed */}
+          <div className="flex items-start justify-between gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <Dot tone="info" />
+                <Link
+                  href={`/dashboard/platform/claims/${claim.id}`}
+                  className="text-sm font-semibold text-foreground hover:underline"
+                >
+                  Claim <span className="font-mono tabular-nums">{claim.id.slice(-8)}</span>
+                </Link>
+                {claim.type && (
+                  <span className="text-xs capitalize text-muted-foreground">{claim.type}</span>
+                )}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                <span className="font-mono tabular-nums">
+                  {new Date(claim.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-                {claim.type && (
-                  <Badge
-                    color="blue"
-                    className="text-[.6rem] sm:text-[.7rem] py-0 px-2 sm:px-3 tracking-wide font-medium rounded-md border h-6"
-                  >
-                    {claim.type.toUpperCase()}
-                  </Badge>
-                )}
-                
-                {/* Action buttons */}
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    onClick={() => setIsEditDrawerOpen(true)}
-                  >
-                    <MoreVertical className="stroke-muted-foreground" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
-                  >
-                    <AccordionTrigger className="py-0" />
-                  </Button>
-                </div>
-              </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                aria-label="Edit"
+                onClick={() => setIsEditDrawerOpen(true)}
+              >
+                <MoreVertical className="stroke-muted-foreground" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                asChild
+              >
+                <AccordionTrigger className="justify-center py-0" />
+              </Button>
             </div>
           </div>
           <AccordionContent className="pb-0">
-            <div className="divide-y">
-              {/* Expanded content - customize based on your entity fields */}
-              <div className="px-4 md:px-6 py-4">
-                <h4 className="text-sm font-medium mb-3">Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">ID:</span>
-                    <span className="ml-2 font-medium">{claim.id}</span>
-                  </div>
-                  {claim.updatedAt && (
-                    <div>
-                      <span className="text-muted-foreground">Updated:</span>
-                      <span className="ml-2 font-medium">
-                        {new Date(claim.updatedAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
+            <div className="border-t border-border bg-background/60 px-4 py-4">
+              <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+                <div className="min-w-0">
+                  <dt className="text-xs text-muted-foreground">ID</dt>
+                  <dd className="mt-0.5 break-all font-mono text-xs tabular-nums text-foreground">{claim.id}</dd>
                 </div>
-              </div>
+                {claim.updatedAt && (
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Updated</dt>
+                    <dd className="mt-0.5 font-mono tabular-nums text-foreground">
+                      {new Date(claim.updatedAt).toLocaleDateString()}
+                    </dd>
+                  </div>
+                )}
+              </dl>
             </div>
           </AccordionContent>
         </AccordionItem>

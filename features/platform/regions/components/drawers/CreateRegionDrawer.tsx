@@ -60,20 +60,18 @@ export function CreateRegionDrawer({ open, onClose, mode }: CreateRegionDrawerPr
           <div className="flex items-center justify-between">
             <div>
               <DrawerTitle>Create Region</DrawerTitle>
-              <DrawerDescription>
-                Create a new region with custom configuration
-              </DrawerDescription>
+              <DrawerDescription className="sr-only">Create region</DrawerDescription>
             </div>
             <DrawerClose asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="size-10 rounded-full" aria-label="Close">
                 <X className="w-4 h-4" />
               </Button>
             </DrawerClose>
           </div>
         </DrawerHeader>
 
-        <div className="px-6 pb-6">
-          <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto">
+        <div className="px-4 pb-6 md:px-6">
+          <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-5">
             <div className="space-y-2">
               <Label htmlFor="name">Region Name</Label>
               <Input
@@ -110,7 +108,7 @@ export function CreateRegionDrawer({ open, onClose, mode }: CreateRegionDrawerPr
               />
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex min-h-10 items-center gap-3 rounded-xl bg-muted/40 px-4 py-2 ring-1 ring-inset ring-border/60">
               <Switch
                 id="automaticTaxes"
                 checked={formData.automaticTaxes}
@@ -122,16 +120,16 @@ export function CreateRegionDrawer({ open, onClose, mode }: CreateRegionDrawerPr
             <div className="flex gap-3 pt-4">
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 onClick={onClose}
-                className="flex-1"
+                className="h-10 flex-1 rounded-full bg-muted hover:bg-muted/80"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isLoading || !formData.name || !formData.code}
-                className="flex-1"
+                className="h-10 flex-1 rounded-full"
               >
                 {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Create Region

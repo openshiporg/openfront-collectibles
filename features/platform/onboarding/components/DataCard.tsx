@@ -14,8 +14,8 @@ interface DataCardProps {
 
 export function DataCard({ title, content, onCopy, copied, copyKey, showPasteButton, onPaste }: DataCardProps) {
   return (
-    <div className="rounded-lg border overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 bg-muted border-b">
+    <div className="overflow-hidden rounded-xl ring-1 ring-border">
+      <div className="flex items-center justify-between border-b bg-muted/40 px-4 py-2">
         <span className="text-sm font-medium text-muted-foreground">{title}</span>
         <div className="flex items-center space-x-2">
           {showPasteButton && onPaste && (

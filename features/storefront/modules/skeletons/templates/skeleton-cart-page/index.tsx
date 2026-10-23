@@ -22,33 +22,33 @@ const SkeletonCartPage = () => {
           <div className="flex flex-col bg-background p-6 gap-y-6">
             <div className="bg-background flex items-start justify-between">
               <div className="flex flex-col gap-y-2">
-                <div className="w-60 h-8 bg-gray-200 animate-pulse" />
-                <div className="w-48 h-6 bg-gray-200 animate-pulse" />
+                <div className="w-60 h-8 bg-cx-well animate-pulse" />
+                <div className="w-48 h-6 bg-cx-well animate-pulse" />
               </div>
               <div>
-                <div className="w-14 h-8 bg-gray-200 animate-pulse" />
+                <div className="w-14 h-8 bg-cx-well animate-pulse" />
               </div>
             </div>
             <div>
               <div className="pb-3 flex items-center">
-                <div className="w-20 h-12 bg-gray-200 animate-pulse" />
+                <div className="w-20 h-12 bg-cx-well animate-pulse" />
               </div>
               <Table>
                 <TableHeader className="border-t-0">
                   <TableRow>
                     <TableHead className="!pl-0">
-                      <div className="w-10 h-6 bg-gray-200 animate-pulse" />
+                      <div className="w-10 h-6 bg-cx-well animate-pulse" />
                     </TableHead>
                     <TableHead></TableHead>
                     <TableHead>
-                      <div className="w-16 h-6 bg-gray-200 animate-pulse" />
+                      <div className="w-16 h-6 bg-cx-well animate-pulse" />
                     </TableHead>
                     <TableHead>
-                      <div className="w-12 h-6 bg-gray-200 animate-pulse" />
+                      <div className="w-12 h-6 bg-cx-well animate-pulse" />
                     </TableHead>
                     <TableHead className="!pr-0">
                       <div className="flex justify-end">
-                        <div className="w-12 h-6 bg-gray-200 animate-pulse" />
+                        <div className="w-12 h-6 bg-cx-well animate-pulse" />
                       </div>
                     </TableHead>
                   </TableRow>

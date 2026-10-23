@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { ListBand } from "../../../components/vault-ui";
 
 interface CreateCurrencyDrawerProps {
   open: boolean;
@@ -31,26 +32,25 @@ export function CreateCurrencyDrawer({ open, onClose }: CreateCurrencyDrawerProp
           <div className="flex items-center justify-between">
             <div>
               <DrawerTitle>Create Currency</DrawerTitle>
-              <DrawerDescription>
-                Add a new currency to the system
-              </DrawerDescription>
+              <DrawerDescription className="sr-only">Create currency</DrawerDescription>
             </div>
             <DrawerClose asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="size-10 rounded-full" aria-label="Close">
                 <X className="w-4 h-4" />
               </Button>
             </DrawerClose>
           </div>
         </DrawerHeader>
 
-        <div className="px-6 pb-6">
-          <div className="max-w-md mx-auto text-center space-y-4">
-            <p className="text-muted-foreground">
-              Currency creation will be implemented using the EditItemDrawer pattern
-              with fields for currency code, name, symbol, and native symbol.
-            </p>
-            <Button onClick={handleCreate}>
-              Implement with EditItemDrawer
+        <div className="px-4 pb-6 md:px-6">
+          <div className="mx-auto max-w-md space-y-4">
+            <ListBand>
+              <div className="px-4 py-4 text-sm text-muted-foreground">
+                Currency creation is not available here.
+              </div>
+            </ListBand>
+            <Button onClick={handleCreate} className="h-10 w-full rounded-full">
+              Continue
             </Button>
           </div>
         </div>

@@ -1,7 +1,4 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-
 import Item from "@/features/storefront/modules/cart/components/item"
-import SkeletonLineItem from "@/features/storefront/modules/skeletons/components/skeleton-line-item"
 
 interface ItemsTemplateProps {
   items?: any[];
@@ -13,39 +10,25 @@ const ItemsTemplate = ({
   region
 }: ItemsTemplateProps) => {
   return (
-    <div>
-      <div className="pb-3 flex items-center">
-        <h1 className="text-[2rem] leading-[2.75rem] font-medium">Cart</h1>
-      </div>
-      <Table>
-        <TableHeader className="border-t-0">
-          <TableRow className="text-muted-foreground text-base font-semibold">
-            <TableHead className="!pl-0">Item</TableHead>
-            <TableHead></TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead className="hidden sm:table-cell">
-              Price
-            </TableHead>
-            <TableHead className="!pr-0 text-right">
-              Total
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {items && region
-            ? items
-                .sort((a, b) => {
-                  return a.createdAt > b.createdAt ? -1 : 1
-                })
-                .map((item) => {
-                  return <Item key={item.id} item={item} region={region} />;
-                })
-            : Array.from(Array(5).keys()).map((i) => {
-                return <SkeletonLineItem key={i} />;
-              })}
-        </TableBody>
-      </Table>
-    </div>
+    <ul className="cx-band divide-y divide-cx-line overflow-hidden" aria-label="Cart items">
+      {items && region
+        ? items
+            .sort((a, b) => {
+              return a.createdAt > b.createdAt ? -1 : 1
+            })
+            .map((item) => {
+              return <Item key={item.id} item={item} region={region} />;
+            })
+        : Array.from(Array(3).keys()).map((i) => (
+            <li key={i} className="flex gap-4 p-4">
+              <div className="size-20 animate-pulse rounded-[10px] bg-cx-line/60" />
+              <div className="flex-1 space-y-2 pt-1">
+                <div className="h-4 w-1/2 animate-pulse rounded bg-cx-line/60" />
+                <div className="h-3 w-1/3 animate-pulse rounded bg-cx-line/60" />
+              </div>
+            </li>
+          ))}
+    </ul>
   );
 }
 

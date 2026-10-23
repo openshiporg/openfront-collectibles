@@ -9,6 +9,7 @@ import ProfileName from "@/features/storefront/modules/account/components/profil
 import { notFound } from "next/navigation"
 import { listRegions } from "@/features/storefront/lib/data/regions"
 import { getUser } from "@/features/storefront/lib/data/user"
+import { AccountHeading } from "@/features/storefront/modules/account/components/account-ui"
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -25,29 +26,13 @@ export async function AccountProfilePage() {
 
   return (
     <div className="w-full" data-testid="profile-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl font-semibold">Profile</h1>
-        <p className="text-sm font-normal">
-          View and update your profile information, including your name, email,
-          and phone number. You can also update your billing address, or change
-          your password.
-        </p>
-      </div>
-      <div className="flex flex-col gap-y-8 w-full">
+      <AccountHeading title="Profile" />
+      <div className="cx-band divide-y divide-cx-line overflow-hidden">
         <ProfileName customer={customer} />
-        <Divider />
         <ProfileEmail customer={customer} />
-        <Divider />
         <ProfilePhone customer={customer} />
-        <Divider />
-        {/* <ProfilePassword customer={customer} />
-        <Divider /> */}
         <ProfileBillingAddress customer={customer} regions={regions} />
       </div>
     </div>
   )
-}
-
-const Divider = () => {
-  return <div className="w-full h-px bg-gray-200" />
 }

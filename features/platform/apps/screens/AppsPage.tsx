@@ -1,6 +1,7 @@
 import { PageBreadcrumbs } from "@/features/dashboard/components/PageBreadcrumbs";
 import { OAuthInstallDialog } from "../../order-management-system/components/OAuthInstallDialog";
 import { AppsPageClient } from "./AppsPageClient";
+import { PageTitle } from "../../components/vault-ui";
 import { getOAuthApps } from "../actions";
 
 interface PageProps {
@@ -52,15 +53,8 @@ export async function AppsPage({ searchParams }: PageProps) {
       />
 
       <div className="flex flex-col flex-1 min-h-0">
-        <div className="border-gray-200 dark:border-gray-800">
-          <div className="px-4 md:px-6 pt-4 md:pt-6 pb-4">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-              Apps
-            </h1>
-            <p className="text-muted-foreground">
-              Connect and manage third-party applications and integrations
-            </p>
-          </div>
+        <div className="px-4 md:px-6 pt-4 md:pt-6 pb-4">
+          <PageTitle title="Apps" />
         </div>
 
         <div className="flex-1 overflow-auto">

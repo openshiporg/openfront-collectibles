@@ -1,16 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Dot, ListBand, type DotTone } from "@/features/platform/components/vault-ui";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Package, ArrowLeft, Clock, CheckCircle, XCircle } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { CreateReturnModal } from "./modals/CreateReturnModal";
 import { updateReturnStatusAction } from "../actions/return-actions";
 import { toast } from 'sonner';
@@ -21,31 +19,11 @@ interface ReturnsSectionProps {
   totalItems: number;
 }
 
-const returnStatusConfig = {
-  requested: { 
-    label: "Requested", 
-    color: "yellow" as const, 
-    icon: Clock,
-    description: "Return has been requested by customer"
-  },
-  received: { 
-    label: "Received", 
-    color: "blue" as const, 
-    icon: Package,
-    description: "Return items have been received"
-  },
-  requires_action: { 
-    label: "Requires Action", 
-    color: "orange" as const, 
-    icon: ArrowLeft,
-    description: "Return requires manual review"
-  },
-  canceled: { 
-    label: "Canceled", 
-    color: "red" as const, 
-    icon: XCircle,
-    description: "Return has been canceled"
-  },
+const returnStatusConfig: Record<string, { label: string; tone: DotTone }> = {
+  requested: { label: "Requested", tone: "warn" },
+  received: { label: "Received", tone: "info" },
+  requires_action: { label: "Requires action", tone: "warn" },
+  canceled: { label: "Canceled", tone: "danger" },
 };
 
 const formatCurrency = (amount: number, currencyCode: string = 'USD') => {
@@ -80,131 +58,105 @@ export const ReturnsSection = ({ order, returns, totalItems }: ReturnsSectionPro
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+      <ListBand className="bg-background">
         {returns.map((returnItem: any, index: number) => {
           const statusConfig = returnStatusConfig[returnItem.status as keyof typeof returnStatusConfig];
-          const StatusIcon = statusConfig?.icon || Clock;
-          
+
           return (
-            <div key={returnItem.id} className="rounded-md border bg-background p-3 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium">
-                        Return #{index + 1}
-                      </span>
-                      <Badge 
-                        color={statusConfig?.color || "zinc"} 
-                        className="text-xs"
-                      >
-                        <StatusIcon className="h-3 w-3 mr-1" />
-                        {statusConfig?.label || returnItem.status}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>
-                        {new Date(returnItem.createdAt).toLocaleDateString()}
-                      </span>
-                      {returnItem.refundAmount > 0 && (
-                        <span>
-                          {formatCurrency(returnItem.refundAmount, order.currency?.code)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+            <div key={returnItem.id} className="flex items-start gap-3 px-3 py-2.5">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span className="text-sm font-medium text-foreground">
+                    Return <span className="font-mono tabular-nums">#{index + 1}</span>
+                  </span>
+                  <span className="inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
+                    <Dot tone={statusConfig?.tone || "muted"} />
+                    {statusConfig?.label || returnItem.status}
+                  </span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 shrink-0"
-                  disabled={isUpdating === returnItem.id}
-                >
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <MoreVertical className="h-3 w-3" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {returnItem.status === 'requested' && (
-                        <>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(returnItem.id, 'received')}
-                          >
-                            Mark as Received
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(returnItem.id, 'requires_action')}
-                          >
-                            Requires Action
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(returnItem.id, 'canceled')}
-                            className="text-red-600"
-                          >
-                            Cancel Return
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                      {returnItem.status === 'received' && (
-                        <DropdownMenuItem 
-                          onClick={() => handleStatusUpdate(returnItem.id, 'requires_action')}
-                        >
-                          Requires Action
-                        </DropdownMenuItem>
-                      )}
-                      {returnItem.status === 'requires_action' && (
-                        <DropdownMenuItem 
-                          onClick={() => handleStatusUpdate(returnItem.id, 'received')}
-                        >
-                          Mark as Received
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </Button>
-              </div>
-              
-              {/* Simplified Status Display */}
-              <div className="space-y-2 mb-3">
-                <div className="text-xs text-muted-foreground">
-                  Status: {statusConfig?.label || returnItem.status}
-                </div>
-              </div>
-              
-              {/* Return Items Summary */}
-              {returnItem.returnItems && returnItem.returnItems.length > 0 && (
-                <>
-                  <Separator className="mb-2" />
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium text-muted-foreground">
-                      {returnItem.returnItems.length} Item{returnItem.returnItems.length !== 1 ? 's' : ''}
+                <div className="mt-0.5 flex flex-wrap gap-x-3 font-mono text-xs tabular-nums text-muted-foreground">
+                  <span>{new Date(returnItem.createdAt).toLocaleDateString()}</span>
+                  {returnItem.refundAmount > 0 && (
+                    <span className="text-foreground">
+                      {formatCurrency(returnItem.refundAmount, order.currency?.code)}
                     </span>
-                    <div className="space-y-1">
-                      {returnItem.returnItems.slice(0, 2).map((item: any) => (
-                        <div key={item.id} className="text-xs">
-                          <div className="truncate font-medium">
-                            {item.lineItem?.title || 'Unknown Item'} 
-                            {item.lineItem?.variantTitle && ` - ${item.lineItem.variantTitle}`}
-                          </div>
-                          <div className="text-muted-foreground">
-                            {item.reason?.replace('_', ' ')} • Qty: {item.quantity}
-                          </div>
-                        </div>
-                      ))}
-                      {returnItem.returnItems.length > 2 && (
-                        <span className="text-xs text-muted-foreground">
-                          +{returnItem.returnItems.length - 2} more
+                  )}
+                </div>
+                {returnItem.returnItems && returnItem.returnItems.length > 0 && (
+                  <ul className="mt-1.5 space-y-0.5 text-xs">
+                    {returnItem.returnItems.slice(0, 2).map((item: any) => (
+                      <li key={item.id} className="flex flex-wrap items-baseline gap-x-2">
+                        <span className="min-w-0 truncate text-foreground">
+                          {item.lineItem?.title || 'Unknown Item'}
+                          {item.lineItem?.variantTitle && ` - ${item.lineItem.variantTitle}`}
                         </span>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+                        <span className="font-mono tabular-nums text-muted-foreground">x{item.quantity}</span>
+                        {item.reason && (
+                          <span className="text-muted-foreground">{item.reason?.replace('_', ' ')}</span>
+                        )}
+                      </li>
+                    ))}
+                    {returnItem.returnItems.length > 2 && (
+                      <li className="font-mono tabular-nums text-muted-foreground">
+                        +{returnItem.returnItems.length - 2} more
+                      </li>
+                    )}
+                  </ul>
+                )}
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Return actions"
+                    disabled={isUpdating === returnItem.id}
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50 max-sm:size-10"
+                  >
+                    <MoreVertical className="size-3.5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {returnItem.status === 'requested' && (
+                    <>
+                      <DropdownMenuItem
+                        onClick={() => handleStatusUpdate(returnItem.id, 'received')}
+                      >
+                        Mark as Received
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStatusUpdate(returnItem.id, 'requires_action')}
+                      >
+                        Requires Action
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStatusUpdate(returnItem.id, 'canceled')}
+                        className="text-red-600"
+                      >
+                        Cancel Return
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {returnItem.status === 'received' && (
+                    <DropdownMenuItem
+                      onClick={() => handleStatusUpdate(returnItem.id, 'requires_action')}
+                    >
+                      Requires Action
+                    </DropdownMenuItem>
+                  )}
+                  {returnItem.status === 'requires_action' && (
+                    <DropdownMenuItem
+                      onClick={() => handleStatusUpdate(returnItem.id, 'received')}
+                    >
+                      Mark as Received
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           );
         })}
-      </div>
-      
+      </ListBand>
+
       <CreateReturnModal
         isOpen={isReturnModalOpen}
         onClose={() => setIsReturnModalOpen(false)}

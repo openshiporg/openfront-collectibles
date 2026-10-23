@@ -13,10 +13,6 @@ import { useHasChanges, serializeValueToOperationItem } from '../../../dashboard
 import { enhanceFields } from '../../../dashboard/utils/enhanceFields'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { CardHeader,  CardContent } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -28,28 +24,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger 
 } from '@/components/ui/alert-dialog'
-import { 
-  Check,
-  Copy,
-  Trash2,
-  RotateCcw,
-  Package,
-  Image,
-  Box,
-  Building,
-  Tag,
-  Hash,
-  ExternalLink,
-  Info,
-  ShieldCheck,
-  TicketPercent
-} from 'lucide-react'
+import { ArrowUpRight, Check, Copy, RotateCcw, Trash2 } from 'lucide-react'
+import { Dot, ListBand, SectionTitle } from '@/features/platform/components/vault-ui'
+import { productStatusConfig } from '../components/StatusBadge'
 import { toast } from 'sonner'
 import { updateItemAction, deleteItemAction } from '../../../dashboard/actions/item-actions'
 import { VariantsTab } from '../components/VariantsTab'
 import { MediaTab } from '../components/MediaTab'
 
-const Card = 'div'
 
 interface ProductItemPageClientProps {
   list: any
@@ -90,7 +72,7 @@ function DeleteButton({ list, value, onError }: { list: any; value: Record<strin
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
+        <Button variant="destructive" size="sm" className="rounded-full">
           <Trash2 className="size-3.5" />
           Delete
         </Button>
@@ -253,37 +235,38 @@ export function ProductItemPageClient({ list, item, itemId }: ProductItemPageCli
   const discountEligibilityEnabled = Boolean((value as Record<string, unknown>).discountable)
   const linkedTaxRateCount = getRelatedCount((value as Record<string, unknown>).taxRates)
 
+  const savedStatus = productStatusConfig[item.status as keyof typeof productStatusConfig]
+  const variantCount = Array.isArray(item.productVariants) ? (item.productVariants as unknown[]).length : undefined
+  const panel = 'rounded-xl bg-muted/40 p-4 ring-1 ring-inset ring-border/60 md:p-5'
+
   if (!item || Object.keys(item).length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <div className="text-muted-foreground/50 mb-4">
-          <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-          </svg>
-        </div>
-        <p className="text-muted-foreground text-sm">Product not found</p>
+      <div className="px-4 py-10 md:px-6">
+        <ListBand>
+          <div className="px-4 py-3 text-sm text-muted-foreground">Product not found</div>
+        </ListBand>
       </div>
     )
   }
 
   return (
     <>
-      <div className="min-h-screen bg-muted/5 pb-20 font-sans selection:bg-indigo-500/30">
-        {/* Premium Glassmorphic Header */}
-        <div className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-          <PageBreadcrumbs 
-            items={breadcrumbItems} 
+      <div className="min-h-screen pb-20">
+        <div className="sticky top-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+          <PageBreadcrumbs
+            items={breadcrumbItems}
             actions={
               <div className="flex items-center gap-2">
                 {!list.hideDelete && <DeleteButton list={list} value={value} onError={setErrorDialogValue} />}
                 {hasChanges && (
-                  <Button variant="outline" size="sm" onClick={handleReset}>
+                  <Button variant="outline" size="sm" className="rounded-full" onClick={handleReset}>
                     <RotateCcw className="size-3.5" />
                     Reset
                   </Button>
                 )}
                 <Button
                   size="sm"
+                  className="rounded-full"
                   onClick={handleSave}
                   disabled={!hasChanges || loading || saveState === 'saving'}
                 >
@@ -294,31 +277,36 @@ export function ProductItemPageClient({ list, item, itemId }: ProductItemPageCli
             }
           />
         </div>
-        
+
         <main className="max-w-6xl p-4 md:p-6">
-          <div className="mb-8">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              {pageLabel}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Manage product details, media, variants, and settings.
-            </p>
+          <div className="mb-8 flex flex-col gap-1">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">{pageLabel}</h1>
+              {savedStatus && (
+                <span className="inline-flex items-baseline gap-1.5 text-sm text-muted-foreground">
+                  <Dot tone={savedStatus.tone} />
+                  {savedStatus.label}
+                </span>
+              )}
+              {hasChanges && (
+                <span className="inline-flex items-baseline gap-1.5 text-sm text-muted-foreground">
+                  <Dot tone="warn" />
+                  Unsaved changes
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-x-3 font-mono text-sm tabular-nums text-muted-foreground">
+              {typeof item.handle === 'string' && item.handle && <span>/{item.handle}</span>}
+              {variantCount !== undefined && <span>{variantCount} variants</span>}
+            </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            {/* Main Content - Left Column */}
-            <div className="flex-1 w-full space-y-8">
-              
-              {/* General Info */}
+          <div className="flex flex-col items-start gap-8 lg:flex-row">
+            <div className="w-full min-w-0 flex-1 space-y-8">
               {Object.keys(fieldsSplit.generalFields).length > 0 && (
-                <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                  <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                    <div className="flex items-center gap-2">
-                      <Package className="size-4 opacity-70 text-muted-foreground" />
-                      <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">General Information</span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6">
+                <section>
+                  <SectionTitle>Details</SectionTitle>
+                  <div className={panel}>
                     <Fields
                       list={list}
                       fields={fieldsSplit.generalFields}
@@ -328,128 +316,88 @@ export function ProductItemPageClient({ list, item, itemId }: ProductItemPageCli
                       invalidFields={invalidFields}
                       isRequireds={isRequireds}
                     />
-                  </CardContent>
-                </Card>
+                  </div>
+                </section>
               )}
 
-              {/* Media */}
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Image className="size-4 opacity-70 text-muted-foreground" />
-                    <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Media Gallery</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <MediaTab product={item} />
-                </CardContent>
-              </Card>
-
-              {/* Variants configuration */}
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Box className="size-4 opacity-70 text-muted-foreground" />
-                    <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Variants & Pricing</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
+              <section>
+                <SectionTitle meta={variantCount}>Variants and pricing</SectionTitle>
+                <div className={panel}>
                   <VariantsTab product={item} />
-                </CardContent>
-              </Card>
+                </div>
+              </section>
 
+              <section>
+                <SectionTitle>Media</SectionTitle>
+                <div className={panel}>
+                  <MediaTab product={item} />
+                </div>
+              </section>
             </div>
 
-            {/* Sidebar - Right Column */}
-            <aside className="w-full lg:w-[320px] flex-shrink-0 space-y-6 lg:sticky lg:top-24">
-              
-              {/* Product ID */}
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Hash className="size-4 opacity-70 text-muted-foreground" />
-                    <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Product Reference</span>
+            <aside className="w-full min-w-0 flex-shrink-0 space-y-8 lg:sticky lg:top-24 lg:w-[320px]">
+              {Object.keys(fieldsSplit.statusFields).length > 0 && (
+                <section>
+                  <SectionTitle>Status</SectionTitle>
+                  <div className={`${panel} [&_label]:hidden`}>
+                    <Fields
+                      list={list}
+                      fields={fieldsSplit.statusFields}
+                      value={value}
+                      onChange={setValue}
+                      forceValidation={forceValidation}
+                      invalidFields={invalidFields}
+                      isRequireds={{ ...isRequireds, status: true }}
+                    />
                   </div>
-                </CardHeader>
-                <CardContent className="p-5">
-                  <div className="space-y-4">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product ID</Label>
-                    <button
-                      onClick={handleCopyId}
-                      className="group flex items-center justify-between w-full rounded-md border border-border/40 p-3 bg-muted/10 transition-colors hover:bg-muted/30 hover:border-border/80"
-                    >
-                      <code className="text-xs font-mono text-muted-foreground truncate mr-2">
-                        {itemId}
-                      </code>
-                      <Copy className="size-3.5 text-muted-foreground/60 group-hover:text-indigo-600 transition-colors flex-shrink-0" />
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
+                </section>
+              )}
 
-              {/* Status */}
-              <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Tag className="size-4 opacity-70 text-muted-foreground" />
-                    <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Status</span>
+              {Object.keys(fieldsSplit.organizationFields).length > 0 && (
+                <section>
+                  <SectionTitle>Organization</SectionTitle>
+                  <div className={panel}>
+                    <Fields
+                      list={list}
+                      fields={fieldsSplit.organizationFields}
+                      value={value}
+                      onChange={setValue}
+                      forceValidation={forceValidation}
+                      invalidFields={invalidFields}
+                      isRequireds={isRequireds}
+                    />
                   </div>
-                </CardHeader>
-                <CardContent className="p-5 space-y-5">
-                  {Object.keys(fieldsSplit.statusFields).length > 0 && (
-                    <div className="space-y-3">
-                      <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product Status</Label>
-                      <div className="[&_label]:hidden">
-                        <Fields
-                          list={list}
-                          fields={fieldsSplit.statusFields}
-                          value={value}
-                          onChange={setValue}
-                          forceValidation={forceValidation}
-                          invalidFields={invalidFields}
-                          isRequireds={{ ...isRequireds, status: true }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                </section>
+              )}
 
               {Object.keys(fieldsSplit.discountTaxFields).length > 0 && (
-                <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                  <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                    <div className="flex items-center gap-2">
-                      <TicketPercent className="size-4 opacity-70 text-muted-foreground" />
-                      <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Discounts</span>
-                    </div>
-                    <Button asChild variant="outline" size="sm" className="h-7 text-xs">
-                      <Link href="/dashboard/platform/discounts">
-                        Open Discounts
-                        <ExternalLink className="size-3.5" />
+                <section>
+                  <SectionTitle
+                    meta={
+                      <Link
+                        href="/dashboard/platform/discounts"
+                        className="inline-flex items-center gap-1 font-sans text-xs font-medium text-foreground hover:underline underline-offset-4"
+                      >
+                        Discounts
+                        <ArrowUpRight className="size-3" />
                       </Link>
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="p-5 space-y-5">
-                    <div className="rounded-xl bg-muted/20 p-4 ring-1 ring-foreground/5 dark:ring-white/10">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Discount eligibility</div>
-                          <div className="mt-2 text-sm font-medium text-foreground">
-                            {discountEligibilityEnabled ? 'This product can receive discounts' : 'Discounts are turned off for this product'}
-                          </div>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            Checkout discount calculation skips this product when discount eligibility is turned off.
-                          </p>
-                        </div>
-                        <Badge variant={discountEligibilityEnabled ? 'default' : 'secondary'}>
-                          <ShieldCheck className="mr-1 size-3" />
-                          {discountEligibilityEnabled ? 'Eligible' : 'Blocked'}
-                        </Badge>
-                      </div>
+                    }
+                  >
+                    Discounts and tax
+                  </SectionTitle>
+                  <ListBand>
+                    <div className="flex items-baseline justify-between gap-3 px-4 py-3 text-sm">
+                      <span className="text-muted-foreground">Discount eligibility</span>
+                      <span className="inline-flex items-baseline gap-1.5 text-foreground">
+                        <Dot tone={discountEligibilityEnabled ? 'ok' : 'muted'} />
+                        {discountEligibilityEnabled ? 'Eligible' : 'Blocked'}
+                      </span>
                     </div>
-
-                    <div className="space-y-3">
-                      <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Discount settings</Label>
+                    <div className="flex items-baseline justify-between gap-3 px-4 py-3 text-sm">
+                      <span className="text-muted-foreground">Linked tax rates</span>
+                      <span className="font-mono tabular-nums text-foreground">{linkedTaxRateCount}</span>
+                    </div>
+                    <div className="px-4 py-4">
                       <Fields
                         list={list}
                         fields={fieldsSplit.discountTaxFields}
@@ -460,46 +408,27 @@ export function ProductItemPageClient({ list, item, itemId }: ProductItemPageCli
                         isRequireds={isRequireds}
                       />
                     </div>
-
-                    <Alert className="bg-indigo-500/5 text-indigo-700 border-indigo-500/20 dark:text-indigo-400">
-                      <Info className="size-4" />
-                      <AlertDescription>
-                        Use this product page for product-level eligibility. Manage shared discount codes, rule logic, schedules, stackability, regions, and advanced promotion setup from the Discounts area.
-                      </AlertDescription>
-                    </Alert>
-
-                    <div className="rounded-xl border border-dashed border-border/60 p-4">
-                      <div className="text-sm font-medium text-foreground">Tax mappings</div>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        This product currently has {linkedTaxRateCount} linked tax rate{linkedTaxRateCount === 1 ? '' : 's'}. Live cart tax is primarily calculated from the cart region, so treat product tax links as advanced mappings rather than the main tax engine.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </ListBand>
+                </section>
               )}
 
-              {/* Organization */}
-              {Object.keys(fieldsSplit.organizationFields).length > 0 && (
-                <Card className="relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden">
-                  <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b bg-muted/40">
-                    <div className="flex items-center gap-2">
-                      <Building className="size-4 opacity-70 text-muted-foreground" />
-                      <span className="font-medium uppercase text-xs tracking-wider text-muted-foreground">Organization</span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-5">
-                    <Fields
-                      list={list}
-                      fields={fieldsSplit.organizationFields}
-                      value={value}
-                      onChange={setValue}
-                      forceValidation={forceValidation}
-                      invalidFields={invalidFields}
-                      isRequireds={isRequireds}
-                    />
-                  </CardContent>
-                </Card>
-              )}
+              <section>
+                <SectionTitle>Reference</SectionTitle>
+                <ListBand>
+                  <button
+                    type="button"
+                    onClick={handleCopyId}
+                    aria-label="Copy product ID"
+                    className="group flex min-h-11 w-full items-center justify-between gap-3 px-4 py-2.5 text-left"
+                  >
+                    <span className="text-sm text-muted-foreground">ID</span>
+                    <span className="flex min-w-0 items-center gap-2">
+                      <code className="truncate font-mono text-xs text-foreground">{itemId}</code>
+                      <Copy className="size-3.5 shrink-0 text-muted-foreground group-hover:text-foreground" />
+                    </span>
+                  </button>
+                </ListBand>
+              </section>
             </aside>
           </div>
         </main>

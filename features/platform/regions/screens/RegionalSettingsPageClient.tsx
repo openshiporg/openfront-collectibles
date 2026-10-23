@@ -1,6 +1,7 @@
 "use client";
 
 import { PageContainer } from "../../../dashboard/components/PageContainer";
+import { PageTitle } from "../../components/vault-ui";
 import { RegionalSettingsTabs, TabType } from "../components/RegionalSettingsTabs";
 import { Region } from "../actions";
 import { Country } from "../actions/country-actions";
@@ -51,14 +52,8 @@ export function RegionalSettingsPageClient({
 
   return (
     <PageContainer
-      header={
-        <>
-          <h1 className="text-2xl font-semibold tracking-tight">Regional Settings</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage regions, countries, and currencies for your store
-          </p>
-        </>
-      }
+      title="Regional Settings"
+      header={<PageTitle title="Regional Settings" />}
     >
       <RegionalSettingsTabs
         initialTab={initialTab}

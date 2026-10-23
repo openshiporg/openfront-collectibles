@@ -1,28 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Code } from 'lucide-react';
+import { toast } from 'sonner';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from '@/components/ui/select';
-import * as SelectPrimitive from '@radix-ui/react-select';
-import { LOGO_ICONS, HUE_PRESETS } from '../lib/icon-registry';
-import { updateStoreSettings } from '../actions';
-import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { Code } from 'lucide-react';
 import { sanitizeStoreLogoSvg } from '@/features/lib/sanitize-store-logo';
+import { PageTitle, Pill, Track, SectionTitle, pillClass } from '@/features/platform/components/vault-ui';
+import { storeBrand } from '@/features/storefront/lib/collectibles-brand';
+import { LOGO_ICONS, HUE_PRESETS } from '../lib/icon-registry';
+import { HueSlider } from '../components/HueSlider';
+import { updateStoreSettings } from '../actions';
+
+// Registry marks are drawn at hue 221; the storefront accent is that hue after rotation.
+const REGISTRY_BASE_HUE = 221;
+const HUES: Array<{ name: string; value: number }> = [{ name: "Bronze", value: 165 }, ...HUE_PRESETS];
 
 interface StoreSettingsPageClientProps {
   initialData: {
@@ -36,32 +32,36 @@ interface StoreSettingsPageClientProps {
   initialError: string | null;
 }
 
-export function StoreSettingsPageClient({
-  initialData,
-  initialError,
-}: StoreSettingsPageClientProps) {
+function MarkTile({ svg, rotation, className }: { svg: string; rotation: string; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      dangerouslySetInnerHTML={{ __html: svg }}
+      style={{ filter: `hue-rotate(${rotation}deg)` }}
+      className={cn('block shrink-0 [&>svg]:block [&>svg]:h-full [&>svg]:w-full', className)}
+    />
+  );
+}
+
+export function StoreSettingsPageClient({ initialData, initialError }: StoreSettingsPageClientProps) {
+  // What the storefront shows today: a store without a chosen registry mark gets the collectibles default.
+  const live = storeBrand(initialData);
   const [name, setName] = useState(initialData?.name || '');
-  const [logoIcon, setLogoIcon] = useState(
-    initialData?.logoIcon || LOGO_ICONS[0].lightSvg
-  );
-  const [logoColor, setLogoColor] = useState(
-    initialData?.logoColor || '0'
-  );
-  const [homepageTitle, setHomepageTitle] = useState(
-    initialData?.homepageTitle || ''
-  );
-  const [homepageDescription, setHomepageDescription] = useState(
-    initialData?.homepageDescription || ''
-  );
+  const [logoIcon, setLogoIcon] = useState(live.logoSvg);
+  const [logoColor, setLogoColor] = useState(live.logoColor);
+  const [homepageTitle, setHomepageTitle] = useState(initialData?.homepageTitle || '');
+  const [homepageDescription, setHomepageDescription] = useState(initialData?.homepageDescription || '');
   const [isLoading, setIsLoading] = useState(false);
   const safeLogo = sanitizeStoreLogoSvg(logoIcon);
+  const rotation = Number.parseFloat(logoColor) || 0;
+  const accentHue = (((REGISTRY_BASE_HUE + rotation) % 360) + 360) % 360;
+  const selectedIcon = LOGO_ICONS.find((icon) => icon.lightSvg === logoIcon);
 
   const handleSave = async () => {
     if (!initialData?.id) {
       toast.error('No store found to update');
       return;
     }
-
     if (logoIcon.trim() && !safeLogo) {
       toast.error('Logo must be a valid, safe SVG document');
       return;
@@ -74,198 +74,145 @@ export function StoreSettingsPageClient({
       homepageTitle,
       homepageDescription,
     });
-
-    if (result.success) {
-      toast.success('Store settings updated successfully');
-    } else {
-      toast.error(result.error || 'Failed to update store settings');
-    }
+    if (result.success) toast.success('Store settings saved');
+    else toast.error(result.error || 'Store settings not saved');
     setIsLoading(false);
   };
 
   if (initialError) {
     return (
-      <div className="p-6">
-        <div className="text-red-500">Error: {initialError}</div>
+      <div className="px-4 py-6 md:px-6">
+        <p role="alert" className="text-sm text-destructive">{initialError}</p>
       </div>
     );
   }
 
-  // Find matching preset icon, but don't default to first icon if not found
-  const selectedIcon = LOGO_ICONS.find((icon) => icon.lightSvg === logoIcon);
-
   return (
-    <div className="p-6 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6">Store Settings</h1>
+    <div className="w-full max-w-6xl space-y-8 px-4 pb-10 pt-4 md:px-6">
+      <PageTitle
+        title="Store settings"
+        actions={
+          <Track label="Save">
+            <Pill active onClick={handleSave} disabled={isLoading}>
+              {isLoading ? 'Saving' : 'Save'}
+            </Pill>
+          </Track>
+        }
+      />
 
-      <div className="space-y-6">
-        {/* Store Name */}
-        <div>
-          <Label htmlFor="store-name">Store Name</Label>
-          <Input
-            id="store-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-2"
-          />
-        </div>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="min-w-0 space-y-8">
+          <section className="space-y-4">
+            <SectionTitle>Store</SectionTitle>
+            <div className="grid gap-1.5">
+              <Label htmlFor="store-name">Store name</Label>
+              <Input id="store-name" value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="homepage-title">Homepage title</Label>
+              <Input id="homepage-title" value={homepageTitle} onChange={(e) => setHomepageTitle(e.target.value)} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="homepage-description">Homepage description</Label>
+              <Textarea
+                id="homepage-description"
+                value={homepageDescription}
+                onChange={(e) => setHomepageDescription(e.target.value)}
+                className="min-h-20"
+              />
+            </div>
+          </section>
 
-        {/* Logo Icon Selector */}
-        <div>
-          <Label>Logo Icon</Label>
-          <div className="mt-2 flex items-center gap-2">
-            <Select
-              value={selectedIcon?.id || ''}
-              onValueChange={(id) => {
-                const icon = LOGO_ICONS.find((i) => i.id === id);
-                if (icon) setLogoIcon(icon.lightSvg);
-              }}
+          <section className="space-y-3">
+            <SectionTitle meta={selectedIcon?.name ?? 'Custom'}>Mark</SectionTitle>
+            <div
+              role="radiogroup"
+              aria-label="Logo mark"
+              className="grid grid-cols-5 gap-1.5 rounded-xl bg-muted/40 p-2 ring-1 ring-inset ring-border/60 sm:grid-cols-8 xl:grid-cols-10"
             >
-              <SelectPrimitive.Trigger
-                aria-label="Logo icon"
-                className={cn(
-                  'flex h-12 w-12 shrink-0 rounded-lg border border-input bg-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 p-0 overflow-hidden items-center justify-center'
-                )}
-              >
-                <div
-                  dangerouslySetInnerHTML={{ __html: safeLogo }}
-                  style={{ filter: `hue-rotate(${logoColor}deg)` }}
-                  className="[&>svg]:w-6 [&>svg]:h-6"
-                />
-              </SelectPrimitive.Trigger>
-              <SelectContent className="border-border dark:border-blue-700">
-                {LOGO_ICONS.map((icon) => (
-                  <SelectItem key={icon.id} value={icon.id}>
-                    <span className="flex items-center gap-3">
-                      <div
-                        dangerouslySetInnerHTML={{ __html: icon.lightSvg }}
-                        style={{ filter: `hue-rotate(${logoColor}deg)` }}
-                        className="[&>svg]:w-6 [&>svg]:h-6"
-                      />
-                      <span>
-                        <span className="block font-medium text-gray-900 dark:text-gray-100">
-                          {icon.name}
-                        </span>
-                      </span>
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* SVG Code Editor Popover */}
+              {LOGO_ICONS.map((icon) => {
+                const active = selectedIcon?.id === icon.id;
+                return (
+                  <button
+                    key={icon.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    aria-label={icon.name}
+                    title={icon.name}
+                    onClick={() => setLogoIcon(icon.lightSvg)}
+                    className={cn(
+                      'flex aspect-square items-center justify-center rounded-lg transition-colors hover:bg-background/70 focus-visible:outline-2 focus-visible:outline-ring',
+                      active && 'bg-background shadow-[0_1px_2px_rgb(0_0_0/0.12),0_0_0_0.5px_rgb(0_0_0/0.06)] dark:bg-zinc-800'
+                    )}
+                  >
+                    <MarkTile svg={icon.lightSvg} rotation={logoColor} className="size-6" />
+                  </button>
+                );
+              })}
+            </div>
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  aria-label="Custom SVG"
-                  size="icon"
-                  className="h-12 w-12 shrink-0"
-                  type="button"
-                >
-                  <Code className="h-4 w-4" />
-                </Button>
+                <button type="button" className={cn(pillClass, 'bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)]')}>
+                  <Code className="size-3.5" aria-hidden="true" />
+                  Custom SVG
+                </button>
               </PopoverTrigger>
-              <PopoverContent className="w-[min(500px,calc(100vw-2rem))]" align="start">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium mb-2">Edit SVG Code</h4>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Edit the SVG code directly. Changes will be reflected in the icon preview.
-                    </p>
-                  </div>
-                  <Textarea
-                    aria-label="Custom SVG"
-                    value={logoIcon}
-                    onChange={(e) => setLogoIcon(e.target.value)}
-                    className="font-mono text-xs min-h-[300px]"
-                    placeholder="<svg>...</svg>"
-                  />
-                  <div className="flex items-center gap-2">
-                    <div className="text-sm text-muted-foreground">Preview:</div>
-                    <div
-                      dangerouslySetInnerHTML={{ __html: safeLogo }}
-                      style={{ filter: `hue-rotate(${logoColor}deg)` }}
-                      className="[&>svg]:w-8 [&>svg]:h-8 flex items-center justify-center p-2 border rounded"
-                    />
-                  </div>
-                </div>
+              <PopoverContent className="w-[min(500px,calc(100vw-2rem))] space-y-3" align="start">
+                <Label htmlFor="custom-svg">SVG</Label>
+                <Textarea
+                  id="custom-svg"
+                  value={logoIcon}
+                  onChange={(e) => setLogoIcon(e.target.value)}
+                  className="min-h-[260px] font-mono text-xs"
+                  placeholder="<svg>...</svg>"
+                />
+                {logoIcon.trim() && !safeLogo && <p role="alert" className="text-xs text-destructive">Not a valid, safe SVG</p>}
               </PopoverContent>
             </Popover>
-          </div>
-        </div>
+          </section>
 
-        {/* Logo Color Selector */}
-        <div>
-          <Label>Logo Color</Label>
-          <div className="mt-2">
-            <Select
-              value={logoColor}
-              onValueChange={(value) => setLogoColor(value)}
-            >
-              <SelectPrimitive.Trigger
-                aria-label="Logo hue"
-                className={cn(
-                  'flex h-12 w-12 shrink-0 rounded-lg border border-input bg-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 p-0 overflow-hidden items-center justify-center'
-                )}
-              >
-                <SelectValue>
-                  <div
-                    className="w-6 h-6 rounded-full"
-                    style={{
-                      background: `hsl(${(240 + parseInt(logoColor)) % 360}, 70%, 50%)`
-                    }}
+          <section className="space-y-3">
+            <SectionTitle meta={`${Math.round(rotation)}°`}>Colour</SectionTitle>
+            <Track label="Logo colour">
+              {HUES.map((preset) => (
+                <Pill key={preset.value} active={Math.round(rotation) === preset.value} onClick={() => setLogoColor(String(preset.value))}>
+                  <span
+                    aria-hidden="true"
+                    className="size-2.5 rounded-full"
+                    style={{ background: `hsl(${(REGISTRY_BASE_HUE + preset.value) % 360} 64% 45%)` }}
                   />
-                </SelectValue>
-              </SelectPrimitive.Trigger>
-              <SelectContent className="border-border dark:border-blue-700">
-                <div className="grid grid-cols-4 gap-2 p-2">
-                  {HUE_PRESETS.map((preset) => (
-                    <SelectItem
-                      key={preset.value}
-                      aria-label={`Hue ${preset.value}`}
-                      value={preset.value.toString()}
-                      className="cursor-pointer p-0 h-12 w-12 flex items-center justify-center [&>span:first-child]:hidden"
-                    >
-                      <div
-                        className="w-6 h-6 rounded-full"
-                        style={{
-                          background: `hsl(${(240 + preset.value) % 360}, 70%, 50%)`
-                        }}
-                      />
-                    </SelectItem>
-                  ))}
-                </div>
-              </SelectContent>
-            </Select>
+                  {preset.name}
+                </Pill>
+              ))}
+            </Track>
+            <HueSlider value={rotation} onValueChange={(value) => setLogoColor(String(value))} className="max-w-md" />
+          </section>
+        </div>
+
+        <aside className="space-y-3 lg:sticky lg:top-4 lg:self-start" aria-label="Preview">
+          <SectionTitle>Preview</SectionTitle>
+          <div className="overflow-hidden rounded-xl ring-1 ring-border">
+            <div className="flex min-h-16 items-center gap-2.5 bg-[#f3f0e8] px-4 text-[#1a1712]">
+              <MarkTile svg={safeLogo} rotation={logoColor} className="size-6" />
+              <span className="truncate font-serif text-xl leading-none">{name || 'Store'}</span>
+            </div>
+            <div className="space-y-2 border-t border-[#d8d1c2] bg-[#f3f0e8] px-4 py-5 text-[#1a1712]">
+              <p className="font-serif text-2xl leading-7">{homepageTitle || name || 'Store'}</p>
+              {homepageDescription && <p className="text-sm text-[#5a5348]">{homepageDescription}</p>}
+              <span
+                className="mt-2 inline-flex min-h-9 items-center rounded-full px-4 text-[13px] font-medium text-[#fbf8f1]"
+                style={{ background: `hsl(${accentHue} 64% 34%)` }}
+              >
+                Accent
+              </span>
+            </div>
+            <div className="flex min-h-14 items-center gap-2.5 bg-[#201c16] px-4 text-[#f3eee3]">
+              <MarkTile svg={safeLogo} rotation={logoColor} className="size-5" />
+              <span className="truncate font-serif text-lg leading-none">{name || 'Store'}</span>
+            </div>
           </div>
-        </div>
-
-        {/* Homepage Title */}
-        <div>
-          <Label htmlFor="homepage-title">Homepage Title</Label>
-          <Input
-            id="homepage-title"
-            value={homepageTitle}
-            onChange={(e) => setHomepageTitle(e.target.value)}
-            className="mt-2"
-          />
-        </div>
-
-        {/* Homepage Description */}
-        <div>
-          <Label htmlFor="homepage-description">Homepage Description</Label>
-          <Input
-            id="homepage-description"
-            value={homepageDescription}
-            onChange={(e) => setHomepageDescription(e.target.value)}
-            className="mt-2"
-          />
-        </div>
-
-        <Button onClick={handleSave} disabled={isLoading}>
-          {isLoading ? 'Saving...' : 'Save Settings'}
-        </Button>
+        </aside>
       </div>
     </div>
   );

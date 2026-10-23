@@ -7,31 +7,19 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, User, Mail, Phone, MapPin, ShoppingCart, CreditCard, Users } from "lucide-react";
+import { MoreVertical } from "lucide-react";
+import { Count, Dot, ListBand, Pill, Track } from "../../components/vault-ui";
 import Link from "next/link";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 import { ItemPagination } from "../../orders/components/ItemPagination";
 import { OrderDetailsComponent } from "../../orders/components/OrderDetailsComponent";
-
-const statusColors = {
-  "has_account": "emerald",
-  "no_account": "zinc"
-} as const;
 
 interface User {
   id: string;
@@ -206,355 +194,240 @@ export function UserDetailsComponent({
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value={user.id} className="border-0">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full border-b relative min-h-[120px]">
-            <div className="flex items-start gap-4">
-              {/* User Info */}
-              <div className="flex flex-col items-start text-left gap-2 sm:gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/dashboard/platform/users/${user.id}`}
-                    className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    {user.name || `${user.firstName} ${user.lastName}`.trim() || user.email}
-                  </Link>
-                  <span>‧</span>
-                  <span className="text-sm font-medium">
-                    <span className="text-muted-foreground/75">
-                      {new Date(user.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </span>
-                </div>
-                
-                {/* Enhanced User Details */}
-                <div className="flex flex-wrap items-center gap-1.5 text-sm">
-                  {user.email && (
-                    <>
-                      <div className="flex items-center gap-1">
-                        <Mail className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">{user.email}</span>
-                      </div>
-                      <span className="text-muted-foreground">‧</span>
-                    </>
-                  )}
-                  {user.phone && (
-                    <>
-                      <div className="flex items-center gap-1">
-                        <Phone className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">{user.phone}</span>
-                      </div>
-                      <span className="text-muted-foreground">‧</span>
-                    </>
-                  )}
-                  <span className="text-muted-foreground">
-                    {ordersData.length} {ordersData.length === 1 ? 'order' : 'orders'}
-                  </span>
-                  {addressesData.length > 0 && (
-                    <>
-                      <span className="text-muted-foreground">‧</span>
-                      <span className="text-muted-foreground">
-                        {addressesData.length} {addressesData.length === 1 ? 'address' : 'addresses'}
-                      </span>
-                    </>
-                  )}
-                </div>
-                
-                {/* Role Display */}
+          <div className="flex items-start justify-between gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <Dot tone={user.hasAccount ? "ok" : "muted"} />
+                <Link
+                  href={`/dashboard/platform/users/${user.id}`}
+                  className="text-sm font-semibold text-foreground hover:underline"
+                >
+                  {user.name || `${user.firstName} ${user.lastName}`.trim() || user.email}
+                </Link>
+                <span className="text-xs text-muted-foreground">{user.hasAccount ? "Has account" : "No account"}</span>
                 {user.role && (
-                  <div className="flex items-center gap-1.5 text-sm">
-                    <Users className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-muted-foreground">Role: {user.role.name}</span>
-                  </div>
+                  <span className="text-xs text-muted-foreground">{user.role.name}</span>
                 )}
+              </div>
+
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                {user.email && <span className="min-w-0 truncate">{user.email}</span>}
+                {user.phone && <span className="font-mono tabular-nums">{user.phone}</span>}
+                <span>
+                  <span className="font-mono tabular-nums">{ordersData.length}</span> {ordersData.length === 1 ? 'order' : 'orders'}
+                </span>
+                {addressesData.length > 0 && (
+                  <span>
+                    <span className="font-mono tabular-nums">{addressesData.length}</span> {addressesData.length === 1 ? 'address' : 'addresses'}
+                  </span>
+                )}
+                <span className="font-mono tabular-nums">
+                  {new Date(user.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-                <Badge
-                  color={
-                    user.hasAccount ? "emerald" : "zinc"
-                  }
-                  className="text-[.6rem] sm:text-[.7rem] py-0 px-2 sm:px-3 tracking-wide font-medium rounded-md border h-6"
-                >
-                  {user.hasAccount ? "HAS ACCOUNT" : "NO ACCOUNT"}
-                </Badge>
-                
-                {/* Action buttons */}
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="border [&_svg]:size-3 h-6 w-6"
-                      >
-                        <MoreVertical className="stroke-muted-foreground" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
-                        Edit User
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            <div className="flex shrink-0 items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
+                    className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                    aria-label="Actions"
                   >
-                    <AccordionTrigger className="py-0" />
+                    <MoreVertical className="stroke-muted-foreground" />
                   </Button>
-                </div>
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
+                    Edit User
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                asChild
+              >
+                <AccordionTrigger className="justify-center py-0" />
+              </Button>
             </div>
           </div>
           <AccordionContent className="pb-0">
-            {/* Responsive Tabs Navigation */}
-            <div className="bg-muted/40">
-              {/* Desktop: Horizontal Tab Buttons */}
-              <div className="hidden md:flex items-center gap-3 px-4 pt-2">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`relative z-10 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-300 border ${
-                      activeTab === tab.key 
-                        ? 'bg-background border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100' 
-                        : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-background/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <span>
+            <div className="space-y-3 border-t border-border bg-background/60 px-4 py-4">
+              {tabs.length > 0 && (
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Track label="Customer records">
+                    {tabs.map((tab) => (
+                      <Pill
+                        key={tab.key}
+                        active={activeTab === tab.key}
+                        onClick={() => setActiveTab(tab.key)}
+                      >
                         {tab.key === 'orders' && 'Orders'}
                         {tab.key === 'addresses' && 'Addresses'}
                         {tab.key === 'carts' && 'Carts'}
                         {tab.key === 'customerGroups' && 'Customer Groups'}
-                      </span>
-                      <span className="rounded-sm bg-muted border px-1.5 py-0 text-[10px] leading-[14px] font-medium text-muted-foreground inline-flex items-center h-[18px] -mr-1">
-                        {tab.count}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              {/* Mobile: Select Dropdown */}
-              <div className="md:hidden px-4 py-2">
-                <div className="w-fit">
-                  <Select value={activeTab} onValueChange={(value: TabType) => setActiveTab(value)}>
-                    <SelectTrigger className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-background border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 h-auto w-auto">
-                      <div className="flex items-center gap-1.5">
-                        <SelectValue />
-                        <span className="rounded-sm bg-muted border px-1.5 py-0 text-[10px] leading-[14px] font-medium text-muted-foreground inline-flex items-center h-[18px] -mr-1">
-                          ({activeTabData?.count || 0})
-                        </span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {tabs.map((tab) => (
-                        <SelectItem key={tab.key} value={tab.key} className="text-xs">
-                          {tab.key === 'orders' && 'Orders'}
-                          {tab.key === 'addresses' && 'Addresses'}
-                          {tab.key === 'carts' && 'Carts'}
-                          {tab.key === 'customerGroups' && 'Customer Groups'}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        <Count>{tab.count}</Count>
+                      </Pill>
+                    ))}
+                  </Track>
+                  {activeTabData && activeTabData.count > itemsPerPage && (
+                    <ItemPagination
+                      currentPage={currentPages[activeTab]}
+                      totalItems={activeTabData.count}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={(newPage) => handlePageChange(activeTab, newPage)}
+                    />
+                  )}
                 </div>
-              </div>
-            </div>
-            
-            {/* Tab Content Area */}
-            <div className="bg-muted/40">
+              )}
+
               {activeTabData && (
                 <>
-                  {/* Pagination for active tab */}
-                  {activeTabData.count > itemsPerPage && (
-                    <div className="flex justify-between items-center p-4 pb-2">
-                      <div />
-                      <ItemPagination
-                        currentPage={currentPages[activeTab]}
-                        totalItems={activeTabData.count}
-                        itemsPerPage={itemsPerPage}
-                        onPageChange={(newPage) => handlePageChange(activeTab, newPage)}
-                      />
-                    </div>
+                  {activeTab === 'orders' && (
+                    <ListBand>
+                      {ordersData.slice(
+                        (currentPages.orders - 1) * itemsPerPage,
+                        currentPages.orders * itemsPerPage
+                      ).map((order) => (
+                        <div key={order.id} className="border-0">
+                          <OrderDetailsComponent
+                            order={order}
+                            list={{ key: "Order" }}
+                            removeEditItemButton={true}
+                          />
+                        </div>
+                      ))}
+                    </ListBand>
                   )}
 
-                  <div className="px-4 py-2">
-                    {/* Orders Tab */}
-                    {activeTab === 'orders' && (
-                      <div className="space-y-2">
-                        {ordersData.slice(
-                          (currentPages.orders - 1) * itemsPerPage,
-                          currentPages.orders * itemsPerPage
-                        ).map((order) => (
-                          <div key={order.id} className="border-0">
-                            <OrderDetailsComponent
-                              order={order}
-                              list={{ key: "Order" }}
-                              removeEditItemButton={true}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Addresses Tab */}
-                    {activeTab === 'addresses' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {addressesData.slice(
-                          (currentPages.addresses - 1) * itemsPerPage,
-                          currentPages.addresses * itemsPerPage
-                        ).map((address, index) => (
-                          <div key={address.id} className="rounded-md border bg-background p-3 shadow-sm">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium truncate">
-                                    {address.firstName} {address.lastName}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {address.address1}
-                                    {address.city && `, ${address.city}`}
-                                    {address.province && `, ${address.province}`}
-                                  </div>
-                                  {address.phone && (
-                                    <div className="text-xs text-muted-foreground">
-                                      {address.phone}
-                                    </div>
-                                  )}
-                                </div>
+                  {activeTab === 'addresses' && (
+                    <ListBand>
+                      {addressesData.slice(
+                        (currentPages.addresses - 1) * itemsPerPage,
+                        currentPages.addresses * itemsPerPage
+                      ).map((address) => (
+                        <div key={address.id} className="flex items-start justify-between gap-3 px-3 py-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-sm font-medium text-foreground">
+                              {address.firstName} {address.lastName}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {address.address1}
+                              {address.city && `, ${address.city}`}
+                              {address.province && `, ${address.province}`}
+                            </div>
+                            {address.phone && (
+                              <div className="font-mono text-xs tabular-nums text-muted-foreground">
+                                {address.phone}
                               </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 shrink-0"
-                                  >
-                                    <MoreVertical className="h-3 w-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleEditItem(address.id, 'addresses')}>
-                                    Edit Address
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                            )}
+                          </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-10 shrink-0 rounded-full sm:size-8 [&_svg]:size-4"
+                            aria-label="Address actions"
+                          >
+                            <MoreVertical className="stroke-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditItem(address.id, 'addresses')}>
+                            Edit Address
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                        </div>
+                      ))}
+                    </ListBand>
+                  )}
+
+                  {activeTab === 'carts' && (
+                    <ListBand>
+                      {cartsData.slice(
+                        (currentPages.carts - 1) * itemsPerPage,
+                        currentPages.carts * itemsPerPage
+                      ).map((cart) => (
+                        <div key={cart.id} className="flex items-start justify-between gap-3 px-3 py-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+                              <Dot tone={cart.status === 'COMPLETED' ? 'ok' : 'info'} />
+                              <span className="text-sm font-medium text-foreground">
+                                Cart <span className="font-mono tabular-nums">{cart.id.slice(-8)}</span>
+                              </span>
+                              <span className="text-xs capitalize text-muted-foreground">{cart.status.toLowerCase()}</span>
+                            </div>
+                            <div className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                              {cart.totalPrice && (
+                                <span className="font-mono tabular-nums text-foreground">{cart.totalPrice}</span>
+                              )}
+                              <span className="font-mono tabular-nums">{new Date(cart.createdAt).toLocaleDateString()}</span>
+                              {cart.lineItems && (
+                                <span><span className="font-mono tabular-nums">{cart.lineItems.length}</span> items</span>
+                              )}
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-10 shrink-0 rounded-full sm:size-8 [&_svg]:size-4"
+                            aria-label="Cart actions"
+                          >
+                            <MoreVertical className="stroke-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditItem(cart.id, 'carts')}>
+                            Edit Cart
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                        </div>
+                      ))}
+                    </ListBand>
+                  )}
 
-                    {/* Carts Tab */}
-                    {activeTab === 'carts' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {cartsData.slice(
-                          (currentPages.carts - 1) * itemsPerPage,
-                          currentPages.carts * itemsPerPage
-                        ).map((cart, index) => (
-                          <div key={cart.id} className="rounded-md border bg-background p-3 shadow-sm">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <ShoppingCart className="w-4 h-4 text-muted-foreground shrink-0" />
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium truncate">
-                                    Cart #{cart.id.slice(-8)}
-                                  </div>
-                                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                    <div className={`w-2 h-2 rounded-full shrink-0 ${
-                                      cart.status === 'COMPLETED' ? 'bg-green-500' : 'bg-blue-500'
-                                    }`}></div>
-                                    <span className="truncate">
-                                      {cart.status.toLowerCase()}
-                                    </span>
-                                    {cart.totalPrice && (
-                                      <>
-                                        <span>‧</span>
-                                        <span>{cart.totalPrice}</span>
-                                      </>
-                                    )}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {new Date(cart.createdAt).toLocaleDateString()}
-                                    {cart.lineItems && (
-                                      <> • {cart.lineItems.length} items</>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 shrink-0"
-                                  >
-                                    <MoreVertical className="h-3 w-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleEditItem(cart.id, 'carts')}>
-                                    Edit Cart
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Customer Groups Tab */}
-                    {activeTab === 'customerGroups' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {customerGroupsData.slice(
-                          (currentPages.customerGroups - 1) * itemsPerPage,
-                          currentPages.customerGroups * itemsPerPage
-                        ).map((group, index) => (
-                          <div key={group.id} className="rounded-md border bg-background p-3 shadow-sm">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <Users className="w-4 h-4 text-muted-foreground shrink-0" />
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium truncate">{group.name}</div>
-                                  <div className="text-xs text-muted-foreground">
-                                    Customer group membership
-                                  </div>
-                                </div>
-                              </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 shrink-0"
-                                  >
-                                    <MoreVertical className="h-3 w-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleEditItem(group.id, 'customer-groups')}>
-                                    Edit Customer Group
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  {activeTab === 'customerGroups' && (
+                    <ListBand>
+                      {customerGroupsData.slice(
+                        (currentPages.customerGroups - 1) * itemsPerPage,
+                        currentPages.customerGroups * itemsPerPage
+                      ).map((group) => (
+                        <div key={group.id} className="flex items-center justify-between gap-3 px-3 py-1.5">
+                          <span className="min-w-0 truncate text-sm font-medium text-foreground">{group.name}</span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-10 shrink-0 rounded-full sm:size-8 [&_svg]:size-4"
+                            aria-label="Customer Group actions"
+                          >
+                            <MoreVertical className="stroke-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditItem(group.id, 'customer-groups')}>
+                            Edit Customer Group
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                        </div>
+                      ))}
+                    </ListBand>
+                  )}
                 </>
               )}
             </div>

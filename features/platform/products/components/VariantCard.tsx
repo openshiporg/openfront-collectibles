@@ -1,5 +1,6 @@
 import { parseMajorToMinor, formatMinorToMajor } from '@/features/lib/minor-units';
 import type { PriceFormProps, PriceDraft, VariantCardProps } from '../types/variant';
+import { Dot } from "@/features/platform/components/vault-ui";
 import { Button } from "@/components/ui/button";
 import {
   MoreHorizontal,
@@ -110,8 +111,8 @@ const PriceForm = ({ region, initialPrice, onSave, onCancel }: PriceFormProps) =
           {initialPrice ? "Update Price" : "Add Price"}
         </h3>
         <p className="text-muted-foreground text-xs">
-          {region.name} • {region.currency.code.toUpperCase()}
-          {region.taxRate ? ` • ${(region.taxRate * 100).toFixed(0)}% tax` : ""}
+          {region.name} · <span className="font-mono">{region.currency.code.toUpperCase()}</span>
+          {region.taxRate ? <span className="font-mono tabular-nums">{` · ${(region.taxRate * 100).toFixed(0)}% tax`}</span> : ""}
         </p>
       </div>
       <div className="p-4 space-y-4">
@@ -128,7 +129,7 @@ const PriceForm = ({ region, initialPrice, onSave, onCancel }: PriceFormProps) =
                   setAmount(val);
                 }
               }}
-              className="peer ps-5 pe-10 h-8 text-sm"
+              className="peer ps-5 pe-10 h-9 font-mono text-sm tabular-nums"
               placeholder="0.00"
             />
             <span className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 text-xs">
@@ -151,7 +152,7 @@ const PriceForm = ({ region, initialPrice, onSave, onCancel }: PriceFormProps) =
                   setCompareAmount(val);
                 }
               }}
-              className="peer ps-5 pe-10 h-8 text-sm"
+              className="peer ps-5 pe-10 h-9 font-mono text-sm tabular-nums"
               placeholder="0.00"
             />
             <span className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 text-xs">
@@ -194,17 +195,18 @@ export function VariantCard({
   onOptionFilter,
   productImages = [],
   renderOptionValue = (ov) => (
-    <Badge
-      color="zinc"
+    <button
+      type="button"
+      data-active={selectedFilters.includes(`${ov.option}:${ov.value}`)}
       className={cn(
-        "uppercase rounded-md border text-[.65rem] py-[.0625rem] px-1.5 font-medium cursor-pointer hover:bg-accent/50",
-        selectedFilters.includes(`${ov.option}:${ov.value}`) && "bg-accent"
+        "inline-flex min-h-6 items-center gap-1 rounded-full bg-muted px-2 text-[11px] font-medium text-foreground hover:bg-muted/70",
+        "data-[active=true]:bg-foreground data-[active=true]:text-background"
       )}
       onClick={() => onOptionFilter?.(ov.option, ov.value)}
     >
-      <span className="opacity-80 mr-1">{ov.option}:</span>
-      {ov.label}
-    </Badge>
+      <span className="opacity-70">{ov.option}</span>
+      <span className="font-mono tabular-nums">{ov.label}</span>
+    </button>
   ),
 }: VariantCardProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -241,12 +243,12 @@ export function VariantCard({
     <Accordion
       type="single"
       collapsible
-      className="border rounded-lg bg-muted/40"
+      className="rounded-xl bg-background ring-1 ring-border"
     >
       <AccordionItem value="details" className="border-0">
         <div className="p-4">
-          <div className="flex justify-between">
-            <div className="flex gap-3">
+          <div className="flex justify-between gap-3">
+            <div className="flex min-w-0 gap-3">
               <Select value={variant.primaryImage?.id || "none"} onValueChange={handleImageSelect}>
                 <SelectPrimitive.Trigger className={cn(
                   "flex h-12 w-12 shrink-0 rounded-lg border border-input bg-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 p-0 overflow-hidden items-center justify-center"
@@ -320,11 +322,21 @@ export function VariantCard({
                   ))}
                 </SelectContent>
               </Select>
-              <div className="space-y-2">
+              <div className="min-w-0 space-y-2">
                 <div>
-                  <div className="text-sm font-medium">{variant.title}</div>
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                    <span className="font-mono text-sm font-medium tabular-nums text-foreground">{variant.title}</span>
+                    <span className="inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
+                      <Dot tone={(variant.inventoryQuantity || 0) <= 0 ? "danger" : "ok"} />
+                      <span className="font-mono tabular-nums text-foreground">{variant.inventoryQuantity || 0}</span>
+                      in stock
+                    </span>
+                    {variant.sku && (
+                      <span className="font-mono text-xs tabular-nums text-muted-foreground">{variant.sku}</span>
+                    )}
+                  </div>
                   {Boolean(variant.productOptionValues?.length) && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="mt-1 flex flex-wrap gap-1.5">
                       {variant.productOptionValues?.map((ov, i) => (
                         <div key={i}>
                           {renderOptionValue({
@@ -338,7 +350,7 @@ export function VariantCard({
                   )}
                 </div>
                 <div className="space-y-0.5">
-                  <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+                  <div className="text-[11px] font-medium text-muted-foreground">
                     Prices
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -360,9 +372,9 @@ export function VariantCard({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-6 cursor-pointer flex items-center gap-1 px-2 rounded-md text-xs hover:bg-accent"
+                                className="h-7 cursor-pointer flex items-center gap-1 rounded-full px-2.5 font-mono text-xs tabular-nums hover:bg-accent max-sm:h-9"
                               >
-                                <span className="uppercase font-bold text-[0.6rem] text-muted-foreground mr-0.5">
+                                <span className="uppercase text-[10px] text-muted-foreground mr-0.5">
                                   {region.currency.code}
                                 </span>
                                 <span>
@@ -407,12 +419,12 @@ export function VariantCard({
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-6 bg-muted/40 hover:bg-muted gap-1 uppercase tracking-wide border px-2 rounded-md text-xs"
+                              className="h-7 gap-1 rounded-full border-dashed bg-transparent px-2.5 text-xs hover:bg-muted max-sm:h-9"
                             >
-                              <span className="uppercase font-bold text-[0.6rem] text-muted-foreground mr-0.5">
+                              <span className="font-mono uppercase text-[10px] text-muted-foreground mr-0.5">
                                 {region.currency.code}
                               </span>
-                              {region.currency.symbol} ADD
+                              Add
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-80 p-0 bg-card border shadow-lg" align="end">
@@ -436,7 +448,7 @@ export function VariantCard({
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-6 w-6 [&_svg]:size-3"
+                      className="size-8 rounded-full [&_svg]:size-3.5 max-sm:size-10"
                     >
                       <MoreHorizontal />
                     </Button>
@@ -454,7 +466,7 @@ export function VariantCard({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-6 w-6 [&_svg]:size-3"
+                className="size-8 rounded-full [&_svg]:size-3.5 max-sm:size-10"
                 asChild
               >
                 <AccordionTrigger className="py-0" />
@@ -466,43 +478,43 @@ export function VariantCard({
         <AccordionContent className="px-4 pb-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-3">
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 SKU
               </div>
-              <div className="text-sm tabular-nums font-medium">
+              <div className="font-mono text-sm tabular-nums font-medium">
                 {variant.sku || "-"}
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 Stock
               </div>
-              <div className="text-sm tabular-nums font-medium">
+              <div className="font-mono text-sm tabular-nums font-medium">
                 {variant.inventoryQuantity || "0"}
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 Barcode
               </div>
-              <div className="text-sm tabular-nums">
+              <div className="font-mono text-sm tabular-nums">
                 {variant.barcode || "-"}
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 EAN
               </div>
-              <div className="text-sm tabular-nums">{variant.ean || "-"}</div>
+              <div className="font-mono text-sm tabular-nums">{variant.ean || "-"}</div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 UPC
               </div>
-              <div className="text-sm tabular-nums">{variant.upc || "-"}</div>
+              <div className="font-mono text-sm tabular-nums">{variant.upc || "-"}</div>
             </div>
             <div className="space-y-1">
-              <div className="text-[.65rem] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="text-[11px] font-medium text-muted-foreground">
                 Material
               </div>
               <div className="text-sm">{variant.material || "-"}</div>

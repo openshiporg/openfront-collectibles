@@ -3,7 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Rocket } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Dot, Pill, Track } from "@/features/platform/components/vault-ui";
 
 export interface OnboardingStep {
   href: string;
@@ -147,59 +147,44 @@ function OnboardingCard({
       {/* Full sidebar view */}
       <div
         className={cn(
-          "group relative rounded-lg border bg-white dark:bg-black transition-all duration-300 ease-spring group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden",
-          "opacity-100 translate-y-0",
+          "group relative rounded-xl bg-background p-2.5 ring-1 ring-border transition-shadow duration-200 group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden",
           "hover:shadow-sm"
         )}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setIsHovered(true)}
       >
-        <div className="absolute -top-1 -right-1.5 z-10">
-          <div className="h-3 w-3 rounded-full bg-blue-700 dark:bg-blue-400 border-blue-200 dark:border-blue-800/50 border-3 animate-pulse" />
-        </div>
-        <div className="flex items-start">
-          <InfoCardContent className="pt-2 px-2">
-            <InfoCardTitle>{title}</InfoCardTitle>
-            <InfoCardDescription>{description}</InfoCardDescription>
-          </InfoCardContent>
-        </div>
+        <InfoCardContent>
+          <InfoCardTitle className="flex items-baseline gap-1.5">
+            {title}
+            <Dot tone="accent" />
+          </InfoCardTitle>
+          <InfoCardDescription>{description}</InfoCardDescription>
+        </InfoCardContent>
 
         <InfoCardFooter isHovered={isHovered}>
-          <div className="m-2 space-x-2">
-            <Button size="sm" onClick={onOpenDialog} className="text-xs h-6">
-              Get started
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDismiss}
-              className="text-xs h-6"
-            >
-              Skip for now
-            </Button>
-          </div>
+          <Track label="Setup" className="mt-1">
+            <Pill active onClick={onOpenDialog} className="min-h-7 px-2.5 text-xs">
+              Set up
+            </Pill>
+            <Pill onClick={handleDismiss} className="min-h-7 px-2.5 text-xs">
+              Skip
+            </Pill>
+          </Track>
         </InfoCardFooter>
       </div>
 
       {/* Icon-only sidebar view */}
-      <div
-        className={cn(
-          "hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:block",
-          "relative"
-        )}
-      >
-        <div className="absolute -top-1 -right-1.5 z-10">
-          <div className="h-3 w-3 rounded-full bg-blue-700 dark:bg-blue-400 border-blue-200 dark:border-blue-800/50 border-3 animate-pulse" />
-        </div>
-        <Button
-          variant="outline"
-          size="icon"
-          className="size-8"
-          // className="w-full h-9 hover:bg-accent hover:text-accent-foreground"
+      <div className="relative hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:block">
+        <Dot tone="accent" className="absolute -right-0.5 -top-0.5 z-10 translate-y-0" />
+        <button
+          type="button"
+          aria-label={title}
           onClick={onOpenDialog}
+          className="inline-flex size-8 items-center justify-center rounded-full bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] hover:text-foreground"
         >
-          <Rocket className="size-3" />
-        </Button>
+          <Rocket className="size-3.5" aria-hidden="true" />
+        </button>
       </div>
     </>
   );

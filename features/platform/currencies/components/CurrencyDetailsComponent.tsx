@@ -7,16 +7,10 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import Link from "next/link";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
-
-const statusColors = {
-  "active": "emerald",
-  "inactive": "zinc"
-} as const;
 
 interface Currency {
   id: string;
@@ -44,79 +38,65 @@ export function CurrencyDetailsComponent({
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value={currency.id} className="border-0">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full border-b relative min-h-[80px]">
-            <div className="flex items-start gap-4">
-              {/* Currency Info */}
-              <div className="flex flex-col items-start text-left gap-2 sm:gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/dashboard/platform/currencies/${currency.id}`}
-                    className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    {currency.name} ({currency.code})
-                  </Link>
-                  <span>‧</span>
-                  <span className="text-sm font-medium">
-                    <span className="text-muted-foreground/75">
-                      {new Date(currency.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </span>
-                </div>
-                
-                {/* Add more fields display here as needed */}
+          <div className="flex items-start justify-between gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <Link
+                  href={`/dashboard/platform/currencies/${currency.id}`}
+                  className="text-sm font-semibold text-foreground hover:underline"
+                >
+                  {currency.name}
+                </Link>
+                <span className="font-mono text-xs uppercase tabular-nums text-muted-foreground">{currency.code}</span>
+              </div>
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span>Symbol <span className="font-mono tabular-nums text-foreground">{currency.symbol}</span></span>
+                <span className="font-mono tabular-nums">
+                  {new Date(currency.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-
-                
-                {/* Action buttons */}
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    onClick={() => setIsEditDrawerOpen(true)}
-                  >
-                    <MoreVertical className="stroke-muted-foreground" />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
-                  >
-                    <AccordionTrigger className="py-0" />
-                  </Button>
-                </div>
-              </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                onClick={() => setIsEditDrawerOpen(true)}
+                aria-label="Edit"
+              >
+                <MoreVertical className="stroke-muted-foreground" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                asChild
+              >
+                <AccordionTrigger className="justify-center py-0" />
+              </Button>
             </div>
           </div>
           <AccordionContent className="pb-0">
-            <div className="divide-y">
-              {/* Expanded content - customize based on your entity fields */}
-              <div className="px-4 md:px-6 py-4">
-                <h4 className="text-sm font-medium mb-3">Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">ID:</span>
-                    <span className="ml-2 font-medium">{currency.id}</span>
-                  </div>
-                  {currency.updatedAt && (
-                    <div>
-                      <span className="text-muted-foreground">Updated:</span>
-                      <span className="ml-2 font-medium">
-                        {new Date(currency.updatedAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
+            <div className="border-t border-border bg-background/60 px-4 py-4">
+              <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+                <div className="min-w-0">
+                  <dt className="text-xs text-muted-foreground">ID</dt>
+                  <dd className="mt-0.5 truncate font-mono text-xs tabular-nums text-foreground">{currency.id}</dd>
                 </div>
-              </div>
+                {currency.updatedAt && (
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Updated</dt>
+                    <dd className="mt-0.5 font-mono tabular-nums text-foreground">
+                      {new Date(currency.updatedAt).toLocaleDateString()}
+                    </dd>
+                  </div>
+                )}
+              </dl>
             </div>
           </AccordionContent>
         </AccordionItem>

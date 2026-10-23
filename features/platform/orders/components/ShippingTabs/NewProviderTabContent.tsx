@@ -77,7 +77,7 @@ export function NewProviderTabContent({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="provider-name" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <Label htmlFor="provider-name" className="text-xs font-medium text-muted-foreground">
           Provider Name
         </Label>
         <Input
@@ -90,7 +90,7 @@ export function NewProviderTabContent({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="api-url" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <Label htmlFor="api-url" className="text-xs font-medium text-muted-foreground">
           API URL
         </Label>
         <Input
@@ -103,7 +103,7 @@ export function NewProviderTabContent({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="api-key" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <Label htmlFor="api-key" className="text-xs font-medium text-muted-foreground">
           API Key
         </Label>
         <Input
@@ -127,7 +127,7 @@ export function NewProviderTabContent({
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="address" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <Label htmlFor="address" className="text-xs font-medium text-muted-foreground">
           Shipping From Address
         </Label>
         <AddressSelect value={selectedAddress} onChange={setSelectedAddress} />

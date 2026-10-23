@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Pill, Track } from "@/features/platform/components/vault-ui";
+import { ChartPanel } from "./MetricBand";
 import { BarList } from "./BarList";
 import { formatCurrency, formatNumber } from "../lib/analyticsHelpers";
 
@@ -34,41 +34,15 @@ export function ProductPerformanceBarList({
   }));
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between gap-2">
-          <div className="space-y-0.5">
-            <CardTitle>{title}</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {description}
-            </p>
-          </div>
-          <div className="bg-black/5 dark:bg-white/10 inline-flex h-7 rounded-lg p-0.5 shrink-0">
-            <RadioGroup
-              value={metricView}
-              onValueChange={setMetricView}
-              className="group text-xs after:border after:border-border after:bg-background has-focus-visible:after:border-ring has-focus-visible:after:ring-ring/50 relative inline-grid grid-cols-[1fr_1fr] items-center gap-0 font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-md after:shadow-xs after:transition-[translate,box-shadow] after:duration-300 after:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] has-focus-visible:after:ring-[3px] data-[state=revenue]:after:translate-x-0 data-[state=quantity]:after:translate-x-full"
-              data-state={metricView}
-            >
-              <label className="group-data-[state=quantity]:text-muted-foreground/50 relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-2 whitespace-nowrap transition-colors select-none">
-                Revenue
-                <RadioGroupItem
-                  value="revenue"
-                  className="sr-only"
-                />
-              </label>
-              <label className="group-data-[state=revenue]:text-muted-foreground/50 relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-2 whitespace-nowrap transition-colors select-none">
-                Quantity
-                <RadioGroupItem 
-                  value="quantity" 
-                  className="sr-only" 
-                />
-              </label>
-            </RadioGroup>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
+    <ChartPanel
+      title={title}
+      control={
+        <Track label="Product metric">
+          <Pill active={metricView === "revenue"} onClick={() => setMetricView("revenue")}>Revenue</Pill>
+          <Pill active={metricView === "quantity"} onClick={() => setMetricView("quantity")}>Quantity</Pill>
+        </Track>
+      }
+    >
         <BarList
           data={barListData}
           valueFormatter={(value) => 
@@ -78,7 +52,6 @@ export function ProductPerformanceBarList({
           }
           showAnimation={true}
         />
-      </CardContent>
-    </Card>
+    </ChartPanel>
   );
 }

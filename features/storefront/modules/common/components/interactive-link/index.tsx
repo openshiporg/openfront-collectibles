@@ -15,13 +15,16 @@ const InteractiveLink = ({
 }: InteractiveLinkProps) => {
   return (
     <LocalizedClientLink
-      className="flex gap-x-1 items-center group"
+      className="group inline-flex min-h-11 items-center gap-1 text-[14px] font-medium text-cx-ink hover:text-cx-accent"
       href={href}
       onClick={onClick}
       {...props}
     >
-      <span className="text-sm">{children}</span>
-      <ArrowUpRight className="group-hover:rotate-45 ease-in-out duration-150 text-primary h-4 w-4" />
+      <span>{children}</span>
+      <ArrowUpRight
+        className="size-4 transition-transform duration-150 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+        aria-hidden="true"
+      />
     </LocalizedClientLink>
   )
 }

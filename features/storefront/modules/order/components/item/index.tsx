@@ -1,5 +1,3 @@
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
-
 import LineItemOptions from "@/features/storefront/modules/common/components/line-item-options"
 import Thumbnail from "@/features/storefront/modules/products/components/thumbnail"
 
@@ -11,33 +9,27 @@ type ItemProps = {
   region: Pick<StoreRegion, 'id' | 'name' | 'currency'>;
 };
 
-const Item = ({ item, region }: ItemProps) => {
+const Item = ({ item }: ItemProps) => {
   return (
-    <TableRow className="w-full">
-      <TableCell className="!pl-0 p-4 w-24">
-        <div className="flex w-16">
-          <Thumbnail thumbnail={item.thumbnail} size="square" />
-        </div>
-      </TableCell>
-
-      <TableCell className="text-left">
-        <p className="font-medium">{item.title}</p>
+    <li className="flex items-center gap-4 p-4" data-testid="product-row">
+      <div className="w-16 shrink-0">
+        <Thumbnail thumbnail={item.thumbnail} size="square" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="font-cx-serif text-[17px] leading-[22px] text-cx-ink">{item.title}</p>
         {item.variantTitle && (
-        <LineItemOptions variant={item.productVariant} variantTitle={item.variantTitle} />
+          <div className="mt-0.5 text-[13px] text-cx-ink-2">
+            <LineItemOptions variant={item.productVariant} variantTitle={item.variantTitle} />
+          </div>
         )}
-      </TableCell>
-
-      <TableCell className="!pr-0">
-        <span className="!pr-0 flex flex-col items-end h-full justify-center">
-          <span className="flex gap-x-1 text-sm">
-            <span className="text-muted-foreground">{item.quantity}x </span>
-            <span>{item.formattedUnitPrice}</span>
-          </span>
-
-          <span>{item.formattedTotal}</span>
+      </div>
+      <div className="cx-num flex shrink-0 flex-col items-end text-[14px]">
+        <span className="text-[12px] text-cx-ink-3">
+          {item.quantity} × {item.formattedUnitPrice}
         </span>
-      </TableCell>
-    </TableRow>
+        <span className="text-cx-ink">{item.formattedTotal}</span>
+      </div>
+    </li>
   );
 };
 

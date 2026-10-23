@@ -7,7 +7,6 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,9 +14,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, DollarSign, Edit, Trash } from "lucide-react";
+import { MoreVertical, Edit, Trash } from "lucide-react";
 import Link from "next/link";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
+import { Dot, ListBand, SectionTitle } from "../../components/vault-ui";
 import { Currency } from "../actions/currency-actions";
 
 interface CurrencyDetailsComponentProps {
@@ -29,140 +29,114 @@ export function CurrencyDetailsComponent({ currency, list }: CurrencyDetailsComp
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
   const isActive = currency.regions && currency.regions.length > 0;
-  const statusColor = isActive ? "emerald" : "zinc";
-  const statusText = isActive ? "ACTIVE" : "UNUSED";
+  const statusTone = isActive ? "ok" : "muted";
+  const statusText = isActive ? "Active" : "Unused";
 
   return (
     <>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value={currency.id} className="border-0">
-          <div className="px-4 md:px-6 py-3 md:py-4 flex justify-between w-full border-b relative min-h-[80px]">
-            <div className="flex items-start gap-4">
-              {/* Currency Symbol */}
-              <div className="w-12 h-12 flex-shrink-0 bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-                <span className="text-xl font-bold text-muted-foreground">
-                  {currency.symbol || <DollarSign className="w-6 h-6" />}
-                </span>
+          <div className="flex items-start justify-between gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <Dot tone={statusTone} />
+                <Link
+                  href={`/dashboard/platform/regions?tab=currencies&focus=${currency.id}`}
+                  className="text-sm font-semibold text-foreground hover:underline"
+                >
+                  {currency.name}
+                </Link>
+                <span className="font-mono text-xs uppercase tabular-nums text-muted-foreground">{currency.code}</span>
+                <span className="text-xs text-muted-foreground">{statusText}</span>
               </div>
 
-              {/* Currency Info */}
-              <div className="flex flex-col items-start text-left gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/dashboard/platform/regions?tab=currencies&focus=${currency.id}`}
-                    className="font-medium text-base hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    {currency.name}
-                  </Link>
-                  <span>‧</span>
-                  <span className="text-sm text-muted-foreground font-mono font-bold">
-                    {currency.code}
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span>Symbol <span className="font-mono tabular-nums text-foreground">{currency.symbol}</span></span>
+                {currency.symbolNative !== currency.symbol && (
+                  <span>Native <span className="font-mono tabular-nums text-foreground">{currency.symbolNative}</span></span>
+                )}
+                {currency.regions && currency.regions.length > 0 && (
+                  <span>
+                    <span className="font-mono tabular-nums">{currency.regions.length}</span> region{currency.regions.length !== 1 ? 's' : ''}
                   </span>
-                  <span>‧</span>
-                  <span className="text-sm text-muted-foreground">
-                    {new Date(currency.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                  <span>Symbol: {currency.symbol}</span>
-                  {currency.symbolNative !== currency.symbol && (
-                    <>
-                      <span>‧</span>
-                      <span>Native: {currency.symbolNative}</span>
-                    </>
-                  )}
-                  {currency.regions && currency.regions.length > 0 && (
-                    <>
-                      <span>‧</span>
-                      <span>{currency.regions.length} region{currency.regions.length !== 1 ? 's' : ''}</span>
-                    </>
-                  )}
-                </div>
+                )}
+                <span className="font-mono tabular-nums">
+                  {new Date(currency.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div className="flex items-center gap-2">
-                <Badge
-                  color={statusColor}
-                  className="text-[.6rem] sm:text-[.7rem] py-0 px-2 sm:px-3 tracking-wide font-medium rounded-md border h-6"
-                >
-                  {statusText}
-                </Badge>
-
-                <div className="absolute bottom-3 right-5 sm:static flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="border [&_svg]:size-3 h-6 w-6"
-                      >
-                        <MoreVertical className="stroke-muted-foreground" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit Currency
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        <Trash className="w-4 h-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
+            <div className="flex shrink-0 items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="icon"
-                    className="border [&_svg]:size-3 h-6 w-6"
-                    asChild
+                    className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                    aria-label="Actions"
                   >
-                    <AccordionTrigger className="py-0" />
+                    <MoreVertical className="stroke-muted-foreground" />
                   </Button>
-                </div>
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setIsEditDrawerOpen(true)}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Currency
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-destructive">
+                    <Trash className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-10 rounded-full sm:size-8 [&_svg]:size-4"
+                asChild
+              >
+                <AccordionTrigger className="justify-center py-0" />
+              </Button>
             </div>
           </div>
 
           <AccordionContent className="pb-0">
-            <div className="px-4 md:px-6 py-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="space-y-4 border-t border-border bg-background/60 px-4 py-4">
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-4">
                 <div>
-                  <span className="text-muted-foreground">Code:</span>
-                  <span className="ml-2 font-medium font-mono">{currency.code}</span>
+                  <dt className="text-xs text-muted-foreground">Code</dt>
+                  <dd className="mt-0.5 font-mono uppercase tabular-nums text-foreground">{currency.code}</dd>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Symbol:</span>
-                  <span className="ml-2 font-medium text-lg">{currency.symbol}</span>
+                  <dt className="text-xs text-muted-foreground">Symbol</dt>
+                  <dd className="mt-0.5 font-mono tabular-nums text-foreground">{currency.symbol}</dd>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Native Symbol:</span>
-                  <span className="ml-2 font-medium text-lg">{currency.symbolNative}</span>
+                  <dt className="text-xs text-muted-foreground">Native symbol</dt>
+                  <dd className="mt-0.5 font-mono tabular-nums text-foreground">{currency.symbolNative}</dd>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Regions:</span>
-                  <span className="ml-2 font-medium">{currency.regions?.length || 0}</span>
+                  <dt className="text-xs text-muted-foreground">Regions</dt>
+                  <dd className="mt-0.5 font-mono tabular-nums text-foreground">{currency.regions?.length || 0}</dd>
                 </div>
-              </div>
+              </dl>
 
-              {/* Regions using this currency */}
               {currency.regions && currency.regions.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Used by Regions</h4>
-                  <div className="flex flex-wrap gap-2">
+                  <SectionTitle meta={currency.regions.length}>Used by regions</SectionTitle>
+                  <ListBand>
                     {currency.regions.map((region) => (
-                      <Badge key={region.id} variant="secondary">
-                        {region.name}
-                      </Badge>
+                      <div key={region.id} className="flex items-baseline justify-between gap-3 px-3 py-2 text-sm">
+                        <span className="truncate text-foreground">{region.name}</span>
+                        <span className="font-mono text-xs uppercase tabular-nums text-muted-foreground">{region.code}</span>
+                      </div>
                     ))}
-                  </div>
+                  </ListBand>
                 </div>
               )}
             </div>

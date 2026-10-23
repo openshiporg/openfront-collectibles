@@ -19,6 +19,7 @@ import SingleSelect, { SingleSelectOption } from '@/components/ui/single-select'
 import MultipleSelector, { Option } from '@/components/ui/multiselect'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { ListBand } from '../../../components/vault-ui'
 import { createPaymentProvider } from '../../actions'
 import { getRegions } from '../../../regions/actions'
 
@@ -34,21 +35,18 @@ const PAYMENT_PROVIDER_PRESETS = [
     id: 'manual', 
     name: 'Cash on Delivery', 
     description: 'Cash on Delivery payment method allows customers to pay when they receive their order. Orders are placed immediately and payment is collected upon delivery.',
-    icon: '👋',
     envVars: []
   },
   { 
     id: 'stripe', 
     name: 'Stripe', 
     description: 'For Stripe to work, you need to add these environment variables to your .env file:',
-    icon: '💳',
     envVars: ['NEXT_PUBLIC_STRIPE_KEY', 'STRIPE_SECRET_KEY']
   },
   { 
     id: 'paypal', 
     name: 'PayPal', 
     description: 'For PayPal to work, you need to add these environment variables to your .env file:',
-    icon: '🟦',
     envVars: ['NEXT_PUBLIC_PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET']
   }
 ]
@@ -72,7 +70,6 @@ export function CreatePaymentProviderDrawer({
     return PAYMENT_PROVIDER_PRESETS.map(preset => ({
       value: preset.id,
       label: preset.name,
-      flag: preset.icon,
       description: preset.description,
     }))
   }
@@ -203,16 +200,14 @@ export function CreatePaymentProviderDrawer({
   return (
     <Drawer open={open} onOpenChange={(open) => { if (!open) handleClose() }}>
       <DrawerContent>
-        <DrawerHeader className="flex-shrink-0">
-          <DrawerTitle>Create Payment Provider</DrawerTitle>
-          <DrawerDescription>
-            Select a payment provider and configure your integration
-          </DrawerDescription>
+        <DrawerHeader className="flex-shrink-0 border-b border-border">
+          <DrawerTitle className="text-lg font-semibold tracking-tight">Create Payment Provider</DrawerTitle>
+          <DrawerDescription className="sr-only">Create Payment Provider</DrawerDescription>
         </DrawerHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6">
+            <div className="mx-auto max-w-xl space-y-5">
               {/* Provider Preset Selection */}
               <div>
                 <SingleSelect
@@ -244,22 +239,16 @@ export function CreatePaymentProviderDrawer({
 
                   {/* Provider Info */}
                   {selectedProvider && (
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground">
+                    <ListBand>
+                      <p className="px-4 py-3 text-sm text-muted-foreground">
                         {selectedProvider.description}
                       </p>
-                      {selectedProvider.envVars.length > 0 && (
-                        <div className="mt-3 space-y-1">
-                          {selectedProvider.envVars.map((envVar, index) => (
-                            <div key={index}>
-                              <code className="bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono">
-                                {envVar}
-                              </code>
-                            </div>
-                          ))}
+                      {selectedProvider.envVars.map((envVar, index) => (
+                        <div key={index} className="px-4 py-2">
+                          <code className="break-all font-mono text-xs text-foreground">{envVar}</code>
                         </div>
-                      )}
-                    </div>
+                      ))}
+                    </ListBand>
                   )}
 
                   {/* Regions Selection */}
@@ -287,7 +276,8 @@ export function CreatePaymentProviderDrawer({
             <div className="flex gap-2 justify-end">
               <Button 
                 type="button" 
-                variant="outline" 
+                variant="ghost"
+                className="h-10 rounded-full bg-muted px-4 hover:bg-muted/80"
                 onClick={handleClose}
                 disabled={loading}
               >
@@ -296,7 +286,7 @@ export function CreatePaymentProviderDrawer({
               <Button 
                 type="submit" 
                 disabled={loading || !isFormValid()}
-                className="min-w-[120px]"
+                className="h-10 min-w-[120px] rounded-full px-4"
               >
                 {loading ? (
                   <>

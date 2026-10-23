@@ -3,17 +3,13 @@ import SkeletonProductPreview from "@/features/storefront/modules/skeletons/comp
 
 const SkeletonRelatedProducts = () => {
   return (
-    <div className="product-page-constraint">
-      <div className="flex flex-col gap-8 items-center text-center mb-8">
-        <div className="w-20 h-6 animate-pulse bg-gray-100"></div>
-        <div className="flex flex-col gap-4 items-center text-center mb-16">
-          <div className="w-96 h-10 animate-pulse bg-gray-100"></div>
-          <div className="w-48 h-10 animate-pulse bg-gray-100"></div>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-end justify-between border-b border-cx-line pb-3">
+        <div className="h-8 w-48 animate-pulse rounded bg-cx-well" />
       </div>
-      <ul className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8 flex-1">
-        {repeat(3).map((index) => (
-          <li key={index}>
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 md:grid-cols-3 lg:grid-cols-4">
+        {repeat(4).map((index) => (
+          <li key={index} className={index > 1 ? "hidden md:block" : undefined}>
             <SkeletonProductPreview />
           </li>
         ))}

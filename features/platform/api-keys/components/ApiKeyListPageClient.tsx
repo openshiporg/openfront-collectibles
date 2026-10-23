@@ -7,14 +7,9 @@
 
 import React, { useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  Triangle,
-  Square,
-  Circle,
-  Search
-} from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EmptyState } from '@/components/ui/empty-state'
+import { PlatformEmptyState } from '@/features/platform/components/PlatformEmptyState'
+import { PageTitle } from '@/features/platform/components/vault-ui'
 import { PageBreadcrumbs } from "@/features/dashboard/components/PageBreadcrumbs"
 import { PlatformFilterBar } from '@/features/platform/components/PlatformFilterBar'
 import { ListTable } from '@/features/dashboard/components/ListTable'
@@ -36,27 +31,11 @@ interface ApiKeyListPageClientProps {
 }
 
 function EmptyStateDefault({ list }: { list: any }) {
-  return (
-    <EmptyState
-      title={`No ${list.label} Created`}
-      description={`You can create a new ${list.singular.toLowerCase()} to get started.`}
-      icons={[Triangle, Square, Circle]}
-    />
-  )
+  return <PlatformEmptyState title={`No ${String(list.label).toLowerCase()}`} />
 }
 
 function EmptyStateSearch({ onResetFilters }: { onResetFilters: () => void }) {
-  return (
-    <EmptyState
-      title="No Results Found"
-      description="Try adjusting your search filters."
-      icons={[Search]}
-      action={{
-        label: "Reset Filters",
-        onClick: onResetFilters
-      }}
-    />
-  )
+  return <PlatformEmptyState title="No results" onReset={onResetFilters} />
 }
 
 export function ApiKeyListPageClient({
@@ -195,15 +174,8 @@ export function ApiKeyListPageClient({
       />
 
       <div className="flex flex-col flex-1 min-h-0">
-        <div className="border-gray-200 dark:border-gray-800">
-          <div className="px-4 md:px-6 pt-4 md:pt-6 pb-4">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
-              API Keys
-            </h1>
-            <p className="text-muted-foreground">
-              <span>Create and manage secure API keys for programmatic access</span>
-            </p>
-          </div>
+        <div className="px-4 md:px-6 pt-4 md:pt-6 pb-4">
+          <PageTitle title="API Keys" />
         </div>
 
         {/* Platform Filter Bar with custom create button */}

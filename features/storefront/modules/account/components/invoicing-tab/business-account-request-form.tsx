@@ -1,14 +1,7 @@
 "use client"
 
-import { useState, useActionState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useActionState, useEffect, startTransition } from "react"
 import { toast } from "@/components/ui/use-toast"
-import { TicketCheck } from "lucide-react"
 import type { StorefrontAccountCustomer as User } from "@/features/storefront/types"
 import { submitBusinessAccountRequest } from "@/features/storefront/lib/data/business-accounts"
 
@@ -28,33 +21,33 @@ const BusinessAccountRequestForm = ({ customer }: BusinessAccountRequestFormProp
     form.append('monthlyOrderVolume', 'medium')
     form.append('requestedCreditLimit', '100000')
     form.append('businessDescription', 'Business account request')
-    
-    action(form)
+
+    startTransition(() => action(form))
   }
 
-  // Handle server action results
-  if (state.success) {
-    toast({
-      title: "Request Submitted!",
-      description: state.message || "Your business account request has been submitted for review.",
-    })
-    // Refresh the page to show the new state
-    window.location.reload()
-  }
-
-  if (state.error) {
-    toast({
-      title: "Error",
-      description: state.error,
-      variant: "destructive",
-    })
-  }
+  useEffect(() => {
+    if (state.success) {
+      toast({
+        title: "Request submitted",
+        description: state.message || undefined,
+      })
+      // Refresh the page to show the new state
+      window.location.reload()
+    }
+  }, [state])
 
   return (
-    <Button onClick={handleSubmit} disabled={loading} size="lg">
-      <TicketCheck className="h-4 w-4 mr-2 opacity-60" />
-      {loading ? "Requesting..." : "Request Invoicing Access"}
-    </Button>
+    <div className="flex flex-col items-start gap-3">
+      <button type="button" className="cx-btn" onClick={handleSubmit} disabled={loading || state.success}>
+        {loading ? "Requesting" : "Request business account"}
+      </button>
+      {state.error && (
+        <p className="inline-flex items-baseline gap-2 text-[13px] text-cx-danger" role="alert">
+          <span className="cx-dot bg-cx-danger" aria-hidden="true" />
+          {state.error}
+        </p>
+      )}
+    </div>
   )
 }
 

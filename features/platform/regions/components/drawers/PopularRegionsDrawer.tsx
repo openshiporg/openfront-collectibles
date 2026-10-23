@@ -10,11 +10,10 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { Globe, MapPin, DollarSign, Percent, X, CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { X, CheckCircle2, Loader2 } from "lucide-react";
+import { Dot, ListBand } from "../../../components/vault-ui";
 import { POPULAR_REGIONS } from "../../constants/popular-regions";
 import { createPopularRegion } from "../../actions/popular-regions";
 
@@ -67,112 +66,72 @@ export function PopularRegionsDrawer({
         <DrawerHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
-              <DrawerTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
-                Popular Regions
-              </DrawerTitle>
-              <DrawerDescription>
-                Quick setup with pre-configured countries, currencies, and settings
-              </DrawerDescription>
+              <DrawerTitle className="text-lg font-semibold tracking-tight">Popular Regions</DrawerTitle>
+              <DrawerDescription className="sr-only">Popular regions</DrawerDescription>
             </div>
             <DrawerClose asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="size-10 rounded-full" aria-label="Close">
                 <X className="w-4 h-4" />
               </Button>
             </DrawerClose>
           </div>
         </DrawerHeader>
 
-        <ScrollArea className="flex-1 px-6 pb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ScrollArea className="flex-1 px-4 pb-6 md:px-6">
+          <ListBand>
             {POPULAR_REGIONS.map((template) => {
               const isCreating = creatingRegion === template.name;
               const isCreated = createdRegions.has(template.name);
 
               return (
-                <Card 
+                <div
                   key={template.name}
-                  className={`transition-colors ${isCreated ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20' : ''}`}
+                  className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-start sm:justify-between"
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <Globe className="w-5 h-5 text-blue-600" />
-                        <CardTitle className="text-base">{template.name}</CardTitle>
-                      </div>
-                      {isCreated && (
-                        <CheckCircle2 className="w-5 h-5 text-green-600" />
-                      )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                      <Dot tone={isCreated ? "ok" : "muted"} />
+                      <span className="text-sm font-semibold text-foreground">{template.name}</span>
+                      {isCreated && <span className="text-xs text-muted-foreground">Created</span>}
                     </div>
-                    <CardDescription className="text-sm">
-                      {template.description}
-                    </CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="space-y-4">
-                    {/* Quick Stats */}
-                    <div className="flex flex-wrap gap-2 text-xs">
-                      <Badge variant="secondary" className="gap-1">
-                        <MapPin className="w-3 h-3" />
-                        {template.countries.length} countries
-                      </Badge>
-                      <Badge variant="secondary" className="gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        {template.currencies.length} currencies
-                      </Badge>
-                      <Badge variant="secondary" className="gap-1">
-                        <Percent className="w-3 h-3" />
-                        {template.taxRate}% tax
-                      </Badge>
+                    {template.description && (
+                      <p className="mt-1 text-sm text-muted-foreground">{template.description}</p>
+                    )}
+                    <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                      <span><span className="font-mono tabular-nums">{template.countries.length}</span> countries</span>
+                      <span><span className="font-mono tabular-nums">{template.currencies.length}</span> currencies</span>
+                      <span>Tax <span className="font-mono tabular-nums">{template.taxRate}%</span></span>
+                      <span>Default <span className="font-mono tabular-nums text-foreground">{template.defaultCurrency}</span></span>
                     </div>
-
-                    {/* Default Currency */}
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Default currency:</span>
-                      <span className="ml-2 font-medium">{template.defaultCurrency}</span>
+                    <div className="mt-1 font-mono text-xs uppercase tabular-nums text-muted-foreground">
+                      {template.countries.slice(0, 4).map((country) => country.iso2).join(" ")}
+                      {template.countries.length > 4 && ` +${template.countries.length - 4}`}
                     </div>
+                  </div>
 
-                    {/* Countries Preview */}
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Countries:</span>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {template.countries.slice(0, 4).map((country) => (
-                          <Badge key={country.iso2} variant="outline" className="text-xs">
-                            {country.iso2}
-                          </Badge>
-                        ))}
-                        {template.countries.length > 4 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{template.countries.length - 4} more
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Action Button */}
-                    <Button
-                      onClick={() => handleCreateRegion(template.name)}
-                      disabled={isCreating || isCreated}
-                      className="w-full"
-                      variant={isCreated ? "secondary" : "default"}
-                    >
-                      {isCreating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                      {isCreated ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4 mr-2" />
-                          Created
-                        </>
-                      ) : isCreating ? (
-                        "Creating..."
-                      ) : (
-                        "Create Region"
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
+                  <Button
+                    onClick={() => handleCreateRegion(template.name)}
+                    disabled={isCreating || isCreated}
+                    size="sm"
+                    className={`h-10 shrink-0 rounded-full px-4 sm:h-8 ${isCreated ? "bg-muted text-foreground hover:bg-muted" : ""}`}
+                    variant={isCreated ? "secondary" : "default"}
+                  >
+                    {isCreating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    {isCreated ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Created
+                      </>
+                    ) : isCreating ? (
+                      "Creating..."
+                    ) : (
+                      "Create Region"
+                    )}
+                  </Button>
+                </div>
               );
             })}
-          </div>
+          </ListBand>
         </ScrollArea>
       </DrawerContent>
     </Drawer>

@@ -22,43 +22,32 @@ export default function ProductPrice({
 
   const selectedPrice = variant ? variantPrice : cheapestPrice
 
-  // Check if product has only one variant
   const hasOnlyOneVariant = useMemo(() => {
     return (product.productVariants?.length || 0) === 1
   }, [product])
 
   if (!selectedPrice) {
-    return <div className="block w-32 h-9 bg-gray-100 animate-pulse" />;
+    return <div className="block h-9 w-32 animate-pulse rounded bg-cx-well" />;
   }
 
-  const formattedPrice = new Intl.NumberFormat(region.locale, {
-    style: 'currency',
-    currency: selectedPrice.currencyCode,
-  }).format(selectedPrice.calculatedAmount / 100);
+  const format = (amount: number) =>
+    new Intl.NumberFormat(region.locale, {
+      style: 'currency',
+      currency: selectedPrice.currencyCode,
+    }).format(amount / 100);
 
   const isOnSale = selectedPrice.calculatedAmount < selectedPrice.originalAmount;
 
   return (
-    <div className="flex flex-col text-foreground">
-      <span
-        className={cn("text-lg font-medium", {
-          "text-primary": isOnSale,
-        })}>
-        {!variant && !hasOnlyOneVariant && "From "}
-        {formattedPrice}
+    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1" data-testid="product-price">
+      <span className={cn("cx-num text-[26px] leading-[32px] text-cx-ink", { "text-cx-accent": isOnSale })}>
+        {!variant && !hasOnlyOneVariant && <span className="mr-1.5 font-cx text-[14px] text-cx-ink-2">From</span>}
+        {format(selectedPrice.calculatedAmount)}
       </span>
       {isOnSale && (
         <>
-          <p>
-            <span className="text-muted-foreground">Original: </span>
-            <span className="line-through">
-              {new Intl.NumberFormat(region.locale, {
-                style: 'currency',
-                currency: selectedPrice.currencyCode,
-              }).format(selectedPrice.originalAmount / 100)}
-            </span>
-          </p>
-          <span className="text-primary">
+          <span className="cx-num text-[14px] text-cx-ink-3 line-through">{format(selectedPrice.originalAmount)}</span>
+          <span className="cx-num text-[13px] text-cx-accent">
             -{Math.round((1 - selectedPrice.calculatedAmount / selectedPrice.originalAmount) * 100)}%
           </span>
         </>

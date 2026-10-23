@@ -60,7 +60,7 @@ const Modal = ({
             "max-w-xl": size === "medium",
             "max-w-3xl": size === "large",
             "bg-transparent shadow-none border-none": search,
-            "bg-background shadow-xl border rounded-rounded": !search,
+            "rounded-2xl border border-cx-line bg-cx-surface text-cx-ink shadow-[0_24px_48px_-24px_rgb(26_23_18/0.45)]": !search,
           }
         )}
       >
@@ -75,8 +75,8 @@ const Title: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <DialogHeader className="flex flex-row items-center justify-between pb-4">
-      <DialogTitle className="text-base font-semibold">{children}</DialogTitle> 
-      <button onClick={close} data-testid="close-modal-button" className="ml-auto">
+      <DialogTitle className="font-cx-serif text-[22px] font-normal leading-[26px]">{children}</DialogTitle>
+      <button onClick={close} data-testid="close-modal-button" aria-label="Close" className="-mr-2 ml-auto inline-flex size-11 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink">
         <X size={20} />
       </button>
     </DialogHeader>
@@ -85,14 +85,14 @@ const Title: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const Description: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <DialogDescription className="flex text-xs font-normal text-foreground items-center justify-center pt-2 pb-4 h-full"> 
+    <DialogDescription className="flex h-full items-center justify-start pb-4 pt-1 text-[13px] text-cx-ink-2">
       {children}
     </DialogDescription>
   )
 }
 
 const Body: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <div className="flex justify-center">{children}</div>
+  return <div className="flex">{children}</div>
 }
 
 const Footer: React.FC<{ children: React.ReactNode }> = ({ children }) => {

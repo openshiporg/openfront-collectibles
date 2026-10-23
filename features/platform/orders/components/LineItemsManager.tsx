@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PackageIcon, Plus, Minus, Search, X } from "lucide-react";
+import { Plus, Minus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ListBand, SectionTitle } from "@/features/platform/components/vault-ui";
 import {
   Command,
   CommandGroup,
@@ -20,7 +20,6 @@ import { cn } from "@/lib/utils";
 import { searchProductsWithVariants } from "../actions";
 import { motion, AnimatePresence } from "framer-motion";
 
-const Card = "div";
 
 type ProductVariant = {
   id: string;
@@ -188,26 +187,21 @@ export function LineItemsManager({
   }, {} as Record<string, { product: any; variants: ProductVariant[] }>);
 
   return (
-    <Card className={cn("relative rounded-xl border border-transparent bg-card shadow ring-1 ring-foreground/5 dark:ring-white/10 overflow-hidden", className)}>
-      <CardHeader className="flex flex-row items-center justify-between p-0 border-b bg-muted/40">
-        <CardTitle className="px-4 py-3 mb-0 font-medium uppercase text-xs tracking-wider text-muted-foreground">
-          Line Items
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="p-0">
+    <section className={className}>
+      <SectionTitle meta={lineItems.length || undefined}>Line items</SectionTitle>
+      <ListBand>
         {/* Search Bar Inline */}
-        <div className="p-4 border-b bg-muted/10">
+        <div className="px-4 py-3">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className="w-full justify-start gap-2 text-left text-muted-foreground bg-background hover:bg-background border-input font-normal"
+                className="h-10 w-full justify-start gap-2 rounded-full text-left text-muted-foreground bg-background hover:bg-background border-input font-normal"
               >
                 <Search className="h-4 w-4 text-muted-foreground opacity-70" />
-                <span className="truncate">Search products or variants to add...</span>
+                <span className="truncate">Search products or variants</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -226,9 +220,8 @@ export function LineItemsManager({
                       Searching...
                     </div>
                   ) : Object.keys(groupedProducts).length === 0 ? (
-                    <div className="p-8 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
-                       <PackageIcon className="h-8 w-8 opacity-20" />
-                       No products found.
+                    <div className="p-8 text-center text-sm text-muted-foreground">
+                      No products found
                     </div>
                   ) : (
                     Object.values(groupedProducts).map(({ product, variants: prodVariants }) => (
@@ -248,12 +241,12 @@ export function LineItemsManager({
                             >
                               <div className="flex flex-col gap-0.5 max-w-[70%]">
                                 <span className="font-medium text-sm truncate">{variant.title}</span>
-                                {variant.sku && <span className="text-xs text-muted-foreground">{variant.sku}</span>}
+                                {variant.sku && <span className="font-mono text-xs tabular-nums text-muted-foreground">{variant.sku}</span>}
                               </div>
                               <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium">{formatPrice(unitPrice)}</span>
+                                <span className="font-mono text-sm font-medium tabular-nums">{formatPrice(unitPrice)}</span>
                                 {existingQty > 0 ? (
-                                  <div className="flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-full w-6 h-6 text-xs font-bold ring-1 ring-inset ring-indigo-600/20">
+                                  <div className="flex h-6 min-w-6 items-center justify-center rounded-full bg-foreground px-1.5 font-mono text-xs tabular-nums text-background">
                                     {existingQty}
                                   </div>
                                 ) : (
@@ -273,13 +266,9 @@ export function LineItemsManager({
         </div>
 
         {/* Existing Items */}
-        <div className="divide-y relative">
+        <div className="relative divide-y divide-border">
           {lineItems.length === 0 ? (
-            <div className="px-10 py-16 text-center text-muted-foreground flex flex-col items-center">
-              <PackageIcon className="h-12 w-12 mb-4 opacity-20" />
-              <p className="text-sm font-medium text-foreground/80">No items added</p>
-              <p className="text-xs mt-1 max-w-[200px] leading-relaxed">Search for products above to start building the order.</p>
-            </div>
+            <div className="px-4 py-3 text-sm text-muted-foreground">No items added</div>
           ) : (
             <AnimatePresence initial={false}>
               {lineItems.map((item) => (
@@ -289,10 +278,10 @@ export function LineItemsManager({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 hover:bg-muted/30 transition-colors"
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3"
                 >
-                  <div className="flex items-center gap-4 min-w-0 flex-1">
-                    <div className="h-12 w-12 bg-muted/30 border border-border/50 rounded-md flex-shrink-0 flex items-center justify-center overflow-hidden">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="h-10 w-10 bg-muted rounded-md flex-shrink-0 flex items-center justify-center overflow-hidden">
                       {item.variant.product.thumbnail ? (
                         <img
                           src={item.variant.product.thumbnail}
@@ -300,7 +289,7 @@ export function LineItemsManager({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <PackageIcon size={16} className="text-muted-foreground/50" />
+                        null
                       )}
                     </div>
                     <div className="min-w-0 flex-1 flex flex-col">
@@ -308,51 +297,54 @@ export function LineItemsManager({
                         {item.variant.product.title}
                       </span>
                       {item.variant.title && (
-                        <span className="text-xs text-muted-foreground truncate flex items-center gap-2 mt-0.5">
-                          {item.variant.title} {item.variant.sku ? <span className="opacity-60">• {item.variant.sku}</span> : ''}
+                        <span className="truncate font-mono text-xs tabular-nums text-foreground/80">
+                          {item.variant.title}{item.variant.sku ? <span className="text-muted-foreground"> · {item.variant.sku}</span> : ''}
                         </span>
                       )}
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-6 self-end sm:self-auto pl-16 sm:pl-0">
+                  <div className="flex items-center justify-between gap-4 sm:justify-end">
                     {/* Quantity Control */}
-                    <div className="flex items-center gap-1 border border-border/60 rounded-lg p-0.5 bg-background shadow-sm hover:border-border transition-colors">
+                    <div className="flex items-center gap-0.5 rounded-full bg-muted p-[3px]">
                       <button
                         type="button"
+                        aria-label="Decrease quantity"
                         onClick={() => updateQuantity(item.id, -1)}
-                        className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        className="inline-flex size-8 items-center justify-center rounded-full bg-background text-foreground shadow-xs max-sm:size-10"
                       >
                         <Minus className="size-3" strokeWidth={3} />
                       </button>
-                      <span className="text-xs font-semibold w-7 text-center text-foreground tabular-nums">
+                      <span className="w-8 text-center font-mono text-sm tabular-nums text-foreground">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
+                        aria-label="Increase quantity"
                         onClick={() => updateQuantity(item.id, 1)}
-                        className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        className="inline-flex size-8 items-center justify-center rounded-full bg-background text-foreground shadow-xs max-sm:size-10"
                       >
                         <Plus className="size-3" strokeWidth={3} />
                       </button>
                     </div>
 
                     <div className="flex flex-col items-end min-w-[70px]">
-                      <span className="text-sm font-semibold tabular-nums text-foreground">
+                      <span className="font-mono text-sm font-medium tabular-nums text-foreground">
                         {formatPrice(item.total)}
                       </span>
                       {item.quantity > 1 && (
-                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-0.5">
+                        <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
                           {formatPrice(item.unitPrice)} ea
                         </span>
                       )}
                     </div>
 
-                    <div className="w-8 flex justify-end">
+                    <div className="flex justify-end">
                       <button
                         type="button"
+                        aria-label="Remove item"
                         onClick={() => removeFromCart(item.id)}
-                        className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"
+                        className="inline-flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive max-sm:size-10"
                         title="Remove item"
                       >
                         <X className="size-4" />
@@ -367,14 +359,12 @@ export function LineItemsManager({
 
         {/* Subtotal */}
         {lineItems.length > 0 && (
-          <div className="border-t bg-muted/5 p-4 py-3">
-            <div className="flex justify-between items-center text-sm">
-              <span className="font-semibold uppercase tracking-wider text-muted-foreground text-[11px]">Total Selected</span>
-              <span className="font-semibold text-base tabular-nums">{formatPrice(getSubtotal())}</span>
-            </div>
+          <div className="flex items-center justify-between px-4 py-3 text-sm">
+            <span className="text-muted-foreground">Selected</span>
+            <span className="font-mono font-semibold tabular-nums">{formatPrice(getSubtotal())}</span>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </ListBand>
+    </section>
   );
 }

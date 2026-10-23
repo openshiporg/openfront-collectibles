@@ -33,7 +33,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Count, Pill, Track } from "@/features/platform/components/vault-ui";
 import {
   Popover,
   PopoverContent,
@@ -594,77 +594,40 @@ export function VariantsTab({ product: initialProduct }: VariantsTab2Props) {
   };
 
   if (productLoading || regionsLoading) {
-    return <div>Loading...</div>;
+    return <div className="py-4 text-sm text-muted-foreground">Loading...</div>;
   }
 
   if (productError || regionsError) {
-    return <div>Error loading data</div>;
+    return <div className="py-4 text-sm text-red-600 dark:text-red-400">Error loading data</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="flex items-center w-full h-auto bg-transparent border-b p-0 rounded-none gap-6 justify-start">
-          <TabsTrigger
-            value="variants"
-            className="group flex items-center justify-center gap-2 py-3 px-1 text-sm font-medium data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:text-foreground text-muted-foreground bg-transparent data-[state=active]:shadow-none rounded-none"
-          >
-            <Badge
-              className="border rounded-full transition-opacity"
-              color={"zinc"}
-            >
-              {(currentProduct.productVariants || []).length}
-            </Badge>
-            Variants
-          </TabsTrigger>
-          <TabsTrigger
-            value="options"
-            className="group flex items-center justify-center gap-2 py-3 px-1 text-sm font-medium data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:text-foreground text-muted-foreground bg-transparent data-[state=active]:shadow-none rounded-none"
-          >
-            <Badge
-              className="border rounded-full transition-opacity"
-              color={"zinc"}
-            >
-              {options.length}
-            </Badge>
-            Options
-          </TabsTrigger>
-          <TabsTrigger
-            value="drift"
-            className="group flex items-center justify-center gap-2 py-3 px-1 text-sm font-medium data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:text-foreground text-muted-foreground bg-transparent data-[state=active]:shadow-none rounded-none"
-          >
-            <div className="flex items-center gap-1">
-              <span className="inline-flex items-center gap-x-1 rounded-lg bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-700 ring-1 ring-inset ring-rose-600/20 dark:bg-rose-500/30 dark:text-rose-300 dark:ring-rose-400/20">
-                <ChevronDown className="-ml-0.5 size-3" aria-hidden={true} />
-                {variantsToDelete.length}
-              </span>
-              <Badge
-                className="border rounded-full transition-opacity"
-                color={unchangedVariants.length > 0 ? "zinc" : "zinc"}
-              >
-                {unchangedVariants.length}
-              </Badge>
-              <span className="inline-flex items-center gap-x-1 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/30 dark:bg-emerald-400/20 dark:text-emerald-500 dark:ring-emerald-400/20">
-                {variantsToCreate.length}
-                <ChevronUp className="-ml-0.5 size-3" aria-hidden={true} />
-              </span>
-            </div>
-            Changes
-          </TabsTrigger>
-        </TabsList>
+    <div className="space-y-5">
+      <Track label="Variant sections">
+        <Pill active={activeTab === "variants"} onClick={() => setActiveTab("variants")}>
+          Variants <Count>{(currentProduct.productVariants || []).length}</Count>
+        </Pill>
+        <Pill active={activeTab === "options"} onClick={() => setActiveTab("options")}>
+          Options <Count>{options.length}</Count>
+        </Pill>
+        <Pill active={activeTab === "drift"} onClick={() => setActiveTab("drift")}>
+          Changes
+          <span className="inline-flex items-baseline gap-1.5 font-mono text-[11px] tabular-nums">
+            <span className="text-red-600 dark:text-red-400">-{variantsToDelete.length}</span>
+            <span className="text-muted-foreground">{unchangedVariants.length}</span>
+            <span className="text-emerald-600 dark:text-emerald-400">+{variantsToCreate.length}</span>
+          </span>
+        </Pill>
+      </Track>
 
-        <TabsContent value="options" className="mt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Product Options</h2>
-              <div className="text-sm text-muted-foreground">
-                Add options like different sizes, colors, and materials
-              </div>
-            </div>
+        {activeTab === "options" && (
+        <div>
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h3 className="text-sm font-semibold text-foreground">Options</h3>
             <AddOptionPopover onAdd={handleAddOption} />
           </div>
 
-          <div className="space-y-4 mt-6">
+          <div className="mt-4 space-y-3">
             {options.map((option) => (
               <OptionCard
                 key={option.id}
@@ -673,25 +636,27 @@ export function VariantsTab({ product: initialProduct }: VariantsTab2Props) {
               />
             ))}
           </div>
-        </TabsContent>
+        </div>
+        )}
 
-        <TabsContent value="variants" className="mt-6">
-          <div className="space-y-4">
+        {activeTab === "variants" && (
+          <div className="space-y-3">
             {/* Filter badges */}
             {selectedFilters.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {selectedFilters.map((filter) => {
                   const [option, value] = filter.split(":");
                   return (
-                    <Badge
+                    <button
+                      type="button"
                       key={filter}
-                      className="cursor-pointer"
+                      className="inline-flex min-h-8 items-center gap-1.5 rounded-full bg-foreground px-3 text-xs font-medium text-background max-sm:min-h-10"
                       onClick={() => handleOptionFilter(option, value)}
                     >
-                      <span className="opacity-80">{option}:</span>
-                      {value}
-                      <X className="h-3 w-3 ml-1" />
-                    </Badge>
+                      <span className="opacity-70">{option}</span>
+                      <span className="font-mono tabular-nums">{value}</span>
+                      <X className="size-3" />
+                    </button>
                   );
                 })}
               </div>
@@ -718,16 +683,17 @@ export function VariantsTab({ product: initialProduct }: VariantsTab2Props) {
                 {selectedFilters.length > 0 &&
                   getFilteredVariants(currentProduct.productVariants || [])
                     .length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      No variants match the selected filters
+                    <div className="py-6 text-sm text-muted-foreground">
+                      No matching variants
                     </div>
                   )}
               </>
             )}
           </div>
-        </TabsContent>
+        )}
 
-        <TabsContent value="drift" className="mt-6">
+        {activeTab === "drift" && (
+        <div>
           {variantsToCreate.length > 0 || variantsToDelete.length > 0 ? (
             <VariantDriftCard
               variantsToCreate={variantsToCreate}
@@ -739,12 +705,12 @@ export function VariantsTab({ product: initialProduct }: VariantsTab2Props) {
               regions={regionsWithLocale}
             />
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="py-6 text-sm text-muted-foreground">
               No pending changes
             </div>
           )}
-        </TabsContent>
-      </Tabs>
+        </div>
+        )}
     </div>
   );
 }

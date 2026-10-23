@@ -12,7 +12,6 @@ import {
   format,
 } from "date-fns"
 import { DateRange } from "react-day-picker"
-import { CalendarIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -87,8 +86,7 @@ export function DateRangePicker({ onDateChange, defaultValue }: DateRangePickerP
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="justify-start">
-          <CalendarIcon className="mr-2 h-4 w-4" />
+        <Button variant="outline" className="h-10 justify-start rounded-full bg-background px-4 font-mono text-sm tabular-nums">
           {formatDateRange(date)}
         </Button>
       </PopoverTrigger>

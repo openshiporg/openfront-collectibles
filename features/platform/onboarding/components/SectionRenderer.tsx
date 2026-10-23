@@ -42,7 +42,7 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
 
             {/* Section header with number badge */}
             <div className="flex items-center space-x-3 mb-2 relative">
-              <div className="inline-flex size-6 items-center justify-center rounded-sm border border-border bg-background text-sm text-foreground shadow-sm z-10">
+              <div className="z-10 inline-flex size-6 items-center justify-center rounded-full bg-background font-mono text-xs tabular-nums text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.12),0_0_0_0.5px_rgb(0_0_0/0.06)] dark:bg-zinc-800">
                 {section.id}
               </div>
               <Label className="text-sm font-medium text-foreground">

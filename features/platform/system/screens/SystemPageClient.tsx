@@ -2,6 +2,7 @@
 
 import { PageContainer } from "../../../dashboard/components/PageContainer";
 import { SystemTabs, TabType } from "../components/SystemTabs";
+import { PageTitle } from "../../components/vault-ui";
 
 interface SystemPageClientProps {
   list: any;
@@ -15,7 +16,7 @@ export function SystemPageClient({
 
   return (
     <PageContainer
-      title="System Configuration"
+      header={<PageTitle title="System Configuration" />}
     >
       <SystemTabs
         initialTab={initialTab}

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ListBand, PageTitle, PillLink } from '@/features/platform/components/vault-ui';
 import { PageContainer } from '../../../dashboard/components/PageContainer';
 import { PlatformFilterBar } from '../../components/PlatformFilterBar';
 import { InventoryDetailsComponent, type InventoryVariant } from '../components/InventoryDetailsComponent';
@@ -33,10 +34,7 @@ interface InventoryListPageClientProps {
 function EmptyInventory({ onReset }: { onReset?: () => void }) {
   return (
     <EmptyState
-      title={onReset ? 'No results found' : 'No product variants found'}
-      description={onReset
-        ? 'Try adjusting your search filters.'
-        : 'Stock levels are shown for existing product variants. Serialized collectibles use their separate inventory workflow.'}
+      title={onReset ? 'No matching variants' : 'No product variants'}
       icons={[Search]}
       action={onReset ? { label: 'Reset filters', onClick: onReset } : undefined}
     />
@@ -96,19 +94,18 @@ export function InventoryListPageClient({
     { type: 'page' as const, label: 'Inventory' },
   ];
   const header = (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">Inventory</h1>
-      <p className="text-muted-foreground">
-        Read current product-variant stock. Serialized collectibles use their separate inventory workflow.
-      </p>
-    </div>
+    <PageTitle
+      title="Inventory"
+      meta={<span className="font-mono tabular-nums">{data.count} variants</span>}
+      actions={<PillLink href="/dashboard/platform/collectible-inventory">Serialized items</PillLink>}
+    />
   );
   const isFiltered = Boolean(searchString || Object.keys(currentSearchParams).some(key => key !== 'page' && key !== 'pageSize' && key !== 'sortBy'));
 
   return (
     <PageContainer title="Inventory" header={header} breadcrumbs={breadcrumbs}>
       <div className="px-4 md:px-6"><PlatformFilterBar list={list} /></div>
-      <div className="px-4 border-b md:px-6"><FilterList list={list} /></div>
+      <div className="px-4 md:px-6"><FilterList list={list} /></div>
       {error ? (
         <div className="px-4 md:px-6">
           <Alert variant="destructive"><AlertDescription>Failed to load inventory: {error}</AlertDescription></Alert>
@@ -117,8 +114,10 @@ export function InventoryListPageClient({
         <div className="px-4 md:px-6"><EmptyInventory onReset={isFiltered ? handleResetFilters : undefined} /></div>
       ) : (
         <>
-          <div className="grid grid-cols-1 divide-y">
-            {data.items.map(item => <InventoryDetailsComponent key={item.id} inventory={item} />)}
+          <div className="px-4 pt-4 md:px-6">
+            <ListBand>
+              {data.items.map(item => <InventoryDetailsComponent key={item.id} inventory={item} />)}
+            </ListBand>
           </div>
           {data.count > pageSize && (
             <div className="px-4 py-4 md:px-6">

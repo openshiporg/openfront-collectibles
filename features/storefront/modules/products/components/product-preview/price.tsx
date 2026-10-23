@@ -7,39 +7,30 @@ interface PreviewPriceProps {
 
 export default function PreviewPrice({ price, region }: PreviewPriceProps) {
   if (!price || !price.calculatedAmount) {
-    return <span>Price not available</span>;
+    return <span className="text-[13px] text-cx-ink-3">Price not available</span>;
   }
 
-  const formattedPrice = new Intl.NumberFormat(region.locale, {
-    style: "currency",
-    currency: price.currencyCode,
-  }).format(price.calculatedAmount / 100);
-
-  const formattedOriginalPrice = new Intl.NumberFormat(region.locale, {
-    style: "currency",
-    currency: price.currencyCode,
-  }).format(price.originalAmount / 100);
+  const format = (amount: number) =>
+    new Intl.NumberFormat(region.locale, {
+      style: "currency",
+      currency: price.currencyCode,
+    }).format(amount / 100);
 
   const isOnSale = price.calculatedAmount < price.originalAmount;
 
   return (
-    <div className="flex flex-col items-end gap-0.5">
-      {isOnSale && (
-        <span
-          className="text-xs line-through text-muted-foreground/60"
-          data-testid="original-price"
-        >
-          {formattedOriginalPrice}
-        </span>
-      )}
+    <div className="cx-num flex items-baseline gap-2 text-[14px]">
       <span
-        className={cn("text-base font-semibold text-foreground/70 whitespace-nowrap", {
-          "text-primary": isOnSale,
-        })}
+        className={cn("whitespace-nowrap text-cx-ink", { "text-cx-accent": isOnSale })}
         data-testid="price"
       >
-        {formattedPrice}
+        {format(price.calculatedAmount)}
       </span>
+      {isOnSale && (
+        <span className="text-[12px] text-cx-ink-3 line-through" data-testid="original-price">
+          {format(price.originalAmount)}
+        </span>
+      )}
     </div>
   );
 }

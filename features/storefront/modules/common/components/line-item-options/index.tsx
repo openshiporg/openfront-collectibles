@@ -9,18 +9,12 @@ const LineItemOptions = ({
   variant,
   variantTitle
 }: LineItemOptionsProps) => {
+  if (!variantTitle && !variant?.sku) return null
+
   return (
-    <div className="text-muted-foreground">
-      {variantTitle && (
-        <p className="inline-block w-full overflow-hidden text-ellipsis">
-          {variantTitle}
-        </p>
-      )}
-      {variant?.sku && (
-        <p className="inline-block w-full overflow-hidden text-ellipsis">
-          SKU: {variant.sku}
-        </p>
-      )}
+    <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+      {variantTitle && <span className="truncate">{variantTitle}</span>}
+      {variant?.sku && <span className="cx-num truncate text-[12px] text-cx-ink-3">SKU {variant.sku}</span>}
     </div>
   )
 }

@@ -1,26 +1,26 @@
-// Removed Medusa UI import
-
 import ItemsPreviewTemplate from "@/features/storefront/modules/cart/templates/preview"
 import DiscountCode from "@/features/storefront/modules/checkout/components/discount-code"
 import CartTotals from "@/features/storefront/modules/common/components/cart-totals"
-import Divider from "@/features/storefront/modules/common/components/divider"
 
 const CheckoutSummary = ({ cart }: { cart: any }) => {
+  const count = cart?.lineItems?.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0) || 0
+
   return (
-    <div className="sticky top-0 flex flex-col-reverse sm:flex-col gap-y-8 py-8 sm:py-0 ">
-      <div className="w-full bg-background flex flex-col">
-        <Divider className="my-6 sm:hidden" />
-        <h2 className="flex flex-row text-3xl font-medium items-baseline">
-          In your Cart
-        </h2>
-        <Divider className="my-6" />
-        <CartTotals data={cart} />
+    <aside className="lg:sticky lg:top-8">
+      <div className="flex flex-col gap-5 rounded-2xl bg-cx-surface p-4 ring-1 ring-cx-line sm:p-6">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="font-cx-serif text-[24px] leading-[28px] text-cx-ink">In your cart</h2>
+          <span className="cx-num text-[12px] text-cx-ink-3">
+            {count} {count === 1 ? "item" : "items"}
+          </span>
+        </div>
         <ItemsPreviewTemplate region={cart?.region} items={cart?.lineItems} />
-        <div className="my-6">
-          <DiscountCode cart={cart} />
+        <DiscountCode cart={cart} />
+        <div className="border-t border-cx-line pt-4">
+          <CartTotals data={cart} />
         </div>
       </div>
-    </div>
+    </aside>
   )
 }
 

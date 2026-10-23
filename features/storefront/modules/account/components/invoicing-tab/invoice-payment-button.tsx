@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js"
 import React, { useState } from "react"
-import { RiLoader2Fill, RiSecurePaymentLine } from "@remixicon/react"
+import { RiLoader2Fill } from "@remixicon/react"
 import { useRouter } from "next/navigation"
 
 interface InvoicePaymentButtonProps {
@@ -73,7 +73,7 @@ const InvoicePaymentButton: React.FC<InvoicePaymentButtonProps> = ({
         />
       )
     default:
-      return <Button disabled size="lg">Select a payment method</Button>
+      return <Button disabled className="h-12 w-full rounded-full text-[15px]">Select a payment method</Button>
   }
 }
 
@@ -166,18 +166,14 @@ const StripeInvoicePaymentButton: React.FC<StripeInvoicePaymentButtonProps> = ({
         disabled={disabled || submitting}
         onClick={handlePayment}
         size="lg"
-        className="w-full"
+        className="h-12 w-full rounded-full text-[15px]"
         data-testid={dataTestId}
       >
-        {submitting ? (
-          <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <RiSecurePaymentLine className="mr-2 h-4 w-4 opacity-60" />
-        )}
-        Pay Invoice
+        {submitting && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />}
+        Pay invoice
       </Button>
       {errorMessage && (
-        <div className="mt-2 text-sm text-red-600" data-testid="stripe-invoice-payment-error-message">
+        <div className="mt-2 text-[13px] text-cx-danger" data-testid="stripe-invoice-payment-error-message">
           {errorMessage}
         </div>
       )}
@@ -231,18 +227,14 @@ const ManualInvoicePaymentButton = ({ invoice, onPaymentSuccess, "data-testid": 
         disabled={submitting}
         onClick={handlePayment}
         size="lg"
-        className="w-full"
+        className="h-12 w-full rounded-full text-[15px]"
         data-testid={dataTestId || "pay-invoice-button"}
       >
-        {submitting ? (
-          <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <RiSecurePaymentLine className="mr-2 h-4 w-4 opacity-60" />
-        )}
-        Pay Invoice
+        {submitting && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />}
+        Pay invoice
       </Button>
       {errorMessage && (
-        <div className="mt-2 text-sm text-red-600" data-testid="manual-invoice-payment-error-message">
+        <div className="mt-2 text-[13px] text-cx-danger" data-testid="manual-invoice-payment-error-message">
           {errorMessage}
         </div>
       )}
@@ -313,7 +305,7 @@ const PayPalInvoicePaymentButton: React.FC<PayPalInvoicePaymentButtonProps> = ({
   }
 
   if (!session?.data?.orderId) {
-    return <div className="text-sm text-red-600">PayPal order ID not found.</div>;
+    return <div className="text-[13px] text-cx-danger">PayPal order ID not found.</div>;
   }
 
   return (
@@ -326,7 +318,7 @@ const PayPalInvoicePaymentButton: React.FC<PayPalInvoicePaymentButtonProps> = ({
         data-testid={dataTestId || "paypal-invoice-payment-button"}
       />
       {errorMessage && (
-        <div className="mt-2 text-sm text-red-600" data-testid="paypal-invoice-payment-error-message">
+        <div className="mt-2 text-[13px] text-cx-danger" data-testid="paypal-invoice-payment-error-message">
           {errorMessage}
         </div>
       )}

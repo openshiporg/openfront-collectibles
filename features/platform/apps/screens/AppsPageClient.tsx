@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Dot, ListBand, SectionTitle } from '../../components/vault-ui'
 import { Loader2, Plus } from 'lucide-react'
 import {
   Dialog,
@@ -67,35 +67,46 @@ function ExistingAppCard({
 
   return (
     <>
-      <Card className="p-6 border-transparent ring-1 ring-foreground/10">
-        <div className="space-y-2">
-          <h3 className="text-base font-medium">{app.name}</h3>
-          <p className="text-muted-foreground text-sm">
-            {app.description || 'OAuth application'}
-          </p>
-          <p className="text-xs text-muted-foreground break-all">Client ID: {app.clientId}</p>
-          <div className="space-y-1 pt-2">
-            {(app.redirectUris || []).map((uri) => (
-              <p key={uri} className="text-xs text-muted-foreground break-all">{uri}</p>
-            ))}
+      <div className="grid gap-3 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_auto] lg:items-start">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+            <Dot tone={app.status === 'active' ? 'ok' : 'danger'} />
+            <h3 className="text-sm font-semibold text-foreground">{app.name}</h3>
+            <span className="text-xs capitalize text-muted-foreground">{app.status}</span>
           </div>
+          {app.description && (
+            <p className="mt-1 text-sm text-muted-foreground">{app.description}</p>
+          )}
+          <dl className="mt-1 flex flex-wrap gap-x-1.5 text-xs">
+            <dt className="text-muted-foreground">Client ID</dt>
+            <dd className="break-all font-mono tabular-nums text-foreground">{app.clientId}</dd>
+          </dl>
+        </div>
+        <div className="min-w-0">
+          <span className="block text-xs text-muted-foreground">
+            Redirect URLs <span className="font-mono tabular-nums">{(app.redirectUris || []).length}</span>
+          </span>
+          <ul className="mt-1 space-y-0.5">
+            {(app.redirectUris || []).map((uri) => (
+              <li key={uri} className="break-all font-mono text-xs text-foreground">{uri}</li>
+            ))}
+          </ul>
         </div>
         <Button
-          variant="outline"
-          size="sm"
-          className="mt-6 gap-2"
+          variant="ghost"
+          className="h-10 justify-self-start rounded-full bg-background px-4 text-[13px] shadow-[0_1px_2px_rgb(0_0_0/0.12),0_0_0_0.5px_rgb(0_0_0/0.06)] sm:h-8 dark:bg-zinc-800"
           onClick={() => setShowAddUrlDialog(true)}
         >
           <Plus className="size-4" />
           Add redirect URL
         </Button>
-      </Card>
+      </div>
 
       <Dialog open={showAddUrlDialog} onOpenChange={setShowAddUrlDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Add redirect URL</DialogTitle>
-            <DialogDescription>Add an OAuth callback URL for {app.name}.</DialogDescription>
+            <DialogDescription>{app.name}</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Label htmlFor={`redirect-url-${app.id}`}>Redirect URL</Label>
@@ -110,7 +121,8 @@ function ExistingAppCard({
           </div>
           <DialogFooter>
             <Button
-              variant="outline"
+              variant="ghost"
+              className="h-10 rounded-full bg-muted px-4"
               onClick={() => {
                 setShowAddUrlDialog(false)
                 setNewRedirectUrl('')
@@ -119,7 +131,7 @@ function ExistingAppCard({
             >
               Cancel
             </Button>
-            <Button onClick={handleAddRedirectUrl} disabled={isUpdating || !newRedirectUrl.trim()}>
+            <Button className="h-10 rounded-full px-4" onClick={handleAddRedirectUrl} disabled={isUpdating || !newRedirectUrl.trim()}>
               {isUpdating && <Loader2 className="mr-2 size-4 animate-spin" />}
               Add URL
             </Button>
@@ -138,11 +150,13 @@ export function AppsPageClient({ existingApps = [] }: AppsPageClientProps) {
 
   return (
     <div className="px-4 pb-6 md:px-6">
-      <h2 className="mb-4 text-lg font-medium">OAuth applications</h2>
+      <SectionTitle meta={apps.length}>OAuth applications</SectionTitle>
       {apps.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No OAuth applications configured.</p>
+        <ListBand>
+          <div className="px-4 py-3 text-sm text-muted-foreground">No OAuth applications</div>
+        </ListBand>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ListBand>
           {apps.map((app) => (
             <ExistingAppCard
               key={app.id}
@@ -150,7 +164,7 @@ export function AppsPageClient({ existingApps = [] }: AppsPageClientProps) {
               onRedirectUrisUpdate={handleRedirectUrisUpdate}
             />
           ))}
-        </div>
+        </ListBand>
       )}
     </div>
   )

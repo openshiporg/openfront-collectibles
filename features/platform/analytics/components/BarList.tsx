@@ -104,7 +104,7 @@ function BarListInner<T>(
                       // base
                       "truncate whitespace-nowrap rounded-sm text-sm",
                       // text color
-                      "text-gray-900 dark:text-gray-50",
+                      "text-foreground",
                       // hover
                       "hover:underline hover:underline-offset-2",
                       // focus
@@ -122,7 +122,7 @@ function BarListInner<T>(
                       // base
                       "truncate whitespace-nowrap text-sm",
                       // text color
-                      "text-gray-900 dark:text-gray-50",
+                      "text-foreground",
                     )}
                   >
                     {item.name}
@@ -146,9 +146,9 @@ function BarListInner<T>(
             <p
               className={cn(
                 // base
-                "truncate whitespace-nowrap text-sm leading-none",
+                "truncate whitespace-nowrap font-mono text-sm leading-none tabular-nums",
                 // text color
-                "text-gray-900 dark:text-gray-50",
+                "text-foreground",
               )}
             >
               {valueFormatter(item.value)}

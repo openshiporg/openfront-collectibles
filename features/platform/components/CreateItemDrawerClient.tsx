@@ -3,7 +3,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
-import { Badge } from '@/components/ui/badge'
 import { Fields } from '../../dashboard/components/Fields'
 import { enhanceFields } from '../../dashboard/utils/enhanceFields'
 import { useCreateItem } from '../../dashboard/utils/useCreateItem'
@@ -72,8 +71,8 @@ export function CreateItemDrawerClient({
     <>
       <DrawerHeader className="flex-shrink-0">
         <DrawerTitle>Create {list.singular}</DrawerTitle>
-        <DrawerDescription>
-          Create a new {list.singular.toLowerCase()}
+        <DrawerDescription className="sr-only">
+          Create {list.singular.toLowerCase()}
         </DrawerDescription>
       </DrawerHeader>
 
@@ -86,11 +85,12 @@ export function CreateItemDrawerClient({
           />
         </div>
 
-        <DrawerFooter className="flex-shrink-0">
+        <DrawerFooter className="flex-shrink-0 border-t border-border">
           <div className="flex gap-2 justify-end">
             <Button 
               type="button" 
-              variant="outline" 
+              variant="ghost" 
+              className="h-10 rounded-full bg-muted px-4 hover:bg-muted/80 dark:bg-muted/60"
               onClick={onClose}
               disabled={createItem.state === 'loading'}
             >
@@ -99,7 +99,7 @@ export function CreateItemDrawerClient({
             <Button 
               type="submit" 
               disabled={createItem.state === 'loading'}
-              className="min-w-[120px]"
+              className="h-10 min-w-[120px] rounded-full px-4"
             >
               {createItem.state === 'loading' ? (
                 <>

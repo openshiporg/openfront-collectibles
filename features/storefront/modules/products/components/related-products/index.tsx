@@ -1,6 +1,7 @@
 import { getProductsList } from "../../../../lib/data/products"
 import { getRegion } from "../../../../lib/data/regions"
 import ProductPreview from "../product-preview"
+import SectionHead from "@/features/storefront/modules/common/components/collectibles/section-head"
 // Define ProductPreviewType locally since product-preview doesn't export it
 type ProductPreviewType = {
   id: string;
@@ -79,23 +80,15 @@ export default async function RelatedProducts({
   }
 
   return (
-    <div className="product-page-constraint">
-      <div className="flex flex-col items-center text-center mb-16">
-        <span className="text-sm leading-6 font-normal text-gray-600 mb-6">
-          Related products
-        </span>
-        <p className="text-3xl font-medium text-foreground max-w-lg">
-          You might also want to check out these products.
-        </p>
-      </div>
-
-      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-6">
-        {filteredProducts.map((productPreview: ProductPreviewType) => (
+    <section className="space-y-6" aria-label="Related items">
+      <SectionHead title="Related items" meta={filteredProducts.length} />
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 md:grid-cols-3 lg:grid-cols-4">
+        {filteredProducts.slice(0, 8).map((productPreview: ProductPreviewType) => (
           <li key={productPreview.id}>
             <ProductPreview region={region} productPreview={productPreview} />
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   )
 }

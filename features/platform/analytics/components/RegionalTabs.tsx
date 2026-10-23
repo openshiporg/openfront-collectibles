@@ -1,8 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Pill, Track } from '@/features/platform/components/vault-ui';
 import { Region } from '../lib/analyticsHelpers';
 
 interface RegionalTabsProps {
@@ -53,49 +52,21 @@ export function RegionalTabs({ regions, selectedRegion, className }: RegionalTab
   ];
 
   return (
-    <div className={`flex items-center gap-4 ${className}`}>
-      <Tabs value={currentTab} onValueChange={handleRegionChange}>
-        <TabsList className="grid grid-cols-4 w-auto h-auto p-1">
-          <TabsTrigger 
-            value="all" 
-            className="px-6 py-2 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+    <div className={`flex min-w-0 items-center gap-4 ${className}`}>
+      <Track label="Region">
+        <Pill active={currentTab === 'all'} onClick={() => handleRegionChange('all')}>
+          All regions
+        </Pill>
+        {regions.map((region) => (
+          <Pill
+            key={region.code}
+            active={currentTab === region.code}
+            onClick={() => handleRegionChange(region.code)}
           >
-            All Regions
-          </TabsTrigger>
-          {regions.map((region) => (
-            <TabsTrigger 
-              key={region.code} 
-              value={region.code}
-              className="px-6 py-2 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              {region.name}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-
-      {/* Currency conversion toggle - only show when "All Regions" is selected */}
-      {/* {currentTab === 'all' && (
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Convert to:</span>
-          <ToggleGroup 
-            type="single" 
-            value={conversionCurrency} 
-            onValueChange={handleCurrencyChange}
-            className="border rounded-md"
-          >
-            {currencies.map((currency) => (
-              <ToggleGroupItem 
-                key={currency.code} 
-                value={currency.code}
-                className="px-3 py-1 text-xs font-medium data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-              >
-                {currency.symbol} {currency.name}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
-      )} */}
+            {region.name}
+          </Pill>
+        ))}
+      </Track>
     </div>
   );
 }
