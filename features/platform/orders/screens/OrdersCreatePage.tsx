@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
-import { ListBand, PageTitle, Pill, SectionTitle, Track } from "@/features/platform/components/vault-ui";
+import { Dot, ListBand, PageTitle, SectionTitle } from "@/features/platform/components/vault-ui";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CustomerSearchCombobox } from "../components/CustomerSearchCombobox";
@@ -47,8 +47,6 @@ export function OrdersCreatePage() {
   const [availablePaymentMethods, setAvailablePaymentMethods] = React.useState<any[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<string>("");
   const [cartId, setCartId] = React.useState<string | null>(null);
-  const [orderCreationMode, setOrderCreationMode] = React.useState<"draft" | "immediate">("draft");
-  const [customerEmailForPayment, setCustomerEmailForPayment] = React.useState(true);
 
   // Create drawer state
   const [createDrawerOpen, setCreateDrawerOpen] = React.useState(false);
@@ -278,34 +276,6 @@ export function OrdersCreatePage() {
     }
   };
 
-  const handleCreateDraftOrder = async () => {
-    if (!cartId) {
-      toast.error("Cart is required");
-      return;
-    }
-
-    setIsCreatingOrder(true);
-    try {
-      // Create order in "Pending Payment" status
-      // This is a placeholder implementation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      if (customerEmailForPayment) {
-        // Send email with payment link to customer
-        toast.success("Draft order created and payment instructions sent to customer!");
-      } else {
-        toast.success("Draft order created successfully!");
-      }
-      
-      router.push("/dashboard/platform/orders");
-    } catch (error) {
-      console.error("Error creating draft order:", error);
-      toast.error("Failed to create draft order");
-    } finally {
-      setIsCreatingOrder(false);
-    }
-  };
-
   return (
     <>
       <PageBreadcrumbs
@@ -363,64 +333,38 @@ export function OrdersCreatePage() {
               </ListBand>
             </section>
 
+            {cartId && availablePaymentMethods.length === 0 && (
+              <section>
+                <SectionTitle>Payment</SectionTitle>
+                <ListBand>
+                  <p className="flex items-baseline gap-2 px-4 py-3.5 text-sm text-muted-foreground" role="status">
+                    <Dot tone="danger" />
+                    No payment method is available for this region
+                  </p>
+                </ListBand>
+              </section>
+            )}
             {cartId && availablePaymentMethods.length > 0 && (
               <section>
                 <SectionTitle>Payment</SectionTitle>
                 <ListBand>
                   <div className="space-y-4 px-4 py-4">
                     <div className="space-y-2">
-                      <div className="text-xs font-medium text-muted-foreground">Mode</div>
-                      <Track label="Order creation mode">
-                        <Pill active={orderCreationMode === "draft"} onClick={() => setOrderCreationMode("draft")}>
-                          Draft with payment link
-                        </Pill>
-                        <Pill active={orderCreationMode === "immediate"} onClick={() => setOrderCreationMode("immediate")}>
-                          Charge now
-                        </Pill>
-                      </Track>
+                      <div className="text-xs font-medium text-muted-foreground">Payment method</div>
+                      <AdminPaymentSelection
+                        availablePaymentMethods={availablePaymentMethods}
+                        selectedPaymentMethod={selectedPaymentMethod}
+                        onPaymentMethodChange={setSelectedPaymentMethod}
+                      />
                     </div>
 
-                    {orderCreationMode === "draft" && (
-                      <div className="flex min-h-10 items-center gap-2">
-                        <Switch
-                          id="email-customer"
-                          checked={customerEmailForPayment}
-                          onCheckedChange={setCustomerEmailForPayment}
-                        />
-                        <Label htmlFor="email-customer" className="text-sm">
-                          Email customer payment instructions
-                        </Label>
-                      </div>
-                    )}
-
-                    {orderCreationMode === "immediate" && (
-                      <div className="space-y-2">
-                        <div className="text-xs font-medium text-muted-foreground">Payment method</div>
-                        <AdminPaymentSelection
-                          availablePaymentMethods={availablePaymentMethods}
-                          selectedPaymentMethod={selectedPaymentMethod}
-                          onPaymentMethodChange={setSelectedPaymentMethod}
-                        />
-                      </div>
-                    )}
-
-                    {orderCreationMode === "draft" ? (
-                      <Button
-                        onClick={handleCreateDraftOrder}
-                        className="h-11 w-full rounded-full"
-                        disabled={isCreatingOrder}
-                      >
-                        {isCreatingOrder ? "Creating Order..." : "Create Draft Order"}
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={handlePlaceOrder}
-                        className="h-11 w-full rounded-full"
-                        disabled={isCreatingOrder || !selectedPaymentMethod}
-                      >
-                        {isCreatingOrder ? "Processing Payment..." : "Place Order"}
-                      </Button>
-                    )}
+                    <Button
+                      onClick={handlePlaceOrder}
+                      className="h-11 w-full rounded-full"
+                      disabled={isCreatingOrder || !selectedPaymentMethod}
+                    >
+                      {isCreatingOrder ? "Processing Payment..." : "Place Order"}
+                    </Button>
                   </div>
                 </ListBand>
               </section>

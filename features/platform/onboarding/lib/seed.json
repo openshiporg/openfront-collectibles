@@ -98,7 +98,7 @@
       "handleWebhookFunction": "stripe"
     },
     {
-      "name": "Manual review",
+      "name": "Bank transfer (manual review)",
       "code": "pp_system_default",
       "isInstalled": true,
       "createPaymentFunction": "manual",

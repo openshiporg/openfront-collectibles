@@ -119,7 +119,7 @@ const CountrySelect = forwardRef<
       <select
         ref={innerRef}
         name={props.name}
-        value={selectedValue}
+        value={selectedValue ?? ""}
         onChange={onChange}
         className="hidden"
         {...props}
@@ -134,7 +134,7 @@ const CountrySelect = forwardRef<
 
       {/* Shadcn UI Select component */}
       <Select
-        value={selectedValue}
+        value={selectedValue ?? ""}
         onValueChange={handleValueChange}
         name={props.name}
       >

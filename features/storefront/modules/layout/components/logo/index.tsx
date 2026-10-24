@@ -28,11 +28,11 @@ export default async function Logo({ size = 'md', tone = 'ink' }: { size?: 'md' 
       )}
       data-testid="nav-store-link"
     >
-      <LogoMark svg={logoSvg} color={logoColor} className={size === 'lg' ? 'size-8' : 'size-6'} />
+      <LogoMark svg={logoSvg} color={logoColor} className={size === 'lg' ? 'size-8' : 'size-5 sm:size-6'} />
       <span
         className={cn(
-          'truncate font-cx-serif leading-none tracking-[-0.01em]',
-          size === 'lg' ? 'text-[26px]' : 'text-[20px]'
+          'line-clamp-2 font-cx-serif leading-[1.05] tracking-[-0.01em]',
+          size === 'lg' ? 'text-[26px]' : 'text-[17px] sm:text-[20px]'
         )}
       >
         {storeName}

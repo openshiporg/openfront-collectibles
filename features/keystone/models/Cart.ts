@@ -553,6 +553,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                 where: { id: item.id },
                 query: `
                   region {
+                    id
                     taxRate
                     currency {
                       code
@@ -616,6 +617,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                 where: { id: item.id },
                 query: `
                   region {
+                    id
                     taxRate
                     currency {
                       code
@@ -734,6 +736,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                 where: { id: item.id },
                 query: `
                   region {
+                    id
                     taxRate
                     currency {
                       code
@@ -926,6 +929,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                     value
                   }
                   region {
+                    id
                     currency {
                       code
                       noDivisionCurrency
@@ -968,6 +972,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                 where: { id: item.id },
                 query: `
                   region {
+                    id
                     taxRate
                     currency {
                       code

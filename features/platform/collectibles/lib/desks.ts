@@ -350,6 +350,7 @@ export const DESKS: Record<DeskKind, Desk> = {
     title: 'Collectors & Sellers',
     attention: { queue: 'sellers', statuses: ['applicant'], label: 'seller applications', tone: 'warn', clear: 'No seller applications' },
     links: [
+      { label: 'New collector', href: '/dashboard/collector-profiles/create' },
       { label: 'New seller', href: '/dashboard/seller-profiles/create' },
       { label: 'Users', href: '/dashboard/platform/users' },
     ],

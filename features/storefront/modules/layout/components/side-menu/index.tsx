@@ -8,6 +8,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
@@ -72,6 +73,7 @@ const SideMenu = ({
         >
           <SheetHeader className="border-b border-cx-line px-4 py-3 text-left">
             <SheetTitle className="sr-only">Menu</SheetTitle>
+            <SheetDescription className="sr-only">Categories, collections and account</SheetDescription>
             {logo}
           </SheetHeader>
 

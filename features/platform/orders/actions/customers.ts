@@ -10,15 +10,9 @@ export async function searchCustomers(
   take: number = 50
 ) {
   const query = search ? `
-    query GetCustomers($search: String!, $take: Int!) {
+    query GetCustomers($where: UserWhereInput!, $take: Int!) {
       users(
-        where: {
-          OR: [
-            { firstName: { contains: $search, mode: insensitive } }
-            { lastName: { contains: $search, mode: insensitive } }
-            { email: { contains: $search, mode: insensitive } }
-          ]
-        }
+        where: $where
         take: $take
         orderBy: { createdAt: desc }
       ) {
@@ -76,7 +70,18 @@ export async function searchCustomers(
     }
   `;
 
-  const variables = search ? { search, take } : { take };
+  // firstName/lastName are virtual on User and can't be filtered; match each word
+  // of the input against the stored name or email.
+  const words = search.trim().split(/\s+/).filter(Boolean).slice(0, 5);
+  const where = {
+    AND: words.map((word) => ({
+      OR: [
+        { name: { contains: word, mode: 'insensitive' } },
+        { email: { contains: word, mode: 'insensitive' } },
+      ],
+    })),
+  };
+  const variables = search ? { where, take } : { take };
   const response = await keystoneClient(query, variables);
   
   return response;

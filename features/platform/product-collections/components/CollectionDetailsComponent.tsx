@@ -105,7 +105,7 @@ export function CollectionDetailsComponent({
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 <Link
-                  href={`/dashboard/platform/product-collections/${collection.id}`}
+                  href={`/dashboard/product-collections/${collection.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   {collection.title}

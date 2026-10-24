@@ -143,7 +143,7 @@ export function PriceListDetailsComponent({
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 {pricelist.status && <Dot tone={statusTone} />}
                 <Link
-                  href={`/dashboard/platform/price-lists/${pricelist.id}`}
+                  href={`/dashboard/price-lists/${pricelist.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   {pricelist.name}

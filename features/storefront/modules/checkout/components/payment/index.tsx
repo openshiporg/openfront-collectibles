@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import ErrorMessage from "../error-message";
 import { StripeContext } from "../payment-wrapper/stripe-wrapper";
 import Radio from "@/features/storefront/modules/common/components/radio";
+import StatusDot from "@/features/storefront/modules/common/components/collectibles/status-dot";
 import StepHeader, { StepSection, SummaryBlock, optionBand, optionRow, secondaryPill } from "../step-header";
 import { CardElement } from "@stripe/react-stripe-js";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -166,6 +167,12 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
         }
       />
       <div className={isOpen ? "mt-6 block space-y-5" : "hidden"}>
+        {!paidByGiftcard && !availablePaymentMethods?.length && (
+          <p className="cx-band flex items-baseline gap-2 px-4 py-3.5 text-[14px] text-cx-ink-2" role="status" data-testid="no-payment-methods">
+            <StatusDot tone="danger" />
+            No payment method is available for this region
+          </p>
+        )}
         {!paidByGiftcard && availablePaymentMethods?.length > 0 && (
           <>
             <RadioGroup

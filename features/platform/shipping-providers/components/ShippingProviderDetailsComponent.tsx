@@ -98,7 +98,7 @@ export function ShippingProviderDetailsComponent({
                   <Dot tone={shippingprovider.isActive ? "ok" : "muted"} />
                 )}
                 <Link
-                  href={`/dashboard/platform/shipping-providers/${shippingprovider.id}`}
+                  href={`/dashboard/shipping-providers/${shippingprovider.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   {shippingprovider.name}

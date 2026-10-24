@@ -95,7 +95,7 @@ export function PaymentProviderDetailsComponent({
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 <Dot tone={paymentprovider.isInstalled ? "ok" : "muted"} />
                 <Link
-                  href={`/dashboard/platform/payment-providers/${paymentprovider.id}`}
+                  href={`/dashboard/payment-providers/${paymentprovider.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   {paymentprovider.name}

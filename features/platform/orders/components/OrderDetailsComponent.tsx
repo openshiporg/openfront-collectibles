@@ -113,7 +113,7 @@ export const OrderDetailsComponent = ({
                 </span>
                 {order.user && (
                   <Link
-                    href={`/dashboard/platform/users/${order.user.id}`}
+                    href={`/dashboard/users/${order.user.id}`}
                     className="min-w-0 truncate text-foreground hover:underline underline-offset-4"
                   >
                     {order.user.name || order.user.email}

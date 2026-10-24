@@ -28,8 +28,9 @@ export async function retrieveCart() {
     ));
   } catch {
     // Expired, signed-out, or otherwise unauthorized proofs are stale browser
-    // state, not a storefront-wide rendering failure.
-    await removeCartId();
+    // state, not a storefront-wide rendering failure. This runs while Server
+    // Components render, where cookies cannot be written, so the stale proof is
+    // left for the next cart action (getOrSetCart) to replace.
     return null;
   }
 

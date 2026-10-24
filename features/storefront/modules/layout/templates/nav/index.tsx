@@ -33,7 +33,7 @@ export default async function Nav() {
   return (
     <div className="sticky inset-x-0 top-0 z-50">
       <header className="border-b border-cx-line bg-cx-bg/95 backdrop-blur supports-[backdrop-filter]:bg-cx-bg/85">
-        <nav className="mx-auto flex h-16 w-full max-w-[1320px] items-center gap-4 px-4 sm:px-6">
+        <nav className="mx-auto flex h-16 w-full max-w-[1320px] items-center gap-2 px-4 sm:gap-4 sm:px-6">
           <div className="flex items-center lg:hidden">
             <SideMenu regions={regions} categories={categories} collections={collectionLinks} logo={<Logo />} />
           </div>
@@ -82,7 +82,7 @@ export default async function Nav() {
             )}
           </ul>
 
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
             <LocalizedClientLink
               href="/search"
               aria-label="Search"

@@ -99,7 +99,7 @@ export function GiftCardDetailsComponent({
                 <span className="text-xs text-muted-foreground">{statusText}</span>
                 {giftcard.order && giftcard.order.user && (
                   <Link
-                    href={`/dashboard/platform/users/${giftcard.order.user.id}`}
+                    href={`/dashboard/users/${giftcard.order.user.id}`}
                     className="text-xs text-muted-foreground hover:text-foreground hover:underline"
                   >
                     {giftcard.order.user.name || giftcard.order.user.email}

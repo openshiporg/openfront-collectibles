@@ -35,12 +35,16 @@ export const CollectorProfile = list({
   fields: {
     user: relationship({
       ref: 'User',
-      access: { create: denyAll, update: denyAll },
+      // Customers always own the profile they create. Collectible-customer managers
+      // may create one on a customer's behalf by choosing the user; field access
+      // rejects that input from anyone else.
+      access: { create: canManageCustomers, update: denyAll },
       hooks: {
         resolveInput({ operation, resolvedData, context }) {
-          return operation === 'create'
-            ? { connect: { id: requireHumanOwnerId(context.session) } }
-            : resolvedData.user;
+          if (operation !== 'create') return resolvedData.user;
+          const chosen = (resolvedData.user as { connect?: { id?: string } } | undefined)?.connect?.id;
+          if (chosen && canManageCustomers({ session: context.session })) return { connect: { id: chosen } };
+          return { connect: { id: requireHumanOwnerId(context.session) } };
         },
       },
     }),

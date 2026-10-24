@@ -41,7 +41,7 @@ export function ClaimDetailsComponent({
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 <Dot tone="info" />
                 <Link
-                  href={`/dashboard/platform/claims/${claim.id}`}
+                  href={`/dashboard/claim-orders/${claim.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   Claim <span className="font-mono tabular-nums">{claim.id.slice(-8)}</span>

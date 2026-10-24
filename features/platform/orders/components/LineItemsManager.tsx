@@ -111,6 +111,10 @@ export function LineItemsManager({
     return () => clearTimeout(timeout);
   }, [searchTerm, open]);
 
+  // Variant title and SKU, without repeating one when it equals the other (unique items).
+  const variantLine = (variant: ProductVariant) =>
+    [variant.title, variant.sku].filter((part, i, all): part is string => !!part && all.indexOf(part) === i).join(' · ');
+
   const formatPriceVal = (variant: ProductVariant) => {
     const price = variant.prices?.[0];
     if (!price) return 0;
@@ -243,8 +247,8 @@ export function LineItemsManager({
                               className="flex items-center justify-between py-2 cursor-pointer w-full"
                             >
                               <div className="flex flex-col gap-0.5 max-w-[70%]">
-                                <span className="font-medium text-sm truncate">{variant.title}</span>
-                                {variant.sku && <span className="font-mono text-xs tabular-nums text-muted-foreground">{variant.sku}</span>}
+                                <span className="font-medium text-sm truncate">{variant.title || variant.sku}</span>
+                                {variant.sku && variant.sku !== variant.title && <span className="font-mono text-xs tabular-nums text-muted-foreground">{variant.sku}</span>}
                               </div>
                               <div className="flex items-center gap-3">
                                 <span className="font-mono text-sm font-medium tabular-nums">{formatPrice(unitPrice, currencyOf(variant))}</span>
@@ -299,9 +303,9 @@ export function LineItemsManager({
                       <span className="font-medium text-sm truncate text-foreground pr-4">
                         {item.variant.product.title}
                       </span>
-                      {item.variant.title && (
-                        <span className="truncate font-mono text-xs tabular-nums text-foreground/80">
-                          {item.variant.title}{item.variant.sku ? <span className="text-muted-foreground"> · {item.variant.sku}</span> : ''}
+                      {variantLine(item.variant) && (
+                        <span className="truncate font-mono text-xs tabular-nums text-muted-foreground">
+                          {variantLine(item.variant)}
                         </span>
                       )}
                     </div>

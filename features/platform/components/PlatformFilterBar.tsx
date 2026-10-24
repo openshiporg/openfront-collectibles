@@ -21,6 +21,9 @@ import Link from "next/link"
 import { useDashboard } from '../../dashboard/context/DashboardProvider'
 import { enhanceFields } from '../../dashboard/utils/enhanceFields'
 
+// Only these platform lists have their own create screen; the rest use the generic one.
+const PLATFORM_CREATE_PAGES = new Set(['products', 'orders'])
+
 /** Class for a feature's own create button passed as `customCreateButton`. */
 export const platformCreateButtonClass =
   "h-10 rounded-full px-3 text-[13px] font-medium lg:w-auto lg:px-4 [&_svg]:size-4"
@@ -165,7 +168,7 @@ export function PlatformFilterBar({
                 </Button>
               ) : (
                 <Link
-                  href={`${basePath}/platform/${list.path}/create`}
+                  href={PLATFORM_CREATE_PAGES.has(list.path) ? `${basePath}/platform/${list.path}/create` : `${basePath}/${list.path}/create`}
                   className={cn(buttonVariants({ size: "icon" }), create)}
                 >
                   <Plus />

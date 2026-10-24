@@ -4402,6 +4402,7 @@ type Listing {
   format: String
   status: String
   priceMinor: Int
+  price: String
   compareAtMinor: Int
   currencyCode: String
   publishedAt: DateTime

@@ -183,7 +183,7 @@ export function RegionDetailsComponent({
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 <Dot tone={isActive ? "ok" : "muted"} />
                 <Link
-                  href={`/dashboard/platform/regions/${region.id}`}
+                  href={`/dashboard/regions/${region.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   {region.name}

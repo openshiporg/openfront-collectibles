@@ -112,7 +112,7 @@ export function ProductCategoryDetailsComponent({
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 <Dot tone={productcategory.isActive ? "ok" : "muted"} />
                 <Link
-                  href={`/dashboard/platform/product-categories/${productcategory.id}`}
+                  href={`/dashboard/product-categories/${productcategory.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   {productcategory.title}
@@ -133,7 +133,7 @@ export function ProductCategoryDetailsComponent({
                   <span>
                     Child of{" "}
                     <Link
-                      href={`/dashboard/platform/product-categories/${productcategory.parentCategory.id}`}
+                      href={`/dashboard/product-categories/${productcategory.parentCategory.id}`}
                       className="font-medium text-foreground hover:underline"
                     >
                       {productcategory.parentCategory.title}

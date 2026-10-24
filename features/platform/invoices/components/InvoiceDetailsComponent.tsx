@@ -123,7 +123,7 @@ export function InvoiceDetailsComponent({
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 <Dot tone={statusTones[invoice.status] || "muted"} />
                 <Link
-                  href={`/dashboard/platform/accounts/${invoice.id}`}
+                  href={`/dashboard/invoices/${invoice.id}`}
                   className="font-mono text-sm font-semibold tabular-nums text-foreground hover:underline"
                 >
                   {invoice.invoiceNumber || invoice.accountNumber}

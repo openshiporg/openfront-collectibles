@@ -39,7 +39,7 @@ export const STORE_TEMPLATES: Record<'full' | 'minimal' | 'custom', StoreTemplat
     categories, collections: ['fresh-to-the-vault', 'staff-picks', 'under-500'], products,
     displayNames: {
       store: ['Northstar Collectibles'], regions: ['North America (USD)', 'Europe (EUR)'],
-      paymentProviders: ['Stripe', 'Manual review'], shipping: ['Tracked shipping', 'High-value signature service', 'Return shipping'],
+      paymentProviders: ['Stripe', 'Bank transfer (manual review)'], shipping: ['Tracked shipping', 'High-value signature service', 'Return shipping'],
       categories: categoryNames, collections: ['Fresh to the vault', 'Staff picks', 'Under $500'], products: productNames,
       collectibles: productNames,
     },
@@ -51,7 +51,7 @@ export const STORE_TEMPLATES: Record<'full' | 'minimal' | 'custom', StoreTemplat
     regions: ['na'], paymentProviders: ['pp_system_default'], shipping: ['Tracked shipping'],
     categories: ['trading-cards'], collections: ['fresh-to-the-vault'], products: [products[0]],
     displayNames: {
-      store: ['Northstar Collectibles'], regions: ['North America (USD)'], paymentProviders: ['Manual review'],
+      store: ['Northstar Collectibles'], regions: ['North America (USD)'], paymentProviders: ['Bank transfer (manual review)'],
       shipping: ['Tracked shipping'], categories: ['Trading Cards'], collections: ['Fresh to the vault'],
       products: [productNames[0]], collectibles: [productNames[0]],
     },
@@ -62,7 +62,7 @@ export const STORE_TEMPLATES: Record<'full' | 'minimal' | 'custom', StoreTemplat
     regions: ['na'], paymentProviders: ['pp_system_default'], shipping: ['Tracked shipping'],
     categories: ['trading-cards'], collections: ['fresh-to-the-vault'], products: [products[0]],
     displayNames: {
-      store: ['Northstar Collectibles'], regions: ['North America (USD)'], paymentProviders: ['Manual review'],
+      store: ['Northstar Collectibles'], regions: ['North America (USD)'], paymentProviders: ['Bank transfer (manual review)'],
       shipping: ['Tracked shipping'], categories: ['Trading Cards'], collections: ['Fresh to the vault'],
       products: [productNames[0]], collectibles: [productNames[0]],
     },

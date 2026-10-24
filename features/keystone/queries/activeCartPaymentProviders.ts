@@ -30,8 +30,12 @@ async function activeCartPaymentProviders(
     `
   });
 
+  // Checkout only offers methods that can complete it: completeActiveCart refuses
+  // manual tender, so offering it would fail at Place order.
   return providers.filter((provider: any) =>
-    isPaymentProviderConfigured(provider.code || '')
+    isPaymentProviderConfigured(provider.code || '') &&
+    provider.code !== 'pp_system_default' &&
+    !String(provider.code || '').startsWith('pp_manual')
   );
 }
 

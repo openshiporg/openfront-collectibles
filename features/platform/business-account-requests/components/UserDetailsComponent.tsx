@@ -199,7 +199,7 @@ export function UserDetailsComponent({
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 <Dot tone={user.hasAccount ? "ok" : "muted"} />
                 <Link
-                  href={`/dashboard/platform/users/${user.id}`}
+                  href={`/dashboard/users/${user.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   {user.name || `${user.firstName} ${user.lastName}`.trim() || user.email}

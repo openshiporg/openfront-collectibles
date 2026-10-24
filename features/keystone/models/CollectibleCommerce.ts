@@ -1,6 +1,7 @@
 import { lockedRecordUi } from './lifecycle-ui';
-import { list } from '@keystone-6/core';
-import { checkbox, integer, json, relationship, select, text, timestamp } from '@keystone-6/core/fields';
+import { graphql, list } from '@keystone-6/core';
+import { checkbox, integer, json, relationship, select, text, timestamp, virtual } from '@keystone-6/core/fields';
+import { formatMinorToMajor } from '../../lib/minor-units';
 import { denyAll } from '@keystone-6/core/access';
 
 import { permissions } from '../access';
@@ -16,7 +17,7 @@ const canManageAuctions = permissions.canManageAuctions;
 
 export const Listing = list({
   access: { operation: { query: canRead, create: () => false, update: () => false, delete: () => false } },
-  ui: { ...{ labelField: 'title', listView: { initialColumns: ['title', 'format', 'status', 'priceMinor', 'currencyCode'] } }, ...lockedRecordUi, itemView: { ...{}, ...lockedRecordUi.itemView } },
+  ui: { ...{ labelField: 'title', listView: { initialColumns: ['title', 'format', 'status', 'price'] } }, ...lockedRecordUi, itemView: { ...{}, ...lockedRecordUi.itemView } },
   fields: {
     store: relationship({ ref: 'Store' }),
     inventoryUnit: relationship({ ref: 'InventoryUnit' }),
@@ -25,15 +26,36 @@ export const Listing = list({
     slug: text({ validation: { isRequired: true }, isIndexed: 'unique' }),
     format: select({ type: 'string', options: ['fixed_price', 'auction'], defaultValue: 'fixed_price' }),
     status: select({ type: 'string', options: ['draft', 'scheduled', 'published', 'paused', 'sold', 'ended', 'withdrawn'], defaultValue: 'draft' }),
-    priceMinor: integer({ validation: { min: 0 } }),
-    compareAtMinor: integer({ validation: { min: 0 } }),
+    priceMinor: integer({
+      validation: { min: 0 },
+      label: 'Price (minor units)',
+      ui: { description: 'Integer minor units of the currency: 475000 USD is USD 4,750.00' },
+    }),
+    // Read-only display of priceMinor in major units, for list columns and item pages.
+    price: virtual({
+      field: graphql.field({
+        type: graphql.String,
+        resolve(item: any) {
+          if (item.priceMinor == null || typeof item.currencyCode !== 'string') return null;
+          try {
+            const [whole, fraction] = formatMinorToMajor(item.priceMinor, item.currencyCode).split('.');
+            const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return `${item.currencyCode} ${fraction ? `${grouped}.${fraction}` : grouped}`;
+          } catch {
+            return null;
+          }
+        },
+      }),
+      ui: { createView: { fieldMode: 'hidden' }, itemView: { fieldMode: 'read' } },
+    }),
+    compareAtMinor: integer({ validation: { min: 0 }, label: 'Compare-at price (minor units)' }),
     currencyCode: text({ validation: { isRequired: true, match: { regex: /^[A-Z]{3}$/ } }, defaultValue: 'USD' }),
     publishedAt: timestamp(),
     endsAt: timestamp(),
     publicationSnapshot: json({ defaultValue: {} }),
     publicSummary: text({ ui: { displayMode: 'textarea' } }),
     offersEnabled: checkbox({ defaultValue: true }),
-    minimumOfferMinor: integer({ validation: { min: 0 } }),
+    minimumOfferMinor: integer({ validation: { min: 0 }, label: 'Minimum offer (minor units)' }),
     auction: relationship({ ref: 'Auction.listing' }),
     offers: relationship({ ref: 'Offer.listing', many: true }),
     ...trackingFields,
