@@ -65,7 +65,8 @@ export default async function Footer() {
               links={[
                 { title: customer ? "Account" : "Sign in", href: "/account" },
                 { title: "Orders", href: "/account/orders" },
-                { title: "Addresses", href: "/account/addresses" },
+                { title: "Wishlist", href: "/account/wishlist" },
+                { title: "Trade in", href: "/trade-in" },
                 { title: "Cart", href: "/cart" },
               ]}
             />

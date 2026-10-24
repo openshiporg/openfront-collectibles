@@ -4,6 +4,8 @@ import { getRegion } from "@/features/storefront/lib/data/regions"
 import { searchProducts } from "@/features/storefront/lib/data/products"
 import ProductPreview from "@/features/storefront/modules/products/components/product-preview"
 import SearchForm from "@/features/storefront/modules/store/components/search-form"
+import SaveSearch from "@/features/storefront/modules/store/components/search-form/save-search"
+import { getUser } from "@/features/storefront/lib/data/user"
 
 export const metadata: Metadata = {
   title: "Search",
@@ -20,7 +22,7 @@ export async function SearchPage(props: Props) {
   const raw = Array.isArray(searchParams.q) ? searchParams.q[0] : searchParams.q
   const query = String(raw || "").trim().slice(0, 80)
 
-  const region = await getRegion(countryCode)
+  const [region, customer] = await Promise.all([getRegion(countryCode), getUser().catch(() => null)])
   let failed = false
   let result: { products: any[]; count: number } = { products: [], count: 0 }
   if (query && region) {
@@ -39,6 +41,11 @@ export async function SearchPage(props: Props) {
       <div className="mt-5 max-w-[640px]">
         <SearchForm countryCode={countryCode} defaultValue={query} autoFocus={!query} />
       </div>
+      {query && customer && !failed && (
+        <div className="mt-3">
+          <SaveSearch key={query} query={query} />
+        </div>
+      )}
 
       {query && (
         <div className="mt-10">

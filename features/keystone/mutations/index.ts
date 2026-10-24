@@ -1,6 +1,7 @@
 import { mergeSchemas } from "@graphql-tools/schema";
 import receiveCollectibleItem from './receiveCollectibleItem';
 import manageCollectibleListing from './manageCollectibleListing';
+import { activeTradeIns, activeWishlist, publicBuylist, submitTradeIn, toggleWishlistListing } from './collectibles-customer';
 import type { GraphQLSchema } from 'graphql'
 import redirectToInit from "./redirectToInit";
 import activeCart from "./activeCart";
@@ -103,6 +104,9 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         ): ProductsSortedByPriceResult!
         marketplaceCollectiblesCapabilities: JSON!
         publicCollectiblesDiscovery(input: JSON): JSON!
+        activeWishlist: JSON!
+        publicBuylist: JSON!
+        activeTradeIns: JSON!
       }
 
       type ProductsSortedByPriceResult {
@@ -314,6 +318,8 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         requestPrivacyAction(action: String!, details: String): Notification
         placeCollectibleBid(auctionId: ID!, amountMinor: Int!, idempotencyKey: String!): Bid!
         submitCollectibleOffer(listingId: ID!, amountMinor: Int!, expiresAt: String!, message: String, idempotencyKey: String!): Offer!
+        toggleWishlistListing(listingId: ID!): JSON!
+        submitTradeIn(input: JSON!): JSON!
       }
     `,
     resolvers: {
@@ -337,6 +343,9 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         getProductsSortedByPrice,
         marketplaceCollectiblesCapabilities,
         publicCollectiblesDiscovery,
+        activeWishlist,
+        publicBuylist,
+        activeTradeIns,
       },
       Mutation: {
         receiveCollectibleItem,
@@ -381,6 +390,8 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         requestPrivacyAction,
         placeCollectibleBid,
         submitCollectibleOffer,
+        toggleWishlistListing,
+        submitTradeIn,
       }
     },
   });

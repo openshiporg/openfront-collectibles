@@ -11,6 +11,7 @@ import SlabLabel from "@/features/storefront/modules/common/components/collectib
 import { slabFromGrading } from "@/features/storefront/lib/collectible-evidence-presentation"
 import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
+import SaveItem from "@/features/storefront/modules/products/components/save-item"
 import { StoreProduct, StoreRegion } from "@/features/storefront/types/storefront"
 
 type ProductTemplateProps = {
@@ -69,6 +70,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
             }
           >
             <ProductActionsWrapper handle={product.handle} region={region} />
+          </Suspense>
+          <Suspense fallback={null}>
+            <SaveItem listingId={typeof collectibleListing?.ref?.id === "string" ? collectibleListing.ref.id : null} />
           </Suspense>
           {specimen && slab && (
             <SlabLabel

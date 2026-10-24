@@ -83,7 +83,7 @@ export const DESKS: Record<DeskKind, Desk> = {
     attention: { queue: 'specimens', statuses: ['intake', 'review'], label: 'awaiting review', tone: 'warn', clear: 'Nothing awaiting review' },
     queues: [
       {
-        key: 'specimens', title: 'Items', type: 'Specimen', list: 'specimens', path: 'specimens',
+        key: 'specimens', title: 'Items', type: 'Specimen', list: 'specimens', path: 'specimens', platformPath: '/dashboard/platform/items',
         statusField: 'lifecycleStatus', statuses: SPECIMEN_STATUSES,
         fields: 'displayName specimenCode lifecycleStatus catalogItem { year maker category { name } } gradeObservationsCount',
         row: (r) => ({
@@ -213,7 +213,7 @@ export const DESKS: Record<DeskKind, Desk> = {
     attention: { queue: 'intakes', statuses: ['submitted', 'received', 'inspecting'], label: 'in intake', tone: 'warn', clear: 'Intake clear' },
     queues: [
       {
-        key: 'intakes', title: 'Intake', type: 'ConsignmentIntake', list: 'consignmentIntakes', path: 'consignment-intakes',
+        key: 'intakes', title: 'Intake', type: 'ConsignmentIntake', list: 'consignmentIntakes', path: 'consignment-intakes', platformPath: '/dashboard/platform/consignments',
         statusField: 'status', statuses: INTAKE_STATUSES,
         fields: 'reference status receivedAt itemsCount consignor { displayName }',
         row: (r) => ({
@@ -249,7 +249,7 @@ export const DESKS: Record<DeskKind, Desk> = {
     attention: { queue: 'submissions', statuses: ['submitted', 'received', 'inspecting'], label: 'to inspect', tone: 'warn', clear: 'Nothing to inspect' },
     queues: [
       {
-        key: 'submissions', title: 'Submissions', type: 'TradeInSubmission', list: 'tradeInSubmissions', path: 'trade-in-submissions',
+        key: 'submissions', title: 'Submissions', type: 'TradeInSubmission', list: 'tradeInSubmissions', path: 'trade-in-submissions', platformPath: '/dashboard/platform/trade-ins',
         statusField: 'status', statuses: TRADE_IN_STATUSES,
         fields: 'reference status disposition itemsCount createdAt',
         row: (r) => ({
@@ -307,7 +307,7 @@ export const DESKS: Record<DeskKind, Desk> = {
         }),
       },
       {
-        key: 'disputes', title: 'Disputes', type: 'DisputeCase', list: 'disputeCases', path: 'dispute-cases',
+        key: 'disputes', title: 'Disputes', type: 'DisputeCase', list: 'disputeCases', path: 'dispute-cases', platformPath: '/dashboard/platform/disputes',
         statusField: 'status', statuses: DISPUTE_STATUSES,
         fields: 'type status summary createdAt order { displayId }',
         row: (r) => ({
@@ -356,7 +356,7 @@ export const DESKS: Record<DeskKind, Desk> = {
     ],
     queues: [
       {
-        key: 'sellers', title: 'Sellers', type: 'SellerProfile', list: 'sellerProfiles', path: 'seller-profiles',
+        key: 'sellers', title: 'Sellers', type: 'SellerProfile', list: 'sellerProfiles', path: 'seller-profiles', platformPath: '/dashboard/platform/sellers',
         statusField: 'status', statuses: SELLER_STATUSES,
         fields: 'displayName status identityEvidenceState createdAt',
         row: (r) => ({

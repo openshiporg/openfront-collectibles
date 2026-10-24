@@ -14,6 +14,8 @@ export type QueueSpec = {
   list: string;
   /** Dashboard list path, e.g. `inventory-units` */
   path: string;
+  /** Platform page that owns this list's records, e.g. `/dashboard/platform/items` */
+  platformPath?: string;
   statusField?: string;
   statuses?: QueueStatus[];
   where?: Record<string, unknown>;
@@ -29,6 +31,7 @@ export type QueueResult = {
   key: string;
   title: string;
   path: string;
+  platformPath?: string;
   statusField?: string;
 } & (
   | { ok: true; total: number; counts: QueueCount[]; rows: QueueRow[] }
@@ -40,7 +43,7 @@ export function listFilterHref(path: string, field: string, value: string) {
 }
 
 export async function loadQueue(spec: QueueSpec): Promise<QueueResult> {
-  const base = { key: spec.key, title: spec.title, path: spec.path, statusField: spec.statusField };
+  const base = { key: spec.key, title: spec.title, path: spec.path, platformPath: spec.platformPath, statusField: spec.statusField };
   const where = spec.where ?? {};
   const statuses = spec.statusField ? spec.statuses ?? [] : [];
   const variables: Record<string, unknown> = { where };

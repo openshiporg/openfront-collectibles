@@ -93,6 +93,13 @@ export default async function Nav() {
             </LocalizedClientLink>
             <LocalizedClientLink
               className="hidden min-h-11 items-center rounded-full px-3 text-[14px] text-cx-ink-2 hover:text-cx-ink lg:inline-flex"
+              href="/trade-in"
+              data-testid="nav-trade-in-link"
+            >
+              Trade in
+            </LocalizedClientLink>
+            <LocalizedClientLink
+              className="hidden min-h-11 items-center rounded-full px-3 text-[14px] text-cx-ink-2 hover:text-cx-ink lg:inline-flex"
               href="/account"
               data-testid="nav-account-link"
             >

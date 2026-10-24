@@ -10,6 +10,8 @@ import { notFound } from "next/navigation"
 import { listRegions } from "@/features/storefront/lib/data/regions"
 import { getUser } from "@/features/storefront/lib/data/user"
 import { AccountHeading } from "@/features/storefront/modules/account/components/account-ui"
+import CollectorProfileForm from "@/features/storefront/modules/account/components/collector-profile"
+import { getCollectorProfile } from "@/features/storefront/lib/data/collectibles"
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -19,6 +21,7 @@ export const metadata: Metadata = {
 export async function AccountProfilePage() {
   const customer: StorefrontCustomerProfile | null = await getUser()
   const { regions }: { regions: StorefrontRegionBasic[] | null } = await listRegions()
+  const collectorProfile = await getCollectorProfile()
 
   if (!customer || !regions) {
     notFound()
@@ -33,6 +36,11 @@ export async function AccountProfilePage() {
         <ProfilePhone customer={customer} />
         <ProfileBillingAddress customer={customer} regions={regions} />
       </div>
+      {collectorProfile !== undefined && (
+        <div className="cx-band mt-8 overflow-hidden">
+          <CollectorProfileForm profile={collectorProfile} fallbackName={(customer as any)?.name || ""} />
+        </div>
+      )}
     </div>
   )
 }

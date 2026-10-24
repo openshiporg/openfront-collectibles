@@ -27,6 +27,10 @@ import {
   SearchCheck,
   ShieldAlert,
   UserRound,
+  Gem,
+  Repeat,
+  Scale,
+  BadgeCheck,
 } from 'lucide-react';
 
 export interface PlatformNavItem {
@@ -109,6 +113,14 @@ export const platformNavItems: PlatformNavItem[] = [
 
   // Collectibles
   {
+    title: 'Items',
+    href: '/platform/items',
+    color: 'amber',
+    description: 'Receive items and keep each item\'s record, condition, grading, and provenance.',
+    icon: Gem,
+    group: 'collectibles'
+  },
+  {
     title: 'Catalog & Items',
     href: '/platform/catalog',
     color: 'amber',
@@ -130,6 +142,14 @@ export const platformNavItems: PlatformNavItem[] = [
     color: 'violet',
     description: 'Record condition, grading, provenance, and valuations for items.',
     icon: ShieldAlert,
+    group: 'collectibles'
+  },
+  {
+    title: 'Disputes',
+    href: '/platform/disputes',
+    color: 'red',
+    description: 'Work condition, authenticity, shipping, and payment disputes to resolution.',
+    icon: Scale,
     group: 'collectibles'
   },
   {
@@ -167,6 +187,22 @@ export const platformNavItems: PlatformNavItem[] = [
     group: 'selling'
   },
   {
+    title: 'Consignments',
+    href: '/platform/consignments',
+    color: 'orange',
+    description: 'Receive consigned items, agree terms, and track each intake.',
+    icon: Handshake,
+    group: 'selling'
+  },
+  {
+    title: 'Trade-Ins',
+    href: '/platform/trade-ins',
+    color: 'cyan',
+    description: 'Receive, inspect, quote, and pay trade-in submissions.',
+    icon: Repeat,
+    group: 'selling'
+  },
+  {
     title: 'Buylist & Trade-In',
     href: '/platform/buylist',
     color: 'cyan',
@@ -190,6 +226,14 @@ export const platformNavItems: PlatformNavItem[] = [
     color: 'purple',
     description: 'Manage buyers, sellers, and consignors.',
     icon: UserRound,
+    group: 'customers'
+  },
+  {
+    title: 'Sellers',
+    href: '/platform/sellers',
+    color: 'purple',
+    description: 'Approve, pause, and manage sellers and consignors.',
+    icon: BadgeCheck,
     group: 'customers'
   },
   {

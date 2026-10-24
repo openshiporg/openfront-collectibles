@@ -4,7 +4,8 @@ import { BandRow, Count, Dot, ListBand, PillLink, humanize, pillClass, trackClas
 import type { QueueResult } from '../lib/desk-data';
 
 export function DeskQueue({ queue }: { queue: QueueResult }) {
-  const listHref = `/dashboard/${queue.path}`;
+  // Records with their own platform page open there; the rest use the generic list.
+  const listHref = queue.platformPath ?? `/dashboard/${queue.path}`;
   return (
     <section aria-labelledby={`queue-${queue.key}`} className="min-w-0 space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2">

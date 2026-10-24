@@ -15176,6 +15176,8 @@ type Mutation {
   requestPrivacyAction(action: String!, details: String): Notification
   placeCollectibleBid(auctionId: ID!, amountMinor: Int!, idempotencyKey: String!): Bid!
   submitCollectibleOffer(listingId: ID!, amountMinor: Int!, expiresAt: String!, message: String, idempotencyKey: String!): Offer!
+  toggleWishlistListing(listingId: ID!): JSON!
+  submitTradeIn(input: JSON!): JSON!
 }
 
 union UserAuthenticationWithPasswordResult = UserAuthenticationWithPasswordSuccess | UserAuthenticationWithPasswordFailure
@@ -15622,6 +15624,9 @@ type Query {
   getProductsSortedByPrice(countryCode: String!, limit: Int!, offset: Int!, priceOrder: String!, collectionId: ID, categoryId: ID): ProductsSortedByPriceResult!
   marketplaceCollectiblesCapabilities: JSON!
   publicCollectiblesDiscovery(input: JSON): JSON!
+  activeWishlist: JSON!
+  publicBuylist: JSON!
+  activeTradeIns: JSON!
 }
 
 union AuthenticatedItem = User
