@@ -30,6 +30,7 @@ interface PaymentProvider {
   name: string;
   code: string;
   isInstalled: boolean;
+  keysMissing?: boolean;
   metadata?: any;
   regions?: Array<{
     id: string;
@@ -93,14 +94,14 @@ export function PaymentProviderDetailsComponent({
           <div className="flex items-start justify-between gap-3 px-4 py-3">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-                <Dot tone={paymentprovider.isInstalled ? "ok" : "muted"} />
+                <Dot tone={paymentprovider.isInstalled ? (paymentprovider.keysMissing ? "warn" : "ok") : "muted"} />
                 <Link
                   href={`/dashboard/payment-providers/${paymentprovider.id}`}
                   className="text-sm font-semibold text-foreground hover:underline"
                 >
                   {paymentprovider.name}
                 </Link>
-                <span className="text-xs text-muted-foreground">{paymentprovider.isInstalled ? "Installed" : "Not installed"}</span>
+                <span className="text-xs text-muted-foreground">{paymentprovider.isInstalled ? (paymentprovider.keysMissing ? "Installed · keys missing, not offered at checkout" : "Installed") : "Not installed"}</span>
               </div>
               <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
                 <span className="font-mono tabular-nums">{paymentprovider.code}</span>

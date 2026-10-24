@@ -25,6 +25,23 @@ export const StoreMembership = list({
 });
 
 export const CollectorProfile = list({
+  ui: { labelField: 'displayName' },
+  hooks: {
+    async resolveInput({ operation, resolvedData, context }) {
+      if (operation !== 'create' || String(resolvedData.displayName ?? '').trim()) return resolvedData;
+      const userId = (resolvedData.user as { connect?: { id?: string } } | undefined)?.connect?.id;
+      const user = userId
+        ? await context.sudo().db.User.findOne({ where: { id: userId } })
+        : null;
+      return { ...resolvedData, displayName: String(user?.name ?? '').trim() };
+    },
+    validateInput({ operation, resolvedData, item, addValidationError }) {
+      const displayName = operation === 'create' || 'displayName' in resolvedData
+        ? resolvedData.displayName
+        : item?.displayName;
+      if (!String(displayName ?? '').trim()) addValidationError('Display name is required');
+    },
+  },
   access: {
     operation: { query: humanCustomer, create: humanCustomer, update: humanCustomer, delete: canManageCustomers },
     filter: {
@@ -48,7 +65,8 @@ export const CollectorProfile = list({
         },
       },
     }),
-    displayName: text({ validation: { isRequired: true } }),
+    // Left empty on create, it defaults to the owner's name (see the list hooks).
+    displayName: text({ ui: { description: 'Defaults to the customer\'s name' } }),
     bio: text({ ui: { displayMode: 'textarea' } }),
     interests: json({ defaultValue: [] }),
     preferences: json({ defaultValue: {} }),

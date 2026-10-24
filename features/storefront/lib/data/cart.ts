@@ -9,6 +9,20 @@ import { redirect } from "next/navigation";
 import { getUser } from "./user";
 import type { AddressCreateInput } from '.keystone/types';
 
+// Message safe to show a customer. graphql-request builds error.message from the
+// whole request and response, and production Keystone masks resolver errors as
+// "Unexpected error.", so only a resolver's own message is passed through.
+function customerError(error: any, fallback: string): string {
+  const gqlError = error?.response?.errors?.[0];
+  const original = gqlError?.extensions?.originalError?.message;
+  if (typeof original === "string" && original) return original;
+  if (typeof gqlError?.message === "string" && gqlError.message && gqlError.message !== "Unexpected error.") {
+    return gqlError.message;
+  }
+  if (!error?.response && error instanceof Error && error.message) return error.message;
+  return fallback;
+}
+
 const CART_QUERY = gql`
   query GetCart($cartId: ID!) {
     activeCart(cartId: $cartId)
@@ -569,7 +583,7 @@ export async function addToCart({ variantId, quantity, countryCode }: { variantI
     updateTag("cart");
   } catch (error) {
     console.error("Error adding to cart:", error instanceof Error ? error.message : String(error));
-    return error instanceof Error ? error.message : String(error);
+    return customerError(error, "Could not add this item to your cart");
   }
 }
 
@@ -619,7 +633,7 @@ export async function updateLineItem({ lineId, quantity }: { lineId: string, qua
     updateTag("cart");
   } catch (error) {
     console.error("Error updating line item:", error instanceof Error ? error.message : String(error));
-    return error instanceof Error ? error.message : String(error);
+    return customerError(error, "Could not update this item");
   }
 }
 
@@ -653,7 +667,7 @@ export async function deleteLineItem(lineId: string) {
     updateTag("cart");
   } catch (error) {
     console.error("Error deleting line item:", error instanceof Error ? error.message : String(error));
-    return error instanceof Error ? error.message : String(error);
+    return customerError(error, "Could not remove this item");
   }
 }
 
@@ -749,7 +763,7 @@ export async function cartUpdate(data: Record<string, any>) {
     updateTag("cart");
   } catch (error) {
     console.error("Error in cartUpdate:", error instanceof Error ? error.message : String(error));
-    return error instanceof Error ? error.message : String(error);
+    return customerError(error, "Could not update your cart");
   }
 }
 
@@ -815,15 +829,7 @@ export async function submitDiscountForm(prevState: any, formData: FormData) {
     updateTag("cart");
     return null;
   } catch (error: any) {
-    // Check for originalError message first (Keystone wraps errors with "Unexpected error")
-    if (error?.response?.errors?.[0]?.extensions?.originalError?.message) {
-      return error.response.errors[0].extensions.originalError.message;
-    }
-    // GraphQL errors from graphql-request come as ClientError with response.errors
-    if (error?.response?.errors?.[0]?.message && error.response.errors[0].message !== "Unexpected error.") {
-      return error.response.errors[0].message;
-    }
-    return error instanceof Error ? error.message : "Failed to apply discount code";
+    return customerError(error, "That code can't be applied to this cart");
   }
 }
 
@@ -1110,7 +1116,7 @@ export async function setAddresses(currentState: any, formData: FormData) {
       }
     } catch (error) {
       console.error("Error creating address:", error);
-      return error instanceof Error ? error.message : String(error);
+      return customerError(error, "Could not save this address");
     }
   }
 
@@ -1132,7 +1138,7 @@ export async function setAddresses(currentState: any, formData: FormData) {
     updateTag("auth");
   } catch (error) {
     console.error("Error updating cart:", error);
-    return error instanceof Error ? error.message : String(error);
+    return customerError(error, "Could not save this address");
   }
   // Return success with countryCode for client-side redirection
   return { success: true, countryCode: formData.get("shippingAddress.countryCode") };

@@ -17,7 +17,7 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         <ItemsPreviewTemplate region={cart?.region} items={cart?.lineItems} />
         <DiscountCode cart={cart} />
         <div className="border-t border-cx-line pt-4">
-          <CartTotals data={cart} />
+          <CartTotals data={cart} shippingPending={!cart?.shippingAddress} />
         </div>
       </div>
     </aside>

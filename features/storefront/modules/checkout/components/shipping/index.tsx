@@ -77,7 +77,9 @@ const Shipping: React.FC<ShippingProps> = ({
     setSelectedOption(cart?.shippingMethods?.[0]?.shippingOption?.id || null)
   }, [isOpen, cart?.shippingMethods])
 
-  const hasMethod = (cart?.shippingMethods?.length ?? 0) > 0
+  // The cart model attaches the cheapest option on create, so a method only counts
+  // once there is an address to ship to.
+  const hasMethod = !!cart?.shippingAddress && (cart?.shippingMethods?.length ?? 0) > 0
 
   return (
     <StepSection>

@@ -169,10 +169,10 @@ export function PaymentProviderListPageClient({
   const breadcrumbs = [
     { type: 'link' as const, label: 'Dashboard', href: basePath },
     { type: 'page' as const, label: 'Platform' },
-    { type: 'page' as const, label: 'PaymentProviders' }
+    { type: 'page' as const, label: 'Payment providers' }
   ]
 
-  const header = <PageTitle title="PaymentProviders" />
+  const header = <PageTitle title="Payment providers" />
 
   // Check if we have any active filters (search or actual filters)
   const hasFilters = !!searchString
@@ -181,7 +181,7 @@ export function PaymentProviderListPageClient({
 
   return (
     <>
-    <PageContainer title="PaymentProviders" header={header} breadcrumbs={breadcrumbs}>
+    <PageContainer title="Payment providers" header={header} breadcrumbs={breadcrumbs}>
       {/* Filter Bar - includes search, filters, sorting, and create button */}
       <div className="px-4 md:px-6">
         <PlatformFilterBar 

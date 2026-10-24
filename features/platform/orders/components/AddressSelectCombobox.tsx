@@ -97,10 +97,10 @@ export function AddressSelectCombobox({
   const filteredAddresses = addresses.filter((address) => {
     const searchLower = searchTerm.toLowerCase();
     return (
-      address.firstName.toLowerCase().includes(searchLower) ||
-      address.lastName.toLowerCase().includes(searchLower) ||
-      address.address1.toLowerCase().includes(searchLower) ||
-      address.city.toLowerCase().includes(searchLower) ||
+      (address.firstName || "").toLowerCase().includes(searchLower) ||
+      (address.lastName || "").toLowerCase().includes(searchLower) ||
+      (address.address1 || "").toLowerCase().includes(searchLower) ||
+      (address.city || "").toLowerCase().includes(searchLower) ||
       (address.company && address.company.toLowerCase().includes(searchLower))
     );
   });
@@ -220,7 +220,7 @@ export function AddressSelectCombobox({
             className="border-input w-full min-w-[var(--radix-popper-anchor-width)] p-0"
             align="start"
           >
-            <Command>
+            <Command shouldFilter={false}>
               <CommandInput 
                 placeholder={placeholder}
                 value={searchTerm}

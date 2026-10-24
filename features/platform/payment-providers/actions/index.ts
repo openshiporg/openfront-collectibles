@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { keystoneClient } from "../../../dashboard/lib/keystoneClient";
+import { isPaymentProviderConfigured } from "../../../keystone/utils/paymentProviderConfig";
 
 // Interface for paymentprovider data (exported for potential use in other files)
 export interface PaymentProvider {
@@ -62,7 +63,11 @@ export async function getPaymentProviders(
     return {
       success: true,
       data: {
-        items: response.data.items || [],
+        // Checkout skips installed providers whose keys are not set on the server.
+        items: (response.data.items || []).map((item: any) => ({
+          ...item,
+          keysMissing: typeof item.code === 'string' && !isPaymentProviderConfigured(item.code),
+        })),
         count: response.data.count || 0,
       },
     };

@@ -179,7 +179,7 @@ export function VariantSearchCombobox({
           className="border-input w-full min-w-[var(--radix-popper-anchor-width)] p-0"
           align="start"
         >
-          <Command>
+          <Command shouldFilter={false}>
             <CommandInput 
               placeholder={placeholder}
               value={searchTerm}

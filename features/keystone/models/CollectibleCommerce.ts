@@ -17,7 +17,7 @@ const canManageAuctions = permissions.canManageAuctions;
 
 export const Listing = list({
   access: { operation: { query: canRead, create: () => false, update: () => false, delete: () => false } },
-  ui: { ...{ labelField: 'title', listView: { initialColumns: ['title', 'format', 'status', 'price'] } }, ...lockedRecordUi, itemView: { ...{}, ...lockedRecordUi.itemView } },
+  ui: { ...{ labelField: 'title', listView: { initialColumns: ['title', 'format', 'status', 'priceMinor', 'currencyCode'] } }, ...lockedRecordUi, itemView: { ...{}, ...lockedRecordUi.itemView } },
   fields: {
     store: relationship({ ref: 'Store' }),
     inventoryUnit: relationship({ ref: 'InventoryUnit' }),
@@ -31,7 +31,8 @@ export const Listing = list({
       label: 'Price (minor units)',
       ui: { description: 'Integer minor units of the currency: 475000 USD is USD 4,750.00' },
     }),
-    // Read-only display of priceMinor in major units, for list columns and item pages.
+    // Read-only display of priceMinor in major units on item pages. It is not a list
+    // column, because the shared dashboard virtual cell does not render row values.
     price: virtual({
       field: graphql.field({
         type: graphql.String,
