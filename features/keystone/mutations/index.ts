@@ -38,6 +38,7 @@ import createProviderShippingLabel from './createProviderShippingLabel';
 import createOrderFulfillment from './createOrderFulfillment';
 import cancelOrderFulfillment from './cancelOrderFulfillment';
 import transitionOrderStatus from './transitionOrderStatus';
+import confirmManualPayment from './confirmManualPayment';
 import regenerateCustomerToken from './regenerateCustomerToken';
 import getCustomerAccount from './getCustomerAccount';
 import getCustomerAccounts from './getCustomerAccounts';
@@ -299,6 +300,7 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         ): Fulfillment!
         cancelOrderFulfillment(fulfillmentId: ID!, reason: String!): Fulfillment!
         transitionOrderStatus(orderId: ID!, status: String!, reason: String!): Order!
+        confirmManualPayment(orderId: ID!, reference: String!): Order!
         regenerateCustomerToken: CustomerTokenResult!
         createInvoiceFromLineItems(accountId: ID!, regionId: ID!, lineItemIds: [ID!]!, dueDate: String): InvoiceCreationResult!
         createInvoicePaymentSessions(invoiceId: ID!): Invoice!
@@ -377,6 +379,7 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         createOrderFulfillment,
         cancelOrderFulfillment,
         transitionOrderStatus,
+        confirmManualPayment,
         regenerateCustomerToken,
         createInvoiceFromLineItems,
         createInvoicePaymentSessions,

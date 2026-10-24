@@ -46,7 +46,17 @@ export function buildPublicCollectiblesDiscoveryPageQuery({
       POSITION(${search} IN LOWER(COALESCE(ci.maker, ''))) > 0 OR
       POSITION(${search} IN LOWER(COALESCE(cc.name, ''))) > 0 OR
       POSITION(${search} IN LOWER(COALESCE(f.name, ''))) > 0 OR
-      POSITION(${search} IN LOWER(COALESCE(cs.name, ''))) > 0
+      POSITION(${search} IN LOWER(COALESCE(cs.name, ''))) > 0 OR
+      EXISTS (
+        SELECT 1
+        FROM "GradeObservation" go
+        LEFT JOIN "GradingCompany" gc ON gc.id = go."gradingCompany"
+        WHERE go.specimen = s.id AND go."publiclyVisible" = TRUE AND (
+          POSITION(${search} IN LOWER(COALESCE(go."certificateReference", ''))) > 0 OR
+          POSITION(${search} IN LOWER(COALESCE(gc.name, ''))) > 0 OR
+          POSITION(${search} IN LOWER(COALESCE(gc.code, ''))) > 0
+        )
+      )
     )`);
   }
 

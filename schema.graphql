@@ -15163,6 +15163,7 @@ type Mutation {
   createOrderFulfillment(orderId: ID!, lineItems: [LineItemInput!]!, trackingNumber: String, carrier: String, noNotification: Boolean, idempotencyKey: String!): Fulfillment!
   cancelOrderFulfillment(fulfillmentId: ID!, reason: String!): Fulfillment!
   transitionOrderStatus(orderId: ID!, status: String!, reason: String!): Order!
+  confirmManualPayment(orderId: ID!, reference: String!): Order!
   regenerateCustomerToken: CustomerTokenResult!
   createInvoiceFromLineItems(accountId: ID!, regionId: ID!, lineItemIds: [ID!]!, dueDate: String): InvoiceCreationResult!
   createInvoicePaymentSessions(invoiceId: ID!): Invoice!

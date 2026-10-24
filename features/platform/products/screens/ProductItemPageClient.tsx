@@ -278,7 +278,7 @@ export function ProductItemPageClient({ list, item, itemId }: ProductItemPageCli
           />
         </div>
 
-        <main className="max-w-6xl p-4 md:p-6">
+        <div className="max-w-6xl p-4 md:p-6">
           <div className="mb-8 flex flex-col gap-1">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <h1 className="text-2xl font-semibold tracking-tight text-foreground">{pageLabel}</h1>
@@ -431,7 +431,7 @@ export function ProductItemPageClient({ list, item, itemId }: ProductItemPageCli
               </section>
             </aside>
           </div>
-        </main>
+        </div>
       </div>
 
       {errorDialogValue && (

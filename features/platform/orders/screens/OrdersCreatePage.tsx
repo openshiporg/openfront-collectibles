@@ -246,10 +246,14 @@ export function OrdersCreatePage() {
       const { initiateAdminPaymentSession, completeAdminCart } = await import('../actions/orders');
       
       // Step 1: Initiate payment session using admin server action
-      await initiateAdminPaymentSession(cartId, selectedPaymentMethod);
+      const sessionResult = await initiateAdminPaymentSession(cartId, selectedPaymentMethod);
+      const paymentSessionId = sessionResult.success ? sessionResult.data?.initiatePaymentSession?.id : null;
+      if (!paymentSessionId) {
+        throw new Error(sessionResult.error || "Could not start the payment");
+      }
 
-      // Step 2: Complete the cart using admin server action
-      const completeResult = await completeAdminCart(cartId);
+      // Step 2: Complete the cart with that payment session
+      const completeResult = await completeAdminCart(cartId, paymentSessionId);
       
       if (!completeResult.success) {
         throw new Error(completeResult.error || "Failed to complete order");

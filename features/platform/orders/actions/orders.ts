@@ -685,14 +685,14 @@ export async function initiateAdminPaymentSession(cartId: string, paymentProvide
 /**
  * Complete cart to order for admin (server action version)
  */
-export async function completeAdminCart(cartId: string) {
+export async function completeAdminCart(cartId: string, paymentSessionId: string) {
   const query = `
-    mutation CompleteActiveCart($cartId: ID!) {
-      completeActiveCart(cartId: $cartId)
+    mutation CompleteActiveCart($cartId: ID!, $paymentSessionId: ID) {
+      completeActiveCart(cartId: $cartId, paymentSessionId: $paymentSessionId)
     }
   `;
 
-  const response = await keystoneClient(query, { cartId });
+  const response = await keystoneClient(query, { cartId, paymentSessionId });
   
   if (response.success) {
     revalidatePath('/dashboard/platform/orders');
@@ -700,3 +700,21 @@ export async function completeAdminCart(cartId: string) {
   
   return response;
 } 
+/**
+ * Record a pending bank transfer as received
+ */
+export async function confirmManualPaymentAction(orderId: string, reference: string) {
+  const query = `
+    mutation ConfirmManualPayment($orderId: ID!, $reference: String!) {
+      confirmManualPayment(orderId: $orderId, reference: $reference) { id status }
+    }
+  `;
+
+  const response = await keystoneClient(query, { orderId, reference });
+
+  if (response.success) {
+    revalidatePath(`/dashboard/platform/orders/${orderId}`);
+  }
+
+  return response;
+}

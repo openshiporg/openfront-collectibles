@@ -437,7 +437,7 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
           />
       </div>
 
-      <main className="max-w-6xl p-4 md:p-6">
+      <div className="max-w-6xl p-4 md:p-6">
         <div className="mb-8">
           <PageTitle title={`Create ${list.singular.toLowerCase()}`} />
         </div>
@@ -671,7 +671,7 @@ export function ProductCreatePageClient({ listKey, list }: ProductCreatePageClie
             )}
           </aside>
         </div>
-      </main>
+      </div>
     </div>
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>

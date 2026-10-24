@@ -16,6 +16,7 @@ import {
 } from "../checkout/recovery";
 import { createOrderFromCartAtomically } from "../checkout/order-commit";
 import { providerCaptureKey } from '../payments/provider-capture-key';
+import { isManualPaymentProvider } from '../utils/paymentProviderConfig';
 import {
   enqueueWebhookOutbox,
   subscribedWebhookEndpointIds,
@@ -363,6 +364,22 @@ async function handlePaidOrder(cart: any, paymentSessionId: string, sudoContext:
   }
 
   let paymentResult = attempt.responseBody?.paymentResult;
+  if (
+    (attempt.recoveryPoint !== 'payment_confirmed' || !paymentResult) &&
+    isManualPaymentProvider(selectedSession.paymentProvider.code)
+  ) {
+    // Manual tender (bank transfer): nothing is charged here. The order is created
+    // with a pending payment that a manager records once the funds arrive.
+    paymentResult = { status: 'manual_pending', paymentIntentId: null };
+    await updateCheckoutAttempt(
+      sudoContext.prisma,
+      attempt.id,
+      'payment_confirmed',
+      { paymentResult }
+    );
+    attempt.recoveryPoint = 'payment_confirmed';
+    attempt.responseBody = { paymentResult };
+  }
   if (attempt.recoveryPoint !== 'payment_confirmed' || !paymentResult) {
     try {
       paymentResult = await settlePaymentSession(selectedSession, cart);
@@ -553,6 +570,10 @@ async function createPaymentRecord(
   cart: any,
   sudoContext: any
 ) {
+  if (paymentResult?.status === 'manual_pending') {
+    await createPendingManualPayment(selectedSession, order, cart, sudoContext);
+    return;
+  }
   const paymentWebhookEndpointIds = await subscribedWebhookEndpointIds(
     sudoContext,
     'payment.captured'
@@ -616,4 +637,47 @@ async function createPaymentRecord(
   });
 }
 
-export default completeActiveCart; 
+// Manual tender: a pending payment for the full total, with no capture. A manager
+// records it as received with confirmManualPayment.
+async function createPendingManualPayment(selectedSession: any, order: any, cart: any, sudoContext: any) {
+  await sudoContext.prisma.$transaction(async (tx: any) => {
+    const existing = await tx.payment.findFirst({
+      where: { orderId: order.id, paymentCollectionId: cart.paymentCollection.id },
+    });
+    if (existing) return;
+    const payment = await tx.payment.create({
+      data: {
+        status: 'pending',
+        amount: cart.rawTotal,
+        currencyCode: cart.region.currency.code,
+        data: {
+          ...selectedSession.data,
+          paymentProviderId: selectedSession.paymentProvider.id,
+          paymentProviderCode: selectedSession.paymentProvider.code,
+          manual: true,
+        },
+        metadata: { checkoutIdempotencyKey: checkoutKey(cart.id) },
+        idempotencyKey: checkoutKey(cart.id),
+        paymentCollectionId: cart.paymentCollection.id,
+        orderId: order.id,
+        userId: cart.user?.id || cart.shippingAddress?.user?.id || null,
+      },
+    });
+    await tx.orderEvent.create({
+      data: {
+        orderId: order.id,
+        type: 'PAYMENT_STATUS_CHANGE',
+        data: {
+          paymentId: payment.id,
+          status: 'pending',
+          amount: cart.rawTotal,
+          currencyCode: cart.region.currency.code,
+          source: 'checkout',
+          method: 'manual',
+        },
+      },
+    });
+  });
+}
+
+export default completeActiveCart;

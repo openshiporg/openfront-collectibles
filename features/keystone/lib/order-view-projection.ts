@@ -57,6 +57,6 @@ export interface OrderViewProjection {
   shippingMethods?: { price?: number | null }[];
   discounts?: { discountRule?: { type: string; value: number; allocation?: string } | null }[];
   fulfillments?: FulfillmentView[];
-  payments?: { id: string; amount: number; status: string; createdAt?: string; data?: { provider?: string; cardLast4?: string } | null; paymentCollection?: { paymentSessions?: PaymentSessionView[] } | null }[];
+  payments?: { id: string; amount: number; status: string; createdAt?: string; data?: { provider?: string; cardLast4?: string; manual?: boolean } | null; paymentCollection?: { paymentSessions?: PaymentSessionView[] } | null }[];
   accountLineItems?: { id: string; paymentStatus: string; amount?: number | null }[];
 }

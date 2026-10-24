@@ -25,6 +25,7 @@ type ProductVariant = {
   id: string;
   title: string;
   sku?: string;
+  collectibleSummary?: string | null;
   product: {
     id: string;
     title: string;
@@ -113,7 +114,7 @@ export function LineItemsManager({
 
   // Variant title and SKU, without repeating one when it equals the other (unique items).
   const variantLine = (variant: ProductVariant) =>
-    [variant.title, variant.sku].filter((part, i, all): part is string => !!part && all.indexOf(part) === i).join(' · ');
+    [variant.title, variant.sku, variant.collectibleSummary].filter((part, i, all): part is string => !!part && all.indexOf(part) === i).join(' · ');
 
   const formatPriceVal = (variant: ProductVariant) => {
     const price = variant.prices?.[0];
@@ -249,6 +250,7 @@ export function LineItemsManager({
                               <div className="flex flex-col gap-0.5 max-w-[70%]">
                                 <span className="font-medium text-sm truncate">{variant.title || variant.sku}</span>
                                 {variant.sku && variant.sku !== variant.title && <span className="font-mono text-xs tabular-nums text-muted-foreground">{variant.sku}</span>}
+                                {variant.collectibleSummary && <span className="text-xs text-muted-foreground">{variant.collectibleSummary}</span>}
                               </div>
                               <div className="flex items-center gap-3">
                                 <span className="font-mono text-sm font-medium tabular-nums">{formatPrice(unitPrice, currencyOf(variant))}</span>

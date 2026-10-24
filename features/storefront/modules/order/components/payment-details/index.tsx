@@ -32,6 +32,11 @@ const PaymentDetails = ({ order }: { order: StoreOrder }) => {
             </span>
           </div>
         </Field>
+        {payment.data?.manual === true && (
+          <Field label="Status">
+            <p>{payment.status === "captured" ? "Received" : payment.status === "canceled" ? "Canceled" : "Awaiting bank transfer"}</p>
+          </Field>
+        )}
       </div>
     </OrderSection>
   );

@@ -75,10 +75,14 @@ async function createOrderFulfillment(
     if (existing) return { fulfillmentId: existing.id, webhookEventIds: [] as string[] };
     const order = await tx.order.findUnique({
       where: { id: orderId },
-      select: { status: true },
+      select: { status: true, payments: { select: { status: true, data: true } } },
     });
     if (!order || !["pending", "completed"].includes(order.status)) {
       throw new Error("Order is not fulfillable");
+    }
+    // A bank-transfer order ships only after its payment is recorded as received.
+    if (order.payments.some((payment: any) => payment.status === "pending" && payment.data?.manual === true)) {
+      throw new Error("Record the bank transfer as received before fulfilling this order");
     }
     const orderLines = await tx.orderLineItem.findMany({
       where: { orderId, id: { in: normalized.map(([id]) => id) } },

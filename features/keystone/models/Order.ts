@@ -867,6 +867,7 @@ export const Order = list<Lists.Order.TypeInfo>({
                 createdAt: payment.createdAt,
                 provider: payment.data?.provider,
                 cardLast4: payment.data?.cardLast4,
+                manual: payment.data?.manual === true,
                 paymentSession: payment.paymentCollection?.paymentSessions?.find(s => s.isSelected)
               })));
             }

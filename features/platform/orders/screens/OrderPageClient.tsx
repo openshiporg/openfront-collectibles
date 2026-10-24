@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dot, ListBand, SectionTitle } from "@/features/platform/components/vault-ui";
 import { StatusBadge } from "../components/StatusBadge";
+import { RecordBankTransfer } from "../components/RecordBankTransfer";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 
 
@@ -23,6 +24,7 @@ interface ExtendedOrder {
   formattedTotalPaid?: string;
   paymentDetails?: Array<{
     status: string;
+    manual?: boolean;
   }>;
   user?: {
     id: string;
@@ -124,6 +126,8 @@ export function OrderPageClient({
 
   const { lineItems = [] } = order;
   const paymentCaptured = order.paymentDetails?.[0]?.status === "captured";
+  const awaitingTransfer =
+    order.paymentDetails?.[0]?.status === "pending" && order.paymentDetails?.[0]?.manual === true;
   const formatDate = (value?: string) =>
     value
       ? new Date(value).toLocaleString("en-US", {
@@ -243,7 +247,7 @@ export function OrderPageClient({
                 meta={
                   <span className="inline-flex items-baseline gap-1.5 font-sans">
                     <Dot tone={paymentCaptured ? "ok" : "warn"} />
-                    {paymentCaptured ? "Payment complete" : "Payment processing"}
+                    {paymentCaptured ? "Payment complete" : awaitingTransfer ? "Awaiting bank transfer" : "Payment processing"}
                   </span>
                 }
               >
@@ -268,6 +272,9 @@ export function OrderPageClient({
                   <span className="text-muted-foreground">Paid</span>
                   <span className="font-mono tabular-nums text-foreground">{order.formattedTotalPaid}</span>
                 </div>
+                {awaitingTransfer && ["pending", "requires_action"].includes(order.status) && (
+                  <RecordBankTransfer orderId={order.id} />
+                )}
               </ListBand>
             </section>
 

@@ -21,7 +21,7 @@ async function transitionOrderStatus(
       where: { id: orderId },
       include: {
         payments: {
-          select: { amount: true, amountRefunded: true, refunds: { select: { amount: true } } },
+          select: { id: true, status: true, amount: true, amountRefunded: true, refunds: { select: { amount: true } } },
         },
         fulfillments: { where: { canceledAt: null }, select: { id: true } },
         accountLineItems: {
@@ -38,7 +38,11 @@ async function transitionOrderStatus(
           select: {
             quantity: true,
             productVariant: {
-              select: { id: true, manageInventory: true },
+              select: {
+                id: true,
+                manageInventory: true,
+                collectibleInventoryUnit: { select: { id: true, status: true, version: true } },
+              },
             },
           },
         },
@@ -54,13 +58,47 @@ async function transitionOrderStatus(
         throw new Error("Order cannot be canceled from its current state");
       }
       if (order.fulfillments.length) throw new Error("Cancel active fulfillments before canceling the order");
+      // Pending manual payments (an unpaid bank transfer) hold no money; they are
+      // cancelled with the order. Anything else must be fully refunded first.
       if (
         order.payments.some(
           (payment: any) =>
+            payment.status !== "pending" &&
+            payment.status !== "canceled" &&
             payment.refunds.reduce((sum: number, refund: any) => sum + refund.amount, 0) < payment.amount
         )
       ) {
         throw new Error("Captured payments must be fully refunded before cancellation");
+      }
+      for (const payment of order.payments) {
+        if (payment.status !== "pending") continue;
+        await tx.payment.update({ where: { id: payment.id }, data: { status: "canceled" } });
+      }
+      // The order sold its serialized specimens at checkout. Put each one back in
+      // stock, and pause its listing so the merchant chooses when to relist it.
+      for (const line of order.lineItems) {
+        const unit = line.productVariant?.collectibleInventoryUnit;
+        if (!unit || unit.status !== "sold") continue;
+        const restored = await tx.inventoryUnit.updateMany({
+          where: { id: unit.id, status: "sold", version: unit.version },
+          data: { status: "available", quantity: 1, version: { increment: 1 } },
+        });
+        if (restored.count !== 1) throw new Error("Specimen changed during cancellation");
+        await tx.listing.updateMany({
+          where: { inventoryUnitId: unit.id, status: "sold" },
+          data: { status: "paused" },
+        });
+        await tx.inventoryMovement.create({
+          data: {
+            inventoryUnitId: unit.id,
+            type: "release",
+            fromStatus: "sold",
+            toStatus: "available",
+            reason: "order_cancellation",
+            occurredAt: new Date(),
+            idempotencyKey: `order-cancel:${orderId}:${unit.id}`,
+          },
+        });
       }
       for (const line of order.lineItems) {
         if (!line.productVariant?.manageInventory) continue;

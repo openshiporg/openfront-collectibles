@@ -916,7 +916,7 @@ export function MiniStorefront({
                 </SidebarGroup>
               </SidebarContent>
             </Sidebar>
-            <main className="flex h-[550px] flex-1 flex-col overflow-hidden">
+            <div className="flex h-[550px] flex-1 flex-col overflow-hidden">
               <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
                 <div className="flex items-center gap-2 px-4">
                   <Breadcrumb>
@@ -937,7 +937,7 @@ export function MiniStorefront({
               <div className="flex-1 overflow-y-auto p-4 pt-0">
                 {renderStepContent()}
               </div>
-            </main>
+            </div>
           </SidebarProvider>
         </DialogContent>
       </Dialog>

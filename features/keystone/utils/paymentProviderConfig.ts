@@ -3,6 +3,12 @@ export interface PublicPaymentProviderConfig {
   publishableKey: string;
 }
 
+// Bank transfer / manual review: no provider call; the order waits for a manager
+// to record the payment as received.
+export function isManualPaymentProvider(code: string | null | undefined): boolean {
+  return code === 'pp_system_default' || String(code || '').startsWith('pp_manual');
+}
+
 export function isPaymentProviderConfigured(code: string): boolean {
   if (code.startsWith('pp_stripe')) {
     return Boolean(
@@ -16,7 +22,7 @@ export function isPaymentProviderConfigured(code: string): boolean {
       process.env.PAYPAL_CLIENT_SECRET
     );
   }
-  return code === 'pp_system_default' || code.startsWith('pp_manual');
+  return isManualPaymentProvider(code);
 }
 
 export function getPublicPaymentProviderConfig(

@@ -30,13 +30,9 @@ async function activeCartPaymentProviders(
     `
   });
 
-  // Checkout only offers methods that can complete it: completeActiveCart refuses
-  // manual tender, so offering it would fail at Place order.
-  return providers.filter((provider: any) =>
-    isPaymentProviderConfigured(provider.code || '') &&
-    provider.code !== 'pp_system_default' &&
-    !String(provider.code || '').startsWith('pp_manual')
-  );
+  // Checkout only offers methods that can complete it. Manual tender (bank
+  // transfer) places the order with its payment pending until a manager records it.
+  return providers.filter((provider: any) => isPaymentProviderConfigured(provider.code || ''));
 }
 
 export default activeCartPaymentProviders; 

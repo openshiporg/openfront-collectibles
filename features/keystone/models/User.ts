@@ -50,6 +50,19 @@ export const User = list<Lists.User.TypeInfo>({
       }
       return resolvedData;
     },
+    // Every customer (a user without a staff role) gets a private collector
+    // profile, so wishlists, trade-ins and collector desks have a record to use.
+    afterOperation: async ({ operation, item, context }) => {
+      if (operation !== 'create' || !item || item.roleId) return;
+      // Prisma directly: the profile's owner hook expects the customer's own session,
+      // which a public sign-up does not have yet.
+      const prisma = context.sudo().prisma;
+      const existing = await prisma.collectorProfile.count({ where: { userId: item.id } });
+      if (existing) return;
+      await prisma.collectorProfile.create({
+        data: { userId: item.id, displayName: item.name || '', public: false },
+      });
+    },
   },
   ui: {
     // hide the backend UI from regular users
