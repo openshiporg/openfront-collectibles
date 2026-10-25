@@ -20,7 +20,7 @@ const CartTemplate = ({ cart, user }: CartTemplateProps) => {
       {cart?.lineItems?.length ? (
         <>
           <div className="flex items-baseline gap-3 border-b border-cx-line pb-4">
-            <h1 className="font-cx-serif text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px]">
+            <h1 className="font-cx-display font-extrabold text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px]">
               Cart
             </h1>
             <span className="cx-num text-[13px] text-cx-ink-3">

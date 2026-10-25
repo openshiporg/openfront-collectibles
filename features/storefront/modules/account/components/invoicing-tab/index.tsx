@@ -192,7 +192,7 @@ const InvoicingTab = ({ customer, businessAccount, businessAccountRequest, order
         <div>
           <div className="mb-6 flex flex-col gap-3 border-b border-cx-line pb-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h1 className="font-cx-serif text-[30px] leading-[34px] tracking-[-0.01em] text-cx-ink sm:text-[36px] sm:leading-[40px]">
+              <h1 className="font-cx-display font-extrabold text-[30px] leading-[34px] tracking-[-0.01em] text-cx-ink sm:text-[36px] sm:leading-[40px]">
                 Business account
               </h1>
               <span className="inline-flex items-baseline gap-1.5 text-[14px] text-cx-ink-2">

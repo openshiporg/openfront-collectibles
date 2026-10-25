@@ -69,7 +69,7 @@ const ImageGallery = ({ images, title, label }: ImageGalleryProps) => {
     <div className="flex flex-col gap-3 lg:flex-row-reverse lg:items-start">
       <div
         ref={scroller}
-        className="cx-pocket no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto rounded-[2px]"
+        className="cx-pocket no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto rounded-[2px] bg-cx-well"
         onScroll={(event) => {
           const el = event.currentTarget
           const index = Math.round(el.scrollLeft / Math.max(el.clientWidth, 1))
@@ -78,7 +78,7 @@ const ImageGallery = ({ images, title, label }: ImageGalleryProps) => {
         aria-label="Item photos"
       >
         {displayImages.map((image, index) => (
-          <div key={image.id ?? index} className="relative aspect-[4/5] w-full shrink-0 snap-center" id={image.id}>
+          <div key={image.id ?? index} className="relative aspect-[4/3] w-full shrink-0 snap-center" id={image.id}>
             <Image
               src={srcOf(image)}
               priority={index === 0}

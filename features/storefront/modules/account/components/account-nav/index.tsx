@@ -59,7 +59,6 @@ const AccountNav = ({ customer }: AccountNavProps) => {
     <div data-testid="account-nav">
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
         <div className="min-w-0">
-          <p className="cx-label">Account</p>
           {name && (
             <p className="mt-1 truncate font-cx-serif text-[28px] leading-[32px] tracking-[-0.01em] text-cx-ink sm:text-[34px] sm:leading-[38px]">
               {name}

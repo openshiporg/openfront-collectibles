@@ -32,13 +32,13 @@ export default async function BrowseHeader({
   return (
     <header className="space-y-6 pb-6 pt-8 sm:pt-12">
       <div className="space-y-2">
-        {eyebrow && <div className="text-[13px] text-cx-ink-2">{eyebrow}</div>}
         <h1
-          className="font-cx-serif text-[40px] leading-[44px] tracking-[-0.015em] text-cx-ink sm:text-[56px] sm:leading-[58px]"
+          className="font-cx-display font-extrabold text-[40px] leading-[44px] tracking-[-0.015em] text-cx-ink sm:text-[56px] sm:leading-[58px]"
           data-testid={titleTestId}
         >
           {title}
         </h1>
+        {eyebrow && <div className="text-[15px] text-cx-ink-2">{eyebrow}</div>}
       </div>
       {children}
       <div className="flex flex-col gap-3 border-y border-cx-line py-3 lg:flex-row lg:items-center lg:justify-between">

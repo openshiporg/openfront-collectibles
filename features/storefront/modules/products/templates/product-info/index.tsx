@@ -103,20 +103,11 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   const variants = product.productVariants || []
   const available = variants.some((v) => (v.inventoryQuantity ?? 0) > 0)
   const unique = variants.length === 1 && variants[0]?.isUniqueCollectible
-  const collection = product.productCollections?.[0]
 
   return (
     <div id="product-info" className="space-y-3">
-      {collection && (
-        <LocalizedClientLink
-          href={`/collections/${collection.handle}`}
-          className="cx-label inline-flex min-h-8 items-center hover:text-cx-ink"
-        >
-          {collection.title}
-        </LocalizedClientLink>
-      )}
       <h1
-        className="font-cx-serif text-[32px] leading-[36px] tracking-[-0.015em] text-cx-ink sm:text-[40px] sm:leading-[44px]"
+        className="font-cx-display font-extrabold text-[32px] leading-[36px] tracking-[-0.015em] text-cx-ink sm:text-[40px] sm:leading-[44px]"
         data-testid="product-title"
       >
         {product.title}

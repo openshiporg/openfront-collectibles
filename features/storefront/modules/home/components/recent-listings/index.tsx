@@ -29,7 +29,7 @@ export default async function RecentListings({ countryCode, locale }: { countryC
             <li key={result?.ref?.id ?? title} className="w-[72vw] max-w-[280px] shrink-0 snap-start sm:w-auto sm:max-w-none">
               <LocalizedClientLink
                 href={typeof result?.merchantUrl === "string" ? result.merchantUrl : "/store"}
-                className="group block space-y-3"
+                className="group block overflow-hidden rounded-[2px] bg-cx-surface transition-colors hover:bg-cx-tint"
               >
                 <SlabLabel
                   size="sm"
@@ -40,11 +40,11 @@ export default async function RecentListings({ countryCode, locale }: { countryC
                   verification={slab?.verification}
                   title={title}
                   line={[specimen?.category, specimen?.catalogNumber].filter(Boolean).join(" · ")}
-                  className="transition-transform duration-200 ease-out group-hover:-translate-y-0.5"
+                  className="!rounded-none !bg-transparent"
                 />
-                <div className="flex items-baseline justify-between gap-2 px-0.5">
+                <div className="flex items-baseline justify-between gap-2 px-3 pb-3">
                   {price && Number.isSafeInteger(price.amountMinor) && typeof price.currency === "string" ? (
-                    <span className="cx-num text-[14px] text-cx-ink">{formatMinorAmount(price.amountMinor, price.currency, locale)}</span>
+                    <span className="cx-num text-[17px] text-cx-ink">{formatMinorAmount(price.amountMinor, price.currency, locale)}</span>
                   ) : (
                     <span className="text-[13px] text-cx-ink-3">Price on request</span>
                   )}

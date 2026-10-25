@@ -22,7 +22,6 @@ const Register = ({ setCurrentView }: Props) => {
       className="flex w-full max-w-[480px] flex-col"
       data-testid="register-page"
     >
-      <p className="cx-label">Account</p>
       <h1 className="mt-2 font-cx-serif text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[44px] sm:leading-[46px]">
         Create account
       </h1>

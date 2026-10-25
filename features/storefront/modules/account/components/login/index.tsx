@@ -24,7 +24,6 @@ const Login = ({ setCurrentView }: Props) => {
       className="flex w-full max-w-[400px] flex-col"
       data-testid="login-page"
     >
-      <p className="cx-label">Account</p>
       <h1 className="mt-2 font-cx-serif text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[44px] sm:leading-[46px]">Sign in</h1>
       <form className="mt-8 w-full" action={formAction}>
         <div className="flex w-full flex-col gap-y-4">

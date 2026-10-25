@@ -100,12 +100,12 @@ export function CollectibleEvidencePanel({ result, unavailable = false }: Eviden
 
   return (
     <section className="mx-auto w-full max-w-[1320px] px-4 py-14 sm:px-6 sm:py-20" aria-labelledby="item-record-title" data-testid="item-record">
-      <div className="flex flex-col gap-2 border-b border-cx-ink pb-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-2 pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
-          <p className="cx-label">{specimen.category}</p>
-          <h2 id="item-record-title" className="font-cx-serif text-[30px] leading-[34px] tracking-[-0.01em] text-cx-ink sm:text-[36px] sm:leading-[40px]">
+          <h2 id="item-record-title" className="font-cx-display text-[32px] font-extrabold leading-[34px] text-cx-ink sm:text-[44px] sm:leading-[44px]">
             Item record
           </h2>
+          <p className="cx-label">{specimen.category}</p>
         </div>
         {(specimen.catalogNumber || specimen.maker) && (
           <span className="cx-num text-[13px] text-cx-ink-2">

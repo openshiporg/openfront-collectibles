@@ -29,7 +29,7 @@ export async function CheckoutPage(props: { params: Promise<{ countryCode: strin
 
   return (
     <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 gap-6 px-4 pb-20 pt-6 sm:px-6 sm:pt-10 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-x-12 lg:gap-y-8">
-      <h1 className="font-cx-serif text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px] lg:col-span-2">
+      <h1 className="font-cx-display font-extrabold text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px] lg:col-span-2">
         Checkout
       </h1>
       <div className="min-w-0">
@@ -81,7 +81,7 @@ export function CheckoutNotFound() {
   return (
     <div className="mx-auto flex min-h-[60vh] w-full max-w-[1320px] flex-col justify-center gap-5 px-4 py-24 sm:px-6">
       <span className="cx-num text-[13px] text-cx-ink-3">404</span>
-      <h1 className="font-cx-serif text-[40px] leading-[44px] tracking-[-0.015em] text-cx-ink">Page not found</h1>
+      <h1 className="font-cx-display font-extrabold text-[40px] leading-[44px] tracking-[-0.015em] text-cx-ink">Page not found</h1>
       <div>
         <InteractiveLink href="/cart">Back to cart</InteractiveLink>
       </div>

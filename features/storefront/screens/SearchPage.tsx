@@ -35,7 +35,7 @@ export async function SearchPage(props: Props) {
 
   return (
     <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 pt-8 sm:px-6 sm:pt-12" data-testid="search-container">
-      <h1 className="font-cx-serif text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px]">
+      <h1 className="font-cx-display font-extrabold text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px]">
         Search
       </h1>
       <div className="mt-5 max-w-[640px]">

@@ -31,7 +31,7 @@ export function MainNotFound() {
   return (
     <div className="mx-auto flex min-h-[60vh] w-full max-w-[1320px] flex-col justify-center gap-5 px-4 py-24 sm:px-6">
       <span className="cx-num text-[13px] text-cx-ink-3">404</span>
-      <h1 className="font-cx-serif text-[40px] leading-[44px] tracking-[-0.015em] text-cx-ink sm:text-[56px] sm:leading-[58px]">
+      <h1 className="font-cx-display font-extrabold text-[40px] leading-[44px] tracking-[-0.015em] text-cx-ink sm:text-[56px] sm:leading-[58px]">
         Page not found
       </h1>
       <div className="mt-2">

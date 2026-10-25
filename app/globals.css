@@ -219,7 +219,7 @@
   .cx-pocket::after {
     content: "";
     position: absolute;
-    inset: 46% 0 0;
+    inset: 58% 0 0;
     z-index: 1;
     background: oklch(100% 0 0 / 0.055);
     border-top: 1px solid oklch(100% 0 0 / 0.16); /* taste-skill-ignore: the glassine strip's folded edge */

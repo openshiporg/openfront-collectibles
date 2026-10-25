@@ -33,7 +33,7 @@ export default function CheckoutLinkCart({
 
   return (
     <div className="w-full space-y-6" data-testid={testId}>
-      <h1 className="font-cx-serif text-[32px] leading-[36px] tracking-[-0.015em] text-cx-ink sm:text-[40px] sm:leading-[44px]">
+      <h1 className="font-cx-display font-extrabold text-[32px] leading-[36px] tracking-[-0.015em] text-cx-ink sm:text-[40px] sm:leading-[44px]">
         {title}
       </h1>
 
