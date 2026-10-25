@@ -100,8 +100,8 @@ const CartDropdown = ({
               <span
                 className={
                   totalItems > 0
-                    ? "cx-num inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-cx-ink px-1.5 text-[11px] text-cx-bg"
-                    : "cx-num text-[12px] text-cx-ink-3"
+                    ? "cx-num inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-cx-ink px-1.5 text-[13px] text-cx-bg"
+                    : "cx-num text-[13px] text-cx-ink-3"
                 }
               >
                 {totalItems}
@@ -109,7 +109,7 @@ const CartDropdown = ({
             </LocalizedClientLink>
           </PopoverTrigger>
           <PopoverContent
-            className="hidden w-[400px] overflow-hidden rounded-2xl border border-cx-line bg-cx-surface p-0 text-cx-ink shadow-[0_24px_48px_-24px_rgb(26_23_18/0.4)] sm:block"
+            className="hidden w-[400px] overflow-hidden rounded-[2px] border border-cx-line bg-cx-surface p-0 text-cx-ink shadow-[0_24px_48px_-24px_rgb(26_23_18/0.4)] sm:block"
             sideOffset={8}
             align="end"
             onMouseEnter={openAndCancel}
@@ -117,7 +117,7 @@ const CartDropdown = ({
           >
             {cartState && cartState.lineItems?.length ? (
               <>
-                <div className="no-scrollbar max-h-[380px] divide-y divide-cx-line overflow-y-auto">
+                <div className="no-scrollbar max-h-[380px] space-y-1 overflow-y-auto p-1">
                   {cartState.lineItems
                     .sort((a: CartItem, b: CartItem) => {
                       return a.created_at > b.created_at ? -1 : 1
@@ -134,9 +134,9 @@ const CartDropdown = ({
                                 {item.title}
                               </LocalizedClientLink>
                             </h3>
-                            {item.productVariant.title && <p className="truncate text-[12px] text-cx-ink-2">{item.productVariant.title}</p>}
+                            {item.productVariant.title && <p className="truncate text-[13px] text-cx-ink-2">{item.productVariant.title}</p>}
                             <LineItemOptions variant={item.productVariant} variantTitle={item.variantTitle}/>
-                            <div className="mt-1.5 flex items-center gap-2 text-[12px] text-cx-ink-2">
+                            <div className="mt-1.5 flex items-center gap-2 text-[13px] text-cx-ink-2">
                               <span className="cx-num">Qty {item.quantity}</span>
                               <span aria-hidden="true">·</span>
                               <DeleteButton id={item.id} />
@@ -149,7 +149,7 @@ const CartDropdown = ({
                       </div>
                     ))}
                 </div>
-                <div className="space-y-3 border-t border-cx-line bg-cx-bg p-4">
+                <div className="space-y-3 bg-cx-bg p-4">
                   <div className="flex items-baseline justify-between">
                     <span className="text-[14px] font-medium">
                       Subtotal <span className="font-normal text-cx-ink-3">excl. tax</span>
@@ -194,7 +194,7 @@ const DeleteButton = ({
   return (
     <button
       onClick={() => handleDelete(id)}
-      className="cursor-pointer text-[12px] font-medium text-cx-danger hover:underline"
+      className="cursor-pointer text-[13px] font-medium text-cx-danger hover:underline"
       disabled={isDeleting}
     >
       {isDeleting ? "Removing" : "Remove"}

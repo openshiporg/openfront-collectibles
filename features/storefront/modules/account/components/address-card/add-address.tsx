@@ -67,7 +67,7 @@ const AddAddress = ({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-2xl border-cx-line bg-cx-bg sm:max-w-xl" data-testid="add-address-modal">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-[2px] border-cx-line bg-cx-bg sm:max-w-xl" data-testid="add-address-modal">
         <DialogHeader>
           <DialogTitle className="font-cx-serif text-[24px] font-normal leading-[28px] text-cx-ink">Add address</DialogTitle>
           <DialogDescription className="sr-only">New shipping or billing address</DialogDescription>

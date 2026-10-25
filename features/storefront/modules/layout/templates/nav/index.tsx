@@ -32,7 +32,7 @@ export default async function Nav() {
 
   return (
     <div className="sticky inset-x-0 top-0 z-50">
-      <header className="border-b border-cx-line bg-cx-bg/95 backdrop-blur supports-[backdrop-filter]:bg-cx-bg/85">
+      <header className="bg-cx-vault">
         <nav className="mx-auto flex h-16 w-full max-w-[1320px] items-center gap-2 px-4 sm:gap-4 sm:px-6">
           <div className="flex items-center lg:hidden">
             <SideMenu regions={regions} categories={categories} collections={collectionLinks} logo={<Logo />} />
@@ -46,7 +46,7 @@ export default async function Nav() {
             <li>
               <LocalizedClientLink
                 href="/store"
-                className="inline-flex min-h-10 items-center rounded-full px-3 text-[14px] font-medium text-cx-ink hover:bg-cx-well"
+                className="inline-flex min-h-10 items-center rounded-[2px] px-3 font-cx-display text-[16px] font-bold text-cx-ink hover:bg-cx-vault-2"
               >
                 All items
               </LocalizedClientLink>
@@ -55,7 +55,7 @@ export default async function Nav() {
               <li key={c.href}>
                 <LocalizedClientLink
                   href={c.href}
-                  className="inline-flex min-h-10 items-center rounded-full px-3 text-[14px] text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink"
+                  className="inline-flex min-h-10 items-center rounded-[2px] px-3 font-cx-display text-[16px] font-semibold text-cx-ink-2 hover:bg-cx-vault-2 hover:text-cx-ink"
                 >
                   {c.title}
                 </LocalizedClientLink>
@@ -64,11 +64,11 @@ export default async function Nav() {
             {overflow.length > 0 && (
               <li className="relative">
                 <details className="group/more">
-                  <summary className="inline-flex min-h-10 cursor-pointer list-none items-center gap-1 rounded-full px-3 text-[14px] text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink [&::-webkit-details-marker]:hidden">
+                  <summary className="inline-flex min-h-10 cursor-pointer list-none items-center gap-1 rounded-[2px] px-3 font-cx-display text-[16px] font-semibold text-cx-ink-2 hover:bg-cx-vault-2 hover:text-cx-ink [&::-webkit-details-marker]:hidden">
                     More
                     <ChevronDown className="size-3.5 transition-transform group-open/more:rotate-180" aria-hidden="true" />
                   </summary>
-                  <ul className="absolute right-0 top-full mt-2 min-w-48 overflow-hidden rounded-2xl border border-cx-line bg-cx-surface py-1 shadow-[0_24px_48px_-24px_rgb(26_23_18/0.4)]">
+                  <ul className="absolute right-0 top-full mt-2 min-w-48 overflow-hidden rounded-[2px] bg-cx-surface py-1 shadow-[0_24px_48px_-16px_rgb(0_0_0/0.7)]">
                     {overflow.map((c) => (
                       <li key={c.href}>
                         <LocalizedClientLink href={c.href} className="flex min-h-11 items-center px-4 text-[14px] text-cx-ink hover:bg-cx-well">
@@ -86,20 +86,20 @@ export default async function Nav() {
             <LocalizedClientLink
               href="/search"
               aria-label="Search"
-              className="inline-flex size-11 items-center justify-center rounded-full text-cx-ink hover:bg-cx-well"
+              className="inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink hover:bg-cx-vault-2"
               data-testid="nav-search-link"
             >
               <Search className="size-[18px]" aria-hidden="true" />
             </LocalizedClientLink>
             <LocalizedClientLink
-              className="hidden min-h-11 items-center rounded-full px-3 text-[14px] text-cx-ink-2 hover:text-cx-ink lg:inline-flex"
+              className="hidden min-h-11 items-center rounded-[2px] px-3 font-cx-display text-[16px] font-semibold text-cx-ink-2 hover:text-cx-ink lg:inline-flex"
               href="/trade-in"
               data-testid="nav-trade-in-link"
             >
               Trade in
             </LocalizedClientLink>
             <LocalizedClientLink
-              className="hidden min-h-11 items-center rounded-full px-3 text-[14px] text-cx-ink-2 hover:text-cx-ink lg:inline-flex"
+              className="hidden min-h-11 items-center rounded-[2px] px-3 font-cx-display text-[16px] font-semibold text-cx-ink-2 hover:text-cx-ink lg:inline-flex"
               href="/account"
               data-testid="nav-account-link"
             >
@@ -112,7 +112,7 @@ export default async function Nav() {
                   href="/cart"
                   data-testid="nav-cart-link"
                 >
-                  Cart <span className="cx-num text-[12px] text-cx-ink-3">0</span>
+                  Cart <span className="cx-num text-[13px] text-cx-ink-3">0</span>
                 </LocalizedClientLink>
               }
             >

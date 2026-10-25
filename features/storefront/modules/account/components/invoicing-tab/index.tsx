@@ -210,7 +210,7 @@ const InvoicingTab = ({ customer, businessAccount, businessAccountRequest, order
             </button>
           </div>
 
-          <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-cx-line ring-1 ring-cx-line sm:grid-cols-3">
+          <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-[2px] bg-cx-line ring-1 ring-cx-line sm:grid-cols-3">
             <div className="bg-cx-surface px-5 py-4">
               <dt className="cx-label">Balance</dt>
               <dd className="cx-num mt-2 text-[24px] leading-none text-cx-ink">{businessAccount.formattedTotalOwedInAccountCurrency}</dd>
@@ -234,7 +234,7 @@ const InvoicingTab = ({ customer, businessAccount, businessAccountRequest, order
               id="customer-token"
               value={currentToken || '••••••••••••••••••••••••'}
               readOnly
-              className="cx-num h-12 min-w-0 flex-1 rounded-xl border border-cx-line bg-cx-well px-4 text-[14px] text-cx-ink outline-none"
+              className="cx-num h-12 min-w-0 flex-1 rounded-[2px] border border-cx-line bg-cx-well px-4 text-[14px] text-cx-ink outline-none"
             />
             <div className="cx-track self-start">
               <button
@@ -278,7 +278,7 @@ const InvoicingTab = ({ customer, businessAccount, businessAccountRequest, order
                   ['unpaid', 'Unpaid', orderCounts.unpaid],
                 ] as const).map(([value, label, count]) => (
                   <PillButton key={value} active={orderFilter === value} onClick={() => setOrderFilter(value)}>
-                    {label} <span className="cx-num text-[11px] text-cx-ink-3">{count}</span>
+                    {label} <span className="cx-num text-[13px] text-cx-ink-3">{count}</span>
                   </PillButton>
                 ))}
               </Track>

@@ -35,7 +35,7 @@ const ItemsPreviewTemplate = ({ items, region }: ItemsPreviewTemplateProps) => {
             })
         : Array.from(Array(3).keys()).map((i) => (
             <li key={i} className="flex gap-3 py-3">
-              <div className="size-14 animate-pulse rounded-[8px] bg-cx-line/60" />
+              <div className="size-14 animate-pulse rounded-[2px] bg-cx-line/60" />
               <div className="h-4 flex-1 animate-pulse rounded bg-cx-line/60" />
             </li>
           ))}

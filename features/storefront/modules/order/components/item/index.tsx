@@ -24,7 +24,7 @@ const Item = ({ item }: ItemProps) => {
         )}
       </div>
       <div className="cx-num flex shrink-0 flex-col items-end text-[14px]">
-        <span className="text-[12px] text-cx-ink-3">
+        <span className="text-[13px] text-cx-ink-3">
           {item.quantity} × {item.formattedUnitPrice}
         </span>
         <span className="text-cx-ink">{item.formattedTotal}</span>

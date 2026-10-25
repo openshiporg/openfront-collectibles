@@ -49,7 +49,7 @@ export async function SearchPage(props: Props) {
 
       {query && (
         <div className="mt-10">
-          <p className="cx-num mb-4 text-[12px] text-cx-ink-3" data-testid="search-count">
+          <p className="cx-num mb-4 text-[13px] text-cx-ink-3" data-testid="search-count">
             {failed ? "Search unavailable" : `${result.count} ${result.count === 1 ? "item" : "items"} for “${query}”`}
           </p>
           {!failed && result.products.length === 0 ? (

@@ -21,7 +21,7 @@ const Overview = ({ user, orders }: OverviewProps) => {
         {user?.firstName}
       </span>
 
-      <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-cx-line ring-1 ring-cx-line sm:grid-cols-3">
+      <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-[2px] bg-cx-line ring-1 ring-cx-line sm:grid-cols-3">
         <div className="bg-cx-surface px-5 py-4">
           <dt className="cx-label">Signed in as</dt>
           <dd className="mt-2 truncate text-[15px] text-cx-ink" data-testid="customer-email" data-value={user?.email}>

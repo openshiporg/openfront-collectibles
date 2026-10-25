@@ -6,7 +6,7 @@ import StatusDot, { type DotTone } from "@/features/storefront/modules/common/co
 // Shared account styling on the cx tokens (docs/design/collectibles-redesign-2026-10-23.md).
 
 export const cxInput =
-  "h-12 rounded-xl border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink shadow-none placeholder:text-cx-ink-3 focus-visible:border-cx-accent focus-visible:ring-cx-accent/20"
+  "h-12 rounded-[2px] border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink shadow-none placeholder:text-cx-ink-3 focus-visible:border-cx-accent focus-visible:ring-cx-accent/20"
 
 export const cxSubmit = "h-12 w-full rounded-full text-[15px] font-medium"
 
@@ -17,7 +17,7 @@ export function AccountHeading({ title, meta, actions }: { title: ReactNode; met
         <h1 className="font-cx-serif text-[30px] leading-[34px] tracking-[-0.01em] text-cx-ink sm:text-[36px] sm:leading-[40px]">
           {title}
         </h1>
-        {meta !== undefined && <span className="cx-num shrink-0 text-[12px] text-cx-ink-3">{meta}</span>}
+        {meta !== undefined && <span className="cx-num shrink-0 text-[13px] text-cx-ink-3">{meta}</span>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>

@@ -31,7 +31,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   return (
     <div
       className={cn(
-        "mb-1.5 flex cursor-pointer flex-col gap-y-2 rounded-[12px] px-4 py-3 text-[15px] text-cx-ink",
+        "mb-1.5 flex cursor-pointer flex-col gap-y-2 rounded-[2px] px-4 py-3 text-[15px] text-cx-ink",
         {
           "bg-cx-surface shadow-[0_1px_2px_rgb(26_23_18/0.14),0_0_0_0.5px_rgb(26_23_18/0.1)]":
             selectedPaymentOptionId === paymentProviderId,
@@ -59,7 +59,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
         </span>
       </div>
       {isManual(paymentProviderId) && isDevelopment && (
-        <PaymentTest className="sm:hidden text-[10px]" />
+        <PaymentTest className="sm:hidden text-[13px]" />
       )}
       {children}
     </div>
@@ -88,14 +88,14 @@ export const StripeCardContainer = ({
       style: {
         base: {
           fontFamily: "ui-sans-serif, system-ui, sans-serif",
-          color: "#1a1712",
+          color: "#efebe2",
           "::placeholder": {
-            color: "#8c8477",
+            color: "#9d978d",
           },
         },
       },
       classes: {
-        base: "block h-12 w-full appearance-none rounded-xl border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1 transition-colors hover:border-cx-ink-3",
+        base: "block h-12 w-full appearance-none rounded-[2px] border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1 transition-colors hover:border-cx-ink-3",
       },
       // Hide postal code since we already collect it in the billing address form
       hidePostalCode: true,

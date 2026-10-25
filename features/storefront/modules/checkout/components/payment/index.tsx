@@ -73,14 +73,14 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
         base: {
           fontFamily: "ui-sans-serif, system-ui, sans-serif",
           fontSize: "16px",
-          color: "#1a1712",
+          color: "#efebe2",
           "::placeholder": {
-            color: "#8c8477",
+            color: "#9d978d",
           },
         },
       },
       classes: {
-        base: "block h-12 w-full appearance-none rounded-xl border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1 transition-colors hover:border-cx-ink-3",
+        base: "block h-12 w-full appearance-none rounded-[2px] border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1 transition-colors hover:border-cx-ink-3",
         focus: "border-cx-accent ring-2 ring-cx-accent/25",
         invalid: "border-cx-danger",
       },
@@ -202,7 +202,7 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="inline-flex items-center gap-1 rounded-full bg-cx-tint px-2 py-0.5 text-[11px] font-medium text-cx-accent">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-cx-tint px-2 py-0.5 text-[13px] font-medium text-cx-accent">
                                   <FlaskConical className="size-3" strokeWidth={2.5} aria-hidden="true" />
                                   Test
                                 </span>
@@ -277,7 +277,7 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
             </SummaryBlock>
             <SummaryBlock label="Details">
               <div className="flex items-center gap-2" data-testid="payment-details-summary">
-                <span className="flex h-7 items-center rounded-md bg-cx-well px-2 text-cx-ink-2">
+                <span className="flex h-7 items-center rounded-[2px] bg-cx-well px-2 text-cx-ink-2">
                   {paymentInfoMap[selectedPaymentMethod]?.icon || (
                     <CreditCard className="size-4" aria-hidden="true" />
                   )}

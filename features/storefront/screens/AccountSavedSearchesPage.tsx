@@ -28,7 +28,7 @@ export async function AccountSavedSearchesPage() {
             <div key={search.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between" data-testid="saved-search-row">
               <div className="min-w-0">
                 <p className="truncate font-cx-serif text-[18px] leading-[24px] text-cx-ink">{search.name}</p>
-                <p className="cx-num mt-0.5 text-[12px] text-cx-ink-3">
+                <p className="cx-num mt-0.5 text-[13px] text-cx-ink-3">
                   {new Date(search.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
                 </p>
               </div>

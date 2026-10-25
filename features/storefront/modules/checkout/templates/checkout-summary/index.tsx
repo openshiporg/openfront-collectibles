@@ -7,10 +7,10 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
 
   return (
     <aside className="lg:sticky lg:top-8">
-      <div className="flex flex-col gap-5 rounded-2xl bg-cx-surface p-4 ring-1 ring-cx-line sm:p-6">
+      <div className="flex flex-col gap-5 rounded-[2px] bg-cx-surface p-4 ring-1 ring-cx-line sm:p-6">
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="font-cx-serif text-[24px] leading-[28px] text-cx-ink">In your cart</h2>
-          <span className="cx-num text-[12px] text-cx-ink-3">
+          <span className="cx-num text-[13px] text-cx-ink-3">
             {count} {count === 1 ? "item" : "items"}
           </span>
         </div>

@@ -142,7 +142,7 @@ const DiscountCode = ({ cart }: DiscountCodeProps) => {
             discount ? (
               <div className="flex items-center justify-between gap-3 text-[14px]" key={discount.code}>
                 <span className="flex min-w-0 items-center gap-1">
-                  <span className="cx-num inline-flex h-7 items-center rounded-full bg-cx-tint px-3 text-[12px] uppercase text-cx-accent">
+                  <span className="cx-num inline-flex h-7 items-center rounded-full bg-cx-tint px-3 text-[13px] uppercase text-cx-accent">
                     {discount.code}
                   </span>
                   <button
@@ -153,7 +153,7 @@ const DiscountCode = ({ cart }: DiscountCodeProps) => {
                     <X size={14} />
                     <span className="sr-only">Remove discount code</span>
                   </button>
-                  <span className="truncate text-[12px] text-cx-ink-3">{discount.value}</span>
+                  <span className="truncate text-[13px] text-cx-ink-3">{discount.value}</span>
                 </span>
                 <span className="cx-num shrink-0 text-cx-ok">−{discount.discountAmount}</span>
               </div>

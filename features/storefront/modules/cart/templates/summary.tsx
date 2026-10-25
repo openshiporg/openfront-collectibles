@@ -36,7 +36,7 @@ type SummaryProps = {
 
 const Summary = ({ cart }: SummaryProps) => {
   return (
-    <div className="flex flex-col gap-5 rounded-2xl bg-cx-surface p-5 ring-1 ring-cx-line sm:p-6">
+    <div className="flex flex-col gap-5 rounded-[2px] bg-cx-surface p-5 ring-1 ring-cx-line sm:p-6">
       <h2 className="font-cx-serif text-[24px] leading-[28px] text-cx-ink">Summary</h2>
       {cart && <DiscountCode cart={cart} />}
       <CartTotals data={cart} />

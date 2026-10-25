@@ -103,7 +103,7 @@ const CartItemSelect = forwardRef<HTMLInputElement, CartItemSelectProps>(
           step={step}
           value={value ?? ""}
           onChange={handleInputChange}
-          className="cx-num h-9 w-10 rounded-full bg-cx-surface text-center text-[14px] text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] outline-none [appearance:textfield] focus-visible:ring-2 focus-visible:ring-cx-accent max-sm:h-10 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="cx-num h-9 w-10 rounded-[2px] bg-cx-surface text-center text-[14px] text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] outline-none [appearance:textfield] focus-visible:ring-2 focus-visible:ring-cx-accent max-sm:h-10 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           {...props}
         />
         <button

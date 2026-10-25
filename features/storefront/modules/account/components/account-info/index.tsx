@@ -59,7 +59,7 @@ const AccountInfo = ({
           </div>
         </div>
         <button
-          className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-cx-surface px-4 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] hover:bg-cx-bg data-[active=true]:bg-transparent data-[active=true]:shadow-none data-[active=true]:text-cx-ink-2"
+          className="inline-flex min-h-11 shrink-0 items-center rounded-[2px] bg-cx-surface px-4 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] hover:bg-cx-bg data-[active=true]:bg-transparent data-[active=true]:shadow-none data-[active=true]:text-cx-ink-2"
           onClick={handleToggle}
           type={state ? "reset" : "button"}
           data-testid="edit-button"

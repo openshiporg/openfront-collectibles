@@ -22,7 +22,7 @@ const Review = ({ cart }: { cart: any }) => {
       <StepHeader step={4} title="Review" muted={!isOpen || !previousStepsCompleted} />
       {isOpen && previousStepsCompleted && (
         <div className="mt-6 space-y-5">
-          <div className="flex items-baseline justify-between gap-4 rounded-xl bg-cx-well px-4 py-3">
+          <div className="flex items-baseline justify-between gap-4 rounded-[2px] bg-cx-well px-4 py-3">
             <span className="text-[14px] text-cx-ink-2">Order total</span>
             <span className="cx-num text-[18px] text-cx-ink">{cart?.total}</span>
           </div>

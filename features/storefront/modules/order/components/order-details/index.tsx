@@ -40,7 +40,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
         : "accent"
 
   return (
-    <dl className="grid grid-cols-2 gap-x-6 gap-y-4 rounded-2xl bg-cx-surface p-4 ring-1 ring-cx-line sm:grid-cols-4 sm:p-5">
+    <dl className="grid grid-cols-2 gap-x-6 gap-y-4 rounded-[2px] bg-cx-surface p-4 ring-1 ring-cx-line sm:grid-cols-4 sm:p-5">
       <div className="min-w-0 space-y-1">
         <dt className="cx-label">Order</dt>
         <dd className="cx-num text-[15px] text-cx-ink" data-testid="order-id">{order.displayId}</dd>

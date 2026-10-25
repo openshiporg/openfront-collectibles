@@ -157,7 +157,7 @@ export default function MobileActions({
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex min-h-12 max-w-[40%] items-center gap-1.5 rounded-full bg-cx-surface px-4 text-[14px] font-medium text-cx-ink ring-1 ring-cx-line"
+              className="inline-flex min-h-12 max-w-[40%] items-center gap-1.5 rounded-[2px] bg-cx-surface px-4 text-[14px] font-medium text-cx-ink ring-1 ring-cx-line"
             >
               <span className="truncate">
                 {variant ? Object.values(options).filter(Boolean).join(" / ") : "Options"}

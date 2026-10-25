@@ -17,7 +17,7 @@ const DISPOSITIONS = [
 ]
 
 const field =
-  "min-h-12 w-full rounded-xl border border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink placeholder:text-cx-ink-3 focus:outline-2 focus:outline-cx-accent"
+  "min-h-12 w-full rounded-[2px] border border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink placeholder:text-cx-ink-3 focus:outline-2 focus:outline-cx-accent"
 
 const newKey = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`

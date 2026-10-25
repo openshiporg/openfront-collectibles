@@ -18,7 +18,7 @@ const LineItemPrice = ({
   return (
     <div className="cx-num flex flex-col items-end text-cx-ink">
       {hasReducedPrice && (
-        <span className="flex items-baseline gap-1.5 text-[12px] text-cx-ink-3">
+        <span className="flex items-baseline gap-1.5 text-[13px] text-cx-ink-3">
           <span className="line-through">{item.originalPrice}</span>
           {style === "default" && <span className="text-cx-accent">-{item.percentageOff}%</span>}
         </span>

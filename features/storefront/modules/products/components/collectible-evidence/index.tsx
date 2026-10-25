@@ -22,7 +22,7 @@ function Stamp({ item }: { item: any }) {
   const timestamp = getCollectibleEvidenceTimestamp(item);
   if (!timestamp) return null;
   return (
-    <time dateTime={timestamp.dateTime} className="cx-num text-[12px] text-cx-ink-3">
+    <time dateTime={timestamp.dateTime} className="cx-num text-[13px] text-cx-ink-3">
       {timestamp.label} {timestamp.dateTime.slice(0, 10)}
     </time>
   );
@@ -58,7 +58,7 @@ function Entry({
         {meta}
         <Stamp item={item} />
       </div>
-      {note && <p className="max-w-[60ch] text-[12px] leading-[18px] text-cx-ink-3">{note}</p>}
+      {note && <p className="max-w-[60ch] text-[13px] leading-[18px] text-cx-ink-3">{note}</p>}
     </li>
   );
 }
@@ -108,7 +108,7 @@ export function CollectibleEvidencePanel({ result, unavailable = false }: Eviden
           </h2>
         </div>
         {(specimen.catalogNumber || specimen.maker) && (
-          <span className="cx-num text-[12px] text-cx-ink-2">
+          <span className="cx-num text-[13px] text-cx-ink-2">
             {[specimen.catalogNumber && `Catalogue ${specimen.catalogNumber}`, specimen.maker, specimen.year].filter(Boolean).join(" · ")}
           </span>
         )}
@@ -120,7 +120,7 @@ export function CollectibleEvidencePanel({ result, unavailable = false }: Eviden
           <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
             {attributes.map(([key, value]) => (
               <div key={key} className="min-w-0">
-                <dt className="text-[12px] text-cx-ink-3">{humanizeEvidence(key)}</dt>
+                <dt className="text-[13px] text-cx-ink-3">{humanizeEvidence(key)}</dt>
                 <dd className="truncate text-[14px] text-cx-ink">{attributeValue(value)}</dd>
               </div>
             ))}

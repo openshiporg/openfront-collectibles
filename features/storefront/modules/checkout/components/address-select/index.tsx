@@ -105,7 +105,7 @@ const AddressSelect = ({
       >
         <SelectTrigger
           id={id}
-          className="h-auto min-h-12 rounded-xl border-cx-line bg-cx-surface ps-4 py-2.5 text-left text-cx-ink [&>span]:flex [&>span]:items-center [&>span]:gap-2"
+          className="h-auto min-h-12 rounded-[2px] border-cx-line bg-cx-surface ps-4 py-2.5 text-left text-cx-ink [&>span]:flex [&>span]:items-center [&>span]:gap-2"
         >
           <SelectValue
             placeholder="Choose an address"

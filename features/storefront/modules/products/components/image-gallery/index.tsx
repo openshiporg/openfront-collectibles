@@ -54,10 +54,10 @@ const ImageGallery = ({ images, title, label }: ImageGalleryProps) => {
 
   if (displayImages.length === 0) {
     return (
-      <div className="relative flex aspect-[4/5] w-full flex-col justify-end gap-2 overflow-hidden rounded-[14px] bg-cx-tint p-6 sm:p-10">
+      <div className="relative flex aspect-[4/5] w-full flex-col justify-end gap-2 overflow-hidden rounded-[2px] bg-cx-tint p-6 sm:p-10">
         {label && <span className="cx-label">{label}</span>}
         {title && (
-          <span className="max-w-[18ch] font-cx-serif text-[32px] leading-[36px] tracking-[-0.01em] text-cx-ink sm:text-[44px] sm:leading-[48px]">
+          <span className="max-w-[18ch] font-cx-display text-[36px] leading-[38px] text-cx-ink sm:text-[52px] sm:leading-[52px]">
             {title}
           </span>
         )}
@@ -69,7 +69,7 @@ const ImageGallery = ({ images, title, label }: ImageGalleryProps) => {
     <div className="flex flex-col gap-3 lg:flex-row-reverse lg:items-start">
       <div
         ref={scroller}
-        className="no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto rounded-[14px] bg-cx-well"
+        className="cx-pocket no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto rounded-[2px] bg-cx-well"
         onScroll={(event) => {
           const el = event.currentTarget
           const index = Math.round(el.scrollLeft / Math.max(el.clientWidth, 1))
@@ -82,7 +82,7 @@ const ImageGallery = ({ images, title, label }: ImageGalleryProps) => {
             <Image
               src={srcOf(image)}
               priority={index === 0}
-              className="object-cover"
+              className="object-contain p-[7%]"
               alt={image?.altText || (title ? `${title}, photo ${index + 1}` : `Photo ${index + 1}`)}
               fill
               sizes="(max-width: 1024px) 100vw, 700px"
@@ -100,11 +100,11 @@ const ImageGallery = ({ images, title, label }: ImageGalleryProps) => {
               aria-label={`Show photo ${index + 1}`}
               aria-current={active === index}
               className={cn(
-                "relative size-16 shrink-0 overflow-hidden rounded-[10px] bg-cx-well ring-1 transition lg:size-[72px]",
+                "relative size-16 shrink-0 overflow-hidden rounded-[2px] bg-cx-well ring-1 transition lg:size-[72px]",
                 active === index ? "ring-2 ring-cx-ink" : "ring-cx-line opacity-70 hover:opacity-100"
               )}
             >
-              <Image src={srcOf(image)} alt="" fill sizes="72px" className="object-cover" />
+              <Image src={srcOf(image)} alt="" fill sizes="72px" className="object-contain p-1" />
             </button>
           ))}
         </div>

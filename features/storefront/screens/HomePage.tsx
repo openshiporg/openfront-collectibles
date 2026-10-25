@@ -44,8 +44,11 @@ export async function HomePage(props: {
 
   return (
     <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 sm:px-6">
-      <Masthead title={store?.homepageTitle || store?.name} description={store?.homepageDescription} />
-      <CategoryIndex categories={categories} />
+      <Masthead
+        title={store?.homepageTitle || store?.name}
+        description={store?.homepageDescription}
+        index={<CategoryIndex categories={categories} />}
+      />
       <RecentListings countryCode={countryCode} locale={region.locale} />
       {collections?.length > 0 && (
         <ul className="flex flex-col">

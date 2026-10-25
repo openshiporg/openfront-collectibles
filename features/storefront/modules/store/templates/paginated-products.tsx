@@ -84,7 +84,7 @@ export default async function PaginatedProducts({
 
   return (
     <>
-      <p className="cx-num mb-4 text-[12px] text-cx-ink-3" data-testid="products-count">
+      <p className="cx-num mb-4 text-[13px] text-cx-ink-3" data-testid="products-count">
         {count} {count === 1 ? "item" : "items"}
       </p>
       {products.length === 0 ? (

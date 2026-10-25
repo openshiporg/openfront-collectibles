@@ -59,7 +59,7 @@ const Item = ({ item, region, type = "full" }: CartItemProps) => {
         </LocalizedClientLink>
         <div className="min-w-0 flex-1">
           <p className="truncate font-cx-serif text-[15px] leading-[20px] text-cx-ink">{item.title}</p>
-          <div className="text-[12px] text-cx-ink-2">
+          <div className="text-[13px] text-cx-ink-2">
             <LineItemOptions variantTitle={item.productVariant?.title} />
           </div>
         </div>

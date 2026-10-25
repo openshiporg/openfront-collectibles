@@ -60,7 +60,7 @@ const Modal = ({
             "max-w-xl": size === "medium",
             "max-w-3xl": size === "large",
             "bg-transparent shadow-none border-none": search,
-            "rounded-2xl border border-cx-line bg-cx-surface text-cx-ink shadow-[0_24px_48px_-24px_rgb(26_23_18/0.45)]": !search,
+            "rounded-[2px] border border-cx-line bg-cx-surface text-cx-ink shadow-[0_24px_48px_-24px_rgb(26_23_18/0.45)]": !search,
           }
         )}
       >

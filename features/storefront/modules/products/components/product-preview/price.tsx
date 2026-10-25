@@ -19,7 +19,7 @@ export default function PreviewPrice({ price, region }: PreviewPriceProps) {
   const isOnSale = price.calculatedAmount < price.originalAmount;
 
   return (
-    <div className="cx-num flex items-baseline gap-2 text-[14px]">
+    <div className="cx-num flex items-baseline gap-2 text-[17px]">
       <span
         className={cn("whitespace-nowrap text-cx-ink", { "text-cx-accent": isOnSale })}
         data-testid="price"
@@ -27,7 +27,7 @@ export default function PreviewPrice({ price, region }: PreviewPriceProps) {
         {format(price.calculatedAmount)}
       </span>
       {isOnSale && (
-        <span className="text-[12px] text-cx-ink-3 line-through" data-testid="original-price">
+        <span className="text-[14px] text-cx-ink-3 line-through" data-testid="original-price">
           {format(price.originalAmount)}
         </span>
       )}

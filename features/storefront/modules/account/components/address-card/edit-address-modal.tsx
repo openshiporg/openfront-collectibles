@@ -107,7 +107,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
             type="button"
             onClick={open}
             data-testid="address-edit-button"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-cx-surface px-4 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] hover:bg-cx-bg"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-[2px] bg-cx-surface px-4 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] hover:bg-cx-bg"
           >
             <Pencil className="size-4" aria-hidden="true" />
             Edit

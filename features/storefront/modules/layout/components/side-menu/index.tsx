@@ -35,13 +35,13 @@ const SideMenu = ({
     links.length > 0 && (
       <div className="space-y-1">
         <p className="cx-label px-1 pb-1">{label}</p>
-        <ul className="cx-band divide-y divide-cx-line overflow-hidden">
+        <ul className="grid gap-1">
           {links.map((link) => (
             <li key={link.href}>
               <LocalizedClientLink
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="flex min-h-12 items-center px-4 text-[15px] text-cx-ink"
+                className="flex min-h-[52px] items-center rounded-[2px] bg-cx-surface px-4 font-cx-display text-[19px] font-bold text-cx-ink active:scale-[0.99] transition-transform"
               >
                 {link.title}
               </LocalizedClientLink>
@@ -71,7 +71,7 @@ const SideMenu = ({
           className="flex h-full w-full flex-col gap-0 border-0 bg-cx-bg p-0 sm:max-w-sm"
           data-testid="nav-menu-popup"
         >
-          <SheetHeader className="border-b border-cx-line px-4 py-3 text-left">
+          <SheetHeader className="bg-cx-vault px-4 py-3 text-left">
             <SheetTitle className="sr-only">Menu</SheetTitle>
             <SheetDescription className="sr-only">Categories, collections and account</SheetDescription>
             {logo}

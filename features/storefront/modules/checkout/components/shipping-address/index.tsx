@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const cxInputClass =
-  "h-12 rounded-xl border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink shadow-none placeholder:text-cx-ink-3 hover:border-cx-ink-3 focus-visible:border-cx-accent focus-visible:ring-2 focus-visible:ring-cx-accent/25"
+  "h-12 rounded-[2px] border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink shadow-none placeholder:text-cx-ink-3 hover:border-cx-ink-3 focus-visible:border-cx-accent focus-visible:ring-2 focus-visible:ring-cx-accent/25"
 
 /** Labelled checkout field: visible label above a 48px input. */
 export function CxField({

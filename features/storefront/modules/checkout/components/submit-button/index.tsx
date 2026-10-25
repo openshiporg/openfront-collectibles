@@ -12,7 +12,7 @@ const VARIANTS: Record<string, string> = {
   default: "cx-btn",
   destructive: "cx-btn !bg-cx-danger",
   secondary:
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-cx-surface px-5 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14),0_0_0_0.5px_rgb(26_23_18/0.1)] hover:bg-cx-bg disabled:opacity-50",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-cx-surface px-5 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14),0_0_0_0.5px_rgb(26_23_18/0.1)] hover:bg-cx-bg disabled:opacity-50",
   outline:
     "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-cx-line bg-transparent px-5 text-[14px] font-medium text-cx-ink hover:bg-cx-well disabled:opacity-50",
   ghost:

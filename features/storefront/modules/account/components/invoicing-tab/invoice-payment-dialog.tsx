@@ -234,7 +234,7 @@ export default function InvoicePaymentDialog({
   if (invoice && availablePaymentMethods.length > 0) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-2xl border-cx-line bg-cx-bg sm:max-w-md">
+        <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-[2px] border-cx-line bg-cx-bg sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-cx-serif text-[24px] font-normal leading-[28px] text-cx-ink">
               Invoice <span className="cx-num text-[20px]">#{invoice.invoiceNumber}</span>
@@ -319,14 +319,14 @@ export default function InvoicePaymentDialog({
                       style: {
                         base: {
                           fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                          color: "#1a1712",
+                          color: "#efebe2",
                           "::placeholder": {
-                            color: "#8c8477",
+                            color: "#9d978d",
                           },
                         },
                       },
                       classes: {
-                        base: "block h-12 w-full rounded-xl border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1",
+                        base: "block h-12 w-full rounded-[2px] border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1",
                       },
                       // Hide postal code - billing address is already collected
                       hidePostalCode: true,
@@ -345,17 +345,17 @@ export default function InvoicePaymentDialog({
               {isStripe(selectedPaymentMethod) && !selectedSessionReady && (
                 <section>
                   <p className="cx-label pb-2">Card</p>
-                  <div className="h-12 animate-pulse rounded-xl bg-cx-well" />
+                  <div className="h-12 animate-pulse rounded-[2px] bg-cx-well" />
                 </section>
               )}
 
               <div className="w-full">
                 {!selectedPaymentMethod ? (
-                  <div className="flex h-12 items-center justify-center rounded-full bg-cx-well text-[14px] text-cx-ink-2">
+                  <div className="flex h-12 items-center justify-center rounded-[2px] bg-cx-well text-[14px] text-cx-ink-2">
                     Select a payment method
                   </div>
                 ) : paymentMethodSwitching ? (
-                  <div className="flex h-12 items-center justify-center gap-2 rounded-full bg-cx-well text-[14px] text-cx-ink-2">
+                  <div className="flex h-12 items-center justify-center gap-2 rounded-[2px] bg-cx-well text-[14px] text-cx-ink-2">
                     <RiLoader2Fill className="size-4 animate-spin" aria-hidden="true" />
                     Loading payment method
                   </div>
@@ -378,7 +378,7 @@ export default function InvoicePaymentDialog({
   // Show region selection (like checkout shows cart items)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="rounded-2xl border-cx-line bg-cx-bg sm:max-w-md">
+      <DialogContent className="rounded-[2px] border-cx-line bg-cx-bg sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-cx-serif text-[24px] font-normal leading-[28px] text-cx-ink">Pay balance</DialogTitle>
           <DialogDescription className="text-[14px] text-cx-ink-2">Region</DialogDescription>
@@ -411,7 +411,7 @@ export default function InvoicePaymentDialog({
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium text-cx-ink">{regionData.region.name}</span>
-                      <span className="cx-num block text-[12px] text-cx-ink-2">
+                      <span className="cx-num block text-[13px] text-cx-ink-2">
                         {regionData.itemCount} {regionData.itemCount === 1 ? 'order' : 'orders'}
                       </span>
                     </span>

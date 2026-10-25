@@ -71,12 +71,12 @@ const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
       {Array.isArray(invoice.lineItems) && (
         <div className="mt-3">
           {(invoice.lineItems.length > 0 || invoice.lineItemsCount > 0 || invoice.lineItemsHasMore !== false) && (
-            <p className="cx-num pb-2 text-[12px] text-cx-ink-3">
+            <p className="cx-num pb-2 text-[13px] text-cx-ink-3">
               {formatInvoiceLineItemCompleteness(invoice, invoice.lineItems.length)}
             </p>
           )}
           {invoice.lineItems.length > 0 && (
-            <ul className="divide-y divide-cx-line overflow-hidden rounded-xl bg-cx-surface ring-1 ring-cx-line">
+            <ul className="divide-y divide-cx-line overflow-hidden rounded-[2px] bg-cx-surface ring-1 ring-cx-line">
               {invoice.lineItems.map((lineItem: any) => {
                 const order = lineItem.accountLineItem?.order;
                 return (

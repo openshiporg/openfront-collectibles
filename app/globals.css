@@ -39,76 +39,91 @@
   }
 }
 
-/* Collectibles storefront: "catalogue & slab" tokens. See docs/design/collectibles-redesign-2026-10-23.md.
+/* Collectibles storefront: "black-page stock book". See .impeccable/surfaces/features-storefront.md.
+   The page is a collector's stock book: black album pages, paper-white ink,
+   specimens held in clear glassine strips, the cover's buckram cloth (in the
+   store's logo hue) for the header band, slab band and footer, and gilt from the
+   same hue as the one accent. Rokkitt (slab) for stamped labels, numbers and
+   display; Literata for everything read.
    --cx-h is set per store from the saved logo colour on the .cx-sf wrapper. */
 @theme inline {
-  --color-cx-bg: #f3f0e8;
-  --color-cx-surface: #fffdf8;
-  --color-cx-well: #e8e3d7;
-  --color-cx-ink: #1a1712;
-  --color-cx-ink-2: #5a5348;
-  --color-cx-ink-3: #8c8477;
-  --color-cx-line: #d8d1c2;
-  --color-cx-vault: #201c16;
-  --color-cx-vault-2: #3a332a;
-  --color-cx-accent: hsl(var(--cx-h, 26) 64% 34%);
-  --color-cx-accent-soft: hsl(var(--cx-h, 26) 58% 62%);
-  --color-cx-tint: hsl(var(--cx-h, 26) 52% 91%);
-  --color-cx-danger: #a6302a;
-  --color-cx-ok: #2f6b3f;
-  --color-cx-warn: #9a5b12;
-  --font-cx: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --color-cx-bg: oklch(14.5% 0.006 60);
+  --color-cx-surface: oklch(19.5% 0.008 60);
+  --color-cx-well: oklch(11.5% 0.005 60);
+  --color-cx-ink: oklch(94.5% 0.012 85);
+  --color-cx-ink-2: oklch(80% 0.012 80);
+  --color-cx-ink-3: oklch(66% 0.012 80);
+  --color-cx-line: oklch(30% 0.01 60);
+  --color-cx-vault: hsl(var(--cx-h, 26) 34% 15%);
+  --color-cx-vault-2: hsl(var(--cx-h, 26) 30% 24%);
+  --color-cx-accent: hsl(var(--cx-h, 26) 58% 66%);
+  --color-cx-accent-soft: hsl(var(--cx-h, 26) 62% 76%);
+  --color-cx-tint: hsl(var(--cx-h, 26) 26% 17%);
+  --color-cx-danger: oklch(71% 0.17 25);
+  --color-cx-ok: oklch(78% 0.14 150);
+  --color-cx-warn: oklch(82% 0.13 75);
+  --font-cx: var(--cx-font-sans), ui-serif, Georgia, serif;
   --font-cx-serif: var(--cx-font-serif), ui-serif, Georgia, serif;
-  --font-cx-mono: var(--cx-font-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-cx-mono: var(--cx-font-display), ui-serif, Georgia, serif;
+  --font-cx-display: var(--cx-font-display), ui-serif, Georgia, serif;
 }
 
 @layer base {
   .cx-sf {
-    --sf-background: #f3f0e8;
-    --sf-foreground: #1a1712;
-    --sf-card: #fffdf8;
-    --sf-card-foreground: #1a1712;
-    --sf-popover: #fffdf8;
-    --sf-popover-foreground: #1a1712;
-    --sf-primary: #1a1712;
-    --sf-primary-foreground: #fbf8f1;
-    --sf-secondary: #e8e3d7;
-    --sf-secondary-foreground: #1a1712;
-    --sf-muted: #e8e3d7;
-    --sf-muted-foreground: #5a5348;
-    --sf-accent: #e8e3d7;
-    --sf-accent-foreground: #1a1712;
-    --sf-border: #d8d1c2;
-    --sf-input: #d8d1c2;
-    --sf-ring: hsl(var(--cx-h, 26) 64% 34%);
-    background-color: #f3f0e8;
-    color: #1a1712;
-    font-family: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
+    --cx-font-serif: var(--cx-font-sans);
+    --sf-background: oklch(14.5% 0.006 60);
+    --sf-foreground: oklch(94.5% 0.012 85);
+    --sf-card: oklch(19.5% 0.008 60);
+    --sf-card-foreground: oklch(94.5% 0.012 85);
+    --sf-popover: oklch(19.5% 0.008 60);
+    --sf-popover-foreground: oklch(94.5% 0.012 85);
+    --sf-primary: oklch(94.5% 0.012 85);
+    --sf-primary-foreground: oklch(14.5% 0.006 60);
+    --sf-secondary: oklch(23% 0.008 60);
+    --sf-secondary-foreground: oklch(94.5% 0.012 85);
+    --sf-muted: oklch(23% 0.008 60);
+    --sf-muted-foreground: oklch(80% 0.012 80);
+    --sf-accent: oklch(23% 0.008 60);
+    --sf-accent-foreground: oklch(94.5% 0.012 85);
+    --sf-border: oklch(30% 0.01 60);
+    --sf-input: oklch(34% 0.01 60);
+    --sf-ring: hsl(var(--cx-h, 26) 58% 66%);
+    background-color: oklch(14.5% 0.006 60);
+    color: oklch(94.5% 0.012 85);
+    color-scheme: dark;
+    font-family: var(--cx-font-sans), ui-serif, Georgia, serif;
+  }
+  .cx-sf ::selection {
+    background: hsl(var(--cx-h, 26) 58% 66%);
+    color: oklch(14.5% 0.006 60);
   }
 
+  /* Stamped numbers: references, grades, counts and prices. */
   .cx-sf .cx-num,
   .cx-sf .font-cx-mono {
-    font-family: var(--cx-font-mono), ui-monospace, SFMono-Regular, monospace;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0;
+    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    font-variant-numeric: tabular-nums lining-nums;
+    font-weight: 600;
+    letter-spacing: 0.01em;
   }
 
   .cx-sf .font-cx-serif {
     font-family: var(--cx-font-serif), ui-serif, Georgia, serif;
     font-optical-sizing: auto;
   }
+  .cx-sf .font-cx-display {
+    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
 }
 
 @layer components {
-  /* Raised pill in a recessed track */
+  /* Track and pill: the chosen one gilt-filled, the rest plain on the page. */
   .cx-track {
     display: inline-flex;
     max-width: 100%;
-    gap: 2px;
-    padding: 3px;
-    border-radius: 999px;
-    background: #e8e3d7;
-    box-shadow: inset 0 1px 2px rgb(26 23 18 / 0.1);
+    gap: 4px;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -116,57 +131,65 @@
   .cx-pill {
     display: inline-flex;
     flex: none;
-    min-height: 36px;
+    min-height: 40px;
     align-items: center;
     justify-content: center;
     gap: 6px;
     padding: 0 14px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #5a5348;
+    border-radius: 2px;
+    background: oklch(19.5% 0.008 60);
+    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: oklch(80% 0.012 80);
     white-space: nowrap;
-    transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+    transition: background-color 160ms cubic-bezier(0.23, 1, 0.32, 1), color 160ms cubic-bezier(0.23, 1, 0.32, 1), transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
   }
-  .cx-pill:hover { color: #1a1712; }
-  .cx-pill[data-active="true"] {
-    background: #fffdf8;
-    color: #1a1712;
-    box-shadow: 0 1px 2px rgb(26 23 18 / 0.14), 0 0 0 0.5px rgb(26 23 18 / 0.08);
+  .cx-pill:active { transform: scale(0.97); }
+  @media (hover: hover) and (pointer: fine) {
+    .cx-pill:hover { color: oklch(94.5% 0.012 85); background: oklch(23% 0.008 60); }
   }
-  .cx-pill[data-active="true"]:disabled { color: #1a1712; text-decoration: none; cursor: default; }
+  .cx-pill[data-active="true"],
+  .cx-pill[data-active="true"]:hover {
+    background: hsl(var(--cx-h, 26) 58% 66%);
+    color: oklch(14.5% 0.006 60);
+  }
+  .cx-pill[data-active="true"]:disabled { cursor: default; }
   .cx-pill:disabled,
-  .cx-pill[aria-disabled="true"] { color: #b4ac9e; text-decoration: line-through; cursor: not-allowed; }
-  .cx-pill:focus-visible { outline: 2px solid hsl(var(--cx-h, 26) 64% 34%); outline-offset: 1px; }
+  .cx-pill[aria-disabled="true"] { color: oklch(52% 0.01 80); text-decoration: line-through; cursor: not-allowed; }
+  .cx-pill:focus-visible { outline: 2px solid hsl(var(--cx-h, 26) 58% 66%); outline-offset: 2px; }
   @media (max-width: 639px) {
-    .cx-pill { min-height: 40px; }
+    .cx-pill { min-height: 44px; }
   }
 
-  /* Primary and secondary in-page buttons */
+  /* Primary button: gilt fill, square corners. */
   .cx-btn {
     display: inline-flex;
     min-height: 48px;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 0 22px;
-    border-radius: 999px;
-    background: #1a1712;
-    color: #fbf8f1;
-    font-size: 15px;
-    font-weight: 500;
-    transition: opacity 150ms ease, transform 150ms ease;
+    padding: 0 24px;
+    border-radius: 2px;
+    background: hsl(var(--cx-h, 26) 58% 66%);
+    color: oklch(14.5% 0.006 60);
+    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transition: background-color 160ms cubic-bezier(0.23, 1, 0.32, 1), transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
   }
-  .cx-btn:hover { opacity: 0.9; }
-  .cx-btn:active { transform: scale(0.98); }
+  @media (hover: hover) and (pointer: fine) {
+    .cx-btn:hover { background: hsl(var(--cx-h, 26) 62% 74%); }
+  }
+  .cx-btn:active { transform: scale(0.97); }
   .cx-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .cx-btn:focus-visible { outline: 2px solid hsl(var(--cx-h, 26) 64% 34%); outline-offset: 2px; }
+  .cx-btn:focus-visible { outline: 2px solid hsl(var(--cx-h, 26) 58% 66%); outline-offset: 3px; }
 
-  /* Recessed band holding hairline rows */
+  /* A page band holding rows. */
   .cx-band {
-    border-radius: 16px;
-    background: #e8e3d7;
-    box-shadow: inset 0 1px 2px rgb(26 23 18 / 0.07);
+    border-radius: 2px;
+    background: oklch(19.5% 0.008 60);
   }
 
   .cx-dot {
@@ -178,14 +201,48 @@
     transform: translateY(-0.1em);
   }
 
-  /* Small caps label, used for catalogue fields */
+  /* Stamped field label. */
   .cx-label {
-    font-size: 11px;
-    line-height: 16px;
+    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    font-size: 14px;
+    line-height: 18px;
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #8c8477;
+    letter-spacing: 0.01em;
+    color: oklch(66% 0.012 80);
+  }
+
+  /* The glassine pocket: a clear strip across the lower part of a specimen well. */
+  .cx-pocket {
+    position: relative;
+    isolation: isolate;
+  }
+  .cx-pocket::after {
+    content: "";
+    position: absolute;
+    inset: 46% 0 0;
+    z-index: 1;
+    background: oklch(100% 0 0 / 0.055);
+    border-top: 1px solid oklch(100% 0 0 / 0.16); /* taste-skill-ignore: the glassine strip's folded edge */
+    pointer-events: none;
+    transition: background-color 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover .cx-pocket::after { background: oklch(100% 0 0 / 0.03); }
+  }
+
+  /* Home: rows print in once, top-down. */
+  @media (prefers-reduced-motion: no-preference) {
+    .cx-rise > * {
+      animation: cx-rise 620ms cubic-bezier(0.23, 1, 0.32, 1) both;
+    }
+    .cx-rise > :nth-child(2) { animation-delay: 60ms; }
+    .cx-rise > :nth-child(3) { animation-delay: 120ms; }
+    .cx-rise > :nth-child(4) { animation-delay: 180ms; }
+    .cx-rise > :nth-child(5) { animation-delay: 240ms; }
+    .cx-rise > :nth-child(n + 6) { animation-delay: 300ms; }
+  }
+  @keyframes cx-rise {
+    from { opacity: 0; transform: translateY(14px); }
   }
 }
 

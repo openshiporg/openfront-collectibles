@@ -47,7 +47,7 @@ export default async function ProductPreview({
   return (
     <LocalizedClientLink
       href={`/products/${productPreview.handle}`}
-      className="group block rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cx-accent"
+      className="group block rounded-[2px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cx-accent active:scale-[0.99] transition-transform duration-150"
       data-testid="product-wrapper"
     >
       <div className="flex flex-col gap-3">
@@ -59,7 +59,7 @@ export default async function ProductPreview({
           label={label}
         />
         <div className="flex flex-col gap-1">
-          <h3 className="line-clamp-2 font-cx-serif text-[16px] leading-[20px] text-cx-ink sm:text-[17px] sm:leading-[22px]" data-testid="product-title">
+          <h3 className="line-clamp-2 font-cx-serif text-[16px] leading-[21px] text-cx-ink transition-colors group-hover:text-cx-accent sm:text-[17px] sm:leading-[23px]" data-testid="product-title">
             {productPreview.title}
           </h3>
           <div className="flex items-baseline justify-between gap-2">
@@ -68,7 +68,7 @@ export default async function ProductPreview({
             ) : (
               <span className="text-[13px] text-cx-ink-3">Price not available</span>
             )}
-            {soldOut && <span className="text-[12px] text-cx-ink-3">Unavailable</span>}
+            {soldOut && <span className="text-[13px] text-cx-ink-3">Unavailable</span>}
           </div>
         </div>
       </div>

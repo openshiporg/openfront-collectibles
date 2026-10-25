@@ -8,7 +8,7 @@ import StatusDot from "@/features/storefront/modules/common/components/collectib
 type Profile = { id: string; displayName: string; interests?: unknown; public?: boolean } | null
 
 const field =
-  "min-h-12 w-full rounded-xl border border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink placeholder:text-cx-ink-3 focus:outline-2 focus:outline-cx-accent"
+  "min-h-12 w-full rounded-[2px] border border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink placeholder:text-cx-ink-3 focus:outline-2 focus:outline-cx-accent"
 
 export default function CollectorProfileForm({ profile, fallbackName }: { profile: Profile; fallbackName: string }) {
   const [state, action, pending] = useActionState(saveCollectorProfile, {} as { success?: boolean; error?: string })

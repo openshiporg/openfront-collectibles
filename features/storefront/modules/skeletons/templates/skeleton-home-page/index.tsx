@@ -1,7 +1,7 @@
 import repeat from "@/features/storefront/lib/util/repeat"
 import SkeletonProductPreview from "@/features/storefront/modules/skeletons/components/skeleton-product-preview"
 
-const block = "animate-pulse rounded-lg bg-cx-well"
+const block = "animate-pulse rounded-[2px] bg-cx-well"
 
 const SkeletonHomePage = () => (
   <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 sm:px-6">

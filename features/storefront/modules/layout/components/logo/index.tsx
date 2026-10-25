@@ -24,15 +24,15 @@ export default async function Logo({ size = 'md', tone = 'ink' }: { size?: 'md' 
       href="/"
       className={cn(
         'group inline-flex min-h-11 min-w-0 items-center gap-2.5',
-        tone === 'paper' ? 'text-[#f3eee3]' : 'text-cx-ink'
+        'text-cx-ink'
       )}
       data-testid="nav-store-link"
     >
       <LogoMark svg={logoSvg} color={logoColor} className={size === 'lg' ? 'size-8' : 'size-5 sm:size-6'} />
       <span
         className={cn(
-          'line-clamp-2 font-cx-serif leading-[1.05] tracking-[-0.01em]',
-          size === 'lg' ? 'text-[26px]' : 'text-[17px] sm:text-[20px]'
+          'line-clamp-2 font-cx-display leading-[1] tracking-[-0.01em]',
+          size === 'lg' ? 'text-[30px]' : 'text-[20px] sm:text-[23px]'
         )}
       >
         {storeName}

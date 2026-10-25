@@ -140,7 +140,7 @@ const CountrySelect = forwardRef<
       >
         <SelectTrigger
           id={id}
-          className="h-12 w-full rounded-xl border-cx-line bg-cx-surface px-4 py-1 text-[15px] text-cx-ink hover:border-cx-ink-3 [&>span_svg]:text-cx-ink-3 [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 data-[placeholder]:text-cx-ink-3"
+          className="h-12 w-full rounded-[2px] border-cx-line bg-cx-surface px-4 py-1 text-[15px] text-cx-ink hover:border-cx-ink-3 [&>span_svg]:text-cx-ink-3 [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 data-[placeholder]:text-cx-ink-3"
         >
           <SelectValue placeholder={placeholder}>
             {selectedValue && (

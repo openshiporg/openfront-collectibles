@@ -57,7 +57,7 @@ export default function TransferRequestForm() {
         </p>
       )}
       {showSuccess && (
-        <div className="flex justify-between p-4 bg-muted shadow-sm w-full self-stretch items-center rounded-md border">
+        <div className="flex justify-between p-4 bg-muted shadow-sm w-full self-stretch items-center rounded-[2px] border">
           <div className="flex gap-x-2 items-center">
             <CheckCircle className="w-4 h-4 text-emerald-500" />
             <div className="flex flex-col gap-y-1">

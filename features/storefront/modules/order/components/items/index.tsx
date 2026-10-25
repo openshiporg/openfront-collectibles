@@ -48,7 +48,7 @@ const Items = ({ items, region }: ItemsProps) => {
             })
         : repeat(3).map((i) => (
             <li key={i} className="flex items-center gap-4 p-4">
-              <div className="size-16 animate-pulse rounded-[10px] bg-cx-line/60" />
+              <div className="size-16 animate-pulse rounded-[2px] bg-cx-line/60" />
               <div className="h-4 flex-1 animate-pulse rounded bg-cx-line/60" />
             </li>
           ))}

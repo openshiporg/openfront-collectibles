@@ -50,7 +50,7 @@ export async function TradeInPage() {
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="cx-num text-[14px] text-cx-ink">{entry.offer}</p>
-                    {entry.maximumQuantity != null && <p className="cx-num text-[12px] text-cx-ink-3">Up to {entry.maximumQuantity}</p>}
+                    {entry.maximumQuantity != null && <p className="cx-num text-[13px] text-cx-ink-3">Up to {entry.maximumQuantity}</p>}
                   </div>
                 </li>
               ))}

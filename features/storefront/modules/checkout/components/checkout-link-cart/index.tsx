@@ -37,12 +37,12 @@ export default function CheckoutLinkCart({
         {title}
       </h1>
 
-      <div className="space-y-5 rounded-2xl bg-cx-surface p-4 ring-1 ring-cx-line sm:p-6" data-testid="cart-card">
+      <div className="space-y-5 rounded-[2px] bg-cx-surface p-4 ring-1 ring-cx-line sm:p-6" data-testid="cart-card">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <p className="cx-num text-[13px] uppercase text-cx-ink-2">Cart {cart.id.slice(-8).toUpperCase()}</p>
           <p className="cx-num text-[22px] text-cx-ink" data-testid="cart-total">{cart.total}</p>
         </div>
-        <dl className="cx-num grid grid-cols-3 gap-3 rounded-xl bg-cx-well px-4 py-3 text-[13px]">
+        <dl className="cx-num grid grid-cols-3 gap-3 rounded-[2px] bg-cx-well px-4 py-3 text-[13px]">
           <div>
             <dt className="cx-label">Subtotal</dt>
             <dd className="text-cx-ink" data-testid="cart-subtotal">{cart.subtotal}</dd>
@@ -73,7 +73,7 @@ export default function CheckoutLinkCart({
               </li>
             ))}
             {numberOfProducts > 3 && (
-              <li className="flex aspect-square items-center justify-center rounded-[14px] bg-cx-well">
+              <li className="flex aspect-square items-center justify-center rounded-[2px] bg-cx-well">
                 <span className="cx-num text-[14px] text-cx-ink-2">+{numberOfLines - 3}</span>
               </li>
             )}

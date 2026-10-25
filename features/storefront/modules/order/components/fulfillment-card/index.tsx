@@ -76,7 +76,7 @@ const FulfillmentCard: React.FC<FulfillmentCardProps> = ({ order }) => {
       title="Shipments"
       meta={
         total > 0 ? (
-          <span className="cx-num text-[12px] text-cx-ink-3">
+          <span className="cx-num text-[13px] text-cx-ink-3">
             {lineItemStats.fulfilled}/{total} shipped
           </span>
         ) : undefined
@@ -111,7 +111,7 @@ const FulfillmentCard: React.FC<FulfillmentCardProps> = ({ order }) => {
                       {state}
                     </span>
                   </span>
-                  <span className="cx-num mt-0.5 block text-[12px] text-cx-ink-3">
+                  <span className="cx-num mt-0.5 block text-[13px] text-cx-ink-3">
                     {itemCount} {itemCount === 1 ? "item" : "items"} · {formatDate(fulfillment.createdAt)}
                   </span>
                 </span>
@@ -147,7 +147,7 @@ const FulfillmentCard: React.FC<FulfillmentCardProps> = ({ order }) => {
                   <ul className="space-y-3">
                     {fulfillment.fulfillmentItems.map((item) => (
                       <li key={item.id} className="flex items-center gap-3">
-                        <div className="size-12 shrink-0 overflow-hidden rounded-[8px] bg-cx-well">
+                        <div className="size-12 shrink-0 overflow-hidden rounded-[2px] bg-cx-well">
                           {item.lineItem.thumbnail ? (
                             <img
                               src={item.lineItem.thumbnail}
@@ -162,7 +162,7 @@ const FulfillmentCard: React.FC<FulfillmentCardProps> = ({ order }) => {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-cx-serif text-[15px] text-cx-ink">{item.lineItem.title}</p>
-                          <p className="cx-num text-[12px] text-cx-ink-3">
+                          <p className="cx-num text-[13px] text-cx-ink-3">
                             Qty {item.quantity}
                             {item.lineItem.sku ? ` · SKU ${item.lineItem.sku}` : ""}
                           </p>

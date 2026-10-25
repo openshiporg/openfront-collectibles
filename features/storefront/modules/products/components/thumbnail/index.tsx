@@ -37,7 +37,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   return (
     <div
       className={cn(
-        "relative w-full overflow-hidden rounded-[14px] bg-cx-well shadow-[inset_0_1px_2px_rgb(26_23_18/0.07)]",
+        "cx-pocket relative w-full overflow-hidden rounded-[2px] bg-cx-well",
         className,
         {
           "aspect-[4/5]": isFeatured || (size !== "square" && size !== "small"),
@@ -54,16 +54,16 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
         <Image
           src={initialImage}
           alt={title || "Item photo"}
-          className="absolute inset-0 object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+          className="absolute inset-0 object-contain object-center p-[9%] transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-translate-y-1"
           draggable={false}
           sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
           fill
           suppressHydrationWarning
         />
       ) : title ? (
-        <div className="absolute inset-0 flex flex-col justify-end gap-1.5 bg-cx-tint p-4">
+        <div className="absolute inset-[9%] flex flex-col justify-end gap-1.5 bg-cx-tint p-4">
           {label && <span className="cx-label">{label}</span>}
-          <span className="line-clamp-4 font-cx-serif text-[18px] leading-[22px] text-cx-ink sm:text-[20px] sm:leading-[24px]">
+          <span className="line-clamp-4 font-cx-display text-[20px] leading-[22px] text-cx-ink sm:text-[24px] sm:leading-[26px]">
             {title}
           </span>
         </div>

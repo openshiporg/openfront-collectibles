@@ -48,7 +48,7 @@ export default async function RecentListings({ countryCode, locale }: { countryC
                   ) : (
                     <span className="text-[13px] text-cx-ink-3">Price on request</span>
                   )}
-                  <span className="inline-flex items-baseline gap-1.5 text-[12px] text-cx-ink-2">
+                  <span className="inline-flex items-baseline gap-1.5 text-[13px] text-cx-ink-2">
                     <StatusDot tone={available ? "ok" : "muted"} />
                     {result?.facts?.format === "auction" ? "Auction" : available ? "Available" : "Unavailable"}
                   </span>

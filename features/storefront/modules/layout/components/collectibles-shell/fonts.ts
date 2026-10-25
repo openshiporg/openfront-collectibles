@@ -1,21 +1,18 @@
-import { Hanken_Grotesk, JetBrains_Mono, Newsreader } from "next/font/google"
+import { Literata, Rokkitt } from "next/font/google"
 
-export const cxSans = Hanken_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--cx-font-sans",
-})
-
-export const cxSerif = Newsreader({
+// Literata for everything read (the serif variable aliases it in globals.css);
+// Rokkitt (slab) for stamped labels, numbers and display.
+export const cxSans = Literata({
   subsets: ["latin"],
   display: "swap",
   style: ["normal", "italic"],
-  variable: "--cx-font-serif",
+  variable: "--cx-font-sans",
 })
 
-export const cxMono = JetBrains_Mono({
+export const cxSerif = cxSans
+
+export const cxMono = Rokkitt({
   subsets: ["latin"],
-  weight: ["400", "500"],
   display: "swap",
-  variable: "--cx-font-mono",
+  variable: "--cx-font-display",
 })
