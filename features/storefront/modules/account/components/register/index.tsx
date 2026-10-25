@@ -22,7 +22,7 @@ const Register = ({ setCurrentView }: Props) => {
       className="flex w-full max-w-[480px] flex-col"
       data-testid="register-page"
     >
-      <h1 className="mt-2 font-cx-serif text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[44px] sm:leading-[46px]">
+      <h1 className="mt-2 font-cx-display font-extrabold tracking-[-0.02em] text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[44px] sm:leading-[46px]">
         Create account
       </h1>
       <form className="mt-8 flex w-full flex-col" action={formAction}>
