@@ -27,7 +27,7 @@ const CheckboxWithLabel: React.FC<CheckboxProps> = ({
         onCheckedChange={onChange}
         name={name}
         data-testid={dataTestId}
-        className="size-5 rounded-[6px] border-cx-ink-3 bg-cx-surface data-[state=checked]:border-cx-ink data-[state=checked]:bg-cx-ink data-[state=checked]:text-cx-bg"
+        className="size-5 rounded-[2px] border-cx-ink-3 bg-cx-surface data-[state=checked]:border-cx-ink data-[state=checked]:bg-cx-ink data-[state=checked]:text-cx-bg"
       />
       <Label htmlFor={id} className="text-[14px] font-normal text-cx-ink">
         {label}

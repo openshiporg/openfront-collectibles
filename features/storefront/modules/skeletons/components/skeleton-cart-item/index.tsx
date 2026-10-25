@@ -4,7 +4,7 @@ const SkeletonCartItem = () => {
   return (
     <TableRow className="w-full m-4">
       <TableCell className="!pl-0 p-4 w-24">
-        <div className="flex w-24 h-24 p-4 bg-cx-well rounded-large animate-pulse" />
+        <div className="flex w-24 h-24 p-4 bg-cx-well rounded-[2px] animate-pulse" />
       </TableCell>
       <TableCell className="text-left">
         <div className="flex flex-col gap-y-2">

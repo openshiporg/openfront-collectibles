@@ -1,0 +1,531 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-25T00:00:00Z",
+  "title": "Design System: Openfront Collectibles Storefront",
+  "extensions": {
+    "colorMeta": {
+      "gilt": {
+        "role": "primary",
+        "displayName": "Gilt",
+        "canonical": "hsl(var(--cx-h, 26) 58% 66%)",
+        "tonalRamp": [
+          "hsl(26 58% 15%)",
+          "hsl(26 58% 25%)",
+          "hsl(26 58% 35%)",
+          "hsl(26 58% 45%)",
+          "hsl(26 58% 55%)",
+          "hsl(26 58% 65%)",
+          "hsl(26 58% 80%)",
+          "hsl(26 58% 95%)"
+        ],
+        "purpose": "Primary action fill, chosen pill, hover, focus ring, selection."
+      },
+      "gilt-hover": {
+        "role": "primary",
+        "displayName": "Gilt Bright",
+        "canonical": "hsl(var(--cx-h, 26) 62% 74%)",
+        "tonalRamp": [
+          "hsl(26 62% 15%)",
+          "hsl(26 62% 25%)",
+          "hsl(26 62% 35%)",
+          "hsl(26 62% 45%)",
+          "hsl(26 62% 55%)",
+          "hsl(26 62% 65%)",
+          "hsl(26 62% 80%)",
+          "hsl(26 62% 95%)"
+        ],
+        "purpose": "Primary button hover."
+      },
+      "gilt-soft": {
+        "role": "primary",
+        "displayName": "Gilt Soft",
+        "canonical": "hsl(var(--cx-h, 26) 62% 76%)",
+        "tonalRamp": [
+          "hsl(26 62% 15%)",
+          "hsl(26 62% 25%)",
+          "hsl(26 62% 35%)",
+          "hsl(26 62% 45%)",
+          "hsl(26 62% 55%)",
+          "hsl(26 62% 65%)",
+          "hsl(26 62% 80%)",
+          "hsl(26 62% 95%)"
+        ],
+        "purpose": "Grader name on the slab band."
+      },
+      "buckram": {
+        "role": "secondary",
+        "displayName": "Buckram",
+        "canonical": "hsl(var(--cx-h, 26) 34% 15%)",
+        "tonalRamp": [
+          "hsl(26 34% 15%)",
+          "hsl(26 34% 25%)",
+          "hsl(26 34% 35%)",
+          "hsl(26 34% 45%)",
+          "hsl(26 34% 55%)",
+          "hsl(26 34% 65%)",
+          "hsl(26 34% 80%)",
+          "hsl(26 34% 95%)"
+        ],
+        "purpose": "Cover cloth: header, home cover, slab band, footer."
+      },
+      "buckram-raised": {
+        "role": "secondary",
+        "displayName": "Buckram Raised",
+        "canonical": "hsl(var(--cx-h, 26) 30% 24%)",
+        "tonalRamp": [
+          "hsl(26 30% 15%)",
+          "hsl(26 30% 25%)",
+          "hsl(26 30% 35%)",
+          "hsl(26 30% 45%)",
+          "hsl(26 30% 55%)",
+          "hsl(26 30% 65%)",
+          "hsl(26 30% 80%)",
+          "hsl(26 30% 95%)"
+        ],
+        "purpose": "Thumb-index tabs, nav hover, footer name stamp."
+      },
+      "gilt-tint": {
+        "role": "secondary",
+        "displayName": "Gilt Tint",
+        "canonical": "hsl(var(--cx-h, 26) 26% 17%)",
+        "tonalRamp": [
+          "hsl(26 26% 15%)",
+          "hsl(26 26% 25%)",
+          "hsl(26 26% 35%)",
+          "hsl(26 26% 45%)",
+          "hsl(26 26% 55%)",
+          "hsl(26 26% 65%)",
+          "hsl(26 26% 80%)",
+          "hsl(26 26% 95%)"
+        ],
+        "purpose": "No-photo specimen plate, discount chips."
+      },
+      "page-black": {
+        "role": "neutral",
+        "displayName": "Page Black",
+        "canonical": "oklch(14.5% 0.006 60)",
+        "tonalRamp": [
+          "oklch(15% 0.006 60)",
+          "oklch(25% 0.006 60)",
+          "oklch(35% 0.006 60)",
+          "oklch(45% 0.006 60)",
+          "oklch(55% 0.006 60)",
+          "oklch(65% 0.006 60)",
+          "oklch(80% 0.006 60)",
+          "oklch(95% 0.006 60)"
+        ],
+        "purpose": "The album page; text on gilt."
+      },
+      "page-band": {
+        "role": "neutral",
+        "displayName": "Page Band",
+        "canonical": "oklch(19.5% 0.008 60)",
+        "tonalRamp": [
+          "oklch(15% 0.008 60)",
+          "oklch(25% 0.008 60)",
+          "oklch(35% 0.008 60)",
+          "oklch(45% 0.008 60)",
+          "oklch(55% 0.008 60)",
+          "oklch(65% 0.008 60)",
+          "oklch(80% 0.008 60)",
+          "oklch(95% 0.008 60)"
+        ],
+        "purpose": "Rows, tables, pills, inputs, popovers."
+      },
+      "page-band-raised": {
+        "role": "neutral",
+        "displayName": "Page Band Raised",
+        "canonical": "oklch(23% 0.008 60)",
+        "tonalRamp": [
+          "oklch(15% 0.008 60)",
+          "oklch(25% 0.008 60)",
+          "oklch(35% 0.008 60)",
+          "oklch(45% 0.008 60)",
+          "oklch(55% 0.008 60)",
+          "oklch(65% 0.008 60)",
+          "oklch(80% 0.008 60)",
+          "oklch(95% 0.008 60)"
+        ],
+        "purpose": "Pill hover, shadcn secondary surfaces."
+      },
+      "specimen-well": {
+        "role": "neutral",
+        "displayName": "Specimen Well",
+        "canonical": "oklch(11.5% 0.005 60)",
+        "tonalRamp": [
+          "oklch(15% 0.005 60)",
+          "oklch(25% 0.005 60)",
+          "oklch(35% 0.005 60)",
+          "oklch(45% 0.005 60)",
+          "oklch(55% 0.005 60)",
+          "oklch(65% 0.005 60)",
+          "oklch(80% 0.005 60)",
+          "oklch(95% 0.005 60)"
+        ],
+        "purpose": "Recess behind every specimen image."
+      },
+      "paper-ink": {
+        "role": "neutral",
+        "displayName": "Paper Ink",
+        "canonical": "oklch(94.5% 0.012 85)",
+        "tonalRamp": [
+          "oklch(15% 0.012 85)",
+          "oklch(25% 0.012 85)",
+          "oklch(35% 0.012 85)",
+          "oklch(45% 0.012 85)",
+          "oklch(55% 0.012 85)",
+          "oklch(65% 0.012 85)",
+          "oklch(80% 0.012 85)",
+          "oklch(95% 0.012 85)"
+        ],
+        "purpose": "Titles and primary text."
+      },
+      "paper-ink-2": {
+        "role": "neutral",
+        "displayName": "Paper Ink 2",
+        "canonical": "oklch(80% 0.012 80)",
+        "tonalRamp": [
+          "oklch(15% 0.012 80)",
+          "oklch(25% 0.012 80)",
+          "oklch(35% 0.012 80)",
+          "oklch(45% 0.012 80)",
+          "oklch(55% 0.012 80)",
+          "oklch(65% 0.012 80)",
+          "oklch(80% 0.012 80)",
+          "oklch(95% 0.012 80)"
+        ],
+        "purpose": "Secondary text, inactive nav and pills."
+      },
+      "paper-ink-3": {
+        "role": "neutral",
+        "displayName": "Paper Ink 3",
+        "canonical": "oklch(66% 0.012 80)",
+        "tonalRamp": [
+          "oklch(15% 0.012 80)",
+          "oklch(25% 0.012 80)",
+          "oklch(35% 0.012 80)",
+          "oklch(45% 0.012 80)",
+          "oklch(55% 0.012 80)",
+          "oklch(65% 0.012 80)",
+          "oklch(80% 0.012 80)",
+          "oklch(95% 0.012 80)"
+        ],
+        "purpose": "Labels, counts, placeholders."
+      },
+      "page-rule": {
+        "role": "neutral",
+        "displayName": "Page Rule",
+        "canonical": "oklch(30% 0.01 60)",
+        "tonalRamp": [
+          "oklch(15% 0.01 60)",
+          "oklch(25% 0.01 60)",
+          "oklch(35% 0.01 60)",
+          "oklch(45% 0.01 60)",
+          "oklch(55% 0.01 60)",
+          "oklch(65% 0.01 60)",
+          "oklch(80% 0.01 60)",
+          "oklch(95% 0.01 60)"
+        ],
+        "purpose": "Hairline dividers, input strokes."
+      },
+      "field-stroke": {
+        "role": "neutral",
+        "displayName": "Field Stroke",
+        "canonical": "oklch(34% 0.01 60)",
+        "tonalRamp": [
+          "oklch(15% 0.01 60)",
+          "oklch(25% 0.01 60)",
+          "oklch(35% 0.01 60)",
+          "oklch(45% 0.01 60)",
+          "oklch(55% 0.01 60)",
+          "oklch(65% 0.01 60)",
+          "oklch(80% 0.01 60)",
+          "oklch(95% 0.01 60)"
+        ],
+        "purpose": "shadcn input token inside the storefront."
+      },
+      "status-danger": {
+        "role": "status",
+        "displayName": "Danger",
+        "canonical": "oklch(71% 0.17 25)",
+        "tonalRamp": [
+          "oklch(15% 0.17 25)",
+          "oklch(25% 0.17 25)",
+          "oklch(35% 0.17 25)",
+          "oklch(45% 0.17 25)",
+          "oklch(55% 0.17 25)",
+          "oklch(65% 0.17 25)",
+          "oklch(80% 0.17 25)",
+          "oklch(95% 0.17 25)"
+        ],
+        "purpose": "Error dots and text."
+      },
+      "status-ok": {
+        "role": "status",
+        "displayName": "OK",
+        "canonical": "oklch(78% 0.14 150)",
+        "tonalRamp": [
+          "oklch(15% 0.14 150)",
+          "oklch(25% 0.14 150)",
+          "oklch(35% 0.14 150)",
+          "oklch(45% 0.14 150)",
+          "oklch(55% 0.14 150)",
+          "oklch(65% 0.14 150)",
+          "oklch(80% 0.14 150)",
+          "oklch(95% 0.14 150)"
+        ],
+        "purpose": "Available / matched dots."
+      },
+      "status-warn": {
+        "role": "status",
+        "displayName": "Warn",
+        "canonical": "oklch(82% 0.13 75)",
+        "tonalRamp": [
+          "oklch(15% 0.13 75)",
+          "oklch(25% 0.13 75)",
+          "oklch(35% 0.13 75)",
+          "oklch(45% 0.13 75)",
+          "oklch(55% 0.13 75)",
+          "oklch(65% 0.13 75)",
+          "oklch(80% 0.13 75)",
+          "oklch(95% 0.13 75)"
+        ],
+        "purpose": "In-review dots."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Store title stamped on the home cover (48/80/104px by breakpoint); footer name stamp up to 164px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section heads and product title (32/34px phone, 44/44px desktop)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Thumb-index tabs and sub-heads (21-24px)."
+      },
+      "body-lead": {
+        "displayName": "Body Lead",
+        "purpose": "Cover description (17/27px phone, 19/30px desktop, max 46ch)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Item names, record prose, footer links (15-17px)."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Record lines, meta, status labels, table cells (13-14px)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Stamped field and column labels in Paper Ink 3, sentence case."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Prices, grades, certificates, counts, SKUs; tabular lining figures."
+      }
+    },
+    "shadows": [
+      {
+        "name": "popover-drop",
+        "value": "0 24px 48px -16px rgb(0 0 0 / 0.7)",
+        "purpose": "Floating menus and popovers only."
+      }
+    ],
+    "materials": [
+      {
+        "name": "glassine-pocket",
+        "value": "::after inset 58% 0 0; background oklch(100% 0 0 / 0.055); border-top 1px solid oklch(100% 0 0 / 0.16); hover background oklch(100% 0 0 / 0.03)",
+        "purpose": "Clear strip over every specimen well."
+      },
+      {
+        "name": "buckram-texture",
+        "value": null,
+        "purpose": "OPEN: named by the direction contract, not rendered. No raster asset yet; cloth is a flat fill until one ships with provenance."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "The only easing."
+      },
+      {
+        "name": "state",
+        "value": "160ms",
+        "purpose": "Colour and background changes."
+      },
+      {
+        "name": "press",
+        "value": "140ms, scale(0.97)",
+        "purpose": "Button and pill press."
+      },
+      {
+        "name": "pocket-lift",
+        "value": "300ms translateY(-4px); pocket clear 200ms",
+        "purpose": "Specimen hover."
+      },
+      {
+        "name": "tab-slide",
+        "value": "200ms translateX(-8px)",
+        "purpose": "Thumb-index tab hover, desktop."
+      },
+      {
+        "name": "rise",
+        "value": "620ms translateY(14px) to 0, 60ms stagger, max 300ms",
+        "purpose": "Home rows print in once; reduced-motion gated."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ],
+    "runtime": {
+      "hueVariable": "--cx-h",
+      "hueDefault": 26,
+      "note": "Set per store from the saved logo colour on the .cx-sf wrapper and mirrored onto body for portals. Frontmatter values resolve the default hue."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Gilt-filled stamped action; one per view.",
+      "html": "<button class=\"ds-btn\">Browse all items</button>",
+      "css": ".ds-btn{display:inline-flex;min-height:48px;align-items:center;justify-content:center;padding:0 24px;border:0;border-radius:2px;background:hsl(var(--cx-h,26) 58% 66%);color:oklch(14.5% 0.006 60);font-family:Rokkitt,ui-serif,Georgia,serif;font-size:17px;font-weight:700;letter-spacing:0.01em;cursor:pointer;transition:background-color 160ms cubic-bezier(0.23, 1, 0.32, 1),transform 140ms cubic-bezier(0.23, 1, 0.32, 1);} .ds-btn:hover{background:hsl(var(--cx-h,26) 62% 74%);} .ds-btn:active{transform:scale(0.97);} .ds-btn:focus-visible{outline:2px solid hsl(var(--cx-h,26) 58% 66%);outline-offset:3px;} .ds-btn:disabled{opacity:0.4;cursor:not-allowed;}"
+    },
+    {
+      "name": "Underlined Text Action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary stamped link with a cloth underline that turns gilt.",
+      "html": "<div class=\"ds-cloth\"><a href=\"#\" class=\"ds-link\">Trade in</a></div>",
+      "css": ".ds-cloth{padding:16px;background:hsl(var(--cx-h,26) 34% 15%);} .ds-link{display:inline-flex;min-height:48px;align-items:center;padding:0 12px;font-family:Rokkitt,ui-serif,Georgia,serif;font-size:17px;font-weight:600;color:oklch(80% 0.012 80);text-decoration:underline;text-decoration-color:hsl(var(--cx-h,26) 30% 24%);text-decoration-thickness:2px;text-underline-offset:6px;transition:color 160ms cubic-bezier(0.23, 1, 0.32, 1);} .ds-link:hover{color:oklch(94.5% 0.012 85);text-decoration-color:hsl(var(--cx-h,26) 58% 66%);} .ds-link:focus-visible{outline:2px solid hsl(var(--cx-h,26) 58% 66%);outline-offset:2px;}"
+    },
+    {
+      "name": "Pill Track",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "Filter and option pills; the chosen one is gilt.",
+      "html": "<div class=\"ds-track\" role=\"group\" aria-label=\"Sort\"><button class=\"ds-pill\" data-active=\"true\">Newest</button><button class=\"ds-pill\">Price</button><button class=\"ds-pill\">Grade</button></div>",
+      "css": ".ds-track{display:inline-flex;gap:4px;padding:8px;background:var(--color-cx-bg,oklch(14.5% 0.006 60));} .ds-pill{display:inline-flex;min-height:40px;align-items:center;padding:0 14px;border:0;border-radius:2px;background:oklch(19.5% 0.008 60);font-family:Rokkitt,ui-serif,Georgia,serif;font-size:15px;font-weight:600;color:oklch(80% 0.012 80);transition:background-color 160ms cubic-bezier(0.23, 1, 0.32, 1),color 160ms cubic-bezier(0.23, 1, 0.32, 1),transform 140ms cubic-bezier(0.23, 1, 0.32, 1);cursor:pointer;} .ds-pill:hover{background:oklch(23% 0.008 60);color:oklch(94.5% 0.012 85);} .ds-pill:active{transform:scale(0.97);} .ds-pill:focus-visible{outline:2px solid hsl(var(--cx-h,26) 58% 66%);outline-offset:2px;} .ds-pill[data-active=true]{background:hsl(var(--cx-h,26) 58% 66%);color:oklch(14.5% 0.006 60);}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Band-filled field with a hairline stroke and gilt focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-label\">Email</span><input class=\"ds-input\" placeholder=\"you@example.com\"></label>",
+      "css": ".ds-field{display:grid;gap:6px;padding:16px;background:oklch(14.5% 0.006 60);} .ds-label{font-family:Rokkitt,ui-serif,Georgia,serif;font-size:14px;line-height:18px;font-weight:600;letter-spacing:0.01em;color:oklch(66% 0.012 80);} .ds-input{height:48px;padding:0 16px;border:1px solid oklch(30% 0.01 60);border-radius:2px;background:oklch(19.5% 0.008 60);color:oklch(94.5% 0.012 85);font-family:Literata,ui-serif,Georgia,serif;font-size:15px;transition:border-color 160ms cubic-bezier(0.23, 1, 0.32, 1);} .ds-input::placeholder{color:oklch(66% 0.012 80);} .ds-input:hover{border-color:oklch(66% 0.012 80);} .ds-input:focus-visible{outline:none;border-color:hsl(var(--cx-h,26) 58% 66%);box-shadow:0 0 0 2px hsl(var(--cx-h,26) 58% 66% / 0.25);}"
+    },
+    {
+      "name": "Header Band",
+      "kind": "nav",
+      "refersTo": "header-band",
+      "description": "Sticky 64px cloth band with stamped category links.",
+      "html": "<nav class=\"ds-nav\"><strong class=\"ds-brand\">Northstar Collectibles</strong><a href=\"#\" class=\"ds-nl ds-nl-on\">All items</a><a href=\"#\" class=\"ds-nl\">Trading Cards</a><a href=\"#\" class=\"ds-nl\">Coins</a></nav>",
+      "css": ".ds-nav{display:flex;height:64px;align-items:center;gap:4px;padding:0 24px;background:hsl(var(--cx-h,26) 34% 15%);} .ds-brand{margin-right:24px;font-family:Rokkitt,ui-serif,Georgia,serif;font-size:20px;font-weight:800;color:oklch(94.5% 0.012 85);} .ds-nl{display:inline-flex;min-height:40px;align-items:center;padding:0 12px;border-radius:2px;font-family:Rokkitt,ui-serif,Georgia,serif;font-size:16px;font-weight:600;color:oklch(80% 0.012 80);text-decoration:none;transition:background-color 160ms cubic-bezier(0.23, 1, 0.32, 1),color 160ms cubic-bezier(0.23, 1, 0.32, 1);} .ds-nl-on{font-weight:700;color:oklch(94.5% 0.012 85);} .ds-nl:hover{background:hsl(var(--cx-h,26) 30% 24%);color:oklch(94.5% 0.012 85);} .ds-nl:focus-visible{outline:2px solid hsl(var(--cx-h,26) 58% 66%);outline-offset:2px;}"
+    },
+    {
+      "name": "Thumb Index",
+      "kind": "custom",
+      "refersTo": "thumb-index-tab",
+      "description": "The cover's stepped category tabs; hover fills gilt and slides left.",
+      "html": "<ol class=\"ds-index\"><li style=\"--s:0px\"><a href=\"#\" class=\"ds-tab\"><span>Trading Cards</span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></li><li style=\"--s:14px\"><a href=\"#\" class=\"ds-tab\"><span>Comics</span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></li><li style=\"--s:28px\"><a href=\"#\" class=\"ds-tab\"><span>Coins</span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></li></ol>",
+      "css": ".ds-index{display:grid;gap:6px;margin:0;padding:24px 0 24px 16px;list-style:none;background:hsl(var(--cx-h,26) 34% 15%);} .ds-index li{margin-left:var(--s);} .ds-tab{display:flex;min-height:54px;align-items:center;gap:16px;padding:0 32px 0 20px;border-radius:2px 0 0 2px;background:hsl(var(--cx-h,26) 30% 24%);color:oklch(94.5% 0.012 85);text-decoration:none;transition:background-color 200ms cubic-bezier(0.23, 1, 0.32, 1),transform 200ms cubic-bezier(0.23, 1, 0.32, 1),color 200ms cubic-bezier(0.23, 1, 0.32, 1);} .ds-tab span{flex:1;font-family:Rokkitt,ui-serif,Georgia,serif;font-size:24px;font-weight:700;line-height:1;} .ds-tab svg{color:oklch(80% 0.012 80);} .ds-tab:hover{background:hsl(var(--cx-h,26) 58% 66%);color:oklch(14.5% 0.006 60);transform:translateX(-8px);} .ds-tab:hover svg{color:oklch(14.5% 0.006 60);} .ds-tab:focus-visible{outline:2px solid hsl(var(--cx-h,26) 58% 66%);outline-offset:2px;}"
+    },
+    {
+      "name": "Specimen Card",
+      "kind": "card",
+      "refersTo": "specimen-well",
+      "description": "Specimen in a dark well behind the glassine strip; lifts on hover as the pocket clears.",
+      "html": "<a href=\"#\" class=\"ds-spec\"><div class=\"ds-well\"><div class=\"ds-art\"></div></div><h3 class=\"ds-name\">1881 Silver Dollar</h3><span class=\"ds-price\">$195.00</span></a>",
+      "css": ".ds-spec{display:grid;gap:4px;width:240px;padding:12px;background:oklch(14.5% 0.006 60);text-decoration:none;} .ds-well{position:relative;isolation:isolate;aspect-ratio:4/3;overflow:hidden;border-radius:2px;background:oklch(11.5% 0.005 60);margin-bottom:8px;} .ds-well::after{content:'';position:absolute;inset:58% 0 0;z-index:1;background:oklch(100% 0 0 / 0.055);border-top:1px solid oklch(100% 0 0 / 0.16);pointer-events:none;transition:background-color 200ms cubic-bezier(0.23, 1, 0.32, 1);} .ds-art{position:absolute;inset:9%;background:oklch(93% 0.012 85);transition:transform 300ms cubic-bezier(0.23, 1, 0.32, 1);} .ds-spec:hover .ds-art{transform:translateY(-4px);} .ds-spec:hover .ds-well::after{background:oklch(100% 0 0 / 0.03);} .ds-name{margin:0;font-family:Literata,ui-serif,Georgia,serif;font-size:17px;line-height:23px;font-weight:400;color:oklch(94.5% 0.012 85);transition:color 160ms cubic-bezier(0.23, 1, 0.32, 1);} .ds-spec:hover .ds-name{color:hsl(var(--cx-h,26) 58% 66%);} .ds-price{font-family:Rokkitt,ui-serif,Georgia,serif;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums lining-nums;color:oklch(94.5% 0.012 85);} .ds-spec:focus-visible{outline:2px solid hsl(var(--cx-h,26) 58% 66%);outline-offset:4px;}"
+    },
+    {
+      "name": "Grading Slab Label",
+      "kind": "custom",
+      "refersTo": "slab-band",
+      "description": "Cloth slab band (grader, grade) over a page-band strip (item, certificate, verification).",
+      "html": "<div class=\"ds-slab\"><div class=\"ds-slab-band\"><div><span class=\"ds-grader\">PSA</span><span class=\"ds-gl\">Gem Mint</span></div><span class=\"ds-grade\">10</span></div><div class=\"ds-strip\"><p class=\"ds-st\">1999 First Edition Fire Dragon Holo</p><div class=\"ds-meta\"><span class=\"ds-cert\">Cert 48120931</span><span><i class=\"ds-dot\"></i>Certificate matched</span></div></div></div>",
+      "css": ".ds-slab{width:340px;overflow:hidden;border-radius:2px;background:oklch(19.5% 0.008 60);color:oklch(94.5% 0.012 85);} .ds-slab-band{display:flex;justify-content:space-between;gap:12px;padding:16px 20px;background:hsl(var(--cx-h,26) 34% 15%);} .ds-grader{display:block;font-family:Rokkitt,ui-serif,Georgia,serif;font-weight:600;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:hsl(var(--cx-h,26) 62% 76%);} .ds-gl{display:block;margin-top:4px;font-family:Literata,ui-serif,Georgia,serif;font-size:13px;color:oklch(80% 0.012 80);} .ds-grade{font-family:Literata,ui-serif,Georgia,serif;font-size:44px;line-height:1;letter-spacing:-0.02em;} .ds-strip{padding:16px 20px;} .ds-st{margin:0 0 4px;font-family:Literata,ui-serif,Georgia,serif;font-size:19px;line-height:24px;} .ds-meta{display:flex;justify-content:space-between;gap:12px;font-family:Literata,ui-serif,Georgia,serif;font-size:13px;color:oklch(80% 0.012 80);} .ds-cert{font-family:Rokkitt,ui-serif,Georgia,serif;font-weight:600;font-variant-numeric:tabular-nums lining-nums;} .ds-dot{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:999px;background:oklch(78% 0.14 150);}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Dealer's Stock Book",
+    "overview": "The storefront is a collector's black-page stock book. Pages are near-black (never grey), ink is warm paper-white, and each specimen sits in a dark well behind a clear glassine strip. The store's own cloth cover (buckram, dyed in the store's logo hue) binds the header band, the home cover, the grading-slab band and the footer, and gilt pressed from that same hue is the only accent. Everything stamped (titles, labels, numbers, prices, tabs) is set in Rokkitt slab; everything read is set in Literata.\n\nDensity is a dealer's ledger, not a gallery: small, legible type (13 to 15px for records), tight 4 to 8px gaps between bands, and a single 1320px column with square 2px corners everywhere. Depth comes from tone, not shadow: the page, the band, the well and the cloth are four stepped values of the same warm dark. Motion is brief and physical: rows print in once on home, specimens lift a few pixels inside their pocket, pressed controls give 3%.\n\nThe hue is the store's, not the system's. Every cloth and gilt value is `hsl(var(--cx-h) ...)` with `--cx-h` set per store from its saved logo colour (default 26, a copper). The values in the frontmatter are that default resolved; never hard-code a hue.",
+    "keyCharacteristics": [
+      "Black album page (page-black) with warm paper-white ink; no grey grounds.",
+      "Buckram cloth in the store hue for header, cover, slab band and footer.",
+      "Gilt (same hue) as the one accent: primary action, chosen pill, hover.",
+      "Rokkitt slab for stamped text and numbers; Literata for reading.",
+      "Square 2px corners; flat tonal layers; one popover shadow.",
+      "Glassine pocket over every specimen image; the specimen lifts and the pocket clears on hover."
+    ],
+    "rules": [
+      {
+        "name": "The One Hue Rule",
+        "body": "Cloth and gilt are both derived from the store's `--cx-h`. No second accent hue exists; status colours are dots, not decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Grey Ground Rule",
+        "body": "Every surface is a warm dark from the page family (chroma 0.005 to 0.008, hue 60). Neutral grey or washed-out mid-tone grounds are out.",
+        "section": "colors"
+      },
+      {
+        "name": "The Stamp and Read Rule",
+        "body": "If it is stamped (a title, a label, a number, a price, a control), it is Rokkitt. If it is read (a name, a sentence, a record line), it is Literata. Note: the CSS aliases `font-cx-mono` and `font-cx-serif` are legacy names; there is no monospace in this system and \"serif\" resolves to Literata.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Labels are sentence case at 0.01em tracking. Uppercase appears only where the source object prints it: the grader's name on a slab band, a carrier code, a discount code.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Page Rule",
+        "body": "Bands, cards, wells and buttons carry no shadow. Only something that genuinely floats above the page (a menu, a popover) gets the popover drop.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Glassine Rule",
+        "body": "Every specimen image sits in a well with the glassine strip. On hover the image lifts 4px (300ms) and the strip clears from 5.5% to 3% white (200ms). Never replace this with a scale-up, glow or card shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do derive every cloth and gilt value from `--cx-h`; the store's logo hue is the brand.",
+      "Do set stamped text and every number in Rokkitt with tabular lining figures, and read text in Literata.",
+      "Do put every specimen image in a Specimen Well with the glassine strip, inset 9%.",
+      "Do keep all corners at 2px and separate surfaces by tone (well, page, band, raised).",
+      "Do keep Gilt to the primary action, the chosen state, hover and focus.",
+      "Do show only what an item's record holds: no grade band without a grade, no certificate line without a certificate."
+    ],
+    "donts": [
+      "Don't use a grey, cream or washed-out ground; the page is warm near-black.",
+      "Don't add a second accent hue, gradient glows, or gradient fills.",
+      "Don't put shadows on bands, cards, wells or buttons; only floating menus get the popover drop.",
+      "Don't fake the buckram weave with CSS noise or gradients; it ships as a raster with provenance or stays a flat fill.",
+      "Don't set labels in uppercase tracking unless the printed object itself is uppercase (grader name, carrier, code).",
+      "Don't round corners beyond 2px except functional dots and badges."
+    ]
+  }
+}

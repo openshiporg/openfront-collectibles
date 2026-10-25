@@ -96,7 +96,7 @@ export default function ModernOrderList({
         };
 
         return (
-          <Card key={order.id} className="hover:shadow-md transition-shadow">
+          <Card key={order.id} className="transition-colors hover:bg-cx-surface">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
