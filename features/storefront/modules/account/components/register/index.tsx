@@ -96,7 +96,7 @@ const Register = ({ setCurrentView }: Props) => {
         <button
           type="button"
           onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-          className="inline-flex min-h-11 items-center rounded-full px-3 font-medium text-cx-ink hover:bg-cx-well"
+          className="inline-flex min-h-11 items-center rounded-[2px] px-3 font-medium text-cx-ink hover:bg-cx-well"
         >
           Sign in
         </button>

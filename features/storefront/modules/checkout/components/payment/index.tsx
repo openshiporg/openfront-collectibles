@@ -202,7 +202,7 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="inline-flex items-center gap-1 rounded-full bg-cx-tint px-2 py-0.5 text-[13px] font-medium text-cx-accent">
+                                <span className="inline-flex items-center gap-1 rounded-[2px] bg-cx-tint px-2 py-0.5 text-[13px] font-medium text-cx-accent">
                                   <FlaskConical className="size-3" strokeWidth={2.5} aria-hidden="true" />
                                   Test
                                 </span>

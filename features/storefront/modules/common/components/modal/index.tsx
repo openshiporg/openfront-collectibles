@@ -76,7 +76,7 @@ const Title: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <DialogHeader className="flex flex-row items-center justify-between pb-4">
       <DialogTitle className="font-cx-serif text-[22px] font-normal leading-[26px]">{children}</DialogTitle>
-      <button onClick={close} data-testid="close-modal-button" aria-label="Close" className="-mr-2 ml-auto inline-flex size-11 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink">
+      <button onClick={close} data-testid="close-modal-button" aria-label="Close" className="-mr-2 ml-auto inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink">
         <X size={20} />
       </button>
     </DialogHeader>

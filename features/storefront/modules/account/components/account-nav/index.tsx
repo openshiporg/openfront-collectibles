@@ -71,7 +71,7 @@ const AccountNav = ({ customer }: AccountNavProps) => {
           onClick={handleLogout}
           disabled={signingOut}
           data-testid="logout-button"
-          className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-[14px] text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-[2px] px-3 text-[14px] text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink disabled:opacity-50"
         >
           <LogOut className="size-4" aria-hidden="true" />
           {signingOut ? "Signing out" : "Sign out"}

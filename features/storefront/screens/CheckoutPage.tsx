@@ -55,7 +55,7 @@ export function CheckoutLayout({
         <nav className="mx-auto grid h-16 w-full max-w-[1320px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 sm:px-6">
           <LocalizedClientLink
             href="/cart"
-            className="-ml-2 inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-2 text-[14px] font-medium text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink"
+            className="-ml-2 inline-flex min-h-11 w-fit items-center gap-1.5 rounded-[2px] px-2 text-[14px] font-medium text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink"
             data-testid="back-to-cart-link"
           >
             <ArrowLeft className="size-4 shrink-0" aria-hidden="true" />

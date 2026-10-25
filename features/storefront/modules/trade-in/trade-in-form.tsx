@@ -69,7 +69,7 @@ export default function TradeInForm({ entries }: { entries: Entry[] }) {
           </LocalizedClientLink>
           <button
             type="button"
-            className="inline-flex min-h-12 items-center rounded-full px-4 text-[15px] text-cx-ink-2 hover:text-cx-ink"
+            className="inline-flex min-h-12 items-center rounded-[2px] px-4 text-[15px] text-cx-ink-2 hover:text-cx-ink"
             onClick={() => {
               setReference(null)
               setRows([{ buylistEntryId: "", description: "", condition: "" }])
@@ -113,7 +113,7 @@ export default function TradeInForm({ entries }: { entries: Entry[] }) {
                 <button
                   type="button"
                   aria-label={`Remove item ${index + 1}`}
-                  className="inline-flex size-10 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink"
+                  className="inline-flex size-10 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink"
                   onClick={() => setRows((current) => current.filter((_, i) => i !== index))}
                 >
                   <X className="size-4" aria-hidden="true" />
@@ -163,7 +163,7 @@ export default function TradeInForm({ entries }: { entries: Entry[] }) {
         {rows.length < 20 && (
           <button
             type="button"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full px-1 text-[14px] font-medium text-cx-ink-2 hover:text-cx-ink"
+            className="inline-flex min-h-11 items-center gap-2 rounded-[2px] px-1 text-[14px] font-medium text-cx-ink-2 hover:text-cx-ink"
             onClick={() => setRows((current) => [...current, { buylistEntryId: "", description: "", condition: "" }])}
           >
             <Plus className="size-4" aria-hidden="true" />

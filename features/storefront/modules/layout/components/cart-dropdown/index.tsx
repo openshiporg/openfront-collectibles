@@ -92,7 +92,7 @@ const CartDropdown = ({
         <div className="relative" onMouseEnter={openAndCancel} onMouseLeave={close}>
           <PopoverTrigger asChild>
             <LocalizedClientLink
-              className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-[14px] font-medium text-cx-ink hover:bg-cx-well"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[2px] px-3 text-[14px] font-medium text-cx-ink hover:bg-cx-well"
               href="/cart"
               data-testid="nav-cart-link"
             >

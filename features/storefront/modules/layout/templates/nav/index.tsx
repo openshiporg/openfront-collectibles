@@ -108,7 +108,7 @@ export default async function Nav() {
             <Suspense
               fallback={
                 <LocalizedClientLink
-                  className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-[14px] text-cx-ink"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-[2px] px-3 text-[14px] text-cx-ink"
                   href="/cart"
                   data-testid="nav-cart-link"
                 >

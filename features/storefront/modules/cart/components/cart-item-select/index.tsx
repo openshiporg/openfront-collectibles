@@ -89,7 +89,7 @@ const CartItemSelect = forwardRef<HTMLInputElement, CartItemSelectProps>(
         <button
           type="button"
           aria-label="Decrease quantity"
-          className="inline-flex size-9 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40 max-sm:size-10"
+          className="inline-flex size-9 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40 max-sm:size-10"
           onClick={handleDecrement}
           disabled={value !== undefined && value <= min}
         >
@@ -109,7 +109,7 @@ const CartItemSelect = forwardRef<HTMLInputElement, CartItemSelectProps>(
         <button
           type="button"
           aria-label="Increase quantity"
-          className="inline-flex size-9 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40 max-sm:size-10"
+          className="inline-flex size-9 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40 max-sm:size-10"
           onClick={handleIncrement}
           disabled={value !== undefined && value >= max}
         >

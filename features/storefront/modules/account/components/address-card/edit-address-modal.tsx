@@ -117,7 +117,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
             onClick={removeAddress}
             disabled={removing}
             data-testid="address-delete-button"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[14px] font-medium text-cx-danger hover:bg-cx-surface disabled:opacity-50"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-[2px] px-3 text-[14px] font-medium text-cx-danger hover:bg-cx-surface disabled:opacity-50"
           >
             {removing ? <RiLoader2Fill className="size-4 animate-spin" aria-hidden="true" /> : <Trash2 className="size-4" aria-hidden="true" />}
             {removing ? "Removing" : "Remove"}
@@ -241,12 +241,12 @@ const EditAddress: React.FC<EditAddressProps> = ({
               <button
                 type="reset"
                 onClick={close}
-                className="inline-flex min-h-12 items-center justify-center rounded-full px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
+                className="inline-flex min-h-12 items-center justify-center rounded-[2px] px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
                 data-testid="cancel-button"
               >
                 Cancel
               </button>
-              <SubmitButton data-testid="save-button" className="h-12 rounded-full px-6 text-[15px]">Save</SubmitButton>
+              <SubmitButton data-testid="save-button" className="h-12 rounded-[2px] px-6 text-[15px]">Save</SubmitButton>
             </div>
           </Modal.Footer>
         </form>

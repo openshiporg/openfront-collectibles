@@ -82,7 +82,7 @@ const Login = ({ setCurrentView }: Props) => {
         <button
           type="button"
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="inline-flex min-h-11 items-center rounded-full px-3 font-medium text-cx-ink hover:bg-cx-well"
+          className="inline-flex min-h-11 items-center rounded-[2px] px-3 font-medium text-cx-ink hover:bg-cx-well"
           data-testid="register-button"
         >
           Create account

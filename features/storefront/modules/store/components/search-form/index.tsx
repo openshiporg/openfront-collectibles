@@ -28,7 +28,7 @@ export default function SearchForm({
         autoFocus={autoFocus}
         maxLength={80}
         placeholder="Search items"
-        className="min-h-12 w-full rounded-full border border-cx-line bg-cx-surface pl-11 pr-28 text-[15px] text-cx-ink placeholder:text-cx-ink-3 focus:outline-2 focus:outline-cx-accent"
+        className="min-h-12 w-full rounded-[2px] border border-cx-line bg-cx-surface pl-11 pr-28 text-[15px] text-cx-ink placeholder:text-cx-ink-3 focus:outline-2 focus:outline-cx-accent"
         data-testid="search-input"
       />
       <button type="submit" className="cx-btn absolute right-1 top-1 !min-h-10 !px-4 !text-[14px]">

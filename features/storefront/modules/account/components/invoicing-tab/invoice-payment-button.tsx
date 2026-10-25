@@ -73,7 +73,7 @@ const InvoicePaymentButton: React.FC<InvoicePaymentButtonProps> = ({
         />
       )
     default:
-      return <Button disabled className="h-12 w-full rounded-full text-[15px]">Select a payment method</Button>
+      return <Button disabled className="h-12 w-full rounded-[2px] text-[15px]">Select a payment method</Button>
   }
 }
 
@@ -166,7 +166,7 @@ const StripeInvoicePaymentButton: React.FC<StripeInvoicePaymentButtonProps> = ({
         disabled={disabled || submitting}
         onClick={handlePayment}
         size="lg"
-        className="h-12 w-full rounded-full text-[15px]"
+        className="h-12 w-full rounded-[2px] text-[15px]"
         data-testid={dataTestId}
       >
         {submitting && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />}
@@ -227,7 +227,7 @@ const ManualInvoicePaymentButton = ({ invoice, onPaymentSuccess, "data-testid": 
         disabled={submitting}
         onClick={handlePayment}
         size="lg"
-        className="h-12 w-full rounded-full text-[15px]"
+        className="h-12 w-full rounded-[2px] text-[15px]"
         data-testid={dataTestId || "pay-invoice-button"}
       >
         {submitting && <RiLoader2Fill className="mr-2 h-4 w-4 animate-spin" />}

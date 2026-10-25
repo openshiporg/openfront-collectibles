@@ -194,12 +194,12 @@ const AddAddress = ({
             <button
               type="reset"
               onClick={close}
-              className="inline-flex min-h-12 items-center justify-center rounded-full px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
+              className="inline-flex min-h-12 items-center justify-center rounded-[2px] px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
               data-testid="cancel-button"
             >
               Cancel
             </button>
-            <SubmitButton data-testid="save-button" className="h-12 rounded-full px-6 text-[15px]">Save</SubmitButton>
+            <SubmitButton data-testid="save-button" className="h-12 rounded-[2px] px-6 text-[15px]">Save</SubmitButton>
           </DialogFooter>
         </form>
       </DialogContent>

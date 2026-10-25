@@ -69,7 +69,7 @@ const ImageGallery = ({ images, title, label }: ImageGalleryProps) => {
     <div className="flex flex-col gap-3 lg:flex-row-reverse lg:items-start">
       <div
         ref={scroller}
-        className="cx-pocket no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto rounded-[2px] bg-cx-well"
+        className="cx-pocket no-scrollbar flex w-full snap-x snap-mandatory overflow-x-auto rounded-[2px]"
         onScroll={(event) => {
           const el = event.currentTarget
           const index = Math.round(el.scrollLeft / Math.max(el.clientWidth, 1))

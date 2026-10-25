@@ -60,7 +60,7 @@ const SideMenu = ({
           <button
             data-testid="nav-menu-button"
             aria-label="Menu"
-            className="-ml-2 inline-flex size-11 items-center justify-center rounded-full text-cx-ink hover:bg-cx-well"
+            className="-ml-2 inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink hover:bg-cx-well"
             suppressHydrationWarning
           >
             <Menu className="size-5" aria-hidden="true" />

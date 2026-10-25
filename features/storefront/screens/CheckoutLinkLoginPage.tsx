@@ -51,7 +51,7 @@ async function GuestCheckoutLinkContent({ cartId, countryCode }: { cartId: strin
         <>
           <Link
             href={`/${countryCode}/account?view=register&returnUrl=${returnUrl}`}
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-cx-line px-5 text-[15px] font-medium text-cx-ink hover:bg-cx-well"
+            className="inline-flex min-h-12 items-center justify-center rounded-[2px] border border-cx-line px-5 text-[15px] font-medium text-cx-ink hover:bg-cx-well"
           >
             Create account
           </Link>

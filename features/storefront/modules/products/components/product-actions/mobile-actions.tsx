@@ -95,7 +95,7 @@ export default function MobileActions({
           <h2 className="font-cx-serif text-[20px] text-cx-ink">Options</h2>
           <button
             onClick={() => setIsOpen(false)}
-            className="inline-flex size-11 items-center justify-center rounded-full text-cx-ink hover:bg-cx-well"
+            className="inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink hover:bg-cx-well"
             aria-label="Close options"
           >
             <X className="size-5" />

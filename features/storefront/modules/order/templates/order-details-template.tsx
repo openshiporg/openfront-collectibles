@@ -24,7 +24,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
       <div className="flex flex-col gap-2">
         <LocalizedClientLink
           href="/account/orders"
-          className="-ml-2 inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-2 text-[14px] font-medium text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink"
+          className="-ml-2 inline-flex min-h-11 w-fit items-center gap-1.5 rounded-[2px] px-2 text-[14px] font-medium text-cx-ink-2 hover:bg-cx-well hover:text-cx-ink"
           data-testid="back-to-overview-button"
         >
           <ArrowLeft className="size-4" aria-hidden="true" /> Orders

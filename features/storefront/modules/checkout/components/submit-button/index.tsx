@@ -14,9 +14,9 @@ const VARIANTS: Record<string, string> = {
   secondary:
     "inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-cx-surface px-5 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14),0_0_0_0.5px_rgb(26_23_18/0.1)] hover:bg-cx-bg disabled:opacity-50",
   outline:
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-cx-line bg-transparent px-5 text-[14px] font-medium text-cx-ink hover:bg-cx-well disabled:opacity-50",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] border border-cx-line bg-transparent px-5 text-[14px] font-medium text-cx-ink hover:bg-cx-well disabled:opacity-50",
   ghost:
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-4 text-[14px] font-medium text-cx-ink hover:bg-cx-well disabled:opacity-50",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] px-4 text-[14px] font-medium text-cx-ink hover:bg-cx-well disabled:opacity-50",
   link: "inline-flex min-h-11 items-center gap-1 text-[14px] font-medium text-cx-ink underline-offset-4 hover:underline disabled:opacity-50",
 }
 

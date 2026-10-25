@@ -8,7 +8,7 @@ import StatusDot, { type DotTone } from "@/features/storefront/modules/common/co
 export const cxInput =
   "h-12 rounded-[2px] border-cx-line bg-cx-surface px-4 text-[15px] text-cx-ink shadow-none placeholder:text-cx-ink-3 focus-visible:border-cx-accent focus-visible:ring-cx-accent/20"
 
-export const cxSubmit = "h-12 w-full rounded-full text-[15px] font-medium"
+export const cxSubmit = "h-12 w-full rounded-[2px] text-[15px] font-medium"
 
 export function AccountHeading({ title, meta, actions }: { title: ReactNode; meta?: ReactNode; actions?: ReactNode }) {
   return (

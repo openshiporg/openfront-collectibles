@@ -29,7 +29,7 @@ const DeleteButton = ({
       disabled={isDeleting}
       aria-label={children ? undefined : "Remove"}
       className={cn(
-        "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-2 text-[13px] text-cx-ink-2 transition-colors hover:bg-cx-well hover:text-cx-danger disabled:opacity-50",
+        "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-[2px] px-2 text-[13px] text-cx-ink-2 transition-colors hover:bg-cx-well hover:text-cx-danger disabled:opacity-50",
         className
       )}
     >

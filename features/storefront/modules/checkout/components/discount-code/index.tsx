@@ -98,7 +98,7 @@ const DiscountCode = ({ cart }: DiscountCodeProps) => {
                 name="code"
                 type="text"
                 autoFocus={false}
-                className="cx-num h-11 flex-1 rounded-full border-cx-line bg-cx-surface px-4 text-[14px] uppercase text-cx-ink placeholder:normal-case placeholder:text-cx-ink-3 focus-visible:border-cx-accent focus-visible:ring-2 focus-visible:ring-cx-accent/25"
+                className="cx-num h-11 flex-1 rounded-[2px] border-cx-line bg-cx-surface px-4 text-[14px] uppercase text-cx-ink placeholder:normal-case placeholder:text-cx-ink-3 focus-visible:border-cx-accent focus-visible:ring-2 focus-visible:ring-cx-accent/25"
               />
               <SubmitButton variant="secondary">Apply</SubmitButton>
             </div>
@@ -123,7 +123,7 @@ const DiscountCode = ({ cart }: DiscountCodeProps) => {
                 </span>
                 <button
                   type="button"
-                  className="inline-flex size-11 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-well hover:text-cx-danger"
+                  className="inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-well hover:text-cx-danger"
                   onClick={() => removeGiftCardCode(gc.code)}
                 >
                   <Trash size={14} />
@@ -142,13 +142,13 @@ const DiscountCode = ({ cart }: DiscountCodeProps) => {
             discount ? (
               <div className="flex items-center justify-between gap-3 text-[14px]" key={discount.code}>
                 <span className="flex min-w-0 items-center gap-1">
-                  <span className="cx-num inline-flex h-7 items-center rounded-full bg-cx-tint px-3 text-[13px] uppercase text-cx-accent">
+                  <span className="cx-num inline-flex h-7 items-center rounded-[2px] bg-cx-tint px-3 text-[13px] uppercase text-cx-accent">
                     {discount.code}
                   </span>
                   <button
                     type="button"
                     onClick={() => removeDiscountCode(discount.code)}
-                    className="inline-flex size-11 items-center justify-center rounded-full text-cx-ink-2 hover:bg-cx-well hover:text-cx-danger"
+                    className="inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-well hover:text-cx-danger"
                   >
                     <X size={14} />
                     <span className="sr-only">Remove discount code</span>

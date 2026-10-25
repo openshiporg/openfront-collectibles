@@ -428,7 +428,7 @@ export default function InvoicePaymentDialog({
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex min-h-12 items-center justify-center rounded-full px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
+              className="inline-flex min-h-12 items-center justify-center rounded-[2px] px-5 text-[15px] font-medium text-cx-ink-2 hover:bg-cx-well"
             >
               Cancel
             </button>
