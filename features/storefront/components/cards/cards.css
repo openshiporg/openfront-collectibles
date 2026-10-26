@@ -63,7 +63,7 @@
 }
 .tc-sheet {
   --tc-action-col: 0px;
-  --tc-row-cols: 22px 52px minmax(0, 1fr) auto 84px;
+  --tc-row-cols: 22px 48px minmax(0, 1fr) auto;
 }
 .tc-sheet[data-actions="true"] { --tc-action-col: 64px; }
 @media (min-width: 768px) {
@@ -75,9 +75,11 @@
   position: relative;
   display: grid;
   grid-template-columns: var(--tc-row-cols);
+  /* Phone: name and price, then rarity, market and Add, then the condition run. */
   grid-template-areas:
-    "tick num name name price"
-    ". meta meta run action";
+    "tick num name price"
+    ". meta meta action"
+    ". run run run";
   gap: 4px 12px;
   align-items: center;
   min-height: 52px;
@@ -101,7 +103,8 @@
 .tc-row > .tc-a-num { grid-area: num; }
 .tc-row > .tc-a-name { grid-area: name; min-width: 0; }
 .tc-row > .tc-a-rarity { grid-area: meta; display: inline-flex; align-items: center; gap: 8px; }
-.tc-row > .tc-a-run { grid-area: run; justify-self: end; }
+.tc-row > .tc-a-run { grid-area: run; justify-self: start; }
+.tc-row > .tc-a-run:empty { display: none; }
 .tc-row > .tc-a-market { display: none; grid-area: market; text-align: right; }
 .tc-row > .tc-a-price { grid-area: price; text-align: right; }
 .tc-row > .tc-a-action { grid-area: action; justify-self: end; }
@@ -337,18 +340,13 @@
 .tc-sealed {
   position: relative;
   display: grid;
-  grid-template-rows: 1fr auto;
-  aspect-ratio: 63 / 88;
   overflow: hidden;
   border-radius: 0;
   background: var(--tc-well);
-  box-shadow: inset 0 0 0 1px var(--tc-line);
+  box-shadow: inset 0 0 0 1px var(--tc-line), inset 0 -10px 0 var(--tc-surface);
 }
-.tc-sealed-end {
-  height: 14px;
-  border-top: 1px solid var(--tc-line);
-  background: repeating-linear-gradient(90deg, var(--tc-surface) 0 18px, var(--tc-well) 18px 19px);
-}
+.tc-sealed[data-size="tile"] { aspect-ratio: 63 / 88; }
+.tc-sealed[data-size="hero"] { aspect-ratio: 3 / 2; }
 /* Pre-order is the dashed state of the one ink, never a yellow field. */
 .tc-preorder-stamp {
   display: inline-flex;
@@ -405,7 +403,7 @@
   padding: 6px 8px;
   background: var(--tc-bg);
   color: var(--tc-ink);
-  box-shadow: inset 0 0 0 1px var(--tc-line), 0 8px 20px -10px oklch(0% 0 0 / 0.6);
+  box-shadow: inset 0 0 0 1px var(--tc-line);
   font-size: 12px;
   line-height: 1.35;
   white-space: nowrap;

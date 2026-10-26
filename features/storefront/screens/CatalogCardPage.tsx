@@ -49,7 +49,7 @@ export async function CatalogCardPage(props: Props) {
       />
       {copies.length > 0 ? (
         <section className="tc mx-auto grid w-full max-w-[1320px] gap-5 px-4 pb-24 sm:px-6" aria-label="Copies in stock">
-          <h2 className="border-b-2 border-cx-ink pb-2 text-[18px] font-bold text-cx-ink">In stock</h2>
+          <h2 className="text-[18px] font-bold text-cx-ink">In stock</h2>
           <CardSheet label="In stock" actions>{copies.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
         </section>
       ) : null}

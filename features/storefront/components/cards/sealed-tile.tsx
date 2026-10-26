@@ -34,10 +34,10 @@ export function BoxEnd({
   }
   const hero = size === 'hero';
   return (
-    <div className="tc tc-sealed" data-preorder={preorder ? 'true' : undefined}>
-      <div className={cn('grid content-between gap-4', hero ? 'p-[9%]' : 'p-[10%]')}>
+    <div className="tc tc-sealed" data-size={hero ? 'hero' : 'tile'} data-preorder={preorder ? 'true' : undefined}>
+      <div className={cn('grid content-between gap-4', hero ? 'p-[7%] pb-[calc(7%+10px)]' : 'p-[10%] pb-[calc(10%+10px)]')}>
         <div className="grid gap-2">
-          <span className="tc-stamp leading-[0.82] text-[var(--tc-ink)]" style={{ fontSize: hero ? 'clamp(64px, 9vw, 120px)' : 'clamp(36px, 7vw, 56px)', fontWeight: 800 }}>
+          <span className="tc-stamp leading-[0.82] text-[var(--tc-ink)]" style={{ fontSize: hero ? 'clamp(72px, 10vw, 140px)' : 'clamp(36px, 7vw, 56px)', fontWeight: 800 }}>
             {code}
           </span>
           <span className={cn('tc-stamp leading-tight text-[var(--tc-ink)]', hero ? 'text-[20px]' : 'text-[13px]')}>{sealedFormatLabel(format) || 'Sealed'}</span>
@@ -55,7 +55,6 @@ export function BoxEnd({
           ) : null}
         </div>
       </div>
-      <div className="tc-sealed-end" aria-hidden="true" />
     </div>
   );
 }

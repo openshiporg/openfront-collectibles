@@ -141,13 +141,18 @@ export async function ProductPage(props: Props) {
           <div className="mx-auto grid w-full max-w-[1320px] gap-14 px-4 pb-24 sm:px-6">
             {sameCard.length > 0 ? (
               <section className="grid gap-5" aria-label="Other copies of this card">
-                <h2 className="border-b-2 border-cx-ink pb-2 text-[18px] font-bold text-cx-ink">Other copies of {item.title}</h2>
-                <CardGrid columns={5}>{sameCard.map((p) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} />)}</CardGrid>
+                <h2 className="text-[18px] font-bold text-cx-ink">Other copies of {item.title}</h2>
+                {sameCard.some((p) => p.productVariants[0]?.stockKind === "graded") ? (
+                  <CardGrid columns={4}>{sameCard.filter((p) => p.productVariants[0]?.stockKind === "graded").map((p) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} />)}</CardGrid>
+                ) : null}
+                {sameCard.some((p) => p.productVariants[0]?.stockKind !== "graded") ? (
+                  <CardSheet label={`Other copies of ${item.title}`} actions>{sameCard.filter((p) => p.productVariants[0]?.stockKind !== "graded").map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
+                ) : null}
               </section>
             ) : null}
             {moreFromSet.length > 0 && item.collectibleSet ? (
               <section className="grid gap-5" aria-label={`More from ${item.collectibleSet.name}`}>
-                <h2 className="border-b-2 border-cx-ink pb-2 text-[18px] font-bold text-cx-ink">More from {item.collectibleSet.name}</h2>
+                <h2 className="text-[18px] font-bold text-cx-ink">More from {item.collectibleSet.name}</h2>
                 <CardSheet label={`More from ${item.collectibleSet.name}`} actions>{moreFromSet.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
               </section>
             ) : null}

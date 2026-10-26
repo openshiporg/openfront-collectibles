@@ -103,19 +103,19 @@ export function CardRow({
       </span>
       <span className="tc-a-name" role="cell">
         {href ? (
-          <Link href={href} className="tc-name block truncate text-[15px] font-semibold leading-snug text-[var(--tc-ink)] outline-none hover:underline focus-visible:underline underline-offset-4">
+          <Link href={href} className="tc-name line-clamp-2 block text-[15px] font-semibold leading-snug text-[var(--tc-ink)] outline-none hover:underline focus-visible:underline underline-offset-4 md:line-clamp-1">
             {card.name}
           </Link>
         ) : (
-          <span className="tc-name block truncate text-[15px] font-semibold leading-snug text-[var(--tc-ink)]">{card.name}</span>
+          <span className="tc-name line-clamp-2 block text-[15px] font-semibold leading-snug text-[var(--tc-ink)] md:line-clamp-1">{card.name}</span>
         )}
-        {detail ? <span className="block truncate text-[12px] leading-snug text-[var(--tc-ink-3)]">{detail}</span> : null}
+        {detail ? <span className="block text-[12px] leading-snug text-[var(--tc-ink-3)] md:truncate">{detail}</span> : null}
       </span>
       <span className="tc-a-rarity" role="cell">
         <RarityMark rarity={card.rarity} />
         {market ? <span className="tc-num text-[12px] text-[var(--tc-ink-3)] md:hidden">Mkt {market}</span> : null}
       </span>
-      <span className="tc-a-run" role="cell">{run}</span>
+      <span className="tc-a-run" role="cell">{run ?? null}</span>
       <span className="tc-a-market tc-num text-[14px] text-[var(--tc-ink-2)]" role="cell">{market}</span>
       <span className="tc-a-price tc-num text-[15px] font-bold text-[var(--tc-ink)]" role="cell">{price}</span>
       {action ? <span className="tc-a-action" role="cell">{action}</span> : null}

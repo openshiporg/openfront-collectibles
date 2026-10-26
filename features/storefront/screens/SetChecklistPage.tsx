@@ -82,7 +82,7 @@ export async function SetChecklistPage(props: Props) {
       )}
       {sealed.products.length > 0 ? (
         <section className="mt-16 grid gap-5" aria-label={`${data.set.name} sealed product`}>
-          <h2 className="border-b-2 border-cx-ink pb-2 text-[18px] font-bold text-cx-ink">Sealed {data.set.name}</h2>
+          <h2 className="text-[18px] font-bold text-cx-ink">Sealed {data.set.name}</h2>
           <CardSheet label={`Sealed ${data.set.name}`} actions runHead="Stock">{sealed.products.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
         </section>
       ) : null}
