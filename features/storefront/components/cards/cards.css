@@ -51,7 +51,7 @@
 /* ---- The sheet: a printed checklist ---------------------------------------------- */
 .tc-sheet { border-top: 2px solid var(--tc-ink); }
 .tc-sheet-head {
-  display: grid;
+  display: none;
   grid-template-columns: var(--tc-row-cols);
   gap: 0 12px;
   align-items: end;
@@ -67,6 +67,7 @@
 }
 .tc-sheet[data-actions="true"] { --tc-action-col: 64px; }
 @media (min-width: 768px) {
+  .tc-sheet-head { display: grid; }
   .tc-sheet { --tc-row-cols: 18px 52px minmax(0, 1fr) 30px 166px 76px 80px var(--tc-action-col); }
 }
 
@@ -167,7 +168,7 @@
   border-radius: 4.5% / 3.2%;
   overflow: hidden;
   background: var(--tc-well);
-  box-shadow: 0 18px 40px -12px oklch(0% 0 0 / 0.65), 0 2px 6px oklch(0% 0 0 / 0.4);
+  outline: 1px solid var(--tc-line);
   transition: translate 300ms var(--tc-ease), scale 300ms var(--tc-ease), opacity 160ms var(--tc-ease), rotate 300ms var(--tc-ease);
 }
 .tc-peek img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -213,6 +214,8 @@
 .tc-run-cell[data-live="true"] { color: var(--tc-ink); border-color: var(--tc-ink-3); cursor: pointer; }
 .tc-run-cell[data-live="false"] { text-decoration: line-through; text-decoration-color: color-mix(in oklch, var(--tc-ink-3) 70%, transparent); }
 .tc-run-cell[data-selected="true"] { background: var(--tc-accent); border-color: var(--tc-accent); color: var(--tc-accent-ink); }
+/* A chosen option that is not the buy action reads in ink, not yellow. */
+.tc-run-cell[data-selected="true"][data-tone="ink"] { background: var(--tc-ink); border-color: var(--tc-ink); color: var(--tc-bg); }
 @media (hover: hover) and (pointer: fine) {
   .tc-run-cell[data-live="true"]:not([data-selected="true"]):hover { border-color: var(--tc-ink); }
 }
@@ -293,9 +296,9 @@
 @media (min-width: 1024px) { .tc-grid { grid-template-columns: repeat(var(--tc-cols, 5), minmax(0, 1fr)); } }
 
 .tc-tile { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.tc-tile .tc-art { transition: translate 260ms var(--tc-ease), box-shadow 260ms var(--tc-ease); }
+.tc-tile .tc-art { transition: translate 260ms var(--tc-ease); }
 @media (hover: hover) and (pointer: fine) {
-  .tc-tile:hover .tc-art { translate: 0 -4px; box-shadow: 0 16px 28px -14px oklch(0% 0 0 / 0.6); }
+  .tc-tile:hover .tc-art { translate: 0 -4px; }
 }
 .tc-tile:focus-within .tc-art { outline: 2px solid var(--tc-accent); outline-offset: 3px; }
 
@@ -310,8 +313,7 @@
   background: color-mix(in oklch, var(--tc-ink) 7%, transparent);
   box-shadow:
     inset 0 0 0 1px color-mix(in oklch, var(--tc-ink) 28%, transparent),
-    inset 0 0 0 6px color-mix(in oklch, var(--tc-ink) 4%, transparent),
-    0 22px 40px -22px oklch(0% 0 0 / 0.7);
+    inset 0 0 0 6px color-mix(in oklch, var(--tc-ink) 4%, transparent);
 }
 .tc-slab-label {
   display: grid;
@@ -342,21 +344,25 @@
   background: var(--tc-well);
   box-shadow: inset 0 0 0 1px var(--tc-line);
 }
-.tc-sealed-face {
-  display: grid;
-  place-items: center;
-  padding: 14% 12%;
-  border-bottom: 1px solid var(--tc-line);
-}
-.tc-sealed-face img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .tc-sealed-end {
-  display: grid;
-  gap: 2px;
-  padding: 10px 12px 12px;
-  background: var(--tc-surface);
+  height: 14px;
+  border-top: 1px solid var(--tc-line);
+  background: repeating-linear-gradient(90deg, var(--tc-surface) 0 18px, var(--tc-well) 18px 19px);
 }
-.tc-sealed[data-preorder="true"] .tc-sealed-end { background: var(--tc-accent); color: var(--tc-accent-ink); }
-.tc-sealed[data-preorder="true"] .tc-sealed-end .tc-dim { color: color-mix(in oklch, var(--tc-accent-ink) 72%, var(--tc-accent)); }
+/* Pre-order is the dashed state of the one ink, never a yellow field. */
+.tc-preorder-stamp {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 6px;
+  border: 1.5px dashed var(--tc-accent);
+  color: var(--tc-ink);
+  font-size: 11px;
+  font-weight: 700;
+  font-stretch: 75%;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 
 /* ---- Completion strip: one cell per card number ------------------------------------------ */
 .tc-strip {

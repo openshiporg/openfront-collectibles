@@ -42,6 +42,15 @@ export function releaseDay(iso: string | null | undefined, style: 'short' | 'lon
     : { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date);
 }
 
+/** "Oct 25" for row stamps; the year only when it isn't this year. */
+export function shortDay(iso: string | null | undefined) {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  const sameYear = date.getUTCFullYear() === new Date().getUTCFullYear();
+  return new Intl.DateTimeFormat('en-US', sameYear ? { day: 'numeric', month: 'short', timeZone: 'UTC' } : { month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date);
+}
+
 export function observedDay(iso: string | null | undefined) {
   return releaseDay(iso, 'short');
 }

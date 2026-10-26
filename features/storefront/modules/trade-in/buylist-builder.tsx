@@ -172,7 +172,7 @@ export function BuylistBuilder({ entries, currencyCode, countryCode, signedIn }:
               <span className="text-[12px] font-semibold text-cx-ink-3">Payout</span>
               <div className="grid grid-cols-2 gap-1">
                 {(["store_credit", "cash"] as const).map((p) => (
-                  <button key={p} type="button" role="radio" aria-checked={payout === p} className="tc-run-cell min-h-11" data-live="true" data-selected={payout === p ? "true" : undefined} onClick={() => setPayout(p)}>
+                  <button key={p} type="button" role="radio" aria-checked={payout === p} className="tc-run-cell min-h-11" data-live="true" data-tone="ink" data-selected={payout === p ? "true" : undefined} onClick={() => setPayout(p)}>
                     {p === "cash" ? `Cash ${money(totals.cash, currencyCode)}` : `Credit ${money(totals.credit, currencyCode)}`}
                   </button>
                 ))}

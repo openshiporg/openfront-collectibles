@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { getCardFacets, getCardProducts } from "@/features/storefront/lib/data/cards"
 import type { CardShelfQuery } from "@/features/storefront/lib/data/cards"
-import { CardGrid, FilterBar, conditionLabel, languageLabel } from "@/features/storefront/components/cards"
+import { CardGrid, CardSheet, FilterBar, conditionLabel, languageLabel } from "@/features/storefront/components/cards"
+import { ProductSheetRow } from "./product-sheet-row"
 import { ProductCardTile } from "./product-card-tile"
 
 export type ShelfParams = { set?: string; rarity?: string; condition?: string; language?: string; kind?: string; price?: string; sortBy?: string; page?: string }
@@ -63,10 +64,15 @@ export async function CardShelf({
           <p className="text-[18px] font-semibold text-cx-ink">Nothing matches these filters</p>
           <p className="text-[15px] text-cx-ink-2">Clear a filter, or look the card up in its <Link href={`/${countryCode}/sets`} className="underline underline-offset-4">set checklist</Link> and add it to your want list.</p>
         </div>
-      ) : (
-        <CardGrid columns={5} label={label}>
-          {products.map((p, i) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} eager={i < 5} />)}
+      ) : category === "graded-slabs" || kind === "graded" ? (
+        // Slabs read by their label, so they keep the slab tile.
+        <CardGrid columns={4} label={label}>
+          {products.map((p, i) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} eager={i < 4} />)}
         </CardGrid>
+      ) : (
+        <CardSheet label={label} actions>
+          {products.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}
+        </CardSheet>
       )}
       {pages > 1 ? (
         <nav aria-label="Pages" className="flex flex-wrap items-center gap-1">

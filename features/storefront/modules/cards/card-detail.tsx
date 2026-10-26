@@ -94,13 +94,13 @@ export function CardDetail({
 
       <div className="grid min-w-0 content-start gap-7">
         <div className="grid gap-3">
-          {set ? (
+          <h1 className="font-cx-display text-[38px] leading-[1.02] text-cx-ink sm:text-[52px]">{(title ?? card.name).replace(/\s*\(Pre-order\)$/, "")}</h1>
+          {!sealed && set ? (
             <Link href={`/${countryCode}/sets/${set.handle}`} className="group flex w-fit items-center gap-3 text-[14px] text-cx-ink-2 hover:text-cx-ink">
               {set.logoUrl ? <span className="flex h-7 items-center"><SetLogo set={set} className="h-full max-w-[90px]" /></span> : null}
               <span className="tc-num group-hover:underline group-hover:underline-offset-4">{[set.name, card.number].filter(Boolean).join(" · ")}</span>
             </Link>
           ) : null}
-          <h1 className="font-cx-display text-[38px] leading-[1.02] text-cx-ink sm:text-[52px]">{(title ?? card.name).replace(/\s*\(Pre-order\)$/, "")}</h1>
           {card.rarity ? (
             <p className="flex items-center gap-2 text-[15px] text-cx-ink-2"><RarityMark rarity={card.rarity} /> {card.rarity}</p>
           ) : null}
@@ -127,6 +127,7 @@ export function CardDetail({
             { label: "HP", value: card.hp },
             { label: "Illustrator", value: card.artist },
             { label: "Grade", value: grade ? `${grade.company} ${grade.grade}${grade.label ? ` ${grade.label}` : ""}` : null },
+            { label: "Certificate", value: grade?.certificate ? (grade.sample ? `${grade.certificate} (sample record)` : grade.certificate) : null },
           ]}
         />
 

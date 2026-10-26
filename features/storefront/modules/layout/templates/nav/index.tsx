@@ -67,7 +67,6 @@ export default async function Nav() {
                   href={collectionLinks.find((c) => c.href.endsWith('-pre-orders'))!.href}
                   className="inline-flex min-h-10 items-center gap-1.5 rounded-[2px] px-3 font-cx-display text-[16px] font-semibold text-cx-ink-2 hover:bg-cx-vault-2 hover:text-cx-ink"
                 >
-                  <span className="size-2 bg-cx-accent" aria-hidden="true" />
                   Pre-orders
                 </LocalizedClientLink>
               </li>

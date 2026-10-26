@@ -46,15 +46,15 @@
    logo hue) as the only ink accent. Archivo throughout: condensed cut for numbers and stamps.
    --cx-h is set per store from the saved logo colour on the .cx-sf wrapper. */
 @theme inline {
-  --color-cx-bg: oklch(15% 0.012 265);
-  --color-cx-surface: oklch(19.5% 0.014 265);
-  --color-cx-well: oklch(11.5% 0.01 265);
+  --color-cx-bg: oklch(14.5% 0.003 265);
+  --color-cx-surface: oklch(19% 0.004 265);
+  --color-cx-well: oklch(11% 0.003 265);
   --color-cx-ink: oklch(95.5% 0.006 95);
   --color-cx-ink-2: oklch(81% 0.01 95);
-  --color-cx-ink-3: oklch(68% 0.012 265);
-  --color-cx-line: oklch(30% 0.014 265);
-  --color-cx-vault: oklch(11.5% 0.01 265);
-  --color-cx-vault-2: oklch(22% 0.014 265);
+  --color-cx-ink-3: oklch(68% 0.006 265);
+  --color-cx-line: oklch(30% 0.004 265);
+  --color-cx-vault: oklch(11% 0.003 265);
+  --color-cx-vault-2: oklch(22% 0.004 265);
   --color-cx-accent: hsl(var(--cx-h, 50) 92% 60%);
   --color-cx-accent-soft: hsl(var(--cx-h, 50) 95% 72%);
   --color-cx-tint: hsl(var(--cx-h, 50) 35% 14%);
@@ -71,31 +71,31 @@
   .cx-sf {
     --cx-font-serif: var(--cx-font-sans);
     --cx-font-display: var(--cx-font-sans);
-    --sf-background: oklch(15% 0.012 265);
+    --sf-background: oklch(14.5% 0.003 265);
     --sf-foreground: oklch(95.5% 0.006 95);
-    --sf-card: oklch(19.5% 0.014 265);
+    --sf-card: oklch(19% 0.004 265);
     --sf-card-foreground: oklch(95.5% 0.006 95);
-    --sf-popover: oklch(19.5% 0.014 265);
+    --sf-popover: oklch(19% 0.004 265);
     --sf-popover-foreground: oklch(95.5% 0.006 95);
     --sf-primary: oklch(95.5% 0.006 95);
-    --sf-primary-foreground: oklch(15% 0.012 265);
-    --sf-secondary: oklch(22% 0.014 265);
+    --sf-primary-foreground: oklch(14.5% 0.003 265);
+    --sf-secondary: oklch(22% 0.004 265);
     --sf-secondary-foreground: oklch(95.5% 0.006 95);
-    --sf-muted: oklch(22% 0.014 265);
+    --sf-muted: oklch(22% 0.004 265);
     --sf-muted-foreground: oklch(81% 0.01 95);
-    --sf-accent: oklch(22% 0.014 265);
+    --sf-accent: oklch(22% 0.004 265);
     --sf-accent-foreground: oklch(95.5% 0.006 95);
-    --sf-border: oklch(30% 0.014 265);
-    --sf-input: oklch(34% 0.014 265);
+    --sf-border: oklch(30% 0.004 265);
+    --sf-input: oklch(34% 0.004 265);
     --sf-ring: hsl(var(--cx-h, 50) 92% 60%);
-    background-color: oklch(15% 0.012 265);
+    background-color: oklch(14.5% 0.003 265);
     color: oklch(95.5% 0.006 95);
     color-scheme: dark;
     font-family: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
   }
   .cx-sf ::selection {
     background: hsl(var(--cx-h, 50) 92% 60%);
-    color: oklch(15% 0.012 265);
+    color: oklch(14.5% 0.003 265);
   }
 
   /* Stamped numbers: references, grades, counts and prices. */
@@ -138,7 +138,7 @@
     gap: 6px;
     padding: 0 14px;
     border-radius: 2px;
-    background: oklch(19.5% 0.014 265);
+    background: oklch(19% 0.004 265);
     font-family: var(--cx-font-display), ui-sans-serif, system-ui, sans-serif;
     font-size: 15px;
     font-weight: 600;
@@ -148,16 +148,16 @@
   }
   .cx-pill:active { transform: scale(0.97); }
   @media (hover: hover) and (pointer: fine) {
-    .cx-pill:hover { color: oklch(95.5% 0.006 95); background: oklch(22% 0.014 265); }
+    .cx-pill:hover { color: oklch(95.5% 0.006 95); background: oklch(22% 0.004 265); }
   }
   .cx-pill[data-active="true"],
   .cx-pill[data-active="true"]:hover {
     background: hsl(var(--cx-h, 50) 92% 60%);
-    color: oklch(15% 0.012 265);
+    color: oklch(14.5% 0.003 265);
   }
   .cx-pill[data-active="true"]:disabled { cursor: default; }
   .cx-pill:disabled,
-  .cx-pill[aria-disabled="true"] { color: oklch(54% 0.012 265); text-decoration: line-through; cursor: not-allowed; }
+  .cx-pill[aria-disabled="true"] { color: oklch(54% 0.005 265); text-decoration: line-through; cursor: not-allowed; }
   .cx-pill:focus-visible { outline: 2px solid hsl(var(--cx-h, 50) 92% 60%); outline-offset: 2px; }
   @media (max-width: 639px) {
     .cx-pill { min-height: 44px; }
@@ -173,7 +173,7 @@
     padding: 0 24px;
     border-radius: 2px;
     background: hsl(var(--cx-h, 50) 92% 60%);
-    color: oklch(15% 0.012 265);
+    color: oklch(14.5% 0.003 265);
     font-family: var(--cx-font-display), ui-sans-serif, system-ui, sans-serif;
     font-size: 17px;
     font-weight: 700;
@@ -190,7 +190,7 @@
   /* A page band holding rows. */
   .cx-band {
     border-radius: 2px;
-    background: oklch(19.5% 0.014 265);
+    background: oklch(19% 0.004 265);
   }
 
   .cx-dot {
@@ -209,7 +209,7 @@
     line-height: 18px;
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: oklch(68% 0.012 265);
+    color: oklch(68% 0.006 265);
   }
 
   /* The glassine pocket: a clear strip across the lower part of a specimen well. */

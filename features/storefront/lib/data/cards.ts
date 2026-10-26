@@ -184,6 +184,7 @@ export type CardProduct = {
   catalogItem: null | {
     id: string; handle: string; kind: string; title: string; cardNumber: string; numberSort: number | null; rarity: string; imageUrl: string; imageLargeUrl: string; sealedFormat: string | null;
     collectibleSet: null | { handle: string; name: string; code: string; releaseDate: string | null; releaseStatus: string | null; logoUrl: string };
+    marketPrices?: Array<{ finish: string | null; marketMinor: number | null; observedAt: string }>;
   };
   productVariants: Array<{
     id: string; title: string; stockKind: string | null; cardCondition: string | null; cardFinish: string | null; cardLanguage: string | null;
@@ -253,6 +254,7 @@ export const getCardProducts = cache(async function (query: CardShelfQuery): Pro
           catalogItem {
             id handle kind title cardNumber numberSort rarity imageUrl imageLargeUrl sealedFormat
             collectibleSet { handle name code releaseDate releaseStatus logoUrl }
+            marketPrices(where: { grade: { equals: "" } }, orderBy: [{ observedAt: desc }], take: 4) { finish marketMinor observedAt }
           }
           productVariants {
             id title stockKind cardCondition cardFinish cardLanguage inventoryQuantity preorder preorderReleaseDate preorderLimitPerCustomer

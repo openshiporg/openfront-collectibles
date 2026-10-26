@@ -19,8 +19,8 @@ function niceTicks(min: number, max: number, count = 4) {
 }
 
 /**
- * Market price over time for one printing: the market line with the low-to-high band behind it.
- * With a single reading there is no trend to draw, so it shows that reading's range instead.
+ * Market price over time for one printing: the market line, the low line dashed under it.
+ * Until there is a week of readings it prints the readings as a table instead of a chart.
  */
 export function PriceHistory({ readings, currencyCode = 'USD', label }: { readings: MarketReading[]; currencyCode?: string; label: string }) {
   const id = useId();
@@ -34,44 +34,47 @@ export function PriceHistory({ readings, currencyCode = 'USD', label }: { readin
     return <p className="text-[14px] text-[var(--tc-ink-3)]">No market readings yet.</p>;
   }
 
-  if (points.length === 1) {
-    const r = points[0];
-    const low = r.lowMinor ?? r.marketMinor!;
-    // Highs on thin markets run to absurd asks; the bar stops at three times market.
-    const high = Math.min(r.highMinor ?? r.marketMinor!, (r.marketMinor ?? 0) * 3);
-    const span = Math.max(1, high - low);
-    const at = (v: number) => `${Math.max(0, Math.min(100, ((v - low) / span) * 100))}%`;
+  const spanDays = (new Date(points[points.length - 1].observedAt).getTime() - new Date(points[0].observedAt).getTime()) / 86_400_000;
+  if (points.length < 3 || spanDays < 7) {
+    // Too little history for a trend: print the readings themselves.
+    const latest = points[points.length - 1];
     return (
       <figure className="tc grid gap-3" aria-label={label}>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="tc-num text-[28px] font-bold leading-none text-[var(--tc-ink)]">{money(r.marketMinor, currencyCode)}</span>
-          <span className="text-[13px] text-[var(--tc-ink-3)]">TCGplayer market, {observedDay(r.observedAt)} · one reading so far</span>
+          <span className="tc-num text-[28px] font-bold leading-none text-[var(--tc-ink)]">{money(latest.marketMinor, currencyCode)}</span>
+          <span className="text-[13px] text-[var(--tc-ink-3)]">{label}, {observedDay(latest.observedAt)}</span>
         </div>
-        <div className="relative mt-3 h-2 bg-[var(--tc-line)]" role="img" aria-label={`Low ${money(low, currencyCode)}, market ${money(r.marketMinor, currencyCode)}, high ${money(high, currencyCode)}`}>
-          <span className="absolute top-1/2 h-5 w-[3px] -translate-x-1/2 -translate-y-1/2 bg-[var(--tc-accent)]" style={{ left: at(r.marketMinor!) }} />
-        </div>
-        <div className="tc-num flex justify-between text-[12px] text-[var(--tc-ink-3)]">
-          <span>Low {money(low, currencyCode)}</span>
-          <span>{r.highMinor != null && r.highMinor > high ? `High ${money(high, currencyCode)}+` : `High ${money(high, currencyCode)}`}</span>
-        </div>
+        <table className="tc-num w-full text-left text-[13px] text-[var(--tc-ink-2)]">
+          <thead className="text-[var(--tc-ink-3)]">
+            <tr><th className="py-1 font-normal">Read</th><th className="py-1 text-right font-normal">Low</th><th className="py-1 text-right font-normal">Mid</th><th className="py-1 text-right font-normal">Market</th></tr>
+          </thead>
+          <tbody>
+            {points.slice().reverse().map((p) => (
+              <tr key={p.observedAt} className="border-t border-[var(--tc-line)]">
+                <td className="py-1.5">{observedDay(p.observedAt)}</td>
+                <td className="py-1.5 text-right">{money(p.lowMinor, currencyCode)}</td>
+                <td className="py-1.5 text-right">{money(p.midMinor ?? null, currencyCode)}</td>
+                <td className="py-1.5 text-right font-semibold text-[var(--tc-ink)]">{money(p.marketMinor, currencyCode)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <figcaption className="text-[12px] text-[var(--tc-ink-3)]">A chart appears once there is a week of readings.</figcaption>
       </figure>
     );
   }
 
   const t0 = new Date(points[0].observedAt).getTime();
   const t1 = new Date(points[points.length - 1].observedAt).getTime();
-  const values = points.flatMap((p) => [p.marketMinor!, p.lowMinor ?? p.marketMinor!, Math.min(p.highMinor ?? p.marketMinor!, p.marketMinor! * 3)]);
-  const vMin = Math.min(...values) * 0.95;
+  const values = points.flatMap((p) => [p.marketMinor!, p.lowMinor ?? p.marketMinor!]);
+  const vMin = Math.min(...values) * 0.97;
   const vMax = Math.max(...values) * 1.03;
   const x = (iso: string) => PAD.left + ((new Date(iso).getTime() - t0) / Math.max(1, t1 - t0)) * (W - PAD.left - PAD.right);
   const y = (v: number) => PAD.top + (1 - (v - vMin) / Math.max(1, vMax - vMin)) * (H - PAD.top - PAD.bottom);
   const line = points.map((p, i) => `${i ? 'L' : 'M'}${x(p.observedAt).toFixed(1)},${y(p.marketMinor!).toFixed(1)}`).join('');
-  const band = [
-    ...points.map((p, i) => `${i ? 'L' : 'M'}${x(p.observedAt).toFixed(1)},${y(Math.min(p.highMinor ?? p.marketMinor!, p.marketMinor! * 3)).toFixed(1)}`),
-    ...points.slice().reverse().map((p) => `L${x(p.observedAt).toFixed(1)},${y(p.lowMinor ?? p.marketMinor!).toFixed(1)}`),
-    'Z',
-  ].join('');
-  const ticks = niceTicks(vMin, vMax);
+  const lowLine = points.filter((p) => p.lowMinor != null).map((p, i) => `${i ? 'L' : 'M'}${x(p.observedAt).toFixed(1)},${y(p.lowMinor!).toFixed(1)}`).join('');
+  // Ticks inside the fitted domain, plus the floor so the lowest reading is never unlabeled.
+  const ticks = [...new Set([Math.round(vMin), ...niceTicks(vMin, vMax).filter((v) => v > vMin && v < vMax)])];
   const last = points[points.length - 1];
   const first = points[0];
   const change = last.marketMinor! - first.marketMinor!;
@@ -101,7 +104,7 @@ export function PriceHistory({ readings, currencyCode = 'USD', label }: { readin
               <text x={PAD.left - 8} y={y(t)} dy="0.32em" textAnchor="end" fontSize="11" fill="var(--tc-ink-3)" className="tc-num">{money(t, currencyCode, { whole: true })}</text>
             </g>
           ))}
-          <path d={band} fill="var(--tc-ink)" opacity="0.08" />
+          <path d={lowLine} fill="none" stroke="var(--tc-ink-3)" strokeWidth="1" strokeDasharray="3 3" />
           <path d={line} fill="none" stroke="var(--tc-accent)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
           <text x={PAD.left} y={H - 8} fontSize="11" fill="var(--tc-ink-3)">{observedDay(first.observedAt)}</text>
           <text x={W - PAD.right} y={H - 8} fontSize="11" textAnchor="end" fill="var(--tc-ink-3)">{observedDay(last.observedAt)}</text>

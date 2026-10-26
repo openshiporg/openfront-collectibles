@@ -2,11 +2,11 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getRegion } from "@/features/storefront/lib/data/regions"
 import { getCardProducts, getSetChecklist, getWantList } from "@/features/storefront/lib/data/cards"
-import { CardGrid, CardSheet, FilterBar, SetSummary, releaseDay } from "@/features/storefront/components/cards"
+import { CardSheet, FilterBar, SetSummary, releaseDay } from "@/features/storefront/components/cards"
 import { ChecklistRow } from "@/features/storefront/modules/cards/checklist-row"
 import { rawCells } from "@/features/storefront/modules/cards/checklist-stock"
-import { ProductCardTile } from "@/features/storefront/modules/cards/product-card-tile"
 import { JumpToNumber } from "@/features/storefront/modules/cards/jump-to-number"
+import { ProductSheetRow } from "@/features/storefront/modules/cards/product-sheet-row"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -83,7 +83,7 @@ export async function SetChecklistPage(props: Props) {
       {sealed.products.length > 0 ? (
         <section className="mt-16 grid gap-5" aria-label={`${data.set.name} sealed product`}>
           <h2 className="border-b-2 border-cx-ink pb-2 text-[18px] font-bold text-cx-ink">Sealed {data.set.name}</h2>
-          <CardGrid columns={5}>{sealed.products.map((p) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} />)}</CardGrid>
+          <CardSheet label={`Sealed ${data.set.name}`} actions runHead="Stock">{sealed.products.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
         </section>
       ) : null}
     </div>

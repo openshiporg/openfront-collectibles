@@ -31,8 +31,8 @@ export default async function Logo({ size = 'md', tone = 'ink' }: { size?: 'md' 
       <LogoMark svg={logoSvg} color={logoColor} className={size === 'lg' ? 'size-8' : 'size-5 sm:size-6'} />
       <span
         className={cn(
-          'line-clamp-2 font-cx-display leading-[1] tracking-[-0.01em]',
-          size === 'lg' ? 'text-[30px]' : 'text-[20px] sm:text-[23px]'
+          'font-cx-display leading-[1] tracking-[-0.01em]',
+          size === 'lg' ? 'line-clamp-2 text-[30px]' : 'truncate text-[17px] [font-stretch:87.5%] sm:text-[23px] sm:[font-stretch:100%]'
         )}
       >
         {storeName}

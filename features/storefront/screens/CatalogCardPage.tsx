@@ -3,8 +3,8 @@ import { notFound } from "next/navigation"
 import { getCardMarket, getCardProducts, getSetChecklist } from "@/features/storefront/lib/data/cards"
 import { getRegion } from "@/features/storefront/lib/data/regions"
 import { CardDetail } from "@/features/storefront/modules/cards/card-detail"
-import { ProductCardTile } from "@/features/storefront/modules/cards/product-card-tile"
-import { CardGrid } from "@/features/storefront/components/cards"
+import { CardSheet } from "@/features/storefront/components/cards"
+import { ProductSheetRow } from "@/features/storefront/modules/cards/product-sheet-row"
 
 type Props = { params: Promise<{ countryCode: string; id: string }> }
 
@@ -50,7 +50,7 @@ export async function CatalogCardPage(props: Props) {
       {copies.length > 0 ? (
         <section className="tc mx-auto grid w-full max-w-[1320px] gap-5 px-4 pb-24 sm:px-6" aria-label="Copies in stock">
           <h2 className="border-b-2 border-cx-ink pb-2 text-[18px] font-bold text-cx-ink">In stock</h2>
-          <CardGrid columns={5}>{copies.map((p) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} />)}</CardGrid>
+          <CardSheet label="In stock" actions>{copies.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
         </section>
       ) : null}
     </>

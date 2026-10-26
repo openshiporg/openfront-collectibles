@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { CardSheet, SetLogo, releaseDay } from "@/features/storefront/components/cards"
+import { CardSheet, CompletionStrip, SetLogo, releaseDay } from "@/features/storefront/components/cards"
 import type { CardSet, ChecklistCard } from "@/features/storefront/lib/data/cards"
 import { ChecklistRow } from "@/features/storefront/modules/cards/checklist-row"
 import { marketFor, rawCells } from "@/features/storefront/modules/cards/checklist-stock"
@@ -63,12 +63,13 @@ export function CheckListHero({
                 <li key={s.handle}>
                   <Link
                     href={`/${countryCode}/sets/${s.handle}`}
-                    className="group grid min-h-12 grid-cols-[76px_minmax(0,1fr)_auto] items-center gap-3 border-b border-cx-line py-1.5 outline-none hover:bg-cx-surface focus-visible:bg-cx-surface"
+                    className="group grid min-h-12 grid-cols-[44px_64px_minmax(0,1fr)_auto] items-center gap-3 border-b border-cx-line py-1.5 outline-none hover:bg-cx-surface focus-visible:bg-cx-surface"
                   >
-                    <span className="flex h-8 items-center"><SetLogo set={s} className="h-full max-w-[76px] text-[13px]" /></span>
+                    <span className="tc-stamp text-[13px] text-cx-ink-2">{s.code || "—"}</span>
+                    <span className="flex h-8 items-center">{s.logoUrl ? <SetLogo set={s} className="h-full max-w-[64px]" /> : null}</span>
                     <span className="truncate text-[15px] font-semibold text-cx-ink group-hover:underline group-hover:underline-offset-4">{s.name}</span>
                     {s.releaseStatus === "preorder" ? (
-                      <span className="tc-stamp bg-cx-accent px-1.5 py-0.5 text-[11px] text-cx-bg">Pre-order</span>
+                      <span className="tc-preorder-stamp">Pre-order</span>
                     ) : (
                       <span className="tc-num text-[13px] text-cx-ink-3">{s.cardsStocked ?? 0} in stock</span>
                     )}
@@ -92,6 +93,10 @@ export function CheckListHero({
                 of {set.totalCards ?? singles.length} in stock
               </p>
             </div>
+            <CompletionStrip
+              cells={singles.map((c) => rawCells(c).cells.some((cell) => cell.available))}
+              label={`${inStock} of ${singles.length} cards in stock`}
+            />
             <CardSheet label={`${set.name} checklist`} actions>
               {rows.map((card, i) => (
                 <ChecklistRow key={card.id} card={card} index={i} setName={set.name} currencyCode={currencyCode} />

@@ -73,13 +73,8 @@ export default async function Footer() {
             />
           </div>
         </div>
-        <p
-          aria-hidden="true"
-          className="mt-16 font-cx-display text-[18vw] font-extrabold leading-[0.8] tracking-[-0.03em] text-cx-vault-2 [overflow-wrap:anywhere] sm:text-[12vw] xl:text-[164px]"
-        >
-          {storeName}
-        </p>
-        <div className="mt-6 flex flex-col gap-2 text-[14px] text-cx-ink-3 sm:flex-row sm:items-center sm:justify-between">
+
+        <div className="mt-14 flex flex-col gap-2 border-t border-cx-line pt-6 text-[14px] text-cx-ink-3 sm:flex-row sm:items-center sm:justify-between">
           <p suppressHydrationWarning>
             © {new Date().getFullYear()} {storeName}
           </p>

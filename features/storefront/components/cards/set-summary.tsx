@@ -73,7 +73,7 @@ export function SetSummary({
           {[set.series, preorder ? `Releases ${releaseDay(set.releaseDate, 'long')}` : releaseDay(set.releaseDate)].filter(Boolean).join(' · ')}
         </span>
         {preorder ? (
-          <span className="tc-stamp mt-1 w-fit bg-[var(--tc-accent)] px-1.5 py-0.5 text-[11px] text-[var(--tc-accent-ink)]">Pre-order</span>
+          <span className="tc-preorder-stamp mt-1 w-fit">Pre-order</span>
         ) : total ? (
           <span className="tc-num text-[13px] text-[var(--tc-ink-2)]">
             <strong className="font-bold text-[var(--tc-ink)]">{have}</strong> of {total} {haveLabel}

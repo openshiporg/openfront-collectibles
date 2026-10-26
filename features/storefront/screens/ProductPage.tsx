@@ -12,7 +12,8 @@ import { GRADERS } from "@/features/keystone/lib/pokemon/card-enums"
 import { CardDetail } from "@/features/storefront/modules/cards/card-detail"
 import { CardBuyPanel } from "@/features/storefront/modules/cards/card-buy-panel"
 import { ProductCardTile, slabGrade } from "@/features/storefront/modules/cards/product-card-tile"
-import { CardGrid } from "@/features/storefront/components/cards"
+import { CardGrid, CardSheet } from "@/features/storefront/components/cards"
+import { ProductSheetRow } from "@/features/storefront/modules/cards/product-sheet-row"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -135,7 +136,6 @@ export async function ProductPage(props: Props) {
           primaryFinish={variants.find((v: any) => v.finish)?.finish ?? null}
           preorder={preorderVariant ? { releaseDate: preorderVariant.preorderReleaseDate, limit: preorderVariant.preorderLimitPerCustomer } : null}
           purchase={<CardBuyPanel variants={variants} currencyCode={currencyCode} />}
-          aside={graded ? <CollectibleEvidencePanel result={collectibleListing} unavailable={collectibleEvidenceUnavailable} /> : null}
         />
         {sameCard.length > 0 || moreFromSet.length > 0 ? (
           <div className="mx-auto grid w-full max-w-[1320px] gap-14 px-4 pb-24 sm:px-6">
@@ -148,7 +148,7 @@ export async function ProductPage(props: Props) {
             {moreFromSet.length > 0 && item.collectibleSet ? (
               <section className="grid gap-5" aria-label={`More from ${item.collectibleSet.name}`}>
                 <h2 className="border-b-2 border-cx-ink pb-2 text-[18px] font-bold text-cx-ink">More from {item.collectibleSet.name}</h2>
-                <CardGrid columns={5}>{moreFromSet.map((p) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} />)}</CardGrid>
+                <CardSheet label={`More from ${item.collectibleSet.name}`} actions>{moreFromSet.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
               </section>
             ) : null}
           </div>

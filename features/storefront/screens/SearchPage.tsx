@@ -4,9 +4,9 @@ import { getRegion } from "@/features/storefront/lib/data/regions"
 import { getCardProducts, searchCatalog } from "@/features/storefront/lib/data/cards"
 import SaveSearch from "@/features/storefront/modules/store/components/search-form/save-search"
 import { getUser } from "@/features/storefront/lib/data/user"
-import { CardGrid, CardRow, CardSheet } from "@/features/storefront/components/cards"
+import { CardRow, CardSheet } from "@/features/storefront/components/cards"
 import { CardSearch } from "@/features/storefront/modules/cards/card-search"
-import { ProductCardTile } from "@/features/storefront/modules/cards/product-card-tile"
+import { ProductSheetRow } from "@/features/storefront/modules/cards/product-sheet-row"
 
 export const metadata: Metadata = {
   title: "Search",
@@ -50,9 +50,9 @@ export async function SearchPage(props: Props) {
               <span className="tc-num text-[13px] text-cx-ink-3" data-testid="search-count">{stock.count} for “{query}”</span>
             </div>
             {stock.products.length ? (
-              <CardGrid columns={5} label="Search results in stock">
-                {stock.products.map((p) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} />)}
-              </CardGrid>
+              <CardSheet label="Search results in stock" actions>
+                {stock.products.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}
+              </CardSheet>
             ) : (
               <p className="text-[15px] text-cx-ink-2">Nothing in stock matches. The catalog below has every printed card.</p>
             )}
