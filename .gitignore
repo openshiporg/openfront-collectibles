@@ -49,3 +49,6 @@ midscene_run/dump
 midscene_run/report
 midscene_run/tmp
 midscene_run/log
+
+# Impeccable review captures (process artifacts; proof shots live in design/)
+.impeccable/review/
