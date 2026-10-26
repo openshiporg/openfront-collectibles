@@ -1,18 +1,15 @@
 import { Metadata } from "next"
 
-import { SortOptions } from "@/features/storefront/modules/store/components/refinement-list/sort-products"
+import type { ShelfParams } from "@/features/storefront/modules/cards/card-shelf"
 import StoreTemplate from "@/features/storefront/modules/store/templates"
 
 export const metadata: Metadata = {
-  title: "Store",
-  description: "Explore all of our products.",
+  title: "All products",
+  description: "Pokémon singles, graded slabs and sealed product.",
 }
 
 type Params = {
-  searchParams: Promise<{
-    sortBy?: SortOptions
-    page?: string
-  }>
+  searchParams: Promise<ShelfParams>
   params: Promise<{
     countryCode: string
   }>
@@ -21,13 +18,5 @@ type Params = {
 export async function StorePage(props: Params) {
   const params = await props.params;
   const searchParams = await props.searchParams;
-  const { sortBy, page } = searchParams
-
-  return (
-    <StoreTemplate
-      sortBy={sortBy}
-      page={page}
-      countryCode={params.countryCode}
-    />
-  )
+  return <StoreTemplate params={searchParams} countryCode={params.countryCode} />
 }

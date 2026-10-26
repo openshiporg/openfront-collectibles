@@ -4,6 +4,7 @@ import {
   assertLineItemBelongsToCart,
 } from "../security/cart-access";
 import { normalizeActiveCartInput } from "../security/active-cart-input";
+import { assertPreorderLimit } from "../lib/pokemon/preorder-limit";
 
 async function updateActiveCart(
   root: any,
@@ -84,6 +85,11 @@ async function updateActiveCart(
       const existingLineItem = existingCart.lineItems?.find(
         (item: any) => item.productVariant.id === variantId
       );
+      await assertPreorderLimit(sudoContext.prisma, {
+        cartId,
+        variantId,
+        quantity: (existingLineItem?.quantity ?? 0) + newItem.quantity,
+      });
 
       if (existingLineItem) {
         // Update existing line item using graphql.raw

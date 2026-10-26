@@ -335,6 +335,21 @@ model CatalogItem {
   franchiseId                   String?              @map("franchise")
   collectibleSet                CollectibleSet?      @relation("CatalogItem_collectibleSet", fields: [collectibleSetId], references: [id])
   collectibleSetId              String?              @map("collectibleSet")
+  kind                          String?              @default("single")
+  cardNumber                    String               @default("")
+  numberSort                    Int?                 @default(0)
+  rarity                        String               @default("")
+  supertype                     String               @default("")
+  subtypes                      Json?                @default("[]")
+  energyTypes                   Json?                @default("[]")
+  hp                            String               @default("")
+  artist                        String               @default("")
+  imageUrl                      String               @default("")
+  imageLargeUrl                 String               @default("")
+  sealedFormat                  String?
+  tcgplayerProductId            Int?
+  products                      Product[]            @relation("Product_catalogItem")
+  marketPrices                  MarketPrice[]        @relation("MarketPrice_catalogItem")
   release                       CollectibleRelease?  @relation("CatalogItem_release", fields: [releaseId], references: [id])
   releaseId                     String?              @map("release")
   title                         String               @default("")
@@ -350,6 +365,7 @@ model CatalogItem {
   createdAt                     DateTime             @default(now())
   updatedAt                     DateTime             @default(now()) @updatedAt
   from_WishlistItem_catalogItem WishlistItem[]       @relation("WishlistItem_catalogItem")
+  from_BinderCard_catalogItem   BinderCard[]         @relation("BinderCard_catalogItem")
   from_BuylistEntry_catalogItem BuylistEntry[]       @relation("BuylistEntry_catalogItem")
   from_TradeInItem_catalogItem  TradeInItem[]        @relation("TradeInItem_catalogItem")
 
@@ -357,6 +373,7 @@ model CatalogItem {
   @@index([categoryId])
   @@index([franchiseId])
   @@index([collectibleSetId])
+  @@index([tcgplayerProductId])
   @@index([releaseId])
 }
 
@@ -438,13 +455,22 @@ model CollectibleSet {
   categoryId                             String?              @map("category")
   name                                   String               @default("")
   handle                                 String               @unique @default("")
+  code                                   String               @default("")
+  series                                 String               @default("")
+  printedTotal                           Int?
+  totalCards                             Int?
+  releaseDate                            DateTime?
+  releaseStatus                          String?              @default("released")
+  logoUrl                                String               @default("")
+  symbolUrl                              String               @default("")
+  tcgplayerGroupId                       Int?
   manufacturer                           String               @default("")
   startYear                              Int?
   endYear                                Int?
+  cards                                  CatalogItem[]        @relation("CatalogItem_collectibleSet")
   metadata                               Json?                @default("{}")
   createdAt                              DateTime             @default(now())
   updatedAt                              DateTime             @default(now()) @updatedAt
-  from_CatalogItem_collectibleSet        CatalogItem[]        @relation("CatalogItem_collectibleSet")
   from_CollectibleRelease_collectibleSet CollectibleRelease[] @relation("CollectibleRelease_collectibleSet")
 
   @@index([storeId])
@@ -466,6 +492,44 @@ model Franchise {
   from_CollectibleSet_franchise CollectibleSet[] @relation("CollectibleSet_franchise")
 
   @@index([storeId])
+}
+
+model MarketPrice {
+  id              String       @id @default(cuid())
+  catalogItem     CatalogItem? @relation("MarketPrice_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId   String?      @map("catalogItem")
+  finish          String?
+  condition       String?
+  grade           String       @default("")
+  source          String?      @default("tcgplayer")
+  sourceReference String       @default("")
+  currencyCode    String       @default("USD")
+  lowMinor        Int?
+  midMinor        Int?
+  highMinor       Int?
+  marketMinor     Int?
+  observedAt      DateTime?    @default(now())
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now()) @updatedAt
+
+  @@index([catalogItemId])
+  @@index([observedAt])
+}
+
+model PricingRule {
+  id                       String   @id @default(cuid())
+  name                     String   @default("")
+  active                   Boolean  @default(true)
+  appliesTo                String?  @default("raw")
+  condition                String?
+  basis                    String?  @default("market")
+  percentBasisPoints       Int      @default(10000)
+  minimumMinor             Int?     @default(25)
+  maximumChangeBasisPoints Int?     @default(3000)
+  rounding                 String?  @default("ninety_nine")
+  priority                 Int?     @default(0)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @default(now()) @updatedAt
 }
 
 model Specimen {
@@ -903,48 +967,98 @@ model SavedSearch {
 }
 
 model WishlistItem {
-  id            String       @id @default(cuid())
-  user          User?        @relation("WishlistItem_user", fields: [userId], references: [id])
-  userId        String?      @map("user")
-  catalogItem   CatalogItem? @relation("WishlistItem_catalogItem", fields: [catalogItemId], references: [id])
-  catalogItemId String?      @map("catalogItem")
-  listing       Listing?     @relation("WishlistItem_listing", fields: [listingId], references: [id])
-  listingId     String?      @map("listing")
-  notes         String       @default("")
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @default(now()) @updatedAt
+  id                String       @id @default(cuid())
+  user              User?        @relation("WishlistItem_user", fields: [userId], references: [id])
+  userId            String?      @map("user")
+  catalogItem       CatalogItem? @relation("WishlistItem_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId     String?      @map("catalogItem")
+  listing           Listing?     @relation("WishlistItem_listing", fields: [listingId], references: [id])
+  listingId         String?      @map("listing")
+  cardFinish        String?
+  minimumCondition  String?
+  maxPriceMinor     Int?
+  quantity          Int?         @default(1)
+  notifyWhenInStock Boolean      @default(true)
+  notes             String       @default("")
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @default(now()) @updatedAt
 
   @@index([userId])
   @@index([catalogItemId])
   @@index([listingId])
 }
 
+model Binder {
+  id        String       @id @default(cuid())
+  user      User?        @relation("Binder_user", fields: [userId], references: [id])
+  userId    String?      @map("user")
+  name      String       @default("My binder")
+  cards     BinderCard[] @relation("BinderCard_binder")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now()) @updatedAt
+
+  @@index([userId])
+}
+
+model BinderCard {
+  id             String       @id @default(cuid())
+  binder         Binder?      @relation("BinderCard_binder", fields: [binderId], references: [id])
+  binderId       String?      @map("binder")
+  catalogItem    CatalogItem? @relation("BinderCard_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId  String?      @map("catalogItem")
+  cardFinish     String?
+  cardCondition  String?      @default("NM")
+  cardLanguage   String?      @default("EN")
+  grade          String       @default("")
+  quantity       Int?         @default(1)
+  costBasisMinor Int?
+  acquiredAt     DateTime?
+  notes          String       @default("")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
+
+  @@index([binderId])
+  @@index([catalogItemId])
+}
+
 model Buylist {
-  id           String         @id @default(cuid())
-  store        Store?         @relation("Buylist_store", fields: [storeId], references: [id])
-  storeId      String?        @map("store")
-  name         String         @default("")
-  status       String?        @default("draft")
-  currencyCode String         @default("")
-  entries      BuylistEntry[] @relation("BuylistEntry_buylist")
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @default(now()) @updatedAt
+  id                       String         @id @default(cuid())
+  store                    Store?         @relation("Buylist_store", fields: [storeId], references: [id])
+  storeId                  String?        @map("store")
+  name                     String         @default("")
+  status                   String?        @default("draft")
+  currencyCode             String         @default("")
+  cashPercentBasisPoints   Int?           @default(6000)
+  creditPercentBasisPoints Int?           @default(8000)
+  conditionBasisPoints     Json?          @default("{\"NM\":10000,\"LP\":8500,\"MP\":7000,\"HP\":5000,\"DMG\":3000}")
+  minimumOfferMinor        Int?           @default(25)
+  publicNotes              String         @default("")
+  entries                  BuylistEntry[] @relation("BuylistEntry_buylist")
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @default(now()) @updatedAt
 
   @@index([storeId])
 }
 
 model BuylistEntry {
-  id               String       @id @default(cuid())
-  buylist          Buylist?     @relation("BuylistEntry_buylist", fields: [buylistId], references: [id])
-  buylistId        String?      @map("buylist")
-  catalogItem      CatalogItem? @relation("BuylistEntry_catalogItem", fields: [catalogItemId], references: [id])
-  catalogItemId    String?      @map("catalogItem")
-  criteria         Json?        @default("{}")
-  offerAmountMinor Int
-  maximumQuantity  Int?
-  active           String?      @default("active")
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @default(now()) @updatedAt
+  id                            String        @id @default(cuid())
+  buylist                       Buylist?      @relation("BuylistEntry_buylist", fields: [buylistId], references: [id])
+  buylistId                     String?       @map("buylist")
+  catalogItem                   CatalogItem?  @relation("BuylistEntry_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId                 String?       @map("catalogItem")
+  cardFinish                    String?
+  minimumCondition              String?       @default("MP")
+  pricingMode                   String?       @default("market")
+  criteria                      Json?         @default("{}")
+  offerAmountMinor              Int
+  creditOfferMinor              Int?
+  hotlist                       Boolean       @default(false)
+  maximumQuantity               Int?
+  quantityBought                Int?          @default(0)
+  active                        String?       @default("active")
+  createdAt                     DateTime      @default(now())
+  updatedAt                     DateTime      @default(now()) @updatedAt
+  from_TradeInItem_buylistEntry TradeInItem[] @relation("TradeInItem_buylistEntry")
 
   @@index([buylistId])
   @@index([catalogItemId])
@@ -1068,10 +1182,16 @@ model TradeInItem {
   submissionId                    String?               @map("submission")
   catalogItem                     CatalogItem?          @relation("TradeInItem_catalogItem", fields: [catalogItemId], references: [id])
   catalogItemId                   String?               @map("catalogItem")
+  buylistEntry                    BuylistEntry?         @relation("TradeInItem_buylistEntry", fields: [buylistEntryId], references: [id])
+  buylistEntryId                  String?               @map("buylistEntry")
   specimen                        Specimen?             @relation("TradeInItem_specimen", fields: [specimenId], references: [id])
   specimenId                      String?               @map("specimen")
   customerDescription             String                @default("")
   customerCondition               String                @default("")
+  cardCondition                   String?
+  cardFinish                      String?
+  quantity                        Int?                  @default(1)
+  quotedCreditMinor               Int?
   inspectedConditionObservation   ConditionObservation? @relation("TradeInItem_inspectedConditionObservation", fields: [inspectedConditionObservationId], references: [id])
   inspectedConditionObservationId String?               @map("inspectedConditionObservation")
   quotedAmountMinor               Int?
@@ -1083,6 +1203,7 @@ model TradeInItem {
 
   @@index([submissionId])
   @@index([catalogItemId])
+  @@index([buylistEntryId])
   @@index([specimenId])
   @@index([inspectedConditionObservationId])
 }
@@ -2053,6 +2174,8 @@ model Product {
   discountable       Boolean             @default(true)
   status             ProductStatusType   @default(draft)
   externalId         String              @default("")
+  catalogItem        CatalogItem?        @relation("Product_catalogItem", fields: [catalogItemId], references: [id])
+  catalogItemId      String?             @map("catalogItem")
   productCollections ProductCollection[] @relation("Product_productCollections")
   productCategories  ProductCategory[]   @relation("Product_productCategories")
   shippingProfile    ShippingProfile?    @relation("Product_shippingProfile", fields: [shippingProfileId], references: [id])
@@ -2069,6 +2192,7 @@ model Product {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now()) @updatedAt
 
+  @@index([catalogItemId])
   @@index([shippingProfileId])
   @@index([productTypeId])
 }
@@ -2170,6 +2294,15 @@ model ProductVariant {
   id                                String               @id @default(cuid())
   title                             String               @default("")
   sku                               String               @default("")
+  stockKind                         String?              @default("raw")
+  cardCondition                     String?
+  cardFinish                        String?
+  cardLanguage                      String?              @default("EN")
+  pricingMode                       String?              @default("manual")
+  lastRepricedAt                    DateTime?
+  preorder                          Boolean              @default(false)
+  preorderReleaseDate               DateTime?
+  preorderLimitPerCustomer          Int?
   barcode                           String               @default("")
   ean                               String               @default("")
   upc                               String               @default("")
@@ -2685,6 +2818,7 @@ model User {
   from_OfferRevision_actor               OfferRevision[]          @relation("OfferRevision_actor")
   from_SavedSearch_user                  SavedSearch[]            @relation("SavedSearch_user")
   from_WishlistItem_user                 WishlistItem[]           @relation("WishlistItem_user")
+  from_Binder_user                       Binder[]                 @relation("Binder_user")
   from_TradeInSubmission_customer        TradeInSubmission[]      @relation("TradeInSubmission_customer")
   from_CollectorProfile_user             CollectorProfile[]       @relation("CollectorProfile_user")
   from_DisputeCase_openedBy              DisputeCase[]            @relation("DisputeCase_openedBy")

@@ -7,6 +7,7 @@ import { denyAll } from '@keystone-6/core/access';
 import { permissions } from '../access';
 import { customerOwnerFilter, isHumanOwnerSession, requireHumanOwnerId } from '../security/customer-personalization-owner';
 import { trackingFields } from './trackingFields';
+import { CARD_CONDITIONS, CARD_FINISHES, CARD_LANGUAGES, options } from '../lib/pokemon/card-enums';
 
 const humanCustomer = ({ session }: any) => isHumanOwnerSession(session);
 const canRead = ({ session }: any) =>
@@ -164,6 +165,70 @@ export const WishlistItem = list({
     }),
     catalogItem: relationship({ ref: 'CatalogItem' }),
     listing: relationship({ ref: 'Listing' }),
+    // Want-list terms: the worst condition and the most the collector will pay.
+    cardFinish: select({ type: 'string', options: options(CARD_FINISHES) }),
+    minimumCondition: select({ type: 'string', options: options(CARD_CONDITIONS) }),
+    maxPriceMinor: integer({ validation: { min: 0 } }),
+    quantity: integer({ validation: { min: 1 }, defaultValue: 1 }),
+    notifyWhenInStock: checkbox({ defaultValue: true }),
+    notes: text(),
+    ...trackingFields,
+  },
+});
+
+const binderOwnerFilter = ({ session }: { session?: unknown }) => {
+  const own = customerOwnerFilter({ session });
+  return own ? { binder: own } : false;
+};
+
+// A collector's binder: what they own, by printing, condition and what they paid.
+export const Binder = list({
+  access: {
+    operation: { query: humanCustomer, create: humanCustomer, update: humanCustomer, delete: humanCustomer },
+    filter: { query: customerOwnerFilter, update: customerOwnerFilter, delete: customerOwnerFilter },
+  },
+  fields: {
+    user: relationship({
+      ref: 'User',
+      access: { create: denyAll, update: denyAll },
+      hooks: {
+        resolveInput({ operation, resolvedData, context }) {
+          return operation === 'create'
+            ? { connect: { id: requireHumanOwnerId(context.session) } }
+            : resolvedData.user;
+        },
+      },
+    }),
+    name: text({ validation: { isRequired: true }, defaultValue: 'My binder' }),
+    cards: relationship({ ref: 'BinderCard.binder', many: true }),
+    ...trackingFields,
+  },
+});
+
+export const BinderCard = list({
+  access: {
+    operation: { query: humanCustomer, create: humanCustomer, update: humanCustomer, delete: humanCustomer },
+    filter: { query: binderOwnerFilter, update: binderOwnerFilter, delete: binderOwnerFilter },
+  },
+  hooks: {
+    async validateInput({ operation, resolvedData, context, addValidationError }) {
+      if (operation !== 'create') return;
+      const binderId = (resolvedData.binder as { connect?: { id?: string } } | undefined)?.connect?.id;
+      const owner = isHumanOwnerSession(context.session) ? context.session.itemId : null;
+      const binder = binderId ? await context.sudo().db.Binder.findOne({ where: { id: binderId } }) : null;
+      if (!binder || !owner || binder.userId !== owner) addValidationError('Choose one of your own binders');
+    },
+  },
+  fields: {
+    binder: relationship({ ref: 'Binder.cards', access: { update: denyAll } }),
+    catalogItem: relationship({ ref: 'CatalogItem' }),
+    cardFinish: select({ type: 'string', options: options(CARD_FINISHES) }),
+    cardCondition: select({ type: 'string', options: options(CARD_CONDITIONS), defaultValue: 'NM' }),
+    cardLanguage: select({ type: 'string', options: options(CARD_LANGUAGES), defaultValue: 'EN' }),
+    grade: text({ ui: { description: 'For slabs, e.g. PSA 10' } }),
+    quantity: integer({ validation: { min: 1 }, defaultValue: 1 }),
+    costBasisMinor: integer({ validation: { min: 0 } }),
+    acquiredAt: timestamp(),
     notes: text(),
     ...trackingFields,
   },

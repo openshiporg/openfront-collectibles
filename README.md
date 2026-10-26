@@ -2,22 +2,23 @@
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fopenshiporg%2Fopenfront-collectibles&env=DATABASE_URL%2CSESSION_SECRET%2CS3_BUCKET_NAME%2CS3_REGION%2CS3_ACCESS_KEY_ID%2CS3_SECRET_ACCESS_KEY)
 
-Openfront Collectibles is a self-hostable catalog and discovery application for unique physical specimens. Operators can organize inventory, condition, grading, provenance, and listing records, while collectors browse published items and follow merchant-owned detail handoffs. Collectible checkout, bidding, offers, payouts, and settlement are not launch-ready.
+Openfront Collectibles is a self-hostable shop for Pokémon trading cards: singles by condition, graded slabs, sealed product and pre-orders, a buylist for buying cards from customers, consignment, and market-price tracking with repricing rules. Every set is a full checklist, so collectors can see what the shop holds, what each card is worth, and keep a binder and want list of their own.
 
 ## Demo
 
-![Illustrative collectible catalog artwork included in this repository](public/images/collectibles/ns-0001.svg)
-
-Explore the application locally using the setup instructions below.
+![The demo shop's home page: the 151 checklist with stock, market prices and Add buttons](design/pokemon-20261025/after-us-desktop-fold.png)
 
 | | |
 |---|---|
+| **Live demo** | [openfront-collectibles-production.up.railway.app](https://openfront-collectibles-production.up.railway.app) (to move to collectibles.openship.org) |
 | **Public application** | `/[countryCode]` on your development URL |
 | **Dashboard** | `/dashboard` on your development URL |
 
-[Learn more →](https://openship.org/products/openfront-collectibles)
+The demo is "Eighth Street Cards", a fictional shop created by the dashboard's normal onboarding (Complete card shop). Its catalog is 19 real sets with real TCGplayer market prices; its slab certificates are labelled samples.
 
-[Documentation →](features/keystone/models)
+[Product spec →](docs/PRODUCT-SPEC.md)
+
+[Learn more →](https://openship.org/products/openfront-collectibles)
 
 ## The Openfront Ecosystem
 
@@ -38,7 +39,7 @@ Every Openfront is open source and self-hostable. Try any of them on its live de
 | Openfront Dealership | Inventory, test drives, deals and service | [openfront-dealership](https://github.com/openshiporg/openfront-dealership) | [dealership.openship.org](https://dealership.openship.org) |
 | Openfront Vape | Age-gated retail with compliance controls | [openfront-vape](https://github.com/openshiporg/openfront-vape) | [vape.openship.org](https://vape.openship.org) |
 | Openfront Convenience | Convenience store POS and inventory | [openfront-convenience](https://github.com/openshiporg/openfront-convenience) | [convenience.openship.org](https://convenience.openship.org) |
-| **Openfront Collectibles** (this repository) | Graded items, consignment and provenance | [openfront-collectibles](https://github.com/openshiporg/openfront-collectibles) | [collectibles.openship.org](https://collectibles.openship.org) |
+| **Openfront Collectibles** (this repository) | Pokémon card shop: singles, slabs, sealed, buylist | [openfront-collectibles](https://github.com/openshiporg/openfront-collectibles) | [collectibles.openship.org](https://collectibles.openship.org) |
 | Openfront Cannabis | Dispensary menu, packages and recalls | [openfront-cannabis](https://github.com/openshiporg/openfront-cannabis) | [cannabis.openship.org](https://cannabis.openship.org) |
 | Openfront Pharmacy | Prescriptions, inventory lots and pickup | [openfront-pharmacy](https://github.com/openshiporg/openfront-pharmacy) | [pharmacy.openship.org](https://pharmacy.openship.org) |
 | Openfront Med Spa | Treatments, consents and memberships | [openfront-medspa](https://github.com/openshiporg/openfront-medspa) | [medspa.openship.org](https://medspa.openship.org) |
@@ -57,20 +58,23 @@ Every Openfront is open source and self-hostable. Try any of them on its live de
 
 ## Core Features
 
-### Admin Dashboard
-Manage collectible commerce, gift cards, regions, currencies, collectors, products, product categories, evidence, price lists, invoices, catalog, discounts through dedicated dashboard workspaces and permission-controlled data screens.
+### Set checklists
+Each Pokémon set is imported as its full printed checklist (card data and image URLs from the Pokémon TCG API's data, bundled in `features/keystone/lib/pokemon/checklists`). The storefront's set pages tick what the shop holds and show every card's latest TCGplayer market reading.
 
-### Storefront
-Country-scoped storefront pages expose catalog browsing and collectible handoffs at `/[countryCode]/collectibles/handoff/[listingId]`. Public observation projections preserve evidence sources and review states rather than presenting provenance or grading as a software guarantee.
+### Singles, slabs and sealed
+Singles are stocked per card × printing × language × condition (NM, LP, MP, HP, DMG), the way TCGplayer and BinderPOS model SKUs. Graded slabs (PSA, BGS, CGC) are single serialized items with their grade, label and certificate. Sealed product sits in its set; pre-orders carry a street date, an allocation and a per-customer limit enforced at the cart.
 
-### Catalog & Specimens
-Separate catalog definitions from individual specimens, identifiers, custody, inventory units, locations, condition observations, and media.
+### Market prices and repricing
+Market readings are stored per card and printing. **Market & Repricing** refreshes today's TCGplayer prices from TCGCSV for every set, then previews and applies pricing rules (basis, percentage per condition, floor, rounding, a swing limit that sends big moves to review).
 
-### Grading & Provenance Evidence
-Maintain grading-company references, reported grades, certificate references, provenance events, and valuation observations with source and confidence information.
+### Buylist, trade-ins and consignment
+The buylist pays a share of market in cash or store credit by condition, with a hotlist and stock caps. Collectors build a sell list on **Sell to us**; staff inspect and quote on the trade-in desk. Slabs can be taken in on consignment with a commission agreement.
 
-### Listing Preparation & Discovery
-Prepare specimens, manage collectible listing records, and publish read-only discovery projections. Auction, consignment, buylist, and offer records are not evidence of completed money movement or active bidding.
+### Collector accounts
+A binder (cards owned, condition, what was paid, market value and set completion) and a want list (worst acceptable condition, maximum price) that shows when the shop can fill a want.
+
+### Card UI
+The storefront and platform pages share one card component slice, `features/storefront/components/cards` (card grid and tile, checklist sheet and row, card art and badges, rarity marks, condition run, filter bar, set and binder summaries, price history, graded slab, sealed box end). It is mobile-first and themes from CSS variables, so the dashboard and the storefront each supply their own palette.
 
 ## Architecture
 
@@ -96,10 +100,11 @@ openfront-collectibles/
 ### Data Models
 The [model registry](features/keystone/models/index.ts) and [Prisma schema](schema.prisma) cover:
 
-- Categories, franchises, sets, releases, catalog items, specimens, identifiers, and media.
+- Card sets, catalog cards (printings and sealed product), market prices and pricing rules.
+- Categories, franchises, releases, specimens, identifiers, and media.
 - Condition, grading, provenance, custody, and valuation observations.
 - Inventory units, locations, movements, reservations, and listings.
-- Auction, bid, offer, consignment, buylist, collector, and inherited commerce records.
+- Auction, bid, offer, consignment, buylist, collector, binder, want list, and inherited commerce records.
 
 ## Getting Started
 

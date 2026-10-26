@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Northstar Collectibles",
-  description: "Shop our unique collection",
+  title: "Openfront Collectibles",
+  description: "Pokémon singles, graded slabs and sealed product",
 };
 
 export default function RootLayout({

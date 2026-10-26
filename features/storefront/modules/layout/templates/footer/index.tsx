@@ -65,8 +65,9 @@ export default async function Footer() {
               links={[
                 { title: customer ? "Account" : "Sign in", href: "/account" },
                 { title: "Orders", href: "/account/orders" },
-                { title: "Wishlist", href: "/account/wishlist" },
-                { title: "Trade in", href: "/trade-in" },
+                { title: "Binder", href: "/account/binder" },
+                { title: "Want list", href: "/account/wishlist" },
+                { title: "Sell to us", href: "/trade-in" },
                 { title: "Cart", href: "/cart" },
               ]}
             />
@@ -81,6 +82,10 @@ export default async function Footer() {
         <div className="mt-6 flex flex-col gap-2 text-[14px] text-cx-ink-3 sm:flex-row sm:items-center sm:justify-between">
           <p suppressHydrationWarning>
             © {new Date().getFullYear()} {storeName}
+          </p>
+          <p className="max-w-[78ch] text-[13px] leading-[1.45] sm:text-right">
+            Card data and images from the Pokémon TCG API. Market prices from TCGplayer via TCGCSV, dated where shown.
+            Pokémon and its trademarks belong to Nintendo, Creatures, GAME FREAK and The Pokémon Company; this shop is independent and not affiliated with them.
           </p>
         </div>
       </div>

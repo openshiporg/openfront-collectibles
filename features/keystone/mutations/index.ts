@@ -2,6 +2,19 @@ import { mergeSchemas } from "@graphql-tools/schema";
 import receiveCollectibleItem from './receiveCollectibleItem';
 import manageCollectibleListing from './manageCollectibleListing';
 import { activeTradeIns, activeWishlist, publicBuylist, submitTradeIn, toggleWishlistListing } from './collectibles-customer';
+import {
+  activeBinder,
+  activeWantList,
+  addToBinder,
+  importCardCatalog,
+  publicCardMarket,
+  publicCardSets,
+  publicSetChecklist,
+  refreshMarketPrices,
+  removeFromBinder,
+  repriceInventory,
+  toggleWantList,
+} from './pokemon';
 import type { GraphQLSchema } from 'graphql'
 import redirectToInit from "./redirectToInit";
 import activeCart from "./activeCart";
@@ -108,6 +121,11 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         activeWishlist: JSON!
         publicBuylist: JSON!
         activeTradeIns: JSON!
+        publicCardSets(currencyCode: String): JSON!
+        publicSetChecklist(handle: String!, currencyCode: String): JSON
+        publicCardMarket(catalogItemId: ID!): JSON
+        activeBinder: JSON!
+        activeWantList(currencyCode: String): JSON!
       }
 
       type ProductsSortedByPriceResult {
@@ -322,6 +340,12 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         submitCollectibleOffer(listingId: ID!, amountMinor: Int!, expiresAt: String!, message: String, idempotencyKey: String!): Offer!
         toggleWishlistListing(listingId: ID!): JSON!
         submitTradeIn(input: JSON!): JSON!
+        importCardCatalog(input: JSON!): JSON!
+        refreshMarketPrices(input: JSON): JSON!
+        repriceInventory(input: JSON): JSON!
+        addToBinder(input: JSON!): JSON!
+        removeFromBinder(binderCardId: ID!): JSON!
+        toggleWantList(input: JSON!): JSON!
       }
     `,
     resolvers: {
@@ -348,6 +372,11 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         activeWishlist,
         publicBuylist,
         activeTradeIns,
+        publicCardSets,
+        publicSetChecklist,
+        publicCardMarket,
+        activeBinder,
+        activeWantList,
       },
       Mutation: {
         receiveCollectibleItem,
@@ -395,6 +424,12 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         submitCollectibleOffer,
         toggleWishlistListing,
         submitTradeIn,
+        importCardCatalog,
+        refreshMarketPrices,
+        repriceInventory,
+        addToBinder,
+        removeFromBinder,
+        toggleWantList,
       }
     },
   });

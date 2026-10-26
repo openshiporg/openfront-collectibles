@@ -1,87 +1,41 @@
 import { notFound } from "next/navigation"
-import { Suspense } from "react"
 
-import SkeletonProductGrid from "@/features/storefront/modules/skeletons/templates/skeleton-product-grid"
-import BrowseHeader from "@/features/storefront/modules/store/components/browse-header"
-import { SortOptions } from "@/features/storefront/modules/store/components/refinement-list/sort-products"
-import PaginatedProducts from "@/features/storefront/modules/store/templates/paginated-products"
 import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
-import { Track, PillLink } from "@/features/storefront/modules/common/components/collectibles/track"
+import { CardShelf, type ShelfParams } from "@/features/storefront/modules/cards/card-shelf"
 import type { StorefrontProductCategory } from "@/features/storefront/types"
+
+const NOTES: Record<string, string> = {
+  singles: "Raw cards, priced by condition from Near Mint to Damaged. Every card shows its TCGplayer market reading.",
+  "graded-slabs": "PSA, Beckett and CGC slabs. Each is one copy with its grade and certificate on the label.",
+  "sealed-product": "Factory-sealed booster boxes, Elite Trainer Boxes, bundles and packs, including pre-orders.",
+}
 
 export default function CategoryTemplate({
   category,
-  sortBy,
-  page,
+  params,
   countryCode,
 }: {
   category: StorefrontProductCategory
-  sortBy?: SortOptions
-  page?: string
+  params: ShelfParams
   countryCode: string
 }) {
-  const pageNumber = page ? parseInt(page) : 1
-  const sort = sortBy || "created_at"
   if (!category || !countryCode) notFound()
-
-  // Walk up to the root so the trail and the active top-level category are known.
-  const parents: StorefrontProductCategory[] = []
-  let cursor = category.parent_category
-  while (cursor && parents.length < 6) {
-    parents.unshift(cursor)
-    cursor = cursor.parent_category
-  }
-  const root = parents[0] ?? category
   const children = category.category_children ?? []
 
   return (
-    <div
-      className="mx-auto w-full max-w-[1320px] px-4 pb-20 sm:px-6"
-      data-testid="category-container"
-    >
-      <BrowseHeader
-        title={category.title}
-        sortBy={sort}
-        activeCategory={root.handle}
-        titleTestId="category-page-title"
-        eyebrow={
-          parents.length > 0 ? (
-            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-2">
-              {parents.map((parent) => (
-                <span key={parent.id} className="inline-flex items-center gap-2">
-                  <LocalizedClientLink
-                    className="inline-flex min-h-11 items-center hover:text-cx-ink"
-                    href={`/categories/${parent.handle}`}
-                    data-testid="sort-by-link"
-                  >
-                    {parent.title}
-                  </LocalizedClientLink>
-                  <span aria-hidden="true" className="text-cx-ink-3">/</span>
-                </span>
-              ))}
-            </nav>
-          ) : undefined
-        }
-      >
-        {children.length > 0 && (
-          <Track label="Subcategory">
-            {children.map((c) => (
-              <PillLink key={c.id} href={`/categories/${c.handle}`}>
-                {c.title}
-              </PillLink>
-            ))}
-          </Track>
-        )}
-      </BrowseHeader>
-      <Suspense fallback={<SkeletonProductGrid numberOfProducts={8} />}>
-        <PaginatedProducts
-          sortBy={sort}
-          page={pageNumber}
-          categoryId={category.id}
-          countryCode={countryCode}
-          label={category.title}
-        />
-      </Suspense>
+    <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 pt-8 sm:px-6 sm:pt-12" data-testid="category-container">
+      <h1 className="font-cx-display text-[44px] leading-none text-cx-ink sm:text-[64px]" data-testid="category-page-title">{category.title}</h1>
+      <p className="mt-4 max-w-[60ch] text-[16px] leading-[1.5] text-cx-ink-2">{NOTES[category.handle] ?? ""}</p>
+      {children.length > 0 && (
+        <nav aria-label="Subcategory" className="mt-4 flex flex-wrap gap-2">
+          {children.map((c) => (
+            <LocalizedClientLink key={c.id} href={`/categories/${c.handle}`} className="tc-run-cell min-h-10 px-3" data-live="true">{c.title}</LocalizedClientLink>
+          ))}
+        </nav>
+      )}
+      <div className="mt-8">
+        <CardShelf countryCode={countryCode} params={params} category={category.handle} label={category.title} hideKind />
+      </div>
     </div>
   )
 }

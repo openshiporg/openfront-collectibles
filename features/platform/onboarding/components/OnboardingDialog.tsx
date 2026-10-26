@@ -127,10 +127,13 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
     ['Shipping options', template.displayNames.shipping ?? []],
     ['Categories', template.displayNames.categories ?? []],
     ['Collections', template.displayNames.collections ?? []],
-    ['Items', template.displayNames.products ?? []],
+    ['Card sets', template.displayNames.cardSets ?? []],
+    ['Products', template.displayNames.products ?? []],
+    ['Graded slabs', template.displayNames.collectibles ?? []],
+    ['Pricing rules and buylist', template.displayNames.pricing ?? []],
   ];
   const setupOptions: Array<{ value: 'minimal' | 'full' | 'custom'; label: string }> = [
-    { value: 'minimal', label: 'Basic' },
+    { value: 'minimal', label: 'Starter' },
     { value: 'full', label: 'Complete' },
     { value: 'custom', label: 'Custom' },
   ];

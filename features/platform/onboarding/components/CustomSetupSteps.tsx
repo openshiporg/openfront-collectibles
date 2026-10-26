@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DataCard } from "./DataCard";
 import seedData from "@/features/platform/onboarding/lib/seed.json";
+import { getSeedForTemplate } from "@/features/platform/onboarding/utils/dataUtils";
 
 interface CustomSetupStepsProps {
   currentJson?: any;
@@ -38,71 +39,9 @@ function useCopyToClipboard(): [
   return [copiedText, copy];
 }
 
-// Get complete setup configuration from seed data
+// The complete card-shop setup, the same slice the Complete template installs.
 function getCompleteSetupJson() {
-  const completeRegionCodes = ["na", "eu", "uk"];
-  const completePaymentProviders = [
-    "pp_stripe_stripe",
-    "pp_paypal_paypal",
-    "pp_system_default",
-  ];
-  const completeShipping = [
-    "Standard Shipping",
-    "Express Shipping",
-    "Return Shipping",
-  ];
-  const completeCategories = ["shirts", "hoodies", "accessories", "pants"];
-  const completeCollections = ["latest-picks", "new-arrivals", "trending"];
-  const completeProducts = [
-    "penrose-triangle-tshirt",
-    "eschers-staircase-hoodie",
-    "mobius-strip-scarf",
-    "fibonacci-spiral-crop-top",
-    "quantum-entanglement-socks",
-    "schrodingers-cat-tank-top",
-    "klein-bottle-beanie",
-    "paradox-puzzle-sweater",
-    "heisenberg-uncertainty-joggers",
-    "mandelbrot-set-infinity-shawl",
-  ];
-
-  // Filter products and clean up variant prices to only include relevant regions
-  const filteredProducts = (seedData.products as any[])
-    .filter((p: any) => completeProducts.includes(p.handle))
-    .map((product: any) => ({
-      ...product,
-      variants: product.variants.map((variant: any) => ({
-        ...variant,
-        prices: variant.prices.filter((price: any) =>
-          completeRegionCodes.includes(price.regionCode)
-        ),
-      })),
-    }));
-
-  return {
-    store: {
-      name: "Impossible Tees",
-      defaultCurrencyCode: "usd",
-      homepageTitle: "Modern Apparel Store",
-      homepageDescription: "Quality clothing and unique designs.",
-    },
-    regions: (seedData.regions as any[]).filter((r: any) =>
-      completeRegionCodes.includes(r.code)
-    ),
-    paymentProviders: (seedData.paymentProviders as any[]).filter((p: any) =>
-      completePaymentProviders.includes(p.code)
-    ),
-    shipping_options: (seedData.shipping_options as any[]).filter((s: any) =>
-      completeShipping.includes(s.name)
-    ),
-    categories: (seedData.categories as any[]).filter((c: any) =>
-      completeCategories.includes(c.handle)
-    ),
-    collections: (seedData.collections as any[]).filter((c: any) =>
-      completeCollections.includes(c.handle)
-    ),
-    products: filteredProducts,
-  };
+  return getSeedForTemplate("full", seedData);
 }
 
 export function CustomSetupSteps({
@@ -134,55 +73,24 @@ export function CustomSetupSteps({
 
   // Generate the AI prompt focused on user questions rather than editing existing JSON
   const generateAIPrompt = () => {
-    return `I need help customizing my e-commerce store configuration. I've pasted my current set up.
+    const singles = completeJson.products.filter((p: any) => p.metadata?.kind === "single").length;
+    const slabs = completeJson.products.filter((p: any) => p.metadata?.kind === "graded").length;
+    const sealed = completeJson.products.filter((p: any) => p.metadata?.kind === "sealed").length;
+    return `I need help customizing the setup for my Pokémon card shop on Openfront Collectibles. I've pasted my current setup JSON.
 
 **Your first response should be:**
 
-Start by telling me what this JSON configuration currently contains:
+Summarize what this JSON contains, section by section:
 
-**STORE INFORMATION:**
-- Store Name: Impossible Tees
-- Default Currency: USD
-- Homepage Title: Modern Apparel Store
-- Homepage Description: Quality clothing and unique designs.
+- **store:** name, default currency, homepage title and description
+- **regions**, **paymentProviders**, **shipping_options**
+- **categories** (singles, graded slabs, sealed product) and **collections**
+- **cardSets:** the Pokémon TCG sets whose full checklists and market prices get imported (by set id, e.g. sv3pt5 is 151), the upcoming pre-order set, and sealed catalog entries
+- **products:** ${singles} singles (each card has one variant per condition NM/LP/MP/HP/DMG and printing), ${slabs} graded slabs, ${sealed} sealed products; each links to its catalog card by handle (set id + card number)
+- **collectibles:** the graded slabs received into inventory, with grading company, grade and certificate
+- **pricing:** repricing rules (percent of market per condition) and the buylist (cash and store-credit percentages)
 
-**REGIONS & CURRENCIES:**
-- North America (USD, $) - United States, Canada - 5% tax rate
-- Europe (EUR, €) - Germany, France, Italy - 8.5% tax rate
-- United Kingdom (GBP, £) - United Kingdom - 7% tax rate
-
-**PAYMENT PROVIDERS:**
-- Stripe (credit/debit cards)
-- PayPal (PayPal payments)
-- Cash on Delivery (manual payment)
-
-**SHIPPING OPTIONS:**
-- Standard Shipping: $10.00
-- Express Shipping: $15.00
-- Return Shipping: $10.00
-
-**PRODUCT CATEGORIES:**
-- Shirts, Hoodies, Accessories, Pants
-
-**COLLECTIONS:**
-- Latest Picks, New Arrivals, Trending
-
-**PRODUCTS (10 items):**
-- Penrose Triangle T-Shirt
-- Escher's Staircase Hoodie
-- Möbius Strip Scarf
-- Fibonacci Spiral Crop Top
-- Quantum Entanglement Socks
-- Schrödinger's Cat Tank Top
-- Klein Bottle Beanie
-- Paradox Puzzle Sweater
-- Heisenberg's Uncertainty Principle Joggers
-- Mandelbrot Set Infinity Shawl
-
-Then ask: "This is what your store configuration currently has. What would you like to change? 
-As the user provides more chnages to the JSON, keep aksing what changes and once the user is finishedand indicates they are done, return the JSON and tell them to paste it into Openfront."
-
-After I tell you what to change, modify the JSON and provide the complete updated configuration for me to paste into Openfront.`;
+Then ask: "What would you like to change?" Keep asking until I say I'm done, then return the complete JSON for me to paste into Openfront. Keep every product's catalogItem handle pointing at a card in an imported set.`;
   };
 
   const [jsonApplied, setJsonApplied] = useState(false);

@@ -2204,6 +2204,23 @@ type CatalogItem {
   category: CollectibleCategory
   franchise: Franchise
   collectibleSet: CollectibleSet
+  kind: String
+  cardNumber: String
+  numberSort: Int
+  rarity: String
+  supertype: String
+  subtypes: JSON
+  energyTypes: JSON
+  hp: String
+  artist: String
+  imageUrl: String
+  imageLargeUrl: String
+  sealedFormat: String
+  tcgplayerProductId: Int
+  products(where: ProductWhereInput! = {}, orderBy: [ProductOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ProductWhereUniqueInput): [Product!]
+  productsCount(where: ProductWhereInput! = {}): Int
+  marketPrices(where: MarketPriceWhereInput! = {}, orderBy: [MarketPriceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: MarketPriceWhereUniqueInput): [MarketPrice!]
+  marketPricesCount(where: MarketPriceWhereInput! = {}): Int
   release: CollectibleRelease
   title: String
   handle: String
@@ -2235,6 +2252,19 @@ input CatalogItemWhereInput {
   category: CollectibleCategoryWhereInput
   franchise: FranchiseWhereInput
   collectibleSet: CollectibleSetWhereInput
+  kind: StringNullableFilter
+  cardNumber: StringFilter
+  numberSort: IntNullableFilter
+  rarity: StringFilter
+  supertype: StringFilter
+  hp: StringFilter
+  artist: StringFilter
+  imageUrl: StringFilter
+  imageLargeUrl: StringFilter
+  sealedFormat: StringNullableFilter
+  tcgplayerProductId: IntNullableFilter
+  products: ProductManyRelationFilter
+  marketPrices: MarketPriceManyRelationFilter
   release: CollectibleReleaseWhereInput
   title: StringFilter
   handle: StringFilter
@@ -2247,6 +2277,18 @@ input CatalogItemWhereInput {
   media: CollectibleMediaManyRelationFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
+}
+
+input ProductManyRelationFilter {
+  every: ProductWhereInput
+  some: ProductWhereInput
+  none: ProductWhereInput
+}
+
+input MarketPriceManyRelationFilter {
+  every: MarketPriceWhereInput
+  some: MarketPriceWhereInput
+  none: MarketPriceWhereInput
 }
 
 input SpecimenManyRelationFilter {
@@ -2263,6 +2305,17 @@ input CollectibleMediaManyRelationFilter {
 
 input CatalogItemOrderByInput {
   id: OrderDirection
+  kind: OrderDirection
+  cardNumber: OrderDirection
+  numberSort: OrderDirection
+  rarity: OrderDirection
+  supertype: OrderDirection
+  hp: OrderDirection
+  artist: OrderDirection
+  imageUrl: OrderDirection
+  imageLargeUrl: OrderDirection
+  sealedFormat: OrderDirection
+  tcgplayerProductId: OrderDirection
   title: OrderDirection
   handle: OrderDirection
   catalogNumber: OrderDirection
@@ -2279,6 +2332,21 @@ input CatalogItemUpdateInput {
   category: CollectibleCategoryRelateToOneForUpdateInput
   franchise: FranchiseRelateToOneForUpdateInput
   collectibleSet: CollectibleSetRelateToOneForUpdateInput
+  kind: String
+  cardNumber: String
+  numberSort: Int
+  rarity: String
+  supertype: String
+  subtypes: JSON
+  energyTypes: JSON
+  hp: String
+  artist: String
+  imageUrl: String
+  imageLargeUrl: String
+  sealedFormat: String
+  tcgplayerProductId: Int
+  products: ProductRelateToManyForUpdateInput
+  marketPrices: MarketPriceRelateToManyForUpdateInput
   release: CollectibleReleaseRelateToOneForUpdateInput
   title: String
   handle: String
@@ -2304,6 +2372,20 @@ input CollectibleSetRelateToOneForUpdateInput {
   create: CollectibleSetCreateInput
   connect: CollectibleSetWhereUniqueInput
   disconnect: Boolean
+}
+
+input ProductRelateToManyForUpdateInput {
+  disconnect: [ProductWhereUniqueInput!]
+  set: [ProductWhereUniqueInput!]
+  create: [ProductCreateInput!]
+  connect: [ProductWhereUniqueInput!]
+}
+
+input MarketPriceRelateToManyForUpdateInput {
+  disconnect: [MarketPriceWhereUniqueInput!]
+  set: [MarketPriceWhereUniqueInput!]
+  create: [MarketPriceCreateInput!]
+  connect: [MarketPriceWhereUniqueInput!]
 }
 
 input CollectibleReleaseRelateToOneForUpdateInput {
@@ -2336,6 +2418,21 @@ input CatalogItemCreateInput {
   category: CollectibleCategoryRelateToOneForCreateInput
   franchise: FranchiseRelateToOneForCreateInput
   collectibleSet: CollectibleSetRelateToOneForCreateInput
+  kind: String
+  cardNumber: String
+  numberSort: Int
+  rarity: String
+  supertype: String
+  subtypes: JSON
+  energyTypes: JSON
+  hp: String
+  artist: String
+  imageUrl: String
+  imageLargeUrl: String
+  sealedFormat: String
+  tcgplayerProductId: Int
+  products: ProductRelateToManyForCreateInput
+  marketPrices: MarketPriceRelateToManyForCreateInput
   release: CollectibleReleaseRelateToOneForCreateInput
   title: String
   handle: String
@@ -2359,6 +2456,16 @@ input FranchiseRelateToOneForCreateInput {
 input CollectibleSetRelateToOneForCreateInput {
   create: CollectibleSetCreateInput
   connect: CollectibleSetWhereUniqueInput
+}
+
+input ProductRelateToManyForCreateInput {
+  create: [ProductCreateInput!]
+  connect: [ProductWhereUniqueInput!]
+}
+
+input MarketPriceRelateToManyForCreateInput {
+  create: [MarketPriceCreateInput!]
+  connect: [MarketPriceWhereUniqueInput!]
 }
 
 input CollectibleReleaseRelateToOneForCreateInput {
@@ -2702,9 +2809,20 @@ type CollectibleSet {
   category: CollectibleCategory
   name: String
   handle: String
+  code: String
+  series: String
+  printedTotal: Int
+  totalCards: Int
+  releaseDate: DateTime
+  releaseStatus: String
+  logoUrl: String
+  symbolUrl: String
+  tcgplayerGroupId: Int
   manufacturer: String
   startYear: Int
   endYear: Int
+  cards(where: CatalogItemWhereInput! = {}, orderBy: [CatalogItemOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CatalogItemWhereUniqueInput): [CatalogItem!]
+  cardsCount(where: CatalogItemWhereInput! = {}): Int
   metadata: JSON
   createdAt: DateTime
   updatedAt: DateTime
@@ -2725,17 +2843,42 @@ input CollectibleSetWhereInput {
   category: CollectibleCategoryWhereInput
   name: StringFilter
   handle: StringFilter
+  code: StringFilter
+  series: StringFilter
+  printedTotal: IntNullableFilter
+  totalCards: IntNullableFilter
+  releaseDate: DateTimeNullableFilter
+  releaseStatus: StringNullableFilter
+  logoUrl: StringFilter
+  symbolUrl: StringFilter
+  tcgplayerGroupId: IntNullableFilter
   manufacturer: StringFilter
   startYear: IntNullableFilter
   endYear: IntNullableFilter
+  cards: CatalogItemManyRelationFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
+}
+
+input CatalogItemManyRelationFilter {
+  every: CatalogItemWhereInput
+  some: CatalogItemWhereInput
+  none: CatalogItemWhereInput
 }
 
 input CollectibleSetOrderByInput {
   id: OrderDirection
   name: OrderDirection
   handle: OrderDirection
+  code: OrderDirection
+  series: OrderDirection
+  printedTotal: OrderDirection
+  totalCards: OrderDirection
+  releaseDate: OrderDirection
+  releaseStatus: OrderDirection
+  logoUrl: OrderDirection
+  symbolUrl: OrderDirection
+  tcgplayerGroupId: OrderDirection
   manufacturer: OrderDirection
   startYear: OrderDirection
   endYear: OrderDirection
@@ -2749,12 +2892,29 @@ input CollectibleSetUpdateInput {
   category: CollectibleCategoryRelateToOneForUpdateInput
   name: String
   handle: String
+  code: String
+  series: String
+  printedTotal: Int
+  totalCards: Int
+  releaseDate: DateTime
+  releaseStatus: String
+  logoUrl: String
+  symbolUrl: String
+  tcgplayerGroupId: Int
   manufacturer: String
   startYear: Int
   endYear: Int
+  cards: CatalogItemRelateToManyForUpdateInput
   metadata: JSON
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+input CatalogItemRelateToManyForUpdateInput {
+  disconnect: [CatalogItemWhereUniqueInput!]
+  set: [CatalogItemWhereUniqueInput!]
+  create: [CatalogItemCreateInput!]
+  connect: [CatalogItemWhereUniqueInput!]
 }
 
 input CollectibleSetUpdateArgs {
@@ -2768,12 +2928,27 @@ input CollectibleSetCreateInput {
   category: CollectibleCategoryRelateToOneForCreateInput
   name: String
   handle: String
+  code: String
+  series: String
+  printedTotal: Int
+  totalCards: Int
+  releaseDate: DateTime
+  releaseStatus: String
+  logoUrl: String
+  symbolUrl: String
+  tcgplayerGroupId: Int
   manufacturer: String
   startYear: Int
   endYear: Int
+  cards: CatalogItemRelateToManyForCreateInput
   metadata: JSON
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+input CatalogItemRelateToManyForCreateInput {
+  create: [CatalogItemCreateInput!]
+  connect: [CatalogItemWhereUniqueInput!]
 }
 
 type Franchise {
@@ -2835,6 +3010,195 @@ input FranchiseCreateInput {
   handle: String
   description: String
   externalReferences: JSON
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type MarketPrice {
+  id: ID!
+  catalogItem: CatalogItem
+  finish: String
+  condition: String
+  grade: String
+  source: String
+  sourceReference: String
+  currencyCode: String
+  lowMinor: Int
+  midMinor: Int
+  highMinor: Int
+  marketMinor: Int
+  observedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input MarketPriceWhereUniqueInput {
+  id: ID
+}
+
+input MarketPriceWhereInput {
+  AND: [MarketPriceWhereInput!]
+  OR: [MarketPriceWhereInput!]
+  NOT: [MarketPriceWhereInput!]
+  id: IDFilter
+  catalogItem: CatalogItemWhereInput
+  finish: StringNullableFilter
+  condition: StringNullableFilter
+  grade: StringFilter
+  source: StringNullableFilter
+  sourceReference: StringFilter
+  currencyCode: StringFilter
+  lowMinor: IntNullableFilter
+  midMinor: IntNullableFilter
+  highMinor: IntNullableFilter
+  marketMinor: IntNullableFilter
+  observedAt: DateTimeNullableFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+}
+
+input MarketPriceOrderByInput {
+  id: OrderDirection
+  finish: OrderDirection
+  condition: OrderDirection
+  grade: OrderDirection
+  source: OrderDirection
+  sourceReference: OrderDirection
+  currencyCode: OrderDirection
+  lowMinor: OrderDirection
+  midMinor: OrderDirection
+  highMinor: OrderDirection
+  marketMinor: OrderDirection
+  observedAt: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input MarketPriceUpdateInput {
+  catalogItem: CatalogItemRelateToOneForUpdateInput
+  finish: String
+  condition: String
+  grade: String
+  source: String
+  sourceReference: String
+  currencyCode: String
+  lowMinor: Int
+  midMinor: Int
+  highMinor: Int
+  marketMinor: Int
+  observedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input MarketPriceUpdateArgs {
+  where: MarketPriceWhereUniqueInput!
+  data: MarketPriceUpdateInput!
+}
+
+input MarketPriceCreateInput {
+  catalogItem: CatalogItemRelateToOneForCreateInput
+  finish: String
+  condition: String
+  grade: String
+  source: String
+  sourceReference: String
+  currencyCode: String
+  lowMinor: Int
+  midMinor: Int
+  highMinor: Int
+  marketMinor: Int
+  observedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type PricingRule {
+  id: ID!
+  name: String
+  active: Boolean
+  appliesTo: String
+  condition: String
+  basis: String
+  percentBasisPoints: Int
+  minimumMinor: Int
+  maximumChangeBasisPoints: Int
+  rounding: String
+  priority: Int
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input PricingRuleWhereUniqueInput {
+  id: ID
+}
+
+input PricingRuleWhereInput {
+  AND: [PricingRuleWhereInput!]
+  OR: [PricingRuleWhereInput!]
+  NOT: [PricingRuleWhereInput!]
+  id: IDFilter
+  name: StringFilter
+  active: BooleanFilter
+  appliesTo: StringNullableFilter
+  condition: StringNullableFilter
+  basis: StringNullableFilter
+  percentBasisPoints: IntFilter
+  minimumMinor: IntNullableFilter
+  maximumChangeBasisPoints: IntNullableFilter
+  rounding: StringNullableFilter
+  priority: IntNullableFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+}
+
+input PricingRuleOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+  active: OrderDirection
+  appliesTo: OrderDirection
+  condition: OrderDirection
+  basis: OrderDirection
+  percentBasisPoints: OrderDirection
+  minimumMinor: OrderDirection
+  maximumChangeBasisPoints: OrderDirection
+  rounding: OrderDirection
+  priority: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input PricingRuleUpdateInput {
+  name: String
+  active: Boolean
+  appliesTo: String
+  condition: String
+  basis: String
+  percentBasisPoints: Int
+  minimumMinor: Int
+  maximumChangeBasisPoints: Int
+  rounding: String
+  priority: Int
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input PricingRuleUpdateArgs {
+  where: PricingRuleWhereUniqueInput!
+  data: PricingRuleUpdateInput!
+}
+
+input PricingRuleCreateInput {
+  name: String
+  active: Boolean
+  appliesTo: String
+  condition: String
+  basis: String
+  percentBasisPoints: Int
+  minimumMinor: Int
+  maximumChangeBasisPoints: Int
+  rounding: String
+  priority: Int
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -4819,6 +5183,11 @@ type WishlistItem {
   user: User
   catalogItem: CatalogItem
   listing: Listing
+  cardFinish: String
+  minimumCondition: String
+  maxPriceMinor: Int
+  quantity: Int
+  notifyWhenInStock: Boolean
   notes: String
   createdAt: DateTime
   updatedAt: DateTime
@@ -4836,6 +5205,11 @@ input WishlistItemWhereInput {
   user: UserWhereInput
   catalogItem: CatalogItemWhereInput
   listing: ListingWhereInput
+  cardFinish: StringNullableFilter
+  minimumCondition: StringNullableFilter
+  maxPriceMinor: IntNullableFilter
+  quantity: IntNullableFilter
+  notifyWhenInStock: BooleanFilter
   notes: StringFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
@@ -4843,6 +5217,11 @@ input WishlistItemWhereInput {
 
 input WishlistItemOrderByInput {
   id: OrderDirection
+  cardFinish: OrderDirection
+  minimumCondition: OrderDirection
+  maxPriceMinor: OrderDirection
+  quantity: OrderDirection
+  notifyWhenInStock: OrderDirection
   notes: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
@@ -4852,6 +5231,11 @@ input WishlistItemUpdateInput {
   user: UserRelateToOneForUpdateInput
   catalogItem: CatalogItemRelateToOneForUpdateInput
   listing: ListingRelateToOneForUpdateInput
+  cardFinish: String
+  minimumCondition: String
+  maxPriceMinor: Int
+  quantity: Int
+  notifyWhenInStock: Boolean
   notes: String
   createdAt: DateTime
   updatedAt: DateTime
@@ -4866,9 +5250,185 @@ input WishlistItemCreateInput {
   user: UserRelateToOneForCreateInput
   catalogItem: CatalogItemRelateToOneForCreateInput
   listing: ListingRelateToOneForCreateInput
+  cardFinish: String
+  minimumCondition: String
+  maxPriceMinor: Int
+  quantity: Int
+  notifyWhenInStock: Boolean
   notes: String
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+type Binder {
+  id: ID!
+  user: User
+  name: String
+  cards(where: BinderCardWhereInput! = {}, orderBy: [BinderCardOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: BinderCardWhereUniqueInput): [BinderCard!]
+  cardsCount(where: BinderCardWhereInput! = {}): Int
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input BinderWhereUniqueInput {
+  id: ID
+}
+
+input BinderWhereInput {
+  AND: [BinderWhereInput!]
+  OR: [BinderWhereInput!]
+  NOT: [BinderWhereInput!]
+  id: IDFilter
+  user: UserWhereInput
+  name: StringFilter
+  cards: BinderCardManyRelationFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+}
+
+input BinderCardManyRelationFilter {
+  every: BinderCardWhereInput
+  some: BinderCardWhereInput
+  none: BinderCardWhereInput
+}
+
+input BinderOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input BinderUpdateInput {
+  user: UserRelateToOneForUpdateInput
+  name: String
+  cards: BinderCardRelateToManyForUpdateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input BinderCardRelateToManyForUpdateInput {
+  disconnect: [BinderCardWhereUniqueInput!]
+  set: [BinderCardWhereUniqueInput!]
+  create: [BinderCardCreateInput!]
+  connect: [BinderCardWhereUniqueInput!]
+}
+
+input BinderUpdateArgs {
+  where: BinderWhereUniqueInput!
+  data: BinderUpdateInput!
+}
+
+input BinderCreateInput {
+  user: UserRelateToOneForCreateInput
+  name: String
+  cards: BinderCardRelateToManyForCreateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input BinderCardRelateToManyForCreateInput {
+  create: [BinderCardCreateInput!]
+  connect: [BinderCardWhereUniqueInput!]
+}
+
+type BinderCard {
+  id: ID!
+  binder: Binder
+  catalogItem: CatalogItem
+  cardFinish: String
+  cardCondition: String
+  cardLanguage: String
+  grade: String
+  quantity: Int
+  costBasisMinor: Int
+  acquiredAt: DateTime
+  notes: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input BinderCardWhereUniqueInput {
+  id: ID
+}
+
+input BinderCardWhereInput {
+  AND: [BinderCardWhereInput!]
+  OR: [BinderCardWhereInput!]
+  NOT: [BinderCardWhereInput!]
+  id: IDFilter
+  binder: BinderWhereInput
+  catalogItem: CatalogItemWhereInput
+  cardFinish: StringNullableFilter
+  cardCondition: StringNullableFilter
+  cardLanguage: StringNullableFilter
+  grade: StringFilter
+  quantity: IntNullableFilter
+  costBasisMinor: IntNullableFilter
+  acquiredAt: DateTimeNullableFilter
+  notes: StringFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+}
+
+input BinderCardOrderByInput {
+  id: OrderDirection
+  cardFinish: OrderDirection
+  cardCondition: OrderDirection
+  cardLanguage: OrderDirection
+  grade: OrderDirection
+  quantity: OrderDirection
+  costBasisMinor: OrderDirection
+  acquiredAt: OrderDirection
+  notes: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input BinderCardUpdateInput {
+  binder: BinderRelateToOneForUpdateInput
+  catalogItem: CatalogItemRelateToOneForUpdateInput
+  cardFinish: String
+  cardCondition: String
+  cardLanguage: String
+  grade: String
+  quantity: Int
+  costBasisMinor: Int
+  acquiredAt: DateTime
+  notes: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input BinderRelateToOneForUpdateInput {
+  create: BinderCreateInput
+  connect: BinderWhereUniqueInput
+  disconnect: Boolean
+}
+
+input BinderCardUpdateArgs {
+  where: BinderCardWhereUniqueInput!
+  data: BinderCardUpdateInput!
+}
+
+input BinderCardCreateInput {
+  binder: BinderRelateToOneForCreateInput
+  catalogItem: CatalogItemRelateToOneForCreateInput
+  cardFinish: String
+  cardCondition: String
+  cardLanguage: String
+  grade: String
+  quantity: Int
+  costBasisMinor: Int
+  acquiredAt: DateTime
+  notes: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input BinderRelateToOneForCreateInput {
+  create: BinderCreateInput
+  connect: BinderWhereUniqueInput
 }
 
 type Buylist {
@@ -4877,6 +5437,11 @@ type Buylist {
   name: String
   status: String
   currencyCode: String
+  cashPercentBasisPoints: Int
+  creditPercentBasisPoints: Int
+  conditionBasisPoints: JSON
+  minimumOfferMinor: Int
+  publicNotes: String
   entries(where: BuylistEntryWhereInput! = {}, orderBy: [BuylistEntryOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: BuylistEntryWhereUniqueInput): [BuylistEntry!]
   entriesCount(where: BuylistEntryWhereInput! = {}): Int
   createdAt: DateTime
@@ -4896,6 +5461,10 @@ input BuylistWhereInput {
   name: StringFilter
   status: StringNullableFilter
   currencyCode: StringFilter
+  cashPercentBasisPoints: IntNullableFilter
+  creditPercentBasisPoints: IntNullableFilter
+  minimumOfferMinor: IntNullableFilter
+  publicNotes: StringFilter
   entries: BuylistEntryManyRelationFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
@@ -4912,6 +5481,10 @@ input BuylistOrderByInput {
   name: OrderDirection
   status: OrderDirection
   currencyCode: OrderDirection
+  cashPercentBasisPoints: OrderDirection
+  creditPercentBasisPoints: OrderDirection
+  minimumOfferMinor: OrderDirection
+  publicNotes: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
 }
@@ -4921,6 +5494,11 @@ input BuylistUpdateInput {
   name: String
   status: String
   currencyCode: String
+  cashPercentBasisPoints: Int
+  creditPercentBasisPoints: Int
+  conditionBasisPoints: JSON
+  minimumOfferMinor: Int
+  publicNotes: String
   entries: BuylistEntryRelateToManyForUpdateInput
   createdAt: DateTime
   updatedAt: DateTime
@@ -4943,6 +5521,11 @@ input BuylistCreateInput {
   name: String
   status: String
   currencyCode: String
+  cashPercentBasisPoints: Int
+  creditPercentBasisPoints: Int
+  conditionBasisPoints: JSON
+  minimumOfferMinor: Int
+  publicNotes: String
   entries: BuylistEntryRelateToManyForCreateInput
   createdAt: DateTime
   updatedAt: DateTime
@@ -4957,9 +5540,15 @@ type BuylistEntry {
   id: ID!
   buylist: Buylist
   catalogItem: CatalogItem
+  cardFinish: String
+  minimumCondition: String
+  pricingMode: String
   criteria: JSON
   offerAmountMinor: Int
+  creditOfferMinor: Int
+  hotlist: Boolean
   maximumQuantity: Int
+  quantityBought: Int
   active: String
   createdAt: DateTime
   updatedAt: DateTime
@@ -4976,8 +5565,14 @@ input BuylistEntryWhereInput {
   id: IDFilter
   buylist: BuylistWhereInput
   catalogItem: CatalogItemWhereInput
+  cardFinish: StringNullableFilter
+  minimumCondition: StringNullableFilter
+  pricingMode: StringNullableFilter
   offerAmountMinor: IntFilter
+  creditOfferMinor: IntNullableFilter
+  hotlist: BooleanFilter
   maximumQuantity: IntNullableFilter
+  quantityBought: IntNullableFilter
   active: StringNullableFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
@@ -4985,8 +5580,14 @@ input BuylistEntryWhereInput {
 
 input BuylistEntryOrderByInput {
   id: OrderDirection
+  cardFinish: OrderDirection
+  minimumCondition: OrderDirection
+  pricingMode: OrderDirection
   offerAmountMinor: OrderDirection
+  creditOfferMinor: OrderDirection
+  hotlist: OrderDirection
   maximumQuantity: OrderDirection
+  quantityBought: OrderDirection
   active: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
@@ -4995,9 +5596,15 @@ input BuylistEntryOrderByInput {
 input BuylistEntryUpdateInput {
   buylist: BuylistRelateToOneForUpdateInput
   catalogItem: CatalogItemRelateToOneForUpdateInput
+  cardFinish: String
+  minimumCondition: String
+  pricingMode: String
   criteria: JSON
   offerAmountMinor: Int
+  creditOfferMinor: Int
+  hotlist: Boolean
   maximumQuantity: Int
+  quantityBought: Int
   active: String
   createdAt: DateTime
   updatedAt: DateTime
@@ -5017,9 +5624,15 @@ input BuylistEntryUpdateArgs {
 input BuylistEntryCreateInput {
   buylist: BuylistRelateToOneForCreateInput
   catalogItem: CatalogItemRelateToOneForCreateInput
+  cardFinish: String
+  minimumCondition: String
+  pricingMode: String
   criteria: JSON
   offerAmountMinor: Int
+  creditOfferMinor: Int
+  hotlist: Boolean
   maximumQuantity: Int
+  quantityBought: Int
   active: String
   createdAt: DateTime
   updatedAt: DateTime
@@ -5568,9 +6181,14 @@ type TradeInItem {
   id: ID!
   submission: TradeInSubmission
   catalogItem: CatalogItem
+  buylistEntry: BuylistEntry
   specimen: Specimen
   customerDescription: String
   customerCondition: String
+  cardCondition: String
+  cardFinish: String
+  quantity: Int
+  quotedCreditMinor: Int
   inspectedConditionObservation: ConditionObservation
   quotedAmountMinor: Int
   acceptedAmountMinor: Int
@@ -5591,9 +6209,14 @@ input TradeInItemWhereInput {
   id: IDFilter
   submission: TradeInSubmissionWhereInput
   catalogItem: CatalogItemWhereInput
+  buylistEntry: BuylistEntryWhereInput
   specimen: SpecimenWhereInput
   customerDescription: StringFilter
   customerCondition: StringFilter
+  cardCondition: StringNullableFilter
+  cardFinish: StringNullableFilter
+  quantity: IntNullableFilter
+  quotedCreditMinor: IntNullableFilter
   inspectedConditionObservation: ConditionObservationWhereInput
   quotedAmountMinor: IntNullableFilter
   acceptedAmountMinor: IntNullableFilter
@@ -5606,6 +6229,10 @@ input TradeInItemOrderByInput {
   id: OrderDirection
   customerDescription: OrderDirection
   customerCondition: OrderDirection
+  cardCondition: OrderDirection
+  cardFinish: OrderDirection
+  quantity: OrderDirection
+  quotedCreditMinor: OrderDirection
   quotedAmountMinor: OrderDirection
   acceptedAmountMinor: OrderDirection
   currencyCode: OrderDirection
@@ -5616,9 +6243,14 @@ input TradeInItemOrderByInput {
 input TradeInItemUpdateInput {
   submission: TradeInSubmissionRelateToOneForUpdateInput
   catalogItem: CatalogItemRelateToOneForUpdateInput
+  buylistEntry: BuylistEntryRelateToOneForUpdateInput
   specimen: SpecimenRelateToOneForUpdateInput
   customerDescription: String
   customerCondition: String
+  cardCondition: String
+  cardFinish: String
+  quantity: Int
+  quotedCreditMinor: Int
   inspectedConditionObservation: ConditionObservationRelateToOneForUpdateInput
   quotedAmountMinor: Int
   acceptedAmountMinor: Int
@@ -5631,6 +6263,12 @@ input TradeInItemUpdateInput {
 input TradeInSubmissionRelateToOneForUpdateInput {
   create: TradeInSubmissionCreateInput
   connect: TradeInSubmissionWhereUniqueInput
+  disconnect: Boolean
+}
+
+input BuylistEntryRelateToOneForUpdateInput {
+  create: BuylistEntryCreateInput
+  connect: BuylistEntryWhereUniqueInput
   disconnect: Boolean
 }
 
@@ -5648,9 +6286,14 @@ input TradeInItemUpdateArgs {
 input TradeInItemCreateInput {
   submission: TradeInSubmissionRelateToOneForCreateInput
   catalogItem: CatalogItemRelateToOneForCreateInput
+  buylistEntry: BuylistEntryRelateToOneForCreateInput
   specimen: SpecimenRelateToOneForCreateInput
   customerDescription: String
   customerCondition: String
+  cardCondition: String
+  cardFinish: String
+  quantity: Int
+  quotedCreditMinor: Int
   inspectedConditionObservation: ConditionObservationRelateToOneForCreateInput
   quotedAmountMinor: Int
   acceptedAmountMinor: Int
@@ -5663,6 +6306,11 @@ input TradeInItemCreateInput {
 input TradeInSubmissionRelateToOneForCreateInput {
   create: TradeInSubmissionCreateInput
   connect: TradeInSubmissionWhereUniqueInput
+}
+
+input BuylistEntryRelateToOneForCreateInput {
+  create: BuylistEntryCreateInput
+  connect: BuylistEntryWhereUniqueInput
 }
 
 input ConditionObservationRelateToOneForCreateInput {
@@ -7078,12 +7726,6 @@ input CustomerGroupManyRelationFilter {
   none: CustomerGroupWhereInput
 }
 
-input ProductManyRelationFilter {
-  every: ProductWhereInput
-  some: ProductWhereInput
-  none: ProductWhereInput
-}
-
 input ProductCollectionManyRelationFilter {
   every: ProductCollectionWhereInput
   some: ProductCollectionWhereInput
@@ -7138,13 +7780,6 @@ input CustomerGroupRelateToManyForUpdateInput {
   connect: [CustomerGroupWhereUniqueInput!]
 }
 
-input ProductRelateToManyForUpdateInput {
-  disconnect: [ProductWhereUniqueInput!]
-  set: [ProductWhereUniqueInput!]
-  create: [ProductCreateInput!]
-  connect: [ProductWhereUniqueInput!]
-}
-
 input ProductCollectionRelateToManyForUpdateInput {
   disconnect: [ProductCollectionWhereUniqueInput!]
   set: [ProductCollectionWhereUniqueInput!]
@@ -7196,11 +7831,6 @@ input DiscountConditionCreateInput {
 input CustomerGroupRelateToManyForCreateInput {
   create: [CustomerGroupCreateInput!]
   connect: [CustomerGroupWhereUniqueInput!]
-}
-
-input ProductRelateToManyForCreateInput {
-  create: [ProductCreateInput!]
-  connect: [ProductWhereUniqueInput!]
 }
 
 input ProductCollectionRelateToManyForCreateInput {
@@ -10648,6 +11278,7 @@ type Product {
   discountable: Boolean
   status: ProductStatusType
   externalId: String
+  catalogItem: CatalogItem
   productCollections(where: ProductCollectionWhereInput! = {}, orderBy: [ProductCollectionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ProductCollectionWhereUniqueInput): [ProductCollection!]
   productCollectionsCount(where: ProductCollectionWhereInput! = {}): Int
   productCategories(where: ProductCategoryWhereInput! = {}, orderBy: [ProductCategoryOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ProductCategoryWhereUniqueInput): [ProductCategory!]
@@ -10700,6 +11331,7 @@ input ProductWhereInput {
   discountable: BooleanFilter
   status: ProductStatusTypeNullableFilter
   externalId: StringFilter
+  catalogItem: CatalogItemWhereInput
   productCollections: ProductCollectionManyRelationFilter
   productCategories: ProductCategoryManyRelationFilter
   shippingProfile: ShippingProfileWhereInput
@@ -10769,6 +11401,7 @@ input ProductUpdateInput {
   discountable: Boolean
   status: ProductStatusType
   externalId: String
+  catalogItem: CatalogItemRelateToOneForUpdateInput
   productCollections: ProductCollectionRelateToManyForUpdateInput
   productCategories: ProductCategoryRelateToManyForUpdateInput
   shippingProfile: ShippingProfileRelateToOneForUpdateInput
@@ -10839,6 +11472,7 @@ input ProductCreateInput {
   discountable: Boolean
   status: ProductStatusType
   externalId: String
+  catalogItem: CatalogItemRelateToOneForCreateInput
   productCollections: ProductCollectionRelateToManyForCreateInput
   productCategories: ProductCategoryRelateToManyForCreateInput
   shippingProfile: ShippingProfileRelateToOneForCreateInput
@@ -11394,6 +12028,15 @@ type ProductVariant {
   fullTitle: String
   title: String
   sku: String
+  stockKind: String
+  cardCondition: String
+  cardFinish: String
+  cardLanguage: String
+  pricingMode: String
+  lastRepricedAt: DateTime
+  preorder: Boolean
+  preorderReleaseDate: DateTime
+  preorderLimitPerCustomer: Int
   barcode: String
   ean: String
   upc: String
@@ -11438,6 +12081,15 @@ input ProductVariantWhereInput {
   id: IDFilter
   title: StringFilter
   sku: StringFilter
+  stockKind: StringNullableFilter
+  cardCondition: StringNullableFilter
+  cardFinish: StringNullableFilter
+  cardLanguage: StringNullableFilter
+  pricingMode: StringNullableFilter
+  lastRepricedAt: DateTimeNullableFilter
+  preorder: BooleanFilter
+  preorderReleaseDate: DateTimeNullableFilter
+  preorderLimitPerCustomer: IntNullableFilter
   barcode: StringFilter
   ean: StringFilter
   upc: StringFilter
@@ -11479,6 +12131,15 @@ input ProductVariantOrderByInput {
   id: OrderDirection
   title: OrderDirection
   sku: OrderDirection
+  stockKind: OrderDirection
+  cardCondition: OrderDirection
+  cardFinish: OrderDirection
+  cardLanguage: OrderDirection
+  pricingMode: OrderDirection
+  lastRepricedAt: OrderDirection
+  preorder: OrderDirection
+  preorderReleaseDate: OrderDirection
+  preorderLimitPerCustomer: OrderDirection
   barcode: OrderDirection
   ean: OrderDirection
   upc: OrderDirection
@@ -11497,6 +12158,15 @@ input ProductVariantOrderByInput {
 input ProductVariantUpdateInput {
   title: String
   sku: String
+  stockKind: String
+  cardCondition: String
+  cardFinish: String
+  cardLanguage: String
+  pricingMode: String
+  lastRepricedAt: DateTime
+  preorder: Boolean
+  preorderReleaseDate: DateTime
+  preorderLimitPerCustomer: Int
   barcode: String
   ean: String
   upc: String
@@ -11557,6 +12227,15 @@ input ProductVariantUpdateArgs {
 input ProductVariantCreateInput {
   title: String
   sku: String
+  stockKind: String
+  cardCondition: String
+  cardFinish: String
+  cardLanguage: String
+  pricingMode: String
+  lastRepricedAt: DateTime
+  preorder: Boolean
+  preorderReleaseDate: DateTime
+  preorderLimitPerCustomer: Int
   barcode: String
   ean: String
   upc: String
@@ -14463,6 +15142,18 @@ type Mutation {
   updateFranchises(data: [FranchiseUpdateArgs!]!): [Franchise]
   deleteFranchise(where: FranchiseWhereUniqueInput!): Franchise
   deleteFranchises(where: [FranchiseWhereUniqueInput!]!): [Franchise]
+  createMarketPrice(data: MarketPriceCreateInput!): MarketPrice
+  createMarketPrices(data: [MarketPriceCreateInput!]!): [MarketPrice]
+  updateMarketPrice(where: MarketPriceWhereUniqueInput!, data: MarketPriceUpdateInput!): MarketPrice
+  updateMarketPrices(data: [MarketPriceUpdateArgs!]!): [MarketPrice]
+  deleteMarketPrice(where: MarketPriceWhereUniqueInput!): MarketPrice
+  deleteMarketPrices(where: [MarketPriceWhereUniqueInput!]!): [MarketPrice]
+  createPricingRule(data: PricingRuleCreateInput!): PricingRule
+  createPricingRules(data: [PricingRuleCreateInput!]!): [PricingRule]
+  updatePricingRule(where: PricingRuleWhereUniqueInput!, data: PricingRuleUpdateInput!): PricingRule
+  updatePricingRules(data: [PricingRuleUpdateArgs!]!): [PricingRule]
+  deletePricingRule(where: PricingRuleWhereUniqueInput!): PricingRule
+  deletePricingRules(where: [PricingRuleWhereUniqueInput!]!): [PricingRule]
   createSpecimen(data: SpecimenCreateInput!): Specimen
   createSpecimens(data: [SpecimenCreateInput!]!): [Specimen]
   updateSpecimen(where: SpecimenWhereUniqueInput!, data: SpecimenUpdateInput!): Specimen
@@ -14577,6 +15268,18 @@ type Mutation {
   updateWishlistItems(data: [WishlistItemUpdateArgs!]!): [WishlistItem]
   deleteWishlistItem(where: WishlistItemWhereUniqueInput!): WishlistItem
   deleteWishlistItems(where: [WishlistItemWhereUniqueInput!]!): [WishlistItem]
+  createBinder(data: BinderCreateInput!): Binder
+  createBinders(data: [BinderCreateInput!]!): [Binder]
+  updateBinder(where: BinderWhereUniqueInput!, data: BinderUpdateInput!): Binder
+  updateBinders(data: [BinderUpdateArgs!]!): [Binder]
+  deleteBinder(where: BinderWhereUniqueInput!): Binder
+  deleteBinders(where: [BinderWhereUniqueInput!]!): [Binder]
+  createBinderCard(data: BinderCardCreateInput!): BinderCard
+  createBinderCards(data: [BinderCardCreateInput!]!): [BinderCard]
+  updateBinderCard(where: BinderCardWhereUniqueInput!, data: BinderCardUpdateInput!): BinderCard
+  updateBinderCards(data: [BinderCardUpdateArgs!]!): [BinderCard]
+  deleteBinderCard(where: BinderCardWhereUniqueInput!): BinderCard
+  deleteBinderCards(where: [BinderCardWhereUniqueInput!]!): [BinderCard]
   createBuylist(data: BuylistCreateInput!): Buylist
   createBuylists(data: [BuylistCreateInput!]!): [Buylist]
   updateBuylist(where: BuylistWhereUniqueInput!, data: BuylistUpdateInput!): Buylist
@@ -15179,6 +15882,12 @@ type Mutation {
   submitCollectibleOffer(listingId: ID!, amountMinor: Int!, expiresAt: String!, message: String, idempotencyKey: String!): Offer!
   toggleWishlistListing(listingId: ID!): JSON!
   submitTradeIn(input: JSON!): JSON!
+  importCardCatalog(input: JSON!): JSON!
+  refreshMarketPrices(input: JSON): JSON!
+  repriceInventory(input: JSON): JSON!
+  addToBinder(input: JSON!): JSON!
+  removeFromBinder(binderCardId: ID!): JSON!
+  toggleWantList(input: JSON!): JSON!
 }
 
 union UserAuthenticationWithPasswordResult = UserAuthenticationWithPasswordSuccess | UserAuthenticationWithPasswordFailure
@@ -15270,6 +15979,12 @@ type Query {
   franchise(where: FranchiseWhereUniqueInput!): Franchise
   franchises(where: FranchiseWhereInput! = {}, orderBy: [FranchiseOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: FranchiseWhereUniqueInput): [Franchise!]
   franchisesCount(where: FranchiseWhereInput! = {}): Int
+  marketPrice(where: MarketPriceWhereUniqueInput!): MarketPrice
+  marketPrices(where: MarketPriceWhereInput! = {}, orderBy: [MarketPriceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: MarketPriceWhereUniqueInput): [MarketPrice!]
+  marketPricesCount(where: MarketPriceWhereInput! = {}): Int
+  pricingRule(where: PricingRuleWhereUniqueInput!): PricingRule
+  pricingRules(where: PricingRuleWhereInput! = {}, orderBy: [PricingRuleOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PricingRuleWhereUniqueInput): [PricingRule!]
+  pricingRulesCount(where: PricingRuleWhereInput! = {}): Int
   specimen(where: SpecimenWhereUniqueInput!): Specimen
   specimens(where: SpecimenWhereInput! = {}, orderBy: [SpecimenOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SpecimenWhereUniqueInput): [Specimen!]
   specimensCount(where: SpecimenWhereInput! = {}): Int
@@ -15327,6 +16042,12 @@ type Query {
   wishlistItem(where: WishlistItemWhereUniqueInput!): WishlistItem
   wishlistItems(where: WishlistItemWhereInput! = {}, orderBy: [WishlistItemOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: WishlistItemWhereUniqueInput): [WishlistItem!]
   wishlistItemsCount(where: WishlistItemWhereInput! = {}): Int
+  binder(where: BinderWhereUniqueInput!): Binder
+  binders(where: BinderWhereInput! = {}, orderBy: [BinderOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: BinderWhereUniqueInput): [Binder!]
+  bindersCount(where: BinderWhereInput! = {}): Int
+  binderCard(where: BinderCardWhereUniqueInput!): BinderCard
+  binderCards(where: BinderCardWhereInput! = {}, orderBy: [BinderCardOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: BinderCardWhereUniqueInput): [BinderCard!]
+  binderCardsCount(where: BinderCardWhereInput! = {}): Int
   buylist(where: BuylistWhereUniqueInput!): Buylist
   buylists(where: BuylistWhereInput! = {}, orderBy: [BuylistOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: BuylistWhereUniqueInput): [Buylist!]
   buylistsCount(where: BuylistWhereInput! = {}): Int
@@ -15628,6 +16349,11 @@ type Query {
   activeWishlist: JSON!
   publicBuylist: JSON!
   activeTradeIns: JSON!
+  publicCardSets(currencyCode: String): JSON!
+  publicSetChecklist(handle: String!, currencyCode: String): JSON
+  publicCardMarket(catalogItemId: ID!): JSON
+  activeBinder: JSON!
+  activeWantList(currencyCode: String): JSON!
 }
 
 union AuthenticatedItem = User

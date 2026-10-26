@@ -3,9 +3,9 @@ import { LOGO_ICONS } from "@/features/platform/store-settings/lib/icon-registry
 // Untitled UI marks are drawn in #155eef (hue 221) and tinted with hue-rotate.
 const REGISTRY_BASE_HUE = 221
 
-// Collectibles' default mark: Kintsugi from the Store Settings registry, rotated to bronze.
-export const COLLECTIBLES_LOGO_ICON_ID = "kintsugi"
-export const COLLECTIBLES_LOGO_COLOR = "165"
+// Collectibles' default mark: Boltshift from the Store Settings registry, rotated to card-border yellow.
+export const COLLECTIBLES_LOGO_ICON_ID = "boltshift"
+export const COLLECTIBLES_LOGO_COLOR = "189"
 export const COLLECTIBLES_LOGO_ICON =
   LOGO_ICONS.find((icon) => icon.id === COLLECTIBLES_LOGO_ICON_ID)?.lightSvg ?? LOGO_ICONS[0].lightSvg
 

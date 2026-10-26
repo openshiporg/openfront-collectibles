@@ -45,10 +45,10 @@ export default async function Nav() {
           <ul className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
             <li>
               <LocalizedClientLink
-                href="/store"
+                href="/sets"
                 className="inline-flex min-h-10 items-center rounded-[2px] px-3 font-cx-display text-[16px] font-bold text-cx-ink hover:bg-cx-vault-2"
               >
-                All items
+                Sets
               </LocalizedClientLink>
             </li>
             {shown.map((c) => (
@@ -61,6 +61,17 @@ export default async function Nav() {
                 </LocalizedClientLink>
               </li>
             ))}
+            {collectionLinks.some((c) => c.href.endsWith('-pre-orders')) && (
+              <li>
+                <LocalizedClientLink
+                  href={collectionLinks.find((c) => c.href.endsWith('-pre-orders'))!.href}
+                  className="inline-flex min-h-10 items-center gap-1.5 rounded-[2px] px-3 font-cx-display text-[16px] font-semibold text-cx-ink-2 hover:bg-cx-vault-2 hover:text-cx-ink"
+                >
+                  <span className="size-2 bg-cx-accent" aria-hidden="true" />
+                  Pre-orders
+                </LocalizedClientLink>
+              </li>
+            )}
             {overflow.length > 0 && (
               <li className="relative">
                 <details className="group/more">
@@ -96,7 +107,7 @@ export default async function Nav() {
               href="/trade-in"
               data-testid="nav-trade-in-link"
             >
-              Trade in
+              Sell to us
             </LocalizedClientLink>
             <LocalizedClientLink
               className="hidden min-h-11 items-center rounded-[2px] px-3 font-cx-display text-[16px] font-semibold text-cx-ink-2 hover:text-cx-ink lg:inline-flex"

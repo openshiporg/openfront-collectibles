@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../features/storefront/components/cards/cards.css";
 
 @theme inline {
   --color-background: var(--sf-background, oklch(100% 0 0));
@@ -39,82 +40,82 @@
   }
 }
 
-/* Collectibles storefront: "black-page stock book". See .impeccable/surfaces/features-storefront.md.
-   The page is a collector's stock book: black album pages, paper-white ink,
-   specimens held in clear glassine strips, the cover's buckram cloth (in the
-   store's logo hue) for the header band, slab band and footer, and gilt from the
-   same hue as the one accent. Rokkitt (slab) for stamped labels, numbers and
-   display; Literata for everything read.
+/* Collectibles storefront: the set checklist. See .impeccable/surfaces/features-storefront.md.
+   Every set is a printed numbered sheet on black card stock: paper-white rows on hairline
+   rules, a square tick box as the one control shape, and card-border yellow (the store's
+   logo hue) as the only ink accent. Archivo throughout: condensed cut for numbers and stamps.
    --cx-h is set per store from the saved logo colour on the .cx-sf wrapper. */
 @theme inline {
-  --color-cx-bg: oklch(14.5% 0.006 60);
-  --color-cx-surface: oklch(19.5% 0.008 60);
-  --color-cx-well: oklch(11.5% 0.005 60);
-  --color-cx-ink: oklch(94.5% 0.012 85);
-  --color-cx-ink-2: oklch(80% 0.012 80);
-  --color-cx-ink-3: oklch(66% 0.012 80);
-  --color-cx-line: oklch(30% 0.01 60);
-  --color-cx-vault: hsl(var(--cx-h, 26) 34% 15%);
-  --color-cx-vault-2: hsl(var(--cx-h, 26) 30% 24%);
-  --color-cx-accent: hsl(var(--cx-h, 26) 58% 66%);
-  --color-cx-accent-soft: hsl(var(--cx-h, 26) 62% 76%);
-  --color-cx-tint: hsl(var(--cx-h, 26) 26% 17%);
-  --color-cx-danger: oklch(71% 0.17 25);
-  --color-cx-ok: oklch(78% 0.14 150);
-  --color-cx-warn: oklch(82% 0.13 75);
-  --font-cx: var(--cx-font-sans), ui-serif, Georgia, serif;
-  --font-cx-serif: var(--cx-font-serif), ui-serif, Georgia, serif;
-  --font-cx-mono: var(--cx-font-display), ui-serif, Georgia, serif;
-  --font-cx-display: var(--cx-font-display), ui-serif, Georgia, serif;
+  --color-cx-bg: oklch(15% 0.012 265);
+  --color-cx-surface: oklch(19.5% 0.014 265);
+  --color-cx-well: oklch(11.5% 0.01 265);
+  --color-cx-ink: oklch(95.5% 0.006 95);
+  --color-cx-ink-2: oklch(81% 0.01 95);
+  --color-cx-ink-3: oklch(68% 0.012 265);
+  --color-cx-line: oklch(30% 0.014 265);
+  --color-cx-vault: oklch(11.5% 0.01 265);
+  --color-cx-vault-2: oklch(22% 0.014 265);
+  --color-cx-accent: hsl(var(--cx-h, 50) 92% 60%);
+  --color-cx-accent-soft: hsl(var(--cx-h, 50) 95% 72%);
+  --color-cx-tint: hsl(var(--cx-h, 50) 35% 14%);
+  --color-cx-danger: oklch(72% 0.17 27);
+  --color-cx-ok: oklch(80% 0.15 150);
+  --color-cx-warn: oklch(84% 0.14 80);
+  --font-cx: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-cx-serif: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-cx-mono: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-cx-display: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
   .cx-sf {
     --cx-font-serif: var(--cx-font-sans);
-    --sf-background: oklch(14.5% 0.006 60);
-    --sf-foreground: oklch(94.5% 0.012 85);
-    --sf-card: oklch(19.5% 0.008 60);
-    --sf-card-foreground: oklch(94.5% 0.012 85);
-    --sf-popover: oklch(19.5% 0.008 60);
-    --sf-popover-foreground: oklch(94.5% 0.012 85);
-    --sf-primary: oklch(94.5% 0.012 85);
-    --sf-primary-foreground: oklch(14.5% 0.006 60);
-    --sf-secondary: oklch(23% 0.008 60);
-    --sf-secondary-foreground: oklch(94.5% 0.012 85);
-    --sf-muted: oklch(23% 0.008 60);
-    --sf-muted-foreground: oklch(80% 0.012 80);
-    --sf-accent: oklch(23% 0.008 60);
-    --sf-accent-foreground: oklch(94.5% 0.012 85);
-    --sf-border: oklch(30% 0.01 60);
-    --sf-input: oklch(34% 0.01 60);
-    --sf-ring: hsl(var(--cx-h, 26) 58% 66%);
-    background-color: oklch(14.5% 0.006 60);
-    color: oklch(94.5% 0.012 85);
+    --cx-font-display: var(--cx-font-sans);
+    --sf-background: oklch(15% 0.012 265);
+    --sf-foreground: oklch(95.5% 0.006 95);
+    --sf-card: oklch(19.5% 0.014 265);
+    --sf-card-foreground: oklch(95.5% 0.006 95);
+    --sf-popover: oklch(19.5% 0.014 265);
+    --sf-popover-foreground: oklch(95.5% 0.006 95);
+    --sf-primary: oklch(95.5% 0.006 95);
+    --sf-primary-foreground: oklch(15% 0.012 265);
+    --sf-secondary: oklch(22% 0.014 265);
+    --sf-secondary-foreground: oklch(95.5% 0.006 95);
+    --sf-muted: oklch(22% 0.014 265);
+    --sf-muted-foreground: oklch(81% 0.01 95);
+    --sf-accent: oklch(22% 0.014 265);
+    --sf-accent-foreground: oklch(95.5% 0.006 95);
+    --sf-border: oklch(30% 0.014 265);
+    --sf-input: oklch(34% 0.014 265);
+    --sf-ring: hsl(var(--cx-h, 50) 92% 60%);
+    background-color: oklch(15% 0.012 265);
+    color: oklch(95.5% 0.006 95);
     color-scheme: dark;
-    font-family: var(--cx-font-sans), ui-serif, Georgia, serif;
+    font-family: var(--cx-font-sans), ui-sans-serif, system-ui, sans-serif;
   }
   .cx-sf ::selection {
-    background: hsl(var(--cx-h, 26) 58% 66%);
-    color: oklch(14.5% 0.006 60);
+    background: hsl(var(--cx-h, 50) 92% 60%);
+    color: oklch(15% 0.012 265);
   }
 
   /* Stamped numbers: references, grades, counts and prices. */
   .cx-sf .cx-num,
   .cx-sf .font-cx-mono {
-    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    font-family: var(--cx-font-display), ui-sans-serif, system-ui, sans-serif;
     font-variant-numeric: tabular-nums lining-nums;
+    font-stretch: 87.5%;
     font-weight: 600;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
   }
 
   .cx-sf .font-cx-serif {
-    font-family: var(--cx-font-serif), ui-serif, Georgia, serif;
+    font-family: var(--cx-font-serif), ui-sans-serif, system-ui, sans-serif;
     font-optical-sizing: auto;
   }
   .cx-sf .font-cx-display {
-    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    font-family: var(--cx-font-display), ui-sans-serif, system-ui, sans-serif;
     font-weight: 800;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 }
 
@@ -137,27 +138,27 @@
     gap: 6px;
     padding: 0 14px;
     border-radius: 2px;
-    background: oklch(19.5% 0.008 60);
-    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    background: oklch(19.5% 0.014 265);
+    font-family: var(--cx-font-display), ui-sans-serif, system-ui, sans-serif;
     font-size: 15px;
     font-weight: 600;
-    color: oklch(80% 0.012 80);
+    color: oklch(81% 0.01 95);
     white-space: nowrap;
     transition: background-color 160ms cubic-bezier(0.23, 1, 0.32, 1), color 160ms cubic-bezier(0.23, 1, 0.32, 1), transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
   }
   .cx-pill:active { transform: scale(0.97); }
   @media (hover: hover) and (pointer: fine) {
-    .cx-pill:hover { color: oklch(94.5% 0.012 85); background: oklch(23% 0.008 60); }
+    .cx-pill:hover { color: oklch(95.5% 0.006 95); background: oklch(22% 0.014 265); }
   }
   .cx-pill[data-active="true"],
   .cx-pill[data-active="true"]:hover {
-    background: hsl(var(--cx-h, 26) 58% 66%);
-    color: oklch(14.5% 0.006 60);
+    background: hsl(var(--cx-h, 50) 92% 60%);
+    color: oklch(15% 0.012 265);
   }
   .cx-pill[data-active="true"]:disabled { cursor: default; }
   .cx-pill:disabled,
-  .cx-pill[aria-disabled="true"] { color: oklch(52% 0.01 80); text-decoration: line-through; cursor: not-allowed; }
-  .cx-pill:focus-visible { outline: 2px solid hsl(var(--cx-h, 26) 58% 66%); outline-offset: 2px; }
+  .cx-pill[aria-disabled="true"] { color: oklch(54% 0.012 265); text-decoration: line-through; cursor: not-allowed; }
+  .cx-pill:focus-visible { outline: 2px solid hsl(var(--cx-h, 50) 92% 60%); outline-offset: 2px; }
   @media (max-width: 639px) {
     .cx-pill { min-height: 44px; }
   }
@@ -171,25 +172,25 @@
     gap: 8px;
     padding: 0 24px;
     border-radius: 2px;
-    background: hsl(var(--cx-h, 26) 58% 66%);
-    color: oklch(14.5% 0.006 60);
-    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    background: hsl(var(--cx-h, 50) 92% 60%);
+    color: oklch(15% 0.012 265);
+    font-family: var(--cx-font-display), ui-sans-serif, system-ui, sans-serif;
     font-size: 17px;
     font-weight: 700;
     letter-spacing: 0.01em;
     transition: background-color 160ms cubic-bezier(0.23, 1, 0.32, 1), transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
   }
   @media (hover: hover) and (pointer: fine) {
-    .cx-btn:hover { background: hsl(var(--cx-h, 26) 62% 74%); }
+    .cx-btn:hover { background: hsl(var(--cx-h, 50) 95% 70%); }
   }
   .cx-btn:active { transform: scale(0.97); }
   .cx-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .cx-btn:focus-visible { outline: 2px solid hsl(var(--cx-h, 26) 58% 66%); outline-offset: 3px; }
+  .cx-btn:focus-visible { outline: 2px solid hsl(var(--cx-h, 50) 92% 60%); outline-offset: 3px; }
 
   /* A page band holding rows. */
   .cx-band {
     border-radius: 2px;
-    background: oklch(19.5% 0.008 60);
+    background: oklch(19.5% 0.014 265);
   }
 
   .cx-dot {
@@ -203,12 +204,12 @@
 
   /* Stamped field label. */
   .cx-label {
-    font-family: var(--cx-font-display), ui-serif, Georgia, serif;
+    font-family: var(--cx-font-display), ui-sans-serif, system-ui, sans-serif;
     font-size: 14px;
     line-height: 18px;
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: oklch(66% 0.012 80);
+    color: oklch(68% 0.012 265);
   }
 
   /* The glassine pocket: a clear strip across the lower part of a specimen well. */

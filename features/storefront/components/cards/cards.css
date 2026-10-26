@@ -1,0 +1,420 @@
+/* Card UI slice: the set-checklist world. Shared by the storefront (.cx-sf re-points the
+   tokens to the checklist stock) and platform pages (tokens follow the dashboard theme). */
+
+.tc {
+  --tc-bg: var(--background);
+  --tc-surface: var(--muted);
+  --tc-well: color-mix(in oklch, var(--muted) 70%, var(--background));
+  --tc-ink: var(--foreground);
+  --tc-ink-2: var(--muted-foreground);
+  --tc-ink-3: color-mix(in oklch, var(--muted-foreground) 78%, var(--background));
+  --tc-line: var(--border);
+  --tc-accent: oklch(84% 0.165 92);
+  --tc-accent-ink: oklch(22% 0.03 90);
+  --tc-accent-tint: color-mix(in oklch, oklch(84% 0.165 92) 18%, var(--background));
+  --tc-up: oklch(62% 0.15 150);
+  --tc-down: oklch(60% 0.19 27);
+  --tc-num-stretch: 87.5%;
+  --tc-ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.cx-sf .tc,
+.cx-sf.tc {
+  --tc-bg: var(--color-cx-bg);
+  --tc-surface: var(--color-cx-surface);
+  --tc-well: var(--color-cx-well);
+  --tc-ink: var(--color-cx-ink);
+  --tc-ink-2: var(--color-cx-ink-2);
+  --tc-ink-3: var(--color-cx-ink-3);
+  --tc-line: var(--color-cx-line);
+  --tc-accent: var(--color-cx-accent);
+  --tc-accent-ink: var(--color-cx-bg);
+  --tc-accent-tint: var(--color-cx-tint);
+  --tc-up: oklch(80% 0.15 150);
+  --tc-down: oklch(72% 0.17 27);
+}
+
+/* Numbers, codes, stamps: the condensed cut of the same face, tabular. */
+.tc-num {
+  font-stretch: var(--tc-num-stretch);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: 0;
+}
+.tc-stamp {
+  font-stretch: 75%;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ---- The sheet: a printed checklist ---------------------------------------------- */
+.tc-sheet { border-top: 2px solid var(--tc-ink); }
+.tc-sheet-head {
+  display: grid;
+  grid-template-columns: var(--tc-row-cols);
+  gap: 0 12px;
+  align-items: end;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--tc-line);
+  color: var(--tc-ink-3);
+  font-size: 12px;
+  line-height: 16px;
+}
+.tc-sheet {
+  --tc-action-col: 0px;
+  --tc-row-cols: 22px 52px minmax(0, 1fr) auto 84px;
+}
+.tc-sheet[data-actions="true"] { --tc-action-col: 64px; }
+@media (min-width: 768px) {
+  .tc-sheet { --tc-row-cols: 18px 52px minmax(0, 1fr) 30px 166px 76px 80px var(--tc-action-col); }
+}
+
+.tc-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--tc-row-cols);
+  grid-template-areas:
+    "tick num name name price"
+    ". meta meta run action";
+  gap: 4px 12px;
+  align-items: center;
+  min-height: 52px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--tc-line);
+  transition: background-color 160ms var(--tc-ease);
+}
+@media (min-width: 768px) {
+  .tc-row {
+    grid-template-areas: "tick num name rarity run market price action";
+    padding: 6px 0;
+    min-height: 48px;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .tc-row:hover { background: var(--tc-surface); }
+}
+.tc-row:focus-within { background: var(--tc-surface); }
+
+.tc-row > .tc-a-tick { grid-area: tick; }
+.tc-row > .tc-a-num { grid-area: num; }
+.tc-row > .tc-a-name { grid-area: name; min-width: 0; }
+.tc-row > .tc-a-rarity { grid-area: meta; display: inline-flex; align-items: center; gap: 8px; }
+.tc-row > .tc-a-run { grid-area: run; justify-self: end; }
+.tc-row > .tc-a-market { display: none; grid-area: market; text-align: right; }
+.tc-row > .tc-a-price { grid-area: price; text-align: right; }
+.tc-row > .tc-a-action { grid-area: action; justify-self: end; }
+@media (min-width: 768px) {
+  .tc-row > .tc-a-rarity { grid-area: rarity; }
+  .tc-row > .tc-a-run { justify-self: start; }
+  .tc-row > .tc-a-market { display: block; }
+}
+
+/* Sold-out rows keep their place on the sheet, struck through. */
+.tc-row[data-status="out"] .tc-a-name .tc-name { text-decoration: line-through; text-decoration-color: var(--tc-ink-3); color: var(--tc-ink-2); }
+.tc-row[data-status="none"] .tc-a-name .tc-name { color: var(--tc-ink-2); }
+
+/* ---- Tick box: one ink, its state ramp --------------------------------------------- */
+.tc-tick {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--tc-ink-2);
+  color: var(--tc-accent-ink);
+  flex: none;
+}
+.tc-tick[data-state="in"],
+.tc-tick[data-state="owned"] { background: var(--tc-accent); border-color: var(--tc-accent); }
+.tc-tick[data-state="out"] { border-color: var(--tc-ink-3); }
+.tc-tick[data-state="wanted"],
+.tc-tick[data-state="preorder"] { border-style: dashed; border-color: var(--tc-accent); }
+.tc-tick[data-state="none"] { border-color: var(--tc-line); }
+.tc-tick svg { width: 12px; height: 12px; }
+@media (prefers-reduced-motion: no-preference) {
+  .tc-tick[data-state="in"] svg path,
+  .tc-tick[data-state="owned"] svg path {
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20;
+    animation: tc-ink 420ms var(--tc-ease) forwards;
+    animation-delay: calc(var(--tc-i, 0) * 28ms + 120ms);
+  }
+}
+@keyframes tc-ink { to { stroke-dashoffset: 0; } }
+
+/* Rows print in by number, once. */
+@media (prefers-reduced-motion: no-preference) {
+  .tc-print .tc-row {
+    animation: tc-print 520ms var(--tc-ease) both;
+    animation-delay: calc(var(--tc-i, 0) * 28ms);
+  }
+}
+@keyframes tc-print { from { opacity: 0; transform: translateY(6px); } }
+
+/* ---- Signature: the card slides out of its number slot ----------------------------- */
+.tc-peek {
+  position: absolute;
+  z-index: 20;
+  left: 92px;
+  top: 50%;
+  width: 132px;
+  aspect-ratio: 63 / 88;
+  translate: -48px -50%;
+  scale: 0.86;
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 4.5% / 3.2%;
+  overflow: hidden;
+  background: var(--tc-well);
+  box-shadow: 0 18px 40px -12px oklch(0% 0 0 / 0.65), 0 2px 6px oklch(0% 0 0 / 0.4);
+  transition: translate 300ms var(--tc-ease), scale 300ms var(--tc-ease), opacity 160ms var(--tc-ease), rotate 300ms var(--tc-ease);
+}
+.tc-peek img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+  .tc-row:hover .tc-peek,
+  .tc-row:has(.tc-a-num :focus-visible) .tc-peek {
+    translate: 0 -50%;
+    scale: 1;
+    opacity: 1;
+    rotate: -3deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tc-peek { transition: opacity 120ms linear; translate: 0 -50%; scale: 1; }
+}
+/* Touch: the number opens the card in place under its row. */
+.tc-inline-art {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  gap: 14px;
+  padding: 10px 0 6px;
+}
+.tc-inline-art img { width: 148px; aspect-ratio: 63 / 88; object-fit: cover; border-radius: 4.5% / 3.2%; background: var(--tc-well); }
+
+/* ---- Condition run: read like a size run ------------------------------------------- */
+.tc-run { display: inline-flex; gap: 2px; }
+.tc-run-cell {
+  display: inline-grid;
+  place-items: center;
+  min-width: 31px;
+  height: 26px;
+  padding: 0 4px;
+  border: 1px solid var(--tc-line);
+  color: var(--tc-ink-3);
+  font-size: 12px;
+  font-weight: 600;
+  font-stretch: 80%;
+  letter-spacing: 0.02em;
+  background: transparent;
+  transition: background-color 140ms var(--tc-ease), color 140ms var(--tc-ease), border-color 140ms var(--tc-ease), transform 120ms var(--tc-ease);
+}
+.tc-run-cell[data-live="true"] { color: var(--tc-ink); border-color: var(--tc-ink-3); cursor: pointer; }
+.tc-run-cell[data-live="false"] { text-decoration: line-through; text-decoration-color: color-mix(in oklch, var(--tc-ink-3) 70%, transparent); }
+.tc-run-cell[data-selected="true"] { background: var(--tc-accent); border-color: var(--tc-accent); color: var(--tc-accent-ink); }
+@media (hover: hover) and (pointer: fine) {
+  .tc-run-cell[data-live="true"]:not([data-selected="true"]):hover { border-color: var(--tc-ink); }
+}
+.tc-run-cell:active[data-live="true"] { transform: scale(0.95); }
+.tc-run-cell:focus-visible { outline: 2px solid var(--tc-accent); outline-offset: 2px; }
+@media (max-width: 767px) {
+  .tc-run-cell { min-width: 30px; height: 28px; }
+}
+
+/* ---- Buttons in the slice ----------------------------------------------------------- */
+.tc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  background: var(--tc-accent);
+  color: var(--tc-accent-ink);
+  font-weight: 700;
+  font-size: 14px;
+  font-stretch: 87.5%;
+  border: 0;
+  transition: filter 140ms var(--tc-ease), transform 120ms var(--tc-ease);
+}
+@media (hover: hover) and (pointer: fine) { .tc-btn:hover { filter: brightness(1.08); } }
+.tc-btn:active { transform: scale(0.97); }
+.tc-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: none; }
+.tc-btn:focus-visible { outline: 2px solid var(--tc-accent); outline-offset: 3px; }
+.tc-btn[data-variant="line"] { background: transparent; color: var(--tc-ink); box-shadow: inset 0 0 0 1px var(--tc-ink-3); }
+@media (hover: hover) and (pointer: fine) { .tc-btn[data-variant="line"]:hover { box-shadow: inset 0 0 0 1px var(--tc-ink); filter: none; } }
+@media (max-width: 767px) { .tc-btn { min-height: 40px; } }
+
+/* ---- Card art ------------------------------------------------------------------------ */
+.tc-art {
+  position: relative;
+  aspect-ratio: 63 / 88;
+  border-radius: 4.5% / 3.2%;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in oklch, var(--tc-line) 55%, transparent) 6px 7px),
+    var(--tc-well);
+}
+.tc-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tc-art-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: end;
+  padding: 10%;
+  color: var(--tc-ink-2);
+  font-size: 13px;
+  line-height: 1.25;
+}
+.tc-badges { position: absolute; left: 6px; right: 6px; bottom: 6px; display: flex; flex-wrap: wrap; gap: 3px; z-index: 1; }
+.tc-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  background: oklch(14% 0.01 265 / 0.86);
+  color: oklch(95% 0.008 95);
+  font-size: 11px;
+  font-weight: 700;
+  font-stretch: 80%;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.tc-badge[data-tone="accent"] { background: var(--tc-accent); color: var(--tc-accent-ink); }
+
+/* ---- Tile ------------------------------------------------------------------------------ */
+.tc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 12px;
+}
+@media (min-width: 640px) { .tc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 16px; } }
+@media (min-width: 1024px) { .tc-grid { grid-template-columns: repeat(var(--tc-cols, 5), minmax(0, 1fr)); } }
+
+.tc-tile { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.tc-tile .tc-art { transition: translate 260ms var(--tc-ease), box-shadow 260ms var(--tc-ease); }
+@media (hover: hover) and (pointer: fine) {
+  .tc-tile:hover .tc-art { translate: 0 -4px; box-shadow: 0 16px 28px -14px oklch(0% 0 0 / 0.6); }
+}
+.tc-tile:focus-within .tc-art { outline: 2px solid var(--tc-accent); outline-offset: 3px; }
+
+/* ---- Graded slab --------------------------------------------------------------------- */
+.tc-slab {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: color-mix(in oklch, var(--tc-ink) 7%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--tc-ink) 28%, transparent),
+    inset 0 0 0 6px color-mix(in oklch, var(--tc-ink) 4%, transparent),
+    0 22px 40px -22px oklch(0% 0 0 / 0.7);
+}
+.tc-slab-label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 3px;
+  background: oklch(96% 0.006 95);
+  color: oklch(20% 0.02 265);
+}
+.tc-slab-grade { grid-row: span 3; text-align: right; line-height: 0.9; }
+.tc-slab-window {
+  border-radius: 4px;
+  padding: 7%;
+  background: color-mix(in oklch, var(--tc-well) 85%, var(--tc-ink) 6%);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--tc-ink) 14%, transparent);
+}
+
+/* ---- Sealed: the box end label --------------------------------------------------------- */
+.tc-sealed {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  aspect-ratio: 63 / 88;
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--tc-well);
+  box-shadow: inset 0 0 0 1px var(--tc-line);
+}
+.tc-sealed-face {
+  display: grid;
+  place-items: center;
+  padding: 14% 12%;
+  border-bottom: 1px solid var(--tc-line);
+}
+.tc-sealed-face img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.tc-sealed-end {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px 12px;
+  background: var(--tc-surface);
+}
+.tc-sealed[data-preorder="true"] .tc-sealed-end { background: var(--tc-accent); color: var(--tc-accent-ink); }
+.tc-sealed[data-preorder="true"] .tc-sealed-end .tc-dim { color: color-mix(in oklch, var(--tc-accent-ink) 72%, var(--tc-accent)); }
+
+/* ---- Completion strip: one cell per card number ------------------------------------------ */
+.tc-strip {
+  display: grid;
+  grid-template-columns: repeat(var(--tc-cells, 100), minmax(0, 1fr));
+  gap: 1px;
+  height: 14px;
+}
+/* Long sets fold onto two rows on a phone so every cell stays visible. */
+@media (max-width: 639px) {
+  .tc-strip[data-long="true"] { grid-template-columns: repeat(var(--tc-half, 50), minmax(0, 1fr)); height: 22px; }
+}
+.tc-strip > i { background: var(--tc-line); }
+.tc-strip > i[data-on="true"] { background: var(--tc-accent); }
+
+/* ---- Filter bar ---------------------------------------------------------------------- */
+.tc-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.tc-field { display: grid; gap: 4px; min-width: 0; }
+.tc-field > span { font-size: 12px; color: var(--tc-ink-3); font-weight: 600; }
+.tc-select {
+  appearance: none;
+  min-height: 40px;
+  min-width: 128px;
+  max-width: 100%;
+  padding: 0 32px 0 12px;
+  border: 1px solid var(--tc-line);
+  background: var(--tc-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23999' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: var(--tc-ink);
+  font-size: 14px;
+}
+.tc-select:focus-visible { outline: 2px solid var(--tc-accent); outline-offset: 1px; }
+.tc-select[data-active="true"] { border-color: var(--tc-accent); box-shadow: inset 0 -2px 0 var(--tc-accent); }
+
+/* ---- Price history ----------------------------------------------------------------------- */
+.tc-chart { position: relative; }
+.tc-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.tc-chart-tip {
+  position: absolute;
+  pointer-events: none;
+  padding: 6px 8px;
+  background: var(--tc-bg);
+  color: var(--tc-ink);
+  box-shadow: inset 0 0 0 1px var(--tc-line), 0 8px 20px -10px oklch(0% 0 0 / 0.6);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  transform: translate(-50%, calc(-100% - 10px));
+}
+
+.tc-input {
+  min-height: 40px;
+  min-width: 0;
+  padding: 0 12px;
+  border: 1px solid var(--tc-line);
+  background: var(--tc-bg);
+  color: var(--tc-ink);
+  font-size: 14px;
+  caret-color: var(--tc-accent);
+}
+.tc-input::placeholder { color: var(--tc-ink-3); }
+.tc-input:focus-visible { outline: 2px solid var(--tc-accent); outline-offset: 1px; }

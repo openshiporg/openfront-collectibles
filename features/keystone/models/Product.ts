@@ -190,6 +190,10 @@ export const Product = list<Lists.Product.TypeInfo>({
       },
     }),
     externalId: text(),
+    // The card printing or sealed product this listing sells; singles, slabs and sealed all link here.
+    catalogItem: relationship({
+      ref: "CatalogItem.products",
+    }),
     productCollections: relationship({
       ref: "ProductCollection.products",
       many: true,

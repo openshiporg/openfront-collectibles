@@ -2,38 +2,40 @@
 
 <!-- impeccable:product-schema 1 -->
 
-Inferred on 2026-10-25 from the repository (README, `docs/design/collectibles-redesign-2026-10-23.md`, QA audits) and the owner's redesign brief (`~/Code/Euler/state/briefs/design-skills-redesign-2026-10-25.md`). The owner ordered the work without an approval stage, so no interview took place. Every line below is inferred, not confirmed.
+Updated 2026-10-25 for the Pokémon overhaul ordered by the owner ("make Openfront Collectibles very focused on Pokémon cards; even the demo and the onboarding should be Pokémon cards"). Market research and the full model are in `docs/PRODUCT-SPEC.md`. The owner ordered the work without an approval stage, so no interview took place; lines marked inferred were not confirmed.
 
 ## Platform
 
 web
 
 ## Users
-- **Collector (storefront):** hunting one specific object (a card, a comic, a coin, a figure, a watch, art, memorabilia). Every listing is a single specimen, so the questions are: which exact one, what condition, who graded it, the certificate, where it has been, what it's worth, then price and shipping.
-- **Merchant (platform):** a collectibles dealer or consignment house working intake, grading, listings, auctions, consignment, trade-ins and high-value fulfilment. The platform shell is shared with Openfront E-commerce and isn't in scope for storefront work.
+- **Collector (storefront):** looks a card up by set and number, compares condition and price against the market, buys singles, slabs and sealed product, pre-orders new sets, sells cards to the shop for cash or credit, and keeps a binder of what they own and a want list of what they don't.
+- **Merchant (platform):** a Pokémon TCG shop stocking singles by condition, graded slabs and sealed product; refreshing market prices and repricing by rule; running a buylist and trade-ins; taking consignment. The platform shell is shared with Openfront E-commerce.
 
 ## Product Purpose
-A self-hostable catalog and discovery app for unique physical specimens. Collectors browse published items by category and collection, read each item's condition, grading, provenance and valuation record, buy through the cart and checkout (bank transfer), trade items in, and manage an account (orders, wishlist, saved searches, trade-ins, addresses, invoices).
+A self-hostable Pokémon card shop. Every set is a full checklist with the shop's stock ticked and a market reading on every card; cards are bought by condition, slabs by grade and certificate, sealed product by box, pre-orders by street date.
 
 ## Positioning
-Each listing is one specimen with its own record (condition, grade observation, certificate, provenance, valuation), not a SKU with stock.
+The checklist is the shop: what you have, what it costs, what we buy. Inferred: set completion and the collector's own binder are what separates it from a generic store.
 
 ## Operating Context
-Routes sit under `/[countryCode]`: home, `/store`, `/categories/[...category]`, `/collections/[handle]`, `/products/[handle]`, `/search`, `/cart`, `/checkout`, `/order/confirmed/[id]`, `/account` (dashboard, orders, order details, profile, addresses, wishlist, saved searches, trade-ins, invoices, invoicing, login, checkout-link) and `/trade-in`.
+Routes under `/[countryCode]`: home, `/sets`, `/sets/[handle]`, `/cards/[id]`, `/store`, `/categories/[...category]`, `/collections/[handle]`, `/products/[handle]`, `/search`, `/trade-in` (Sell to us), `/cart`, `/checkout`, `/order/confirmed/[id]`, `/account` (overview, orders, binder, want list, saved searches, sold to us, profile, addresses, business account, invoices). Platform pages under `/dashboard/platform`, including Cards & Sets, Graded Slabs, Sealed & Pre-orders, Market & Repricing and Buylist.
 
 ## Capabilities and Constraints
-- E-commerce storefront architecture (`features/storefront/modules`, `screens`), with country-prefixed routes.
-- Bidding, offers, payouts and settlement are not launch-ready. The storefront must not imply them.
-- Demo item artwork (`public/images/collectibles/*.svg`) is illustrative and carries its own light ground.
+- Card data and image URLs come from the Pokémon TCG API's data (bundled checklists); market prices are TCGplayer readings via TCGCSV, dated. Prices are not per condition at the source; conditions price as a share of Near Mint.
+- Demo slab certificates are samples and never link to a grader lookup.
+- Card UI is our own slice (`features/storefront/components/cards`), shared with platform pages; no third-party card UI library (owner, 2026-10-25).
+- Bidding and auctions are not launch-ready and are not shown on the storefront.
 
 ## Brand Commitments
-- The store's own name, logo SVG and logo hue are the brand. The default mark is Untitled UI Kintsugi.
-- Owner direction for this redesign (2026-10-24): dark, considered and premium; no grey, washed-out grounds; no generic SaaS cards; UI copy is labels, states and errors only; phone width must work; never drop products, categories or collections. Tessier (`~/Code/shops/tessier`) is the reference the owner likes.
+- The store's own name, logo SVG and logo hue are the brand. The default mark is Untitled UI Boltshift in card-border yellow.
+- Owner direction (2026-10-24, kept): dark, considered and premium; no grey, washed-out grounds; no generic SaaS cards; UI copy is labels, states and errors only; phone width must work.
+- Pokémon is a trademark of its owners; the storefront states the shop is independent and not affiliated.
 
 ## Evidence on Hand
-Live catalog data: 7 categories, collections (Fresh to the vault, Staff picks, Under $500) and items with records. There are no testimonials, press or sales figures, and none may be invented.
+Real: 19 sets' card lists, TCGplayer market readings (2026-10-25), sealed product prices, the Delta Reign street date. Fictional: the shop's name, stock quantities, slab asking prices, sample certificates and consignor. No testimonials, press or sales figures exist, and none may be invented.
 
 ## Product Principles
-1. The specimen and its record come first; the price follows the facts.
-2. Show only what the record holds. Never invent grades, provenance or claims.
-3. Every route, state and workflow stays. Presentation changes; behaviour doesn't.
+1. The number is the navigation: every card is findable by set and number.
+2. Show the market reading with its source and date; never invent a price, grade or certificate.
+3. Every route, state and workflow stays working; presentation changes serve the card shop.

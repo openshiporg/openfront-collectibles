@@ -6,12 +6,15 @@ import {
   checkbox,
   integer,
   json,
+  select,
   text,
   relationship,
+  timestamp,
   virtual,
 } from "@keystone-6/core/fields";
 import { permissions } from "../access";
 import { trackingFields } from "./trackingFields";
+import { CARD_CONDITIONS, CARD_FINISHES, CARD_LANGUAGES, STOCK_KINDS, options } from "../lib/pokemon/card-enums";
 
 export const ProductVariant = list<Lists.ProductVariant.TypeInfo>({
   access: {
@@ -55,6 +58,21 @@ export const ProductVariant = list<Lists.ProductVariant.TypeInfo>({
       },
     }),
     sku: text(),
+    // One SKU per card printing x language x condition, as card shops stock singles.
+    stockKind: select({ type: "string", options: options(STOCK_KINDS), defaultValue: "raw" }),
+    cardCondition: select({ type: "string", options: options(CARD_CONDITIONS) }),
+    cardFinish: select({ type: "string", options: options(CARD_FINISHES) }),
+    cardLanguage: select({ type: "string", options: options(CARD_LANGUAGES), defaultValue: "EN" }),
+    // Market-priced variants follow the pricing rules; manual ones keep the price they are given.
+    pricingMode: select({
+      type: "string",
+      options: [{ value: "market", label: "Follow market" }, { value: "manual", label: "Manual" }],
+      defaultValue: "manual",
+    }),
+    lastRepricedAt: timestamp({ ui: { itemView: { fieldMode: "read" } } }),
+    preorder: checkbox({ defaultValue: false }),
+    preorderReleaseDate: timestamp(),
+    preorderLimitPerCustomer: integer({ validation: { min: 0 } }),
     barcode: text({ access: { read: permissions.canManageProducts } }),
     ean: text({ access: { read: permissions.canManageProducts } }),
     upc: text({ access: { read: permissions.canManageProducts } }),

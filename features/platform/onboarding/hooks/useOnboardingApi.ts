@@ -6,6 +6,7 @@ import {
   COLLECTIBLES_LOGO_COLOR,
   COLLECTIBLES_LOGO_ICON,
 } from '@/features/storefront/lib/collectibles-brand';
+import { buylistOffersFromMarket } from '@/features/keystone/lib/pokemon/pricing';
 
 const GRAPHQL_ENDPOINT = '/api/graphql';
 
@@ -74,8 +75,10 @@ export function useOnboardingApi({
       await createShippingOptions(client, currentJsonData, createdFulfillmentProviders, createdRegions);
       const createdCategories = await createCategories(client, currentJsonData);
       const createdCollections = await createCollections(client, currentJsonData);
+      await createCardSets(client, currentJsonData);
       await createProducts(client, currentJsonData, createdCategories, createdCollections, createdCurrencies, createdRegions);
       await createCollectibles(client, currentJsonData);
+      await createPricing(client, currentJsonData);
 
       setProgress('Onboarding complete!');
 
@@ -460,7 +463,7 @@ export function useOnboardingApi({
       const productName = product.title || 'Unknown Product';
       setItemLoading('products', productName);
 
-      const { variants, productCollections, productCategories, subtitle, ...productInput } = product;
+      const { variants, productCollections, productCategories, subtitle, image, ...productInput } = product;
 
       // Only connect the collections that exist for this product, by id
       let collectionsToConnect: any[] = [];
@@ -486,14 +489,8 @@ export function useOnboardingApi({
         ...(typeof subtitle === 'string' && subtitle.trim() !== '' ? { subtitle } : {}),
         productCollections: collectionsToConnect.length > 0 ? { connect: collectionsToConnect } : undefined,
         productCategories: categoriesToConnect.length > 0 ? { connect: categoriesToConnect } : undefined,
-        productImages: {
-          create: [
-            {
-              imagePath: `/images/collectibles/${String(productInput.metadata?.specimenCode || '').toLowerCase()}.svg`,
-              altText: productInput.title,
-            },
-          ],
-        },
+        // Card art is linked from the Pokémon TCG API's image host, as card shops show stock.
+        ...(image?.url ? { productImages: { create: [{ imagePath: image.url, altText: image.alt || productInput.title }] } } : {}),
       };
 
       // Create product
@@ -559,13 +556,22 @@ export function useOnboardingApi({
           })),
         };
 
+        const graded = variant.stockKind === 'graded';
         await client.request(variantMutation, {
           data: {
             title: variant.title,
             sku: variant.sku,
-            metadata: { specimenCode: variant.sku, serializedInventory: true },
+            metadata: graded ? { specimenCode: variant.sku, serializedInventory: true } : {},
             inventoryQuantity: variant.inventoryQuantity,
             manageInventory: variant.manageInventory,
+            stockKind: variant.stockKind || 'raw',
+            ...(variant.cardCondition ? { cardCondition: variant.cardCondition } : {}),
+            ...(variant.cardFinish ? { cardFinish: variant.cardFinish } : {}),
+            cardLanguage: variant.cardLanguage || 'EN',
+            pricingMode: variant.pricingMode || 'manual',
+            preorder: Boolean(variant.preorder),
+            ...(variant.preorderReleaseDate ? { preorderReleaseDate: variant.preorderReleaseDate } : {}),
+            ...(variant.preorderLimitPerCustomer ? { preorderLimitPerCustomer: variant.preorderLimitPerCustomer } : {}),
             product: { connect: { id: (productResult as any).createProduct.id } },
             productOptionValues: { connect: matchingIds },
             prices,
@@ -578,10 +584,75 @@ export function useOnboardingApi({
     }
   };
 
+  const createCardSets = async (client: GraphQLClient, data: any) => {
+    const cardSets = data.cardSets;
+    if (!cardSets) return;
+    setProgress('Importing card sets and market prices...');
+    const run = async (label: string, input: Record<string, unknown>) => {
+      setItemLoading('cardSets', label);
+      await client.request(gql`mutation ImportCardCatalog($input: JSON!) { importCardCatalog(input: $input) }`, { input });
+      setItemCompleted('cardSets', label);
+    };
+    for (const set of cardSets.sets || []) await run(set.name || set.id, { set: set.id });
+    if (cardSets.upcoming) await run(cardSets.upcoming.name, { upcoming: cardSets.upcoming });
+    // Sealed product joins its set's catalog; it reports under the set it belongs to.
+    if (cardSets.sealed?.length) {
+      await client.request(gql`mutation ImportSealed($input: JSON!) { importCardCatalog(input: $input) }`, { input: { sealed: cardSets.sealed } });
+    }
+  };
+
+  const createPricing = async (client: GraphQLClient, data: any) => {
+    const pricing = data.pricing;
+    if (!pricing) return;
+    setProgress('Setting pricing rules and the buylist...');
+    for (const rule of pricing.rules || []) {
+      setItemLoading('pricing', rule.name);
+      const existing = await client.request<{ pricingRules: { id: string }[] }>(
+        gql`query ExistingRule($name: String!) { pricingRules(where: { name: { equals: $name } }, take: 1) { id } }`, { name: rule.name },
+      );
+      if (!existing.pricingRules.length) {
+        await client.request(gql`mutation CreatePricingRule($data: PricingRuleCreateInput!) { createPricingRule(data: $data) { id } }`, { data: rule });
+      }
+      setItemCompleted('pricing', rule.name);
+    }
+    const buylist = pricing.buylist;
+    if (!buylist) return;
+    setItemLoading('pricing', buylist.name);
+    const existing = await client.request<{ buylists: { id: string }[] }>(
+      gql`query ExistingBuylist($name: String!) { buylists(where: { name: { equals: $name } }, take: 1) { id } }`, { name: buylist.name },
+    );
+    if (!existing.buylists.length) {
+      const { entries, ...terms } = buylist;
+      await client.request(gql`mutation CreateBuylist($data: BuylistCreateInput!) { createBuylist(data: $data) { id } }`, {
+        data: {
+          ...terms,
+          status: 'active',
+          entries: {
+            create: (entries || []).map((entry: any) => {
+              const offers = buylistOffersFromMarket(entry.marketMinor, terms);
+              return {
+                catalogItem: { connect: { handle: entry.catalogItemHandle } },
+                cardFinish: entry.finish,
+                minimumCondition: entry.minimumCondition,
+                pricingMode: 'market',
+                offerAmountMinor: offers.cashMinor,
+                creditOfferMinor: offers.creditMinor,
+                hotlist: Boolean(entry.hotlist),
+                maximumQuantity: entry.maximumQuantity,
+                active: 'active',
+              };
+            }),
+          },
+        },
+      });
+    }
+    setItemCompleted('pricing', buylist.name);
+  };
+
   const createCollectibles = async (client: GraphQLClient, data: any) => {
     const items = data.collectibles || [];
     if (!items.length) return;
-    setProgress('Receiving items into inventory...');
+    setProgress('Receiving graded slabs into inventory...');
     const categoryNames: Record<string, string> = Object.fromEntries(
       (data.categories || []).map((category: { handle: string; name: string }) => [category.handle, category.name])
     );

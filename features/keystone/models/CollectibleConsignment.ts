@@ -1,10 +1,11 @@
 import { lockedRecordUi } from './lifecycle-ui';
 import { list } from '@keystone-6/core';
-import { integer, json, relationship, select, text, timestamp } from '@keystone-6/core/fields';
+import { checkbox, integer, json, relationship, select, text, timestamp } from '@keystone-6/core/fields';
 import { denyAll } from '@keystone-6/core/access';
 
 import { permissions } from '../access';
 import { trackingFields } from './trackingFields';
+import { CARD_CONDITIONS, CARD_FINISHES, options } from '../lib/pokemon/card-enums';
 
 const canRead = ({ session }: any) => permissions.canReadCollectibles({ session }) || permissions.canManageConsignments({ session });
 const canManage = permissions.canManageConsignments;
@@ -108,6 +109,13 @@ export const Buylist = list({
     name: text({ validation: { isRequired: true } }),
     status: select({ type: 'string', options: ['draft', 'active', 'paused', 'archived'], defaultValue: 'draft' }),
     currencyCode: text({ validation: { isRequired: true, match: { regex: /^[A-Z]{3}$/ } } }),
+    // Offers on market-priced entries: cash and store credit as a share of the Near Mint market price.
+    cashPercentBasisPoints: integer({ validation: { min: 0, max: 10000 }, defaultValue: 6000 }),
+    creditPercentBasisPoints: integer({ validation: { min: 0, max: 15000 }, defaultValue: 8000 }),
+    // Share of the Near Mint offer paid for each lower condition, e.g. { "LP": 8500, "MP": 7000 }.
+    conditionBasisPoints: json({ defaultValue: { NM: 10000, LP: 8500, MP: 7000, HP: 5000, DMG: 3000 } }),
+    minimumOfferMinor: integer({ validation: { min: 0 }, defaultValue: 25 }),
+    publicNotes: text({ ui: { displayMode: 'textarea' } }),
     entries: relationship({ ref: 'BuylistEntry.buylist', many: true }),
     ...trackingFields,
   },
@@ -118,9 +126,16 @@ export const BuylistEntry = list({
   fields: {
     buylist: relationship({ ref: 'Buylist.entries' }),
     catalogItem: relationship({ ref: 'CatalogItem' }),
+    cardFinish: select({ type: 'string', options: options(CARD_FINISHES) }),
+    minimumCondition: select({ type: 'string', options: options(CARD_CONDITIONS), defaultValue: 'MP' }),
+    pricingMode: select({ type: 'string', options: [{ value: 'market', label: 'Share of market' }, { value: 'fixed', label: 'Fixed offer' }], defaultValue: 'market' }),
     criteria: json({ defaultValue: {} }),
-    offerAmountMinor: integer({ validation: { isRequired: true, min: 0 } }),
+    // The Near Mint cash offer; market entries refresh it when prices are refreshed.
+    offerAmountMinor: integer({ validation: { isRequired: true, min: 0 }, label: 'Cash offer, Near Mint (minor units)' }),
+    creditOfferMinor: integer({ validation: { min: 0 }, label: 'Store credit offer, Near Mint (minor units)' }),
+    hotlist: checkbox({ defaultValue: false }),
     maximumQuantity: integer({ validation: { min: 0 } }),
+    quantityBought: integer({ validation: { min: 0 }, defaultValue: 0 }),
     active: select({ type: 'string', options: ['active', 'paused'], defaultValue: 'active' }),
     ...trackingFields,
   },
@@ -145,9 +160,14 @@ export const TradeInItem = list({
   fields: {
     submission: relationship({ ref: 'TradeInSubmission.items' }),
     catalogItem: relationship({ ref: 'CatalogItem' }),
+    buylistEntry: relationship({ ref: 'BuylistEntry' }),
     specimen: relationship({ ref: 'Specimen' }),
     customerDescription: text({ ui: { displayMode: 'textarea' } }),
     customerCondition: text(),
+    cardCondition: select({ type: 'string', options: options(CARD_CONDITIONS) }),
+    cardFinish: select({ type: 'string', options: options(CARD_FINISHES) }),
+    quantity: integer({ validation: { min: 1 }, defaultValue: 1 }),
+    quotedCreditMinor: integer({ validation: { min: 0 } }),
     inspectedConditionObservation: relationship({ ref: 'ConditionObservation' }),
     quotedAmountMinor: integer({ validation: { min: 0 } }),
     acceptedAmountMinor: integer({ validation: { min: 0 } }),

@@ -23,9 +23,10 @@ const LINKS = [
   { href: "/account/orders", label: "Orders", testId: "orders-link" },
   { href: "/account/profile", label: "Profile", testId: "profile-link" },
   { href: "/account/addresses", label: "Addresses", testId: "addresses-link" },
-  { href: "/account/wishlist", label: "Wishlist", testId: "wishlist-link" },
+  { href: "/account/binder", label: "Binder", testId: "binder-link" },
+  { href: "/account/wishlist", label: "Want list", testId: "wishlist-link" },
   { href: "/account/saved-searches", label: "Saved searches", testId: "saved-searches-link" },
-  { href: "/account/trade-ins", label: "Trade-ins", testId: "trade-ins-link" },
+  { href: "/account/trade-ins", label: "Sold to us", testId: "trade-ins-link" },
   { href: "/account/invoicing", label: "Business account", testId: "invoicing-link" },
   { href: "/account/invoices", label: "Invoices", testId: "invoices-link" },
 ]

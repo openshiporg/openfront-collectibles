@@ -117,7 +117,7 @@ export async function getPublicBuylist(): Promise<any[] | null> {
 export async function submitTradeIn(input: {
   key: string;
   disposition: string;
-  items: { buylistEntryId?: string; description: string; condition: string }[];
+  items: { buylistEntryId?: string; description: string; condition: string; cardCondition?: string; quantity?: number }[];
 }): Promise<{ reference?: string; error?: string }> {
   const headers = await signedIn();
   if (!headers) return { error: 'Sign in to submit a trade-in' };
@@ -133,6 +133,7 @@ export async function submitTradeIn(input: {
     const message = error instanceof Error ? error.message : '';
     if (message.includes('no longer being bought')) return { error: 'A selected item is no longer on the buylist' };
     if (message.includes('exceeds the quantity')) return { error: 'One item is over the quantity the shop is buying' };
+    if (message.includes('not buying that card in that condition')) return { error: 'The shop is not buying one of these cards in that condition' };
     return { error: 'Could not submit your trade-in' };
   }
 }

@@ -26,8 +26,10 @@ const initialItemsState = {
   shipping: [],
   categories: [],
   collections: [],
+  cardSets: [],
   products: [],
   collectibles: [],
+  pricing: [],
 };
 
 export function useOnboardingState() {
@@ -115,6 +117,8 @@ export function useOnboardingState() {
       products: getItemsFromJsonData(data, 'products'),
       collections: getItemsFromJsonData(data, 'collections'),
       collectibles: getItemsFromJsonData(data, 'collectibles'),
+      cardSets: getItemsFromJsonData(data, 'cardSets'),
+      pricing: getItemsFromJsonData(data, 'pricing'),
     };
   };
 
@@ -225,7 +229,10 @@ export function useOnboardingState() {
           shipping: [...displayNames.shipping],
           categories: [...displayNames.categories],
           collections: [...displayNames.collections || []],
+          cardSets: [...displayNames.cardSets || []],
           products: [...displayNames.products],
+          collectibles: [...displayNames.collectibles || []],
+          pricing: [...displayNames.pricing || []],
         }
       }));
     }

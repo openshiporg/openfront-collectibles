@@ -1,18 +1,14 @@
-import { Literata, Rokkitt } from "next/font/google"
+import { Archivo } from "next/font/google"
 
-// Literata for everything read (the serif variable aliases it in globals.css);
-// Rokkitt (slab) for stamped labels, numbers and display.
-export const cxSans = Literata({
+// Archivo throughout, on its width axis: normal width for names and reading,
+// the condensed cut (font-stretch) for numbers, codes and stamped labels.
+export const cxSans = Archivo({
   subsets: ["latin"],
   display: "swap",
-  style: ["normal", "italic"],
+  axes: ["wdth"],
   variable: "--cx-font-sans",
 })
 
+// The display and reading faces are the same family; globals.css aliases their variables.
 export const cxSerif = cxSans
-
-export const cxMono = Rokkitt({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--cx-font-display",
-})
+export const cxMono = cxSans

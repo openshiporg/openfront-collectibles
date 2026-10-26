@@ -64,3 +64,15 @@ export const BuylistWorkbenchPage = () => <WorkbenchPage kind="buylist" />;
 export const EvidenceWorkbenchPage = () => <WorkbenchPage kind="evidence" />;
 export const FulfillmentWorkbenchPage = () => <WorkbenchPage kind="fulfillment" />;
 export const CollectorsWorkbenchPage = () => <WorkbenchPage kind="customers" />;
+
+/** A desk's queues without the page frame, for embedding under another desk. */
+export async function DeskQueues({ kind }: { kind: DeskKind }) {
+  const queues = await Promise.all(DESKS[kind].queues.map(loadQueue));
+  return (
+    <div className="grid gap-8 lg:grid-cols-2">
+      {queues.map((queue) => (
+        <DeskQueue key={queue.key} queue={queue} />
+      ))}
+    </div>
+  );
+}

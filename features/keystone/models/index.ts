@@ -18,6 +18,8 @@ import {
   CollectibleRelease,
   CollectibleSet,
   Franchise,
+  MarketPrice,
+  PricingRule,
   Specimen,
   SpecimenIdentifier,
 } from './CollectibleCatalog';
@@ -30,7 +32,7 @@ import {
   ValuationObservation,
 } from './CollectibleEvidence';
 import { InventoryLocation, InventoryMovement, InventoryUnit, Reservation } from './CollectibleInventory';
-import { Auction, Bid, Listing, Offer, OfferRevision, SavedSearch, WishlistItem } from './CollectibleCommerce';
+import { Auction, Bid, Binder, BinderCard, Listing, Offer, OfferRevision, SavedSearch, WishlistItem } from './CollectibleCommerce';
 import {
   Buylist,
   BuylistEntry,
@@ -151,6 +153,8 @@ export const models = {
   CollectibleRelease,
   CollectibleSet,
   Franchise,
+  MarketPrice,
+  PricingRule,
   Specimen,
   SpecimenIdentifier,
   ConditionObservation,
@@ -170,6 +174,8 @@ export const models = {
   OfferRevision,
   SavedSearch,
   WishlistItem,
+  Binder,
+  BinderCard,
   Buylist,
   BuylistEntry,
   ConsignmentAgreement,

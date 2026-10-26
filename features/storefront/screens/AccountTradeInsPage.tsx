@@ -8,7 +8,7 @@ import { AccountHeading, Band, EmptyState, TitleState } from "@/features/storefr
 import type { DotTone } from "@/features/storefront/modules/common/components/collectibles/status-dot"
 
 export const metadata: Metadata = {
-  title: "Trade-ins",
+  title: "Sold to us",
 }
 
 const TONES: Record<string, DotTone> = {
@@ -38,7 +38,7 @@ export async function AccountTradeInsPage() {
   return (
     <div className="w-full" data-testid="trade-ins-page-wrapper">
       <AccountHeading
-        title="Trade-ins"
+        title="Sold to us"
         meta={tradeIns.length}
         actions={
           <LocalizedClientLink href="/trade-in" className="cx-btn !min-h-10 !text-[14px]">
@@ -66,17 +66,20 @@ export async function AccountTradeInsPage() {
                 {tradeIn.items.map((item: any) => {
                   const quoted = money(item.quotedAmountMinor, item.currencyCode)
                   const accepted = money(item.acceptedAmountMinor, item.currencyCode)
+                  const estimate = money(tradeIn.disposition === "cash" ? item.estimateCashMinor : item.estimateCreditMinor, item.currencyCode)
                   return (
                     <div key={item.id} className="flex items-start justify-between gap-4 px-4 py-3">
                       <div className="min-w-0">
-                        <p className="truncate text-[15px] text-cx-ink">{item.title || item.description}</p>
-                        <p className="truncate text-[13px] text-cx-ink-2">{item.title ? `${item.description} · ${item.condition}` : item.condition}</p>
+                        <p className="truncate text-[15px] text-cx-ink">{item.description || item.title}</p>
+                        <p className="truncate text-[13px] text-cx-ink-2">{[item.quantity > 1 ? `${item.quantity} copies` : null, item.condition].filter(Boolean).join(" · ")}</p>
                       </div>
                       <div className="shrink-0 text-right text-[13px]">
                         {accepted ? (
                           <p className="cx-num text-cx-ink">{accepted}</p>
                         ) : quoted ? (
                           <p className="cx-num text-cx-ink">Quote {quoted}</p>
+                        ) : estimate ? (
+                          <p className="cx-num text-cx-ink-2">Buylist estimate {estimate}</p>
                         ) : (
                           <p className="text-cx-ink-3">Not quoted</p>
                         )}

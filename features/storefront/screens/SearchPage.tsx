@@ -1,11 +1,12 @@
 import { Metadata } from "next"
 
 import { getRegion } from "@/features/storefront/lib/data/regions"
-import { searchProducts } from "@/features/storefront/lib/data/products"
-import ProductPreview from "@/features/storefront/modules/products/components/product-preview"
-import SearchForm from "@/features/storefront/modules/store/components/search-form"
+import { getCardProducts, searchCatalog } from "@/features/storefront/lib/data/cards"
 import SaveSearch from "@/features/storefront/modules/store/components/search-form/save-search"
 import { getUser } from "@/features/storefront/lib/data/user"
+import { CardGrid, CardRow, CardSheet } from "@/features/storefront/components/cards"
+import { CardSearch } from "@/features/storefront/modules/cards/card-search"
+import { ProductCardTile } from "@/features/storefront/modules/cards/product-card-tile"
 
 export const metadata: Metadata = {
   title: "Search",
@@ -23,52 +24,61 @@ export async function SearchPage(props: Props) {
   const query = String(raw || "").trim().slice(0, 80)
 
   const [region, customer] = await Promise.all([getRegion(countryCode), getUser().catch(() => null)])
-  let failed = false
-  let result: { products: any[]; count: number } = { products: [], count: 0 }
-  if (query && region) {
-    try {
-      result = await searchProducts({ query, countryCode })
-    } catch {
-      failed = true
-    }
-  }
+  const [stock, catalog] = query && region
+    ? await Promise.all([getCardProducts({ countryCode, search: query, limit: 30, sort: "price_desc" }), searchCatalog(query)])
+    : [{ products: [], count: 0 }, []]
+  const stockedIds = new Set(stock.products.map((p) => p.catalogItem?.id))
+  const elsewhere = catalog.filter((c: any) => !stockedIds.has(c.id))
 
   return (
-    <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 pt-8 sm:px-6 sm:pt-12" data-testid="search-container">
-      <h1 className="font-cx-display font-extrabold text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px]">
-        Search
-      </h1>
-      <div className="mt-5 max-w-[640px]">
-        <SearchForm countryCode={countryCode} defaultValue={query} autoFocus={!query} />
+    <div className="mx-auto w-full max-w-[1320px] px-4 pb-24 pt-8 sm:px-6 sm:pt-12" data-testid="search-container">
+      <h1 className="font-cx-display text-[44px] leading-none text-cx-ink sm:text-[64px]">Search</h1>
+      <div className="mt-6 max-w-[640px]">
+        <CardSearch countryCode={countryCode} defaultValue={query} autoFocus={!query} />
       </div>
-      {query && customer && !failed && (
+      {query && customer ? (
         <div className="mt-3">
           <SaveSearch key={query} query={query} />
         </div>
-      )}
+      ) : null}
 
-      {query && (
-        <div className="mt-10">
-          <p className="cx-num mb-4 text-[13px] text-cx-ink-3" data-testid="search-count">
-            {failed ? "Search unavailable" : `${result.count} ${result.count === 1 ? "item" : "items"} for “${query}”`}
-          </p>
-          {!failed && result.products.length === 0 ? (
-            <div className="cx-band flex min-h-40 items-center p-6">
-              <p className="font-cx-serif text-[22px] text-cx-ink">No matching items</p>
+      {query ? (
+        <div className="mt-10 grid gap-14">
+          <section className="grid gap-5" aria-label="In stock">
+            <div className="flex items-baseline justify-between border-b-2 border-cx-ink pb-2">
+              <h2 className="text-[18px] font-bold text-cx-ink">In stock</h2>
+              <span className="tc-num text-[13px] text-cx-ink-3" data-testid="search-count">{stock.count} for “{query}”</span>
             </div>
-          ) : (
-            region && (
-              <ul className="grid w-full grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 md:grid-cols-3 lg:grid-cols-4" data-testid="search-results">
-                {result.products.map((product) => (
-                  <li key={product.id}>
-                    <ProductPreview productPreview={product} region={region as any} />
-                  </li>
+            {stock.products.length ? (
+              <CardGrid columns={5} label="Search results in stock">
+                {stock.products.map((p) => <ProductCardTile key={p.id} product={p} countryCode={countryCode} />)}
+              </CardGrid>
+            ) : (
+              <p className="text-[15px] text-cx-ink-2">Nothing in stock matches. The catalog below has every printed card.</p>
+            )}
+          </section>
+          {elsewhere.length > 0 ? (
+            <section className="grid gap-5" aria-label="In the catalog">
+              <div className="flex items-baseline justify-between border-b-2 border-cx-ink pb-2">
+                <h2 className="text-[18px] font-bold text-cx-ink">In the catalog</h2>
+                <span className="tc-num text-[13px] text-cx-ink-3">{elsewhere.length} cards</span>
+              </div>
+              <CardSheet label="Catalog matches" heads={false}>
+                {elsewhere.map((c: any, i: number) => (
+                  <CardRow
+                    key={c.id}
+                    index={i}
+                    status="none"
+                    href={`/${countryCode}/cards/${c.id}`}
+                    card={{ id: c.id, name: c.title, number: c.cardNumber, rarity: c.rarity, imageUrl: c.imageUrl, setName: c.collectibleSet?.name }}
+                    detail={c.collectibleSet?.name}
+                  />
                 ))}
-              </ul>
-            )
-          )}
+              </CardSheet>
+            </section>
+          ) : null}
         </div>
-      )}
+      ) : null}
     </div>
   )
 }

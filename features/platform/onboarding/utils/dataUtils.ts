@@ -23,6 +23,16 @@ export function getItemsFromJsonData(jsonData: any, sectionType: string): string
       return (jsonData.products || []).map((p: any) => p.title || 'Unknown Product');
     case 'collectibles':
       return (jsonData.collectibles || []).map((p: any) => p.title || p.code || 'Unknown Item');
+    case 'cardSets':
+      return [
+        ...(jsonData.cardSets?.sets || []).map((s: any) => s.name || s.id || 'Unknown Set'),
+        ...(jsonData.cardSets?.upcoming ? [jsonData.cardSets.upcoming.name] : []),
+      ];
+    case 'pricing':
+      return [
+        ...(jsonData.pricing?.rules || []).map((r: any) => r.name || 'Pricing rule'),
+        ...(jsonData.pricing?.buylist ? [jsonData.pricing.buylist.name || 'Buylist'] : []),
+      ];
     default:
       return [];
   }
@@ -49,6 +59,21 @@ export function getSeedForTemplate(template: 'full' | 'minimal' | 'custom', seed
       }))
     }));
 
+  // Card sets: every set a chosen product draws on; sealed catalog only for chosen sealed products.
+  const catalogHandles = new Set(filteredProducts.map((p: any) => p.catalogItem?.connect?.handle).filter(Boolean));
+  const chosenSets = new Set(tpl.cardSets);
+  const allSetsChosen = tpl.cardSets.length === (seedData.cardSets?.sets || []).length;
+  const sealed = (seedData.cardSets?.sealed || []).filter((s: any) => catalogHandles.has(s.handle));
+  const pricing = seedData.pricing
+    ? {
+        rules: seedData.pricing.rules,
+        buylist: seedData.pricing.buylist && {
+          ...seedData.pricing.buylist,
+          entries: (seedData.pricing.buylist.entries || []).filter((e: any) => chosenSets.has(String(e.catalogItemHandle).replace(/-[^-]+$/, ''))),
+        },
+      }
+    : undefined;
+
   return {
     store: seedData.store,
     regions: (seedData.regions as any[]).filter((r: any) =>
@@ -66,9 +91,15 @@ export function getSeedForTemplate(template: 'full' | 'minimal' | 'custom', seed
     collections: (seedData.collections as any[]).filter((c: any) =>
       tpl.collections.includes(c.handle)
     ),
+    cardSets: {
+      sets: (seedData.cardSets?.sets || []).filter((s: any) => chosenSets.has(s.id)),
+      ...(allSetsChosen && seedData.cardSets?.upcoming ? { upcoming: seedData.cardSets.upcoming } : {}),
+      sealed,
+    },
     products: filteredProducts,
     collectibles: (seedData.collectibles || []).filter((item: any) =>
       filteredProducts.some((product: any) => product.title === item.title)
     ),
+    pricing,
   };
 }

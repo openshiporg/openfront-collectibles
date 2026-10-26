@@ -1,6 +1,6 @@
+import type { ShelfParams } from "@/features/storefront/modules/cards/card-shelf"
 import type { StorefrontProductCategory } from '@/features/storefront/types'; // Corrected path with @ alias
 import type { Metadata } from 'next';
-import type { SortOptions } from '@/features/storefront/modules/store/components/refinement-list/sort-products'; // Corrected path with @ alias
 import { notFound } from "next/navigation"
 
 import { getCategoryByHandle } from "@/features/storefront/lib/data/categories"
@@ -9,7 +9,7 @@ import CategoryTemplate from "@/features/storefront/modules/categories/templates
 // Type alias for props
 type Props = {
   params: Promise<{ category: string[]; countryCode: string }>; // Next.js 15 async params
-  searchParams: Promise<{ sortBy?: SortOptions; page?: string }>; // Next.js 15 async searchParams
+  searchParams: Promise<ShelfParams>; // Next.js 15 async searchParams
 };
 
 // TODO: Adapt generateStaticParams if needed. Requires fetching all category handles and country codes.
@@ -72,7 +72,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export async function CategoryPage(props: Props) {
   const searchParams = await props.searchParams // Await searchParams in Next.js 15
   const params = await props.params // Await params in Next.js 15
-  const { sortBy, page } = searchParams
   const handle = params.category[params.category.length - 1] // Get the last handle
 
   // Fetch category using the new function and structure
@@ -93,8 +92,7 @@ export async function CategoryPage(props: Props) {
   return (
     <CategoryTemplate
       category={category}
-      sortBy={sortBy}
-      page={page}
+      params={searchParams as ShelfParams}
       countryCode={params.countryCode}
     />
   )

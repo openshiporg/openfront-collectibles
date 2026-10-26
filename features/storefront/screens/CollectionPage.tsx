@@ -1,6 +1,6 @@
+import type { ShelfParams } from "@/features/storefront/modules/cards/card-shelf"
 import type { StorefrontCollection } from '@/features/storefront/types'; // Use @ alias
 import type { Metadata } from 'next';
-import type { SortOptions } from '@/features/storefront/modules/store/components/refinement-list/sort-products'; // Use @ alias
 import { notFound } from "next/navigation"
 
 import { getCollectionByHandle } from "@/features/storefront/lib/data/collections"
@@ -9,7 +9,7 @@ import CollectionTemplate from "@/features/storefront/modules/collections/templa
 // Type alias for props
 type Props = {
   params: Promise<{ handle: string; countryCode: string }>; // Next.js 15 async params
-  searchParams: Promise<{ page?: string; sortBy?: SortOptions }>; // Next.js 15 async searchParams
+  searchParams: Promise<ShelfParams>; // Next.js 15 async searchParams
 };
 
 const PRODUCT_LIMIT = 12
@@ -59,7 +59,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export async function CollectionPage(props: Props) {
   const searchParams = await props.searchParams // Await searchParams in Next.js 15
   const params = await props.params // Await params in Next.js 15
-  const { sortBy, page } = searchParams
 
   // Fetch collection using the new function and structure
   const { productCollection: collection }: { productCollection: StorefrontCollection | null } = await getCollectionByHandle(params.handle)
@@ -71,8 +70,7 @@ export async function CollectionPage(props: Props) {
   return (
     <CollectionTemplate
       collection={collection}
-      page={page}
-      sortBy={sortBy}
+      params={searchParams as ShelfParams}
       countryCode={params.countryCode}
     />
   )

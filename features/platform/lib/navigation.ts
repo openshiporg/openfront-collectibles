@@ -31,6 +31,9 @@ import {
   Repeat,
   Scale,
   BadgeCheck,
+  Layers,
+  TrendingUp,
+  PackageOpen,
 } from 'lucide-react';
 
 export interface PlatformNavItem {
@@ -111,20 +114,88 @@ export const platformNavItems: PlatformNavItem[] = [
     group: 'catalog'
   },
 
-  // Collectibles
+  // Cards: the shop's stock, by set, grade and box
   {
-    title: 'Items',
+    title: 'Cards & Sets',
+    href: '/platform/cards',
+    color: 'amber',
+    description: 'Every card set as a checklist: what is in stock, by condition, against the market.',
+    icon: Layers,
+    group: 'cards'
+  },
+  {
+    title: 'Graded Slabs',
+    href: '/platform/graded',
+    color: 'violet',
+    description: 'PSA, BGS and CGC slabs with grade, certificate, price and status.',
+    icon: BadgeCheck,
+    group: 'cards'
+  },
+  {
+    title: 'Sealed & Pre-orders',
+    href: '/platform/sealed',
+    color: 'sky',
+    description: 'Booster boxes, ETBs and packs; pre-order allocations, street dates and limits.',
+    icon: PackageOpen,
+    group: 'cards'
+  },
+  {
+    title: 'Market & Repricing',
+    href: '/platform/pricing',
+    color: 'emerald',
+    description: 'Refresh market prices, set pricing rules, preview and apply repricing.',
+    icon: TrendingUp,
+    group: 'cards'
+  },
+
+  // Buying: what the shop takes in
+  {
+    title: 'Buylist',
+    href: '/platform/buylist',
+    color: 'cyan',
+    description: 'What the shop buys, at cash and store-credit offers per condition.',
+    icon: SearchCheck,
+    group: 'buying'
+  },
+  {
+    title: 'Trade-ins',
+    href: '/platform/trade-ins',
+    color: 'cyan',
+    description: 'Receive, inspect, quote, and pay trade-in submissions.',
+    icon: Repeat,
+    group: 'buying'
+  },
+  {
+    title: 'Consignments',
+    href: '/platform/consignments',
+    color: 'orange',
+    description: 'Receive consigned cards and slabs, agree terms, and track each intake.',
+    icon: Handshake,
+    group: 'buying'
+  },
+  {
+    title: 'Consignment Payouts',
+    href: '/platform/consignment',
+    color: 'orange',
+    description: 'Consignment agreements, settlements and payouts in one queue.',
+    icon: Handshake,
+    group: 'buying'
+  },
+
+  // Records: intake, custody, grading evidence and fulfilment
+  {
+    title: 'Receive Items',
     href: '/platform/items',
     color: 'amber',
-    description: 'Receive items and keep each item\'s record, condition, grading, and provenance.',
+    description: 'Receive slabs and one-of-a-kind items with their condition, grading and provenance.',
     icon: Gem,
     group: 'collectibles'
   },
   {
-    title: 'Catalog & Items',
+    title: 'Catalog Desk',
     href: '/platform/catalog',
     color: 'amber',
-    description: 'Manage catalog entries, sets, releases, and individual items.',
+    description: 'Catalog entries, sets, releases and individual items as review queues.',
     icon: Archive,
     group: 'collectibles'
   },
@@ -176,38 +247,6 @@ export const platformNavItems: PlatformNavItem[] = [
     color: 'rose',
     description: 'Manage timed auctions, bids, and results.',
     icon: Gavel,
-    group: 'selling'
-  },
-  {
-    title: 'Consignment',
-    href: '/platform/consignment',
-    color: 'orange',
-    description: 'Manage consignment intake, agreements, and payouts.',
-    icon: Handshake,
-    group: 'selling'
-  },
-  {
-    title: 'Consignments',
-    href: '/platform/consignments',
-    color: 'orange',
-    description: 'Receive consigned items, agree terms, and track each intake.',
-    icon: Handshake,
-    group: 'selling'
-  },
-  {
-    title: 'Trade-Ins',
-    href: '/platform/trade-ins',
-    color: 'cyan',
-    description: 'Receive, inspect, quote, and pay trade-in submissions.',
-    icon: Repeat,
-    group: 'selling'
-  },
-  {
-    title: 'Buylist & Trade-In',
-    href: '/platform/buylist',
-    color: 'cyan',
-    description: 'Manage what you buy, trade-in submissions, and inspection.',
-    icon: SearchCheck,
     group: 'selling'
   },
 
@@ -334,16 +373,28 @@ export const platformNavGroups: PlatformNavGroup[] = [
     items: platformNavItems.filter(item => item.group === 'catalog')
   },
   {
-    id: 'collectibles',
-    title: 'Collectibles',
-    icon: Archive,
-    items: platformNavItems.filter(item => item.group === 'collectibles')
+    id: 'cards',
+    title: 'Cards',
+    icon: Layers,
+    items: platformNavItems.filter(item => item.group === 'cards')
+  },
+  {
+    id: 'buying',
+    title: 'Buying',
+    icon: Repeat,
+    items: platformNavItems.filter(item => item.group === 'buying')
   },
   {
     id: 'selling',
     title: 'Selling',
     icon: Gavel,
     items: platformNavItems.filter(item => item.group === 'selling')
+  },
+  {
+    id: 'collectibles',
+    title: 'Records',
+    icon: Archive,
+    items: platformNavItems.filter(item => item.group === 'collectibles')
   },
   {
     id: 'customers',
