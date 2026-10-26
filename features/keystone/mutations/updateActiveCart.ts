@@ -89,6 +89,7 @@ async function updateActiveCart(
         cartId,
         variantId,
         quantity: (existingLineItem?.quantity ?? 0) + newItem.quantity,
+        adding: newItem.quantity,
       });
 
       if (existingLineItem) {

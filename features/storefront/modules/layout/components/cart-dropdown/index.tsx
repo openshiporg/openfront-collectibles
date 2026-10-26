@@ -109,7 +109,7 @@ const CartDropdown = ({
             </LocalizedClientLink>
           </PopoverTrigger>
           <PopoverContent
-            className="hidden w-[400px] overflow-hidden rounded-[2px] border border-cx-line bg-cx-surface p-0 text-cx-ink shadow-[0_24px_48px_-24px_rgb(26_23_18/0.4)] sm:block"
+            className="hidden w-[400px] overflow-hidden rounded-[2px] border border-cx-line bg-cx-surface p-0 text-cx-ink shadow-[0_24px_48px_-24px_rgb(0_0_0/0.4)] sm:block"
             sideOffset={8}
             align="end"
             onMouseEnter={openAndCancel}

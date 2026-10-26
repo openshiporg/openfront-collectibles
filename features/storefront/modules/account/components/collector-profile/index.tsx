@@ -33,7 +33,7 @@ export default function CollectorProfileForm({ profile, fallbackName }: { profil
         <input name="interests" className={field} maxLength={1200} defaultValue={interests} />
       </label>
       <label className="flex min-h-11 items-center gap-3 text-[14px] text-cx-ink">
-        <input type="checkbox" name="public" defaultChecked={!!profile?.public} className="size-5 accent-[hsl(var(--cx-h,26)_64%_34%)]" />
+        <input type="checkbox" name="public" defaultChecked={!!profile?.public} className="size-5 accent-[hsl(var(--cx-h,50)_92%_60%)]" />
         Public profile
       </label>
       <div className="flex flex-wrap items-center gap-3">

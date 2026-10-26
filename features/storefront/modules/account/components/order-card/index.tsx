@@ -67,7 +67,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
         <LocalizedClientLink
           href={`/account/orders/details/${order.id}`}
           data-testid="order-details-link"
-          className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-[2px] bg-cx-surface px-4 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14)] hover:bg-cx-bg"
+          className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-[2px] bg-cx-surface px-4 text-[14px] font-medium text-cx-ink hover:bg-cx-bg"
         >
           Details
           <ArrowUpRight className="size-4" aria-hidden="true" />

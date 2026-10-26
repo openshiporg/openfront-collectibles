@@ -5,7 +5,7 @@ import StatusDot from "@/features/storefront/modules/common/components/collectib
 
 /** Raised pill used for secondary in-page actions (edit a completed step, apply a code). */
 export const secondaryPill =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-cx-surface px-4 text-[14px] font-medium text-cx-ink shadow-[0_1px_2px_rgb(26_23_18/0.14),0_0_0_0.5px_rgb(26_23_18/0.1)] transition-colors hover:bg-cx-bg disabled:opacity-50"
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-cx-surface px-4 text-[14px] font-medium text-cx-ink transition-colors hover:bg-cx-bg disabled:opacity-50"
 
 /**
  * Checkout step heading: mono step number, serif title, and a done dot on the
@@ -77,7 +77,7 @@ export function optionRow(selected: boolean, disabled?: boolean) {
   return cn(
     "flex min-h-14 w-full cursor-pointer items-center justify-between gap-4 rounded-[2px] px-4 py-3 text-left text-[15px] text-cx-ink transition-[background-color,box-shadow] duration-150",
     selected
-      ? "bg-cx-surface shadow-[0_1px_2px_rgb(26_23_18/0.14),0_0_0_0.5px_rgb(26_23_18/0.1)]"
+      ? "bg-cx-surface"
       : "hover:bg-cx-surface/60",
     disabled && "cursor-not-allowed opacity-50"
   )

@@ -120,7 +120,7 @@
 }
 
 @layer components {
-  /* Track and pill: the chosen one gilt-filled, the rest plain on the page. */
+  /* Track and pill: the chosen one in the accent, the rest plain on the sheet. */
   .cx-track {
     display: inline-flex;
     max-width: 100%;
@@ -163,7 +163,7 @@
     .cx-pill { min-height: 44px; }
   }
 
-  /* Primary button: gilt fill, square corners. */
+  /* Primary button: accent fill, square corners. */
   .cx-btn {
     display: inline-flex;
     min-height: 48px;

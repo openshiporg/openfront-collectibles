@@ -33,7 +33,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
       className={cn(
         "mb-1.5 flex cursor-pointer flex-col gap-y-2 rounded-[2px] px-4 py-3 text-[15px] text-cx-ink",
         {
-          "bg-cx-surface shadow-[0_1px_2px_rgb(26_23_18/0.14),0_0_0_0.5px_rgb(26_23_18/0.1)]":
+          "bg-cx-surface":
             selectedPaymentOptionId === paymentProviderId,
         }
       )}

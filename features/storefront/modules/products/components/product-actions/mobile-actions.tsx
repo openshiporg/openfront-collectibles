@@ -84,7 +84,7 @@ export default function MobileActions({
 
       <div
         className={cn(
-          "fixed inset-x-0 rounded-t-[22px] bg-cx-bg shadow-[0_-12px_32px_rgb(26_23_18/0.2)] transition-all duration-300 ease-out lg:hidden",
+          "fixed inset-x-0 rounded-none bg-cx-bg shadow-[0_-12px_32px_rgb(0_0_0/0.2)] transition-all duration-300 ease-out lg:hidden",
           isOpen ? "bottom-0 z-[101]" : "-bottom-full z-[-1]"
         )}
         role="dialog"

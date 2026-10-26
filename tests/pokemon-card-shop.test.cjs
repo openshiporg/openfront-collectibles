@@ -114,8 +114,11 @@ test('pre-order limits hold across the cart and earlier uncancelled orders', asy
     } },
   });
   await assertPreorderLimit(prisma(0), { cartId: 'c', variantId: 'v', quantity: 2 });
-  await assert.rejects(assertPreorderLimit(prisma(1), { cartId: 'c', variantId: 'v', quantity: 2 }), /you can add 1 more/);
-  await assert.rejects(assertPreorderLimit(prisma(2), { cartId: 'c', variantId: 'v', quantity: 1 }), /already have 2/);
+  await assert.rejects(assertPreorderLimit(prisma(1), { cartId: 'c', variantId: 'v', quantity: 2, adding: 2 }), /you can add 1 more/);
+  await assert.rejects(assertPreorderLimit(prisma(2), { cartId: 'c', variantId: 'v', quantity: 1, adding: 1 }), /already have 2/);
+  // Two already in the cart, adding a third: nothing left to add.
+  await assert.rejects(assertPreorderLimit(prisma(0), { cartId: 'c', variantId: 'v', quantity: 3, adding: 1 }), /already have 2/);
+  await assert.rejects(assertPreorderLimit(prisma(0), { cartId: 'c', variantId: 'v', quantity: 3 }), /limited to 2 per customer$/);
   await assertPreorderLimit(prisma(5, 2, false), { cartId: 'c', variantId: 'v', quantity: 9 });
 });
 

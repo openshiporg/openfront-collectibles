@@ -1,7 +1,8 @@
 // Pre-order allocation limits: a customer may hold at most the variant's limit across
 // this cart and their earlier, uncancelled orders. Guests are limited per cart.
 
-export async function assertPreorderLimit(prisma: any, { cartId, variantId, quantity }: { cartId: string; variantId: string; quantity: number }) {
+/** `quantity` is the line's total after the change; `adding` is how many this change adds, when known. */
+export async function assertPreorderLimit(prisma: any, { cartId, variantId, quantity, adding }: { cartId: string; variantId: string; quantity: number; adding?: number }) {
   const variant = await prisma.productVariant.findUnique({
     where: { id: variantId },
     select: { preorder: true, preorderLimitPerCustomer: true, title: true, product: { select: { title: true } } },
@@ -18,9 +19,13 @@ export async function assertPreorderLimit(prisma: any, { cartId, variantId, quan
   const held = earlier?._sum?.quantity ?? 0;
   if (held + quantity > limit) {
     const name = variant?.product?.title ?? 'this pre-order';
-    const left = Math.max(0, limit - held);
+    const inCart = adding != null ? quantity - adding : null;
+    const left = inCart != null ? Math.max(0, limit - held - inCart) : null;
+    const have = held + (inCart ?? 0);
     throw new Error(left
       ? `${name} is limited to ${limit} per customer; you can add ${left} more`
-      : `${name} is limited to ${limit} per customer, and you already have ${held}`);
+      : have
+        ? `${name} is limited to ${limit} per customer, and you already have ${have}`
+        : `${name} is limited to ${limit} per customer`);
   }
 }

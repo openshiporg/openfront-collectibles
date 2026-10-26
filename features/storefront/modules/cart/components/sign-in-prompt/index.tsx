@@ -8,7 +8,7 @@ const SignInPrompt = () => {
       <LocalizedClientLink
         href="/account"
         data-testid="sign-in-button"
-        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-cx-well px-5 text-[14px] font-medium text-cx-ink shadow-[inset_0_1px_2px_rgb(26_23_18/0.08)] hover:bg-cx-line/70"
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-cx-well px-5 text-[14px] font-medium text-cx-ink hover:bg-cx-line/70"
       >
         <LinkStatus />
         Sign in
