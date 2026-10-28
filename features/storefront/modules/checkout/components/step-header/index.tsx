@@ -25,8 +25,8 @@ export default function StepHeader({
   action?: ReactNode
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="flex min-w-0 items-baseline gap-3">
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="cx-num text-[13px] text-cx-ink-3">{String(step).padStart(2, "0")}</span>
         <h2
           className={cn(
@@ -43,7 +43,7 @@ export default function StepHeader({
           </span>
         )}
       </div>
-      {action}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   )
 }

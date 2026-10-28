@@ -53,6 +53,7 @@ export function CheckListHero({
           </div>
           <CardSearch countryCode={countryCode} />
         </div>
+        {sets.length > 0 ? (
         <nav aria-label="Sets" className="order-last grid content-start gap-2 lg:order-none lg:col-start-1 lg:row-start-2">
             <div className="flex items-baseline justify-between border-b-2 border-cx-ink pb-2">
               <h2 className="text-[15px] font-bold text-cx-ink">Sets</h2>
@@ -78,6 +79,7 @@ export function CheckListHero({
               ))}
             </ol>
           </nav>
+        ) : null}
 
         {set && checklist ? (
           <div className="grid content-start gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
@@ -106,7 +108,20 @@ export function CheckListHero({
               Full {set.name} checklist, {set.totalCards ?? singles.length} cards
             </Link>
           </div>
-        ) : null}
+        ) : (
+          <div className="grid content-start gap-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+            <div className="flex items-baseline justify-between border-b-2 border-cx-ink pb-2">
+              <h2 className="text-[15px] font-bold text-cx-ink">This week&apos;s checklist</h2>
+            </div>
+            <div className="tc-empty-sheet grid min-h-[220px] content-center gap-3 border-b border-cx-line px-6 py-10 sm:px-10">
+              <p className="text-[20px] font-semibold leading-[1.25] text-cx-ink">No set is on the sheet yet</p>
+              <p className="max-w-[48ch] text-[15px] leading-[1.5] text-cx-ink-2">
+                When the shop lists a set, its numbered checklist prints here with every card we hold ticked. Search above for a card, or{" "}
+                <Link href={`/${countryCode}/trade-in`} className="underline underline-offset-4 hover:text-cx-ink">sell us yours</Link>.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )

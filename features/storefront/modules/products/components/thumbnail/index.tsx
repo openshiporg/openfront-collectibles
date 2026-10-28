@@ -37,7 +37,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   return (
     <div
       className={cn(
-        "cx-pocket relative w-full overflow-hidden rounded-[2px] bg-cx-well",
+        "relative w-full overflow-hidden rounded-[2px] bg-cx-well",
         className,
         {
           "aspect-[4/3]": isFeatured || (size !== "square" && size !== "small"),

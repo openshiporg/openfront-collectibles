@@ -45,9 +45,13 @@ export async function HomePage(props: {
   const checklist = featuredSet ? await getSetChecklist(featuredSet.handle, currencyCode) : null
   const upcoming = sets.find((s) => s.releaseStatus === "preorder") ?? null
   const inStockSealed = sealed.products.filter((p) => !p.productVariants.some((v) => v.preorder))
+  const hasShelves = Boolean(
+    (upcoming && preorders.products.length) || slabs.products.length || chase.products.length ||
+    inStockSealed.length || buylists?.[0]?.entries?.length || sets.length,
+  )
 
   return (
-    <div className="pb-24">
+    <div className={hasShelves ? "pb-24" : undefined}>
       <CheckListHero
         countryCode={countryCode}
         currencyCode={currencyCode}
@@ -57,6 +61,7 @@ export async function HomePage(props: {
         checklist={checklist}
       />
 
+      {hasShelves ? (
       <div className="mx-auto grid w-full max-w-[1320px] gap-16 px-4 pt-16 sm:px-6 sm:pt-20">
         {upcoming && preorders.products.length > 0 ? (
           <Shelf title={`${upcoming.name} pre-orders`} href={`/${countryCode}/collections/delta-reign-pre-orders`} linkLabel="All pre-orders">
@@ -104,6 +109,7 @@ export async function HomePage(props: {
           </Shelf>
         ) : null}
       </div>
+      ) : null}
     </div>
   )
 }

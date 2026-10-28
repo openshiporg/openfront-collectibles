@@ -73,16 +73,22 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
         base: {
           fontFamily: "ui-sans-serif, system-ui, sans-serif",
           fontSize: "16px",
+          fontSmoothing: "antialiased",
           color: "#efebe2",
+          iconColor: "#b5afa5",
           "::placeholder": {
             color: "#9d978d",
           },
         },
+        invalid: {
+          color: "#f0857a",
+          iconColor: "#f0857a",
+        },
       },
       classes: {
         base: "block h-12 w-full appearance-none rounded-[2px] border border-cx-line bg-cx-surface px-4 pt-3.5 pb-1 transition-colors hover:border-cx-ink-3",
-        focus: "border-cx-accent ring-2 ring-cx-accent/25",
-        invalid: "border-cx-danger",
+        focus: "border-cx-accent! ring-2 ring-cx-accent/25",
+        invalid: "border-cx-danger!",
       },
       // Hide postal code since we already collect it in the billing address form
       hidePostalCode: true,

@@ -10,7 +10,7 @@ export default async function SaveItem({ listingId }: { listingId?: string | nul
     return (
       <LocalizedClientLink
         href="/account"
-        className="inline-flex min-h-11 items-center gap-2 self-start rounded-[2px] px-1 text-[14px] text-cx-ink-2 underline-offset-4 hover:text-cx-ink hover:underline"
+        className="inline-flex min-h-11 items-center gap-2 self-start rounded-[2px] text-[14px] text-cx-ink-2 underline-offset-4 hover:text-cx-ink hover:underline"
         data-testid="save-item-signin"
       >
         Sign in to save this item

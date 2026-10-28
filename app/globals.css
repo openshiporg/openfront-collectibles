@@ -212,25 +212,6 @@
     color: oklch(68% 0.006 265);
   }
 
-  /* The glassine pocket: a clear strip across the lower part of a specimen well. */
-  .cx-pocket {
-    position: relative;
-    isolation: isolate;
-  }
-  .cx-pocket::after {
-    content: "";
-    position: absolute;
-    inset: 58% 0 0;
-    z-index: 1;
-    background: oklch(100% 0 0 / 0.055);
-    border-top: 1px solid oklch(100% 0 0 / 0.16); /* taste-skill-ignore: the glassine strip's folded edge */
-    pointer-events: none;
-    transition: background-color 200ms cubic-bezier(0.23, 1, 0.32, 1);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .group:hover .cx-pocket::after { background: oklch(100% 0 0 / 0.03); }
-  }
-
   /* Home: rows print in once, top-down. */
   @media (prefers-reduced-motion: no-preference) {
     .cx-rise > * {

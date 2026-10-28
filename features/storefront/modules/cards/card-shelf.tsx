@@ -38,6 +38,7 @@ export async function CardShelf({
     }),
   ])
   const pages = Math.max(1, Math.ceil(count / PAGE))
+  const filtered = Object.entries(params).some(([k, v]) => v && k !== "page")
   const pageHref = (n: number) => {
     const q = new URLSearchParams(Object.entries(params).filter(([k, v]) => v && k !== "page") as [string, string][])
     if (n > 1) q.set("page", String(n))
@@ -61,8 +62,21 @@ export async function CardShelf({
       <p className="tc-num text-[13px] text-cx-ink-3" aria-live="polite">{count} {count === 1 ? "product" : "products"}</p>
       {products.length === 0 ? (
         <div className="grid gap-3 border-y border-cx-line py-10">
-          <p className="text-[18px] font-semibold text-cx-ink">Nothing matches these filters</p>
-          <p className="text-[15px] text-cx-ink-2">Clear a filter, or look the card up in its <Link href={`/${countryCode}/sets`} className="underline underline-offset-4">set checklist</Link> and add it to your want list.</p>
+          {filtered ? (
+            <>
+              <p className="text-[18px] font-semibold text-cx-ink">Nothing matches these filters</p>
+              <p className="max-w-[60ch] text-[15px] leading-[1.5] text-cx-ink-2">
+                <Link href="?" className="underline underline-offset-4 hover:text-cx-ink">Clear the filters</Link>, or look the card up in its <Link href={`/${countryCode}/sets`} className="underline underline-offset-4 hover:text-cx-ink">set checklist</Link> and add it to your want list.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-[18px] font-semibold text-cx-ink">Nothing on this shelf yet</p>
+              <p className="max-w-[60ch] text-[15px] leading-[1.5] text-cx-ink-2">
+                New stock lands here as it is graded and priced. Look a card up in its <Link href={`/${countryCode}/sets`} className="underline underline-offset-4 hover:text-cx-ink">set checklist</Link> and add it to your want list; it shows as in stock there when one arrives.
+              </p>
+            </>
+          )}
         </div>
       ) : category === "graded-slabs" || kind === "graded" ? (
         // Slabs read by their label, so they keep the slab tile.
