@@ -1,6 +1,10 @@
+<!-- logo -->
+
 # Openfront Collectibles
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fopenshiporg%2Fopenfront-collectibles&env=DATABASE_URL%2CSESSION_SECRET%2CS3_BUCKET_NAME%2CS3_REGION%2CS3_ACCESS_KEY_ID%2CS3_SECRET_ACCESS_KEY)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/openfront-collectibles)
 
 Openfront Collectibles is a self-hostable shop for Pokémon trading cards: singles by condition, graded slabs, sealed product and pre-orders, a buylist for buying cards from customers, consignment, and market-price tracking with repricing rules. Every set is a full checklist, so collectors can see what the shop holds, what each card is worth, and keep a binder and want list of their own.
 
@@ -12,9 +16,8 @@ Openfront Collectibles is a self-hostable shop for Pokémon trading cards: singl
 
 | | |
 |---|---|
-| **Live demo** | [openfront-collectibles-production.up.railway.app](https://openfront-collectibles-production.up.railway.app) (to move to collectibles.openship.org) |
-| **Public application** | `/[countryCode]` on your development URL |
-| **Dashboard** | `/dashboard` on your development URL |
+| **Storefront** | [collectibles.openship.org](https://collectibles.openship.org) |
+| **Dashboard** | [collectibles.openship.org/dashboard](https://collectibles.openship.org/dashboard) |
 
 The demo is "Eighth Street Cards", a fictional shop created by the dashboard's normal onboarding (Complete card shop). Its catalog is 19 real sets with real TCGplayer market prices; its slab certificates are labelled samples.
 
