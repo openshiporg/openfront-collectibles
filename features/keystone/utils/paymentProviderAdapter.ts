@@ -9,16 +9,23 @@ export async function executeAdapterFunction({ provider, functionName, args }: {
   // A specialized claimed workflow export must not be callable through legacy dispatch.
   if (!['createPaymentFunction', 'capturePaymentFunction', 'refundPaymentFunction', 'getPaymentStatusFunction', 'generatePaymentLinkFunction', 'handleWebhookFunction'].includes(functionName)) throw new Error('Payment provider operation is not registered');
   const adapterKey = provider?.[functionName];
-  if (typeof adapterKey === 'string' && adapterKey.startsWith('http')) {
-    const response = await fetch(adapterKey, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider, ...args }),
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP request failed: ${response.statusText}`);
+  if (typeof adapterKey === 'string' && /^[a-z]+:/i.test(adapterKey)) {
+    // External adapters: HTTPS only, bounded, no redirects, projected provider record.
+    if (!/^https:\/\//i.test(adapterKey)) throw new Error('External payment adapters must use HTTPS');
+    const projectedProvider = { id: provider.id, code: provider.code, credentials: provider.credentials || {}, metadata: provider.metadata || {} };
+    try {
+      const response = await fetch(adapterKey, {
+        method: 'POST',
+        redirect: 'error',
+        signal: AbortSignal.timeout(30_000),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...args, provider: projectedProvider }),
+      });
+      if (!response.ok) throw new Error(`status ${response.status}`);
+      return await response.json();
+    } catch {
+      throw new Error('External payment adapter request failed; reconcile the original attempt before retrying');
     }
-    return response.json();
   }
   if (typeof adapterKey !== 'string' || !Object.prototype.hasOwnProperty.call(paymentProviderAdapters, adapterKey)) {
     throw new Error('Payment provider adapter is not registered');
