@@ -159,7 +159,7 @@ export function CollectibleEvidencePanel({ result, unavailable = false }: Eviden
               meta={
                 <>
                   {item.reportedLabel && <span>{item.reportedLabel}</span>}
-                  {item.certificateReference && (
+                  {item.certificateReference && !/^SAMPLE-/i.test(String(item.certificateReference).trim()) && (
                     <span className="cx-num">Cert {String(item.certificateReference).trim().slice(0, 160)}</span>
                   )}
                 </>

@@ -26,7 +26,7 @@ export function SlabView({ card, grade, year, eager, compact, className }: { car
       {grade.certificate && !compact ? (
         <figcaption className="tc-num flex flex-wrap justify-between gap-x-3 px-1 text-[12px] text-[var(--tc-ink-3)]">
           <span>Cert {grade.certificate}</span>
-          {grade.sample ? <span>Sample record</span> : grade.certificateUrl ? <a className="underline underline-offset-2 hover:text-[var(--tc-ink)]" href={grade.certificateUrl} target="_blank" rel="noopener noreferrer">Verify with {grade.company}</a> : null}
+          {grade.certificateUrl ? <a className="underline underline-offset-2 hover:text-[var(--tc-ink)]" href={grade.certificateUrl} target="_blank" rel="noopener noreferrer">Verify with {grade.company}</a> : null}
         </figcaption>
       ) : null}
     </figure>

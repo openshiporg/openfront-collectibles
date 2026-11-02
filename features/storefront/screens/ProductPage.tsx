@@ -100,9 +100,10 @@ export async function ProductPage(props: Props) {
     const evidence = slabFromGrading(collectibleListing?.extension?.value?.observations?.grading)
     const fallback = graded ? slabGrade({ ...(product as any), subtitle: (product as any).subtitle ?? null }) : null
     const company = evidence?.company || fallback?.company || null
-    const certificate = evidence?.certificate || null
+    const rawCertificate = evidence?.certificate || null
+    const certificate = rawCertificate && !/^SAMPLE-/i.test(rawCertificate) ? rawCertificate : null
     const template = GRADERS.find((g) => g.value === company)?.certUrl
-    const sample = certificate ? certificate.startsWith("SAMPLE-") : false
+    const sample = false
     const grade = graded && company && (evidence?.grade || fallback?.grade)
       ? {
           company,

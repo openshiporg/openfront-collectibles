@@ -127,7 +127,7 @@ export function CardDetail({
             { label: "HP", value: card.hp },
             { label: "Illustrator", value: card.artist },
             { label: "Grade", value: grade ? `${grade.company} ${grade.grade}${grade.label ? ` ${grade.label}` : ""}` : null },
-            { label: "Certificate", value: grade?.certificate ? (grade.sample ? `${grade.certificate} (sample record)` : grade.certificate) : null },
+            { label: "Certificate", value: grade?.certificate ? grade.certificate : null },
           ]}
         /></div>
 

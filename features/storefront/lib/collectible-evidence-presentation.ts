@@ -31,8 +31,9 @@ export function formatGradingEvidence(item: {
   const reference = typeof item?.certificateReference === 'string'
     ? item.certificateReference.trim().slice(0, 160)
     : '';
+  const showReference = reference && !/^SAMPLE-/i.test(reference);
 
-  return [company, grade, verification, reference ? `Reported certificate ref: ${reference}` : null]
+  return [company, grade, verification, showReference ? `Reported certificate ref: ${reference}` : null]
     .filter(Boolean)
     .join(' · ');
 }
@@ -54,7 +55,7 @@ export function slabFromGrading(grading: any[] | undefined | null) {
     companyName: typeof company?.name === 'string' ? company.name : null,
     grade: row.reportedGrade as string,
     gradeLabel: typeof row.reportedLabel === 'string' ? row.reportedLabel : null,
-    certificate: typeof row.certificateReference === 'string' && row.certificateReference.trim()
+    certificate: typeof row.certificateReference === 'string' && row.certificateReference.trim() && !/^SAMPLE-/i.test(row.certificateReference.trim())
       ? row.certificateReference.trim().slice(0, 160)
       : null,
     verification: typeof row.verificationState === 'string' ? row.verificationState : null,
