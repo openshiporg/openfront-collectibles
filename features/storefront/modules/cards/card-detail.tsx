@@ -70,7 +70,7 @@ export function CardDetail({
   const face = { id: card.id, name: card.name, number: card.number, rarity: card.rarity, setName: set?.name, imageUrl: card.imageUrl, imageLargeUrl: card.imageLargeUrl }
 
   return (
-    <div className="tc deneb-detail">
+    <><nav className="deneb-breadcrumb" aria-label="Breadcrumb"><Link href={`/${countryCode}/store`}>Singles</Link><span>/</span>{set ? <><Link href={`/${countryCode}/sets/${set.handle}`}>{set.name}</Link><span>/</span></> : null}<span>{card.name} {card.number}</span></nav><div className="tc deneb-detail">
       <div className="deneb-detail-art">
         {grade ? (
           <SlabView card={face} grade={grade} year={slabYear} eager />
@@ -134,6 +134,6 @@ export function CardDetail({
         {!sealed ? <BinderButton catalogItemId={card.id} finish={primaryFinish ?? null} label={card.name} /> : null}
         {aside}
       </div>
-    </div>
+    </div></>
   )
 }

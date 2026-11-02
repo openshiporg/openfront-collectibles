@@ -115,7 +115,6 @@ export async function ProductPage(props: Props) {
       : null
     const preorderVariant = variants.find((v: any) => v.preorder)
     const sameCard = setMore.products.filter((p) => p.handle !== product.handle && p.catalogItem?.id === item.id)
-    const moreFromSet = setMore.products.filter((p) => p.handle !== product.handle && p.catalogItem?.id !== item.id).slice(0, 5)
     const set = item.collectibleSet
       ? { ...item.collectibleSet, code: item.collectibleSet.code || null, series: item.collectibleSet.series || null, logoUrl: item.collectibleSet.logoUrl || null, symbolUrl: item.collectibleSet.symbolUrl || null }
       : null
@@ -139,7 +138,7 @@ export async function ProductPage(props: Props) {
           purchase={<CardBuyPanel variants={variants} currencyCode={currencyCode} />}
           aside={<section className="deneb-stock-record"><h2>IN STOCK</h2>{variants.map((v: any) => <div key={v.id}><span>{[v.stockKind === 'raw' ? 'Raw' : v.stockKind === 'graded' ? `${grade?.company || 'Graded'} ${grade?.grade || ''}` : 'Sealed', v.condition ? conditionLabel(v.condition) : null, v.finish ? finishLabel(v.finish) : null].filter(Boolean).join(' · ')} · {v.quantity} available</span><strong>{money(v.priceMinor, currencyCode)}</strong></div>)}</section>}
         />
-        {sameCard.length > 0 || moreFromSet.length > 0 ? (
+        {sameCard.length > 0 ? (
           <div className="mx-auto grid w-full max-w-[1320px] gap-14 px-4 pb-24 sm:px-6">
             {sameCard.length > 0 ? (
               <section className="grid gap-5" aria-label="Other copies of this card">
@@ -150,12 +149,6 @@ export async function ProductPage(props: Props) {
                 {sameCard.some((p) => p.productVariants[0]?.stockKind !== "graded") ? (
                   <CardSheet label={`Other copies of ${item.title}`} actions>{sameCard.filter((p) => p.productVariants[0]?.stockKind !== "graded").map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
                 ) : null}
-              </section>
-            ) : null}
-            {moreFromSet.length > 0 && item.collectibleSet ? (
-              <section className="grid gap-5" aria-label={`More from ${item.collectibleSet.name}`}>
-                <h2 className="text-[18px] font-bold text-cx-ink">More from {item.collectibleSet.name}</h2>
-                <CardSheet label={`More from ${item.collectibleSet.name}`} actions>{moreFromSet.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}</CardSheet>
               </section>
             ) : null}
           </div>
