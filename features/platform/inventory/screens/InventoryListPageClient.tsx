@@ -15,6 +15,7 @@ import { useDashboard } from '../../../dashboard/context/DashboardProvider';
 import { useListItemsQuery } from '../../../dashboard/hooks/useListItems.query';
 import { buildOrderByClause } from '../../../dashboard/lib/buildOrderByClause';
 import { buildWhereClause } from '../../../dashboard/lib/buildWhereClause';
+import { plural } from '@/features/platform/lib/plural'
 
 interface InventoryListMeta {
   key: string;
@@ -96,7 +97,7 @@ export function InventoryListPageClient({
   const header = (
     <PageTitle
       title="Inventory"
-      meta={<span className="font-mono tabular-nums">{data.count} variants</span>}
+      meta={<span className="font-mono tabular-nums">{plural(data.count, 'variant')}</span>}
       actions={<PillLink href="/dashboard/platform/collectible-inventory">Serialized items</PillLink>}
     />
   );

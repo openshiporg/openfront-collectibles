@@ -227,7 +227,7 @@ export function OrderPageClient({
                         <div className="text-sm font-medium text-foreground">{item.title}</div>
                         {spec && <div className="font-mono text-xs tabular-nums text-foreground/80">{spec}</div>}
                         {item.sku && (
-                          <div className="font-mono text-[11px] tabular-nums text-muted-foreground">SKU {item.sku}</div>
+                          <div className="font-mono text-xs tabular-nums text-muted-foreground">SKU {item.sku}</div>
                         )}
                       </div>
                       <div className="shrink-0 text-right font-mono tabular-nums">

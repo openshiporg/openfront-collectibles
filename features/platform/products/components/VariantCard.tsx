@@ -199,7 +199,7 @@ export function VariantCard({
       type="button"
       data-active={selectedFilters.includes(`${ov.option}:${ov.value}`)}
       className={cn(
-        "inline-flex min-h-6 items-center gap-1 rounded-full bg-muted px-2 text-[11px] font-medium text-foreground hover:bg-muted/70",
+        "inline-flex min-h-6 items-center gap-1 rounded-full bg-muted px-2 text-xs font-medium text-foreground hover:bg-muted/70",
         "data-[active=true]:bg-foreground data-[active=true]:text-background"
       )}
       onClick={() => onOptionFilter?.(ov.option, ov.value)}
@@ -350,7 +350,7 @@ export function VariantCard({
                   )}
                 </div>
                 <div className="space-y-0.5">
-                  <div className="text-[11px] font-medium text-muted-foreground">
+                  <div className="text-xs font-medium text-muted-foreground">
                     Prices
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -374,7 +374,7 @@ export function VariantCard({
                                 size="sm"
                                 className="h-7 cursor-pointer flex items-center gap-1 rounded-full px-2.5 font-mono text-xs tabular-nums hover:bg-accent max-sm:h-9"
                               >
-                                <span className="uppercase text-[10px] text-muted-foreground mr-0.5">
+                                <span className="uppercase text-xs text-muted-foreground mr-0.5">
                                   {region.currency.code}
                                 </span>
                                 <span>
@@ -421,7 +421,7 @@ export function VariantCard({
                               size="sm"
                               className="h-7 gap-1 rounded-full border-dashed bg-transparent px-2.5 text-xs hover:bg-muted max-sm:h-9"
                             >
-                              <span className="font-mono uppercase text-[10px] text-muted-foreground mr-0.5">
+                              <span className="font-mono uppercase text-xs text-muted-foreground mr-0.5">
                                 {region.currency.code}
                               </span>
                               Add
@@ -478,7 +478,7 @@ export function VariantCard({
         <AccordionContent className="px-4 pb-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-3">
             <div className="space-y-1">
-              <div className="text-[11px] font-medium text-muted-foreground">
+              <div className="text-xs font-medium text-muted-foreground">
                 SKU
               </div>
               <div className="font-mono text-sm tabular-nums font-medium">
@@ -486,7 +486,7 @@ export function VariantCard({
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[11px] font-medium text-muted-foreground">
+              <div className="text-xs font-medium text-muted-foreground">
                 Stock
               </div>
               <div className="font-mono text-sm tabular-nums font-medium">
@@ -494,7 +494,7 @@ export function VariantCard({
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[11px] font-medium text-muted-foreground">
+              <div className="text-xs font-medium text-muted-foreground">
                 Barcode
               </div>
               <div className="font-mono text-sm tabular-nums">
@@ -502,19 +502,19 @@ export function VariantCard({
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-[11px] font-medium text-muted-foreground">
+              <div className="text-xs font-medium text-muted-foreground">
                 EAN
               </div>
               <div className="font-mono text-sm tabular-nums">{variant.ean || "-"}</div>
             </div>
             <div className="space-y-1">
-              <div className="text-[11px] font-medium text-muted-foreground">
+              <div className="text-xs font-medium text-muted-foreground">
                 UPC
               </div>
               <div className="font-mono text-sm tabular-nums">{variant.upc || "-"}</div>
             </div>
             <div className="space-y-1">
-              <div className="text-[11px] font-medium text-muted-foreground">
+              <div className="text-xs font-medium text-muted-foreground">
                 Material
               </div>
               <div className="text-sm">{variant.material || "-"}</div>

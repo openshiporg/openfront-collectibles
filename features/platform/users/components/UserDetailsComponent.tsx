@@ -211,7 +211,7 @@ export function UserDetailsComponent({
               </div>
 
               <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                {user.email && <span className="min-w-0 truncate">{user.email}</span>}
+                {user.email && <span className="min-w-0 break-all">{user.email}</span>}
                 {user.phone && <span className="font-mono tabular-nums">{user.phone}</span>}
                 <span>
                   <span className="font-mono tabular-nums">{ordersData.length}</span> {ordersData.length === 1 ? 'order' : 'orders'}

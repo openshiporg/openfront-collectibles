@@ -118,7 +118,7 @@ export const OAuthInstallDialogClient: React.FC<OAuthInstallDialogClientProps> =
                       <Dot tone="ok" />
                       {getScopeDescription(scope)}
                     </span>
-                    <span className="font-mono text-[11px] text-muted-foreground">{scope}</span>
+                    <span className="font-mono text-xs text-muted-foreground">{scope}</span>
                   </div>
                 ))}
               </ListBand>

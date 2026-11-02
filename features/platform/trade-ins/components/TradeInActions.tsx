@@ -17,6 +17,7 @@ import {
   transitionSubmission,
 } from '../actions';
 import { ACTION_LABELS, SUBMISSION_TRANSITIONS } from '../lib/transitions';
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
 
 const text = (form: FormData, key: string) => String(form.get(key) ?? '').trim();
 
@@ -37,22 +38,22 @@ export function CreateSubmissionButton({ customers }: { customers: { id: string;
       }}
     >
       <Field id="tradein-customer" label="Customer">
-        <select id="tradein-customer" name="customerId" required defaultValue="" className={fieldClass}>
+        <OptionSelect id="tradein-customer" name="customerId" required defaultValue="" className={fieldClass}>
           <option value="" disabled>{customers.length ? 'Select customer' : 'No customers yet'}</option>
           {customers.map((c) => (
             <option key={c.id} value={c.id}>{c.name ? `${c.name} · ${c.email}` : c.email}</option>
           ))}
-        </select>
+        </OptionSelect>
       </Field>
       <Field id="tradein-reference" label="Reference">
         <Input id="tradein-reference" name="reference" required maxLength={64} pattern="[A-Za-z0-9][A-Za-z0-9_\-]{1,63}" className="font-mono" />
       </Field>
       <Field id="tradein-disposition" label="Payout">
-        <select id="tradein-disposition" name="disposition" defaultValue="cash" className={fieldClass}>
+        <OptionSelect id="tradein-disposition" name="disposition" defaultValue="cash" className={fieldClass}>
           <option value="cash">Cash</option>
           <option value="store_credit">Store credit</option>
           <option value="trade">Trade</option>
-        </select>
+        </OptionSelect>
       </Field>
     </FormDialog>
   );
@@ -96,12 +97,12 @@ export function AddTradeInItemButton({
       }}
     >
       <Field id="tradein-item-catalog" label="Catalogue item">
-        <select id="tradein-item-catalog" name="catalogItemId" defaultValue="" className={fieldClass}>
+        <OptionSelect id="tradein-item-catalog" name="catalogItemId" defaultValue="" className={fieldClass}>
           <option value="">Not in the catalogue</option>
           {catalogItems.map((c) => (
             <option key={c.id} value={c.id}>{[c.title, c.catalogNumber, c.year].filter(Boolean).join(' · ')}</option>
           ))}
-        </select>
+        </OptionSelect>
       </Field>
       <Field id="tradein-item-description" label="Description">
         <Textarea id="tradein-item-description" name="description" maxLength={4000} rows={3} />
@@ -222,12 +223,12 @@ export function LinkSpecimenForm({
     >
       <label htmlFor={selectId} className="text-xs text-muted-foreground">Item record</label>
       <div className="flex items-center gap-2">
-        <select id={selectId} name="specimenId" required defaultValue="" className={`${fieldClass} h-9 max-w-56`}>
+        <OptionSelect id={selectId} name="specimenId" required defaultValue="" className={`${fieldClass} h-9 max-w-56`}>
           <option value="" disabled>Select record</option>
           {specimens.map((s) => (
             <option key={s.id} value={s.id}>{s.specimenCode} · {s.displayName}</option>
           ))}
-        </select>
+        </OptionSelect>
         <Track label="Link record">
           <Pill type="submit" active disabled={pending}>{pending ? 'Linking' : 'Link'}</Pill>
         </Track>

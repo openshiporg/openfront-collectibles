@@ -10,6 +10,7 @@ import { PlatformEmptyState } from '../../components/PlatformEmptyState'
 import { Dot, ListBand, PageTitle, StatusFilter, humanize, pillClass, trackClass } from '../../components/vault-ui'
 import { money } from '../../collectibles/lib/format'
 import { LIFECYCLE, LISTING_TONES, UNIT_TONES, lifecycleTone } from '../lib/constants'
+import { plural } from '@/features/platform/lib/plural'
 
 type Props = {
   list: any
@@ -78,7 +79,7 @@ export function ItemListPageClient({ list, data, error, currentPage, pageSize, i
   const header = (
     <PageTitle
       title="Items"
-      meta={<span className="font-mono tabular-nums">{statusCounts.all ?? data.count} items</span>}
+      meta={<span className="font-mono tabular-nums">{plural(statusCounts.all ?? data.count, 'item')}</span>}
       actions={
         <div className={trackClass}>
           <Link href="/dashboard/platform/items/receive" data-active="true" className={pillClass}>

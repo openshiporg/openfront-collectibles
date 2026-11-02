@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { openDispute } from '../actions';
 import { DISPUTE_TYPES } from '../lib/lifecycle';
 import { Field, FormSheet, inputCls } from './form-kit';
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
 
 export function OpenDisputeSheet({
   orders,
@@ -40,19 +41,19 @@ export function OpenDisputeSheet({
       }}
     >
       <Field id="dispute-order" label="Order">
-        <select id="dispute-order" name="orderId" required defaultValue={defaultOrderId || ''} className={inputCls}>
+        <OptionSelect id="dispute-order" name="orderId" required defaultValue={defaultOrderId || ''} className={inputCls}>
           <option value="">Select order</option>
           {orders.map((order) => (
             <option key={order.id} value={order.id}>
               #{order.displayId}{order.email ? ` · ${order.email}` : ''}{order.total ? ` · ${order.total}` : ''}
             </option>
           ))}
-        </select>
+        </OptionSelect>
       </Field>
       <Field id="dispute-type" label="Type">
-        <select id="dispute-type" name="type" required defaultValue="condition" className={inputCls}>
+        <OptionSelect id="dispute-type" name="type" required defaultValue="condition" className={inputCls}>
           {DISPUTE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-        </select>
+        </OptionSelect>
       </Field>
       <Field id="dispute-summary" label="Summary">
         <Textarea id="dispute-summary" name="summary" required maxLength={4000} rows={5} />

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { parseMajorToMinor, currencyExponent } from '@/features/lib/minor-units';
 import { getManagedListingData, runManagedListingCommand, type ManagedListingData } from '../actions/listings';
 import { money } from '../lib/format';
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
 export function ManagedListings() {
   const [data, setData] = useState<ManagedListingData | null>(null);
   const [error, setError] = useState(''), [message, setMessage] = useState(''), [pending, setPending] = useState(false);
@@ -74,7 +75,7 @@ export function ManagedListings() {
       </ListBand>
       <form key={editing ?? key} action={save} className="grid content-start gap-3 rounded-xl bg-background p-4 shadow-[0_1px_2px_rgb(0_0_0/0.06)] ring-1 ring-border">
         <h3 className="text-sm font-semibold text-foreground">{selected ? 'Edit draft' : 'New draft listing'}</h3>
-        {!selected && <div className="grid gap-1.5"><Label htmlFor="listing-unit">Available stock</Label><select id="listing-unit" name="unitId" onChange={event => setUnitChoice(event.target.value)} required className={selectCls}><option value="">Select unit</option>{freeUnits.map(unit => <option key={unit.id} value={unit.id}>{unit.sku}</option>)}</select>{freeUnits.length === 0 && <p className="text-xs text-muted-foreground">{data.inventoryUnits.some(unit => unit.status === 'available') ? 'Every available unit already has an active listing' : 'No available stock'}</p>}</div>}
+        {!selected && <div className="grid gap-1.5"><Label htmlFor="listing-unit">Available stock</Label><OptionSelect id="listing-unit" name="unitId" onChange={event => setUnitChoice(event.target.value)} required className={selectCls}><option value="">Select unit</option>{freeUnits.map(unit => <option key={unit.id} value={unit.id}>{unit.sku}</option>)}</OptionSelect>{freeUnits.length === 0 && <p className="text-xs text-muted-foreground">{data.inventoryUnits.some(unit => unit.status === 'available') ? 'Every available unit already has an active listing' : 'No available stock'}</p>}</div>}
         <div className="grid gap-1.5"><Label htmlFor="listing-title">Title</Label><Input id="listing-title" name="title" required maxLength={300} defaultValue={selected?.title} /></div>
         {!selected && <div className="grid gap-1.5"><Label htmlFor="listing-slug">Slug</Label><Input id="listing-slug" name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={180} className="font-mono" /></div>}
         <div className="grid gap-1.5"><Label htmlFor="listing-condition">Reported condition</Label><Input id="listing-condition" name="condition" required maxLength={2000} defaultValue={selected?.publicSummary} /></div>

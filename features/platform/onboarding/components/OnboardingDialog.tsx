@@ -56,7 +56,7 @@ const PaymentProviderEnvDisplay: React.FC<PaymentProviderEnvDisplayProps> = ({
             <p className="text-sm text-foreground">{provider}</p>
             <div className="flex flex-wrap gap-1.5">
               {PAYMENT_PROVIDER_ENV_VARS[provider].map((envVar) => (
-                <code key={envVar} className="rounded bg-background px-1.5 py-0.5 font-mono text-[11px] ring-1 ring-border">
+                <code key={envVar} className="rounded bg-background px-1.5 py-0.5 font-mono text-xs ring-1 ring-border">
                   {envVar}
                 </code>
               ))}

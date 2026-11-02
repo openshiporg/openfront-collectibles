@@ -56,7 +56,7 @@ export async function BuylistPage({ workbench }: { workbench?: React.ReactNode }
                         <div className="flex flex-wrap items-baseline gap-x-2">
                           <a href={`/dashboard/buylist-entries/${entry.id}`} className="font-medium text-foreground underline-offset-4 hover:underline">{card?.title ?? 'Unlinked entry'}</a>
                           <RarityMark rarity={card?.rarity} />
-                          {entry.hotlist ? <span className="border border-foreground px-1 text-[11px] font-semibold uppercase tracking-wide text-foreground">Hotlist</span> : null}
+                          {entry.hotlist ? <span className="border border-foreground px-1 text-xs font-semibold uppercase tracking-wide text-foreground">Hotlist</span> : null}
                           {entry.active !== 'active' ? <span className="text-xs text-muted-foreground">Paused</span> : null}
                         </div>
                         <span className="tabular-nums text-muted-foreground">

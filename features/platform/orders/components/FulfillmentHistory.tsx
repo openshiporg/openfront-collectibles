@@ -137,7 +137,7 @@ export function FulfillmentHistory({
             <p className="font-mono text-xs tabular-nums text-foreground/80">{item.lineItem.variantTitle}</p>
           )}
           {item.lineItem.sku && (
-            <p className="font-mono text-[11px] tabular-nums text-muted-foreground">SKU {item.lineItem.sku}</p>
+            <p className="font-mono text-xs tabular-nums text-muted-foreground">SKU {item.lineItem.sku}</p>
           )}
         </div>
         <div className="shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">

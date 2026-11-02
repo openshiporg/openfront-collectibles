@@ -138,7 +138,7 @@ export async function ItemPage({ params }: { params: Promise<{ id: string }> }) 
                 {evidence.map((entry) => (
                   <div key={entry.key} className="space-y-1 px-4 py-3">
                     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{entry.kind}</span>
+                      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{entry.kind}</span>
                       <span className="text-sm font-medium text-foreground">{entry.title}</span>
                       {entry.state && (
                         <span className="inline-flex items-baseline gap-1.5 text-xs text-muted-foreground">
@@ -150,7 +150,7 @@ export async function ItemPage({ params }: { params: Promise<{ id: string }> }) 
                     </div>
                     {entry.meta && <p className="text-xs text-muted-foreground">{entry.meta}</p>}
                     {entry.note && <p className="max-w-[70ch] text-xs leading-5 text-muted-foreground">{entry.note}</p>}
-                    <p className="text-[11px] text-muted-foreground">{entry.isPublic ? 'Public' : 'Internal'}</p>
+                    <p className="text-xs text-muted-foreground">{entry.isPublic ? 'Public' : 'Internal'}</p>
                   </div>
                 ))}
               </ListBand>
@@ -276,7 +276,7 @@ export async function ItemPage({ params }: { params: Promise<{ id: string }> }) 
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={media.url} alt={media.altText || ''} className="size-12 shrink-0 rounded-md bg-muted object-cover" />
                     ) : (
-                      <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] text-muted-foreground">{humanize(media.kind)}</span>
+                      <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted text-xs text-muted-foreground">{humanize(media.kind)}</span>
                     )}
                     <div className="min-w-0 flex-1">
                       <a href={media.url} target="_blank" rel="noreferrer" className="block truncate text-sm text-foreground hover:underline">

@@ -48,6 +48,6 @@ export function Pill({
 }
 
 export function Count({ children }: { children: ReactNode }) {
-  return <span className="font-mono text-[11px] tabular-nums text-muted-foreground">{children ?? 0}</span>
+  return <span className="font-mono text-xs tabular-nums text-muted-foreground">{children ?? 0}</span>
 }
 

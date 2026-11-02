@@ -12,6 +12,8 @@ import {
 } from '../actions';
 import { ACTION_LABELS, AGREEMENT_TRANSITIONS, INTAKE_TRANSITIONS, ITEM_TRANSITIONS } from '../lib/transitions';
 import { Field, FormDialog, MovePills, fieldClass } from './controls';
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
+import { PlatformDateInput } from '@/features/platform/components/PlatformDateTime'
 
 const movesFor = (map: Record<string, string[]>, status?: string | null) =>
   (status ? map[status] || [] : []).map((to) => ({ to, label: ACTION_LABELS[to] || to }));
@@ -37,12 +39,12 @@ export function CreateIntakeButton({ consignors }: { consignors: { id: string; d
       }}
     >
       <Field id="intake-consignor" label="Consignor">
-        <select id="intake-consignor" name="consignorId" required className={fieldClass} defaultValue="">
+        <OptionSelect id="intake-consignor" name="consignorId" required className={fieldClass} defaultValue="">
           <option value="" disabled>{consignors.length ? 'Select consignor' : 'No sellers yet'}</option>
           {consignors.map((c) => (
             <option key={c.id} value={c.id}>{c.displayName}{c.status !== 'active' ? ` (${c.status})` : ''}</option>
           ))}
-        </select>
+        </OptionSelect>
       </Field>
       <Field id="intake-reference" label="Reference">
         <Input id="intake-reference" name="reference" required maxLength={64} pattern="[A-Za-z0-9][A-Za-z0-9_\-]{1,63}" className="font-mono" />
@@ -121,12 +123,12 @@ export function AddItemButton({
       }}
     >
       <Field id="item-specimen" label="Item record">
-        <select id="item-specimen" name="specimenId" className={fieldClass} defaultValue="">
+        <OptionSelect id="item-specimen" name="specimenId" className={fieldClass} defaultValue="">
           <option value="">Not yet recorded</option>
           {specimens.map((s) => (
             <option key={s.id} value={s.id}>{s.specimenCode} · {s.displayName}</option>
           ))}
-        </select>
+        </OptionSelect>
       </Field>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field id="item-reserve" label={`Reserve (${currencyCode})`}>
@@ -174,17 +176,17 @@ export function CreateAgreementButton({ intakeId, currencyCode, label }: { intak
           <Input id="agreement-currency" name="currencyCode" defaultValue={currencyCode} required maxLength={3} pattern="[A-Za-z]{3}" className="font-mono uppercase" />
         </Field>
         <Field id="agreement-authority" label="Pricing authority">
-          <select id="agreement-authority" name="pricingAuthority" defaultValue="mutual" className={fieldClass}>
+          <OptionSelect id="agreement-authority" name="pricingAuthority" defaultValue="mutual" className={fieldClass}>
             <option value="mutual">Mutual</option>
             <option value="operator">Store</option>
             <option value="consignor">Consignor</option>
-          </select>
+          </OptionSelect>
         </Field>
         <Field id="agreement-starts" label="Starts">
-          <Input id="agreement-starts" name="startsAt" type="date" />
+          <PlatformDateInput id="agreement-starts" name="startsAt" />
         </Field>
         <Field id="agreement-ends" label="Ends">
-          <Input id="agreement-ends" name="endsAt" type="date" />
+          <PlatformDateInput id="agreement-ends" name="endsAt" />
         </Field>
       </div>
     </FormDialog>

@@ -5,6 +5,7 @@ import { PageContainer } from '@/features/dashboard/components/PageContainer';
 import { formatMinorToMajor } from '@/features/lib/minor-units';
 import { BandRow, Dot, ListBand, PageTitle, SectionTitle, humanize, pillClass, trackClass, type DotTone } from '@/features/platform/components/vault-ui';
 import { MetricBand } from '../components/MetricBand';
+import { plural } from '@/features/platform/lib/plural'
 
 interface PageProps { searchParams: Promise<Record<string, string | string[] | undefined>> }
 const periods = [['24h', '24 hours'], ['7d', '7 days'], ['30d', '30 days'], ['90d', '90 days']] as const;
@@ -99,7 +100,7 @@ export async function AnalyticsListPage({ searchParams }: PageProps) {
         </div>
 
         <section className="min-w-0">
-          <SectionTitle meta={report.payments.byCurrency.length ? `${report.payments.byCurrency.length} currencies` : undefined}>Payments</SectionTitle>
+          <SectionTitle meta={report.payments.byCurrency.length ? plural(report.payments.byCurrency.length, 'currency', 'currencies') : undefined}>Payments</SectionTitle>
           {report.payments.byCurrency.length ? (
             <ListBand>
               <div className="hidden grid-cols-[80px_repeat(4,minmax(0,1fr))] gap-3 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid">

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Dot, ListBand, Pill, SectionTitle, Track } from '../../components/vault-ui'
 import { money } from '../../collectibles/lib/format'
 import { getReceiveOptions, receiveItem } from '../actions'
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
 
 type Variant = { id: string; sku: string | null; title: string | null; product?: { id: string; title: string; status: string } | null; prices?: { amount: number; currency?: { code: string } | null }[] }
 type Category = { id: string; name: string; handle: string; status: string }
@@ -151,12 +152,12 @@ export function ReceiveItemForm({
               <Pill active={categoryMode === 'new'} onClick={() => setCategoryMode('new')}>New</Pill>
             </Track>
             {categoryMode === 'existing' ? (
-              <select name="category" aria-label="Category" required className={selectCls} defaultValue="">
+              <OptionSelect name="category" aria-label="Category" required className={selectCls} defaultValue="">
                 <option value="">Select</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.handle}>{c.name}</option>
                 ))}
-              </select>
+              </OptionSelect>
             ) : (
               <div className="grid gap-1">
                 <Input aria-label="New category name" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} required maxLength={120} className="min-h-10" />

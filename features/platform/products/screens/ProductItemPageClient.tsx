@@ -31,6 +31,7 @@ import { toast } from 'sonner'
 import { updateItemAction, deleteItemAction } from '../../../dashboard/actions/item-actions'
 import { VariantsTab } from '../components/VariantsTab'
 import { MediaTab } from '../components/MediaTab'
+import { plural } from '@/features/platform/lib/plural'
 
 
 interface ProductItemPageClientProps {
@@ -297,7 +298,7 @@ export function ProductItemPageClient({ list, item, itemId }: ProductItemPageCli
             </div>
             <div className="flex flex-wrap gap-x-3 font-mono text-sm tabular-nums text-muted-foreground">
               {typeof item.handle === 'string' && item.handle && <span>/{item.handle}</span>}
-              {variantCount !== undefined && <span>{variantCount} variants</span>}
+              {variantCount !== undefined && <span>{plural(variantCount, 'variant')}</span>}
             </div>
           </div>
 

@@ -115,7 +115,7 @@ export const VariantsContent = ({
                     <span className="font-mono text-sm tabular-nums text-foreground">{variant.title}</span>
                   </div>
                   {variant.sku && (
-                    <div className="pl-[18px] font-mono text-[11px] tabular-nums text-muted-foreground">SKU {variant.sku}</div>
+                    <div className="pl-[18px] font-mono text-xs tabular-nums text-muted-foreground">SKU {variant.sku}</div>
                   )}
                 </div>
                 <div className="shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">

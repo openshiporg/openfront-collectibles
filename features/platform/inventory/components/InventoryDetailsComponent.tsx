@@ -55,7 +55,7 @@ export function InventoryDetailsComponent({ inventory }: { inventory: InventoryV
         <span className="block font-mono text-base font-medium tabular-nums text-foreground">
           {managed ? inventory.inventoryQuantity ?? 0 : '—'}
         </span>
-        <span className="text-[11px] text-muted-foreground">On hand</span>
+        <span className="text-xs text-muted-foreground">On hand</span>
       </div>
     </article>
   );

@@ -10,6 +10,7 @@ import { dateTime, day } from '../../collectibles/lib/format';
 import { addDisputeEvidence, assignDispute, transitionDispute } from '../actions';
 import { DISPUTE_TRANSITIONS, disputeStatus, disputeTypeLabel } from '../lib/lifecycle';
 import { ActionError, Field, FormSheet, inputCls, useAction } from '../components/form-kit';
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
 
 export function DisputeDetailPageClient({ dispute, staff }: { dispute: any; staff: { id: string; name?: string | null; email?: string | null }[] }) {
   const status = disputeStatus(dispute.status);
@@ -118,7 +119,7 @@ export function DisputeDetailPageClient({ dispute, staff }: { dispute: any; staf
         <aside className="min-w-0 space-y-8">
           <section>
             <SectionTitle>Assignee</SectionTitle>
-            <select
+            <OptionSelect
               aria-label="Assignee"
               className={inputCls}
               defaultValue={dispute.assignedTo?.id || ''}
@@ -127,7 +128,7 @@ export function DisputeDetailPageClient({ dispute, staff }: { dispute: any; staf
             >
               <option value="">Unassigned</option>
               {staff.map((user) => <option key={user.id} value={user.id}>{user.name || user.email}</option>)}
-            </select>
+            </OptionSelect>
           </section>
 
           {dispute.order && (

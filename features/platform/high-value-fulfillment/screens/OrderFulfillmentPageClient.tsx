@@ -10,6 +10,7 @@ import { dateTime, day, money } from '../../collectibles/lib/format';
 import { Field, FormSheet, inputCls } from '../../disputes/components/form-kit';
 import { createRequirement, recordShipmentEvidence } from '../actions';
 import { EVIDENCE_TYPES } from '../lib/constants';
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
 
 function CheckRow({ name, label, defaultChecked }: { name: string; label: string; defaultChecked?: boolean }) {
   return (
@@ -103,10 +104,10 @@ export function OrderFulfillmentPageClient({ order, requirements, evidence }: { 
                   />
                 </Field>
                 <Field id="req-line" label="Applies to">
-                  <select id="req-line" name="orderLineItemId" className={inputCls} defaultValue={current?.orderLineItem?.id || ''}>
+                  <OptionSelect id="req-line" name="orderLineItemId" className={inputCls} defaultValue={current?.orderLineItem?.id || ''}>
                     <option value="">Whole order</option>
                     {(order.lineItems || []).map((line: any) => <option key={line.id} value={line.id}>{line.title}</option>)}
-                  </select>
+                  </OptionSelect>
                 </Field>
                 <CheckRow name="signatureRequired" label="Signature required" defaultChecked={current?.signatureRequired ?? true} />
                 <CheckRow name="insuranceRequested" label="Insurance requested" defaultChecked={current?.insuranceRequested} />
@@ -159,9 +160,9 @@ export function OrderFulfillmentPageClient({ order, requirements, evidence }: { 
                   }}
                 >
                   <Field id="ev-type" label="Type">
-                    <select id="ev-type" name="type" className={inputCls} defaultValue="tracking">
+                    <OptionSelect id="ev-type" name="type" className={inputCls} defaultValue="tracking">
                       {EVIDENCE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-                    </select>
+                    </OptionSelect>
                   </Field>
                   <Field id="ev-provider" label="Provider">
                     <Input id="ev-provider" name="provider" required maxLength={120} />
@@ -176,14 +177,14 @@ export function OrderFulfillmentPageClient({ order, requirements, evidence }: { 
                     <Input id="ev-summary" name="publicSummary" maxLength={1000} />
                   </Field>
                   <Field id="ev-fulfillment" label="Shipment">
-                    <select id="ev-fulfillment" name="fulfillmentId" className={inputCls} defaultValue="">
+                    <OptionSelect id="ev-fulfillment" name="fulfillmentId" className={inputCls} defaultValue="">
                       <option value="">None</option>
                       {(order.fulfillments || []).map((f: any) => (
                         <option key={f.id} value={f.id}>
                           {f.shippingLabels?.[0]?.trackingNumber || `Shipment ${day(f.createdAt)}`}
                         </option>
                       ))}
-                    </select>
+                    </OptionSelect>
                   </Field>
                 </FormSheet>
               </div>

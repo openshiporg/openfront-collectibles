@@ -50,6 +50,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar";
+import { plural } from '@/features/platform/lib/plural'
 
 // Types
 interface MiniStorefrontProps {
@@ -504,7 +505,7 @@ export function MiniStorefront({
                                 {product.title}
                               </h4>
                               <p className="text-xs text-muted-foreground">
-                                {product.productVariants?.length || 0} variants
+                                {plural(product.productVariants?.length || 0, 'variant')}
                               </p>
                             </div>
                           </div>

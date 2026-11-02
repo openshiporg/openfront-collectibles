@@ -149,7 +149,7 @@ function PendingVariantCard({
   renderOptionValue = (ov) => (
     <Badge
       color="zinc"
-      className="rounded-full bg-muted px-2 py-0.5 font-mono text-[11px] font-medium tabular-nums"
+      className="rounded-full bg-muted px-2 py-0.5 font-mono text-xs font-medium tabular-nums"
     >
       <span className="mr-1 font-sans opacity-70">{ov.option}</span>
       {ov.label}
@@ -231,7 +231,7 @@ function PendingVariantCard({
                 )}
               </div>
               <div className="space-y-0.5 mt-2">
-                <div className="text-[11px] font-medium text-muted-foreground">
+                <div className="text-xs font-medium text-muted-foreground">
                   Prices (Pending)
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -255,7 +255,7 @@ function PendingVariantCard({
                               size="sm"
                               className="h-7 cursor-pointer flex items-center gap-1 px-2.5 rounded-full font-mono text-xs tabular-nums hover:bg-accent border-dashed"
                             >
-                              <span className="font-mono uppercase text-[10px] text-muted-foreground mr-0.5">
+                              <span className="font-mono uppercase text-xs text-muted-foreground mr-0.5">
                                 {region.currency.code}
                               </span>
                               <span>
@@ -308,7 +308,7 @@ function PendingVariantCard({
                             size="sm"
                             className="h-7 gap-1 border border-dashed px-2.5 rounded-full text-xs"
                           >
-                            <span className="font-mono uppercase text-[10px] text-muted-foreground mr-0.5">
+                            <span className="font-mono uppercase text-xs text-muted-foreground mr-0.5">
                               {region.currency.code}
                             </span>
                             Add
@@ -583,7 +583,7 @@ export function VariantDriftCard({
                               <Badge
                                 key={i}
                                 color="zinc"
-                                className="rounded-full bg-muted px-2 py-0.5 font-mono text-[11px] font-medium tabular-nums"
+                                className="rounded-full bg-muted px-2 py-0.5 font-mono text-xs font-medium tabular-nums"
                               >
                                 <span className="mr-1 font-sans opacity-70">
                                   {ov.productOption.title}

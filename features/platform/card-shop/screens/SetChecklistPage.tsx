@@ -11,6 +11,7 @@ import {
 } from '@/features/storefront/components/cards';
 import { getSetChecklist } from '../actions';
 import { DeskError, DeskFrame, DeskLink, DeskSection } from '../components/frame';
+import { plural } from '@/features/platform/lib/plural'
 
 function latestMarket(market: Record<string, { marketMinor: number | null }>) {
   const values = Object.values(market ?? {}).map((m) => m.marketMinor).filter((v): v is number => v != null);
@@ -37,7 +38,7 @@ export async function SetChecklistPage({ params }: { params: Promise<{ handle: s
     >
       <SetSummary set={set} have={cells.filter(Boolean).length} cells={cells} size="head" titleAs="p" />
 
-      <DeskSection title="Checklist" meta={`${singles.length} cards`}>
+      <DeskSection title="Checklist" meta={plural(singles.length, 'card')}>
         <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
           <CardSheet label={`${set.name} checklist`} priceHead="Our price" actions>
             {singles.map((card: any, index: number) => {
@@ -76,7 +77,7 @@ export async function SetChecklistPage({ params }: { params: Promise<{ handle: s
       </DeskSection>
 
       {sealed.length ? (
-        <DeskSection title="Sealed" meta={`${sealed.length} products`}>
+        <DeskSection title="Sealed" meta={plural(sealed.length, 'product')}>
           <ul className="divide-y divide-border border-y border-border text-sm">
             {sealed.map((item: any) => {
               const variant = item.stock[0]?.variants[0];

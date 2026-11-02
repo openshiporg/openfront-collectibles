@@ -7,6 +7,7 @@ import { PlatformEmptyState } from '../../components/PlatformEmptyState';
 import { BandRow, Count, ListBand, PageTitle, pillClass, trackClass } from '../../components/vault-ui';
 import { day } from '../../collectibles/lib/format';
 import { QUEUES, type QueueKey } from '../lib/constants';
+import { plural } from '@/features/platform/lib/plural'
 
 type Props = {
   queue: QueueKey;
@@ -58,7 +59,7 @@ export function FulfillmentQueuePageClient({ queue, page, pageSize, items, count
                 title={`#${order.displayId}`}
                 tone={order.hasRequirement ? 'ok' : 'warn'}
                 state={order.hasRequirement ? 'Requirements set' : 'Needs requirements'}
-                meta={[order.user?.name || order.email, `${order.lineItemsCount ?? 0} items`, order.fulfillmentsCount ? `${order.fulfillmentsCount} shipments` : 'Not shipped', day(order.createdAt)].filter(Boolean).join(' · ')}
+                meta={[order.user?.name || order.email, plural(order.lineItemsCount ?? 0, 'item'), order.fulfillmentsCount ? plural(order.fulfillmentsCount, 'shipment') : 'Not shipped', day(order.createdAt)].filter(Boolean).join(' · ')}
                 trailing={order.total}
               />
             ))}

@@ -86,7 +86,7 @@ export const OrderSectionTabs = ({ order }: OrderSectionTabsProps) => {
                     <div className="text-sm font-medium text-foreground">{item.title}</div>
                     {spec && <div className="font-mono text-xs tabular-nums text-foreground/80">{spec}</div>}
                     {(sku || item.variantData?.barcode) && (
-                      <div className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                      <div className="font-mono text-xs tabular-nums text-muted-foreground">
                         {sku && <>SKU {sku}</>}
                         {sku && item.variantData?.barcode && <span className="mx-1.5">·</span>}
                         {item.variantData?.barcode && <>Barcode {item.variantData.barcode}</>}

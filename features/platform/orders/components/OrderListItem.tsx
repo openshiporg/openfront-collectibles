@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { ProductImage } from "../../components/ProductImage";
+import { plural } from '@/features/platform/lib/plural'
 
 // Status configuration for styling
 type BadgeColorType = "white" | "red" | "orange" | "amber" | "yellow" | "lime" | "green" | "emerald" | "teal" | "cyan" | "sky" | "blue" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose" | "zinc" | undefined;
@@ -134,7 +135,7 @@ export function OrderListItem({ order }: OrderListItemProps) {
               {order.total}
             </div>
             <div className="text-sm text-muted-foreground">
-              {order.lineItems?.length || 0} items
+              {plural(order.lineItems?.length || 0, 'item')}
             </div>
             <div className="mt-auto flex gap-2">
               <Button

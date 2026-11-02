@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Dot, Pill, Track, humanize } from '../../components/vault-ui'
 import { addItemEvidence } from '../actions'
 import { OPTIONS, type EvidenceKind } from '../lib/constants'
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
 
 type Option = { value: string; label: string }
 type Field =
@@ -187,7 +188,7 @@ export function EvidenceActions({ specimenId, storeId, defaultCurrency, gradingC
                         {'required' in field && field.required && <span className="text-muted-foreground"> *</span>}
                       </Label>
                       {field.type === 'select' ? (
-                        <select
+                        <OptionSelect
                           id={`ev-${field.name}`}
                           name={field.name}
                           required={field.required}
@@ -198,7 +199,7 @@ export function EvidenceActions({ specimenId, storeId, defaultCurrency, gradingC
                           {field.options.map((option) => (
                             <option key={option.value} value={option.value}>{option.label}</option>
                           ))}
-                        </select>
+                        </OptionSelect>
                       ) : field.type === 'textarea' ? (
                         <Textarea id={`ev-${field.name}`} name={field.name} required={field.required} rows={3} />
                       ) : (

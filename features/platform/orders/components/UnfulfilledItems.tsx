@@ -35,7 +35,7 @@ function UnfulfilledItem({
             <p className="font-mono text-xs tabular-nums text-foreground/80">{item.variantTitle}</p>
           )}
           {item.sku && (
-            <p className="font-mono text-[11px] tabular-nums text-muted-foreground">SKU {item.sku}</p>
+            <p className="font-mono text-xs tabular-nums text-muted-foreground">SKU {item.sku}</p>
           )}
         </div>
       </div>

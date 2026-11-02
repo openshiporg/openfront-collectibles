@@ -1,6 +1,7 @@
 import { SetSummary } from '@/features/storefront/components/cards';
 import { getCardSets, getSetStrips } from '../actions';
 import { DeskEmpty, DeskError, DeskFrame, DeskLink } from '../components/frame';
+import { plural } from '@/features/platform/lib/plural'
 
 export async function CardSetsPage() {
   const [sets, strips] = await Promise.all([getCardSets(), getSetStrips()]);
@@ -14,7 +15,7 @@ export async function CardSetsPage() {
   return (
     <DeskFrame
       title="Cards & sets"
-      meta={`${list.length} sets · ${stocked} cards in stock`}
+      meta={`${plural(list.length, 'set')} · ${plural(stocked, 'card')} in stock`}
       actions={<><DeskLink href="/dashboard/platform/pricing">Market & repricing</DeskLink><DeskLink href="/dashboard/card-sets">Edit sets</DeskLink></>}
     >
       {list.length === 0 ? (

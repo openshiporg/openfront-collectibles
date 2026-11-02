@@ -8,6 +8,8 @@ import { day, money } from '../../collectibles/lib/format';
 import { ActionError, inputCls, useAction } from '../../disputes/components/form-kit';
 import { moveSeller, setSellerBio, setSellerIdentityState } from '../actions';
 import { IDENTITY_STATES, SELLER_TRANSITIONS, identityState, sellerStatus } from '../lib/lifecycle';
+import { OptionSelect } from '@/features/platform/components/OptionSelect'
+import { plural } from '@/features/platform/lib/plural'
 
 export function SellerDetailPageClient({ seller }: { seller: any }) {
   const status = sellerStatus(seller.status);
@@ -61,7 +63,7 @@ export function SellerDetailPageClient({ seller }: { seller: any }) {
                   title={intake.reference}
                   state={humanize(intake.status)}
                   tone={intake.status === 'declined' || intake.status === 'returned' ? 'muted' : intake.status === 'accepted' ? 'ok' : 'warn'}
-                  meta={[`${intake.itemsCount ?? 0} items`, intake.agreement ? `Agreement ${humanize(intake.agreement.status).toLowerCase()}` : 'No agreement', day(intake.receivedAt || intake.createdAt)].join(' · ')}
+                  meta={[plural(intake.itemsCount ?? 0, 'item'), intake.agreement ? `Agreement ${humanize(intake.agreement.status).toLowerCase()}` : 'No agreement', day(intake.receivedAt || intake.createdAt)].join(' · ')}
                   trailing={intake.agreement?.commissionBasisPoints != null ? `${(intake.agreement.commissionBasisPoints / 100).toFixed(2)}%` : undefined}
                 />
               ))}
@@ -90,7 +92,7 @@ export function SellerDetailPageClient({ seller }: { seller: any }) {
         <aside className="min-w-0 space-y-8">
           <section className="space-y-2">
             <SectionTitle>Identity evidence</SectionTitle>
-            <select
+            <OptionSelect
               aria-label="Identity evidence state"
               className={inputCls}
               defaultValue={identityState(seller.identityEvidenceState).value}
@@ -98,7 +100,7 @@ export function SellerDetailPageClient({ seller }: { seller: any }) {
               onChange={(event) => run('identity', () => setSellerIdentityState(seller.id, event.target.value))}
             >
               {IDENTITY_STATES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
+            </OptionSelect>
           </section>
           <section className="space-y-2">
             <SectionTitle>Public bio</SectionTitle>

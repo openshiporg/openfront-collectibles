@@ -19,6 +19,7 @@ import {
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 import { ItemPagination } from "../../orders/components/ItemPagination";
 import { Count, Dot, ListBand, Pill, Track } from "../../components/vault-ui";
+import { plural } from '@/features/platform/lib/plural'
 
 interface Region {
   id: string;
@@ -76,7 +77,7 @@ function TabContent({ items, currentPage, itemsPerPage, renderItem }: TabContent
       {items.length > itemsPerPage && (
         <div className="text-xs text-muted-foreground">
           Showing {startIndex + 1}-{Math.min(endIndex, items.length)} of{" "}
-          {items.length} items
+          {plural(items.length, 'item')}
         </div>
       )}
       <ListBand>

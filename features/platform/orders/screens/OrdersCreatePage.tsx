@@ -17,6 +17,7 @@ import { AdminPaymentSelection } from "../components/AdminPaymentSelection";
 import { CreateItemDrawer } from "@/features/dashboard/views/relationship/client/components/CreateItemDrawer";
 import { getCustomer } from "../actions/customers";
 import { getRegionByCountry, getActiveCartPaymentProviders } from "../actions/regions";
+import { plural } from '@/features/platform/lib/plural'
 
 
 type LineItem = {
@@ -397,7 +398,7 @@ export function OrdersCreatePage() {
                     </div>
                     <div className="mt-0.5 flex flex-wrap gap-x-3 font-mono text-xs tabular-nums text-muted-foreground">
                       <span>{selectedCustomer.phone || "No phone number"}</span>
-                      <span>{selectedCustomer.orders?.length || 0} orders</span>
+                      <span>{plural(selectedCustomer.orders?.length || 0, 'order')}</span>
                     </div>
                   </div>
                 )}

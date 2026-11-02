@@ -342,7 +342,7 @@ export function LineItemsManager({
                         {formatPrice(item.total, currencyOf(item.variant))}
                       </span>
                       {item.quantity > 1 && (
-                        <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                        <span className="font-mono text-xs tabular-nums text-muted-foreground">
                           {formatPrice(item.unitPrice, currencyOf(item.variant))} ea
                         </span>
                       )}
