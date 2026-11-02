@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../features/storefront/components/cards/cards.css";
+@import "../features/storefront/deneb.css";
 
 @theme inline {
   --color-background: var(--sf-background, oklch(100% 0 0));
