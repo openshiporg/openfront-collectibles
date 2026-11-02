@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dot, ListBand, SectionTitle } from "@/features/platform/components/vault-ui";
 import { StatusBadge } from "../components/StatusBadge";
 import { RecordBankTransfer } from "../components/RecordBankTransfer";
+import { RefundOrderDialog, type RefundablePayment } from "../components/RefundOrderDialog";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 
 
@@ -22,6 +23,7 @@ interface ExtendedOrder {
   tax?: string;
   total?: string;
   formattedTotalPaid?: string;
+  payments?: RefundablePayment[];
   paymentDetails?: Array<{
     status: string;
     manual?: boolean;
@@ -281,6 +283,9 @@ export function OrderPageClient({
                 </div>
                 {awaitingTransfer && ["pending", "requires_action"].includes(order.status) && (
                   <RecordBankTransfer orderId={order.id} />
+                )}
+                {(order.payments || []).some((p) => p.status === "captured" && p.amount > p.amountRefunded) && (
+                  <div className="px-4 py-3"><RefundOrderDialog orderId={order.id} payments={order.payments || []} /></div>
                 )}
               </ListBand>
             </section>
