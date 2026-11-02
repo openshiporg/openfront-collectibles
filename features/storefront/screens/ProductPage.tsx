@@ -12,7 +12,7 @@ import { GRADERS } from "@/features/keystone/lib/pokemon/card-enums"
 import { CardDetail } from "@/features/storefront/modules/cards/card-detail"
 import { CardBuyPanel } from "@/features/storefront/modules/cards/card-buy-panel"
 import { ProductCardTile, slabGrade } from "@/features/storefront/modules/cards/product-card-tile"
-import { CardGrid, CardSheet } from "@/features/storefront/components/cards"
+import { CardGrid, CardSheet, money, conditionLabel, finishLabel } from "@/features/storefront/components/cards"
 import { ProductSheetRow } from "@/features/storefront/modules/cards/product-sheet-row"
 
 type Props = {
@@ -123,6 +123,7 @@ export async function ProductPage(props: Props) {
       <>
         <CardDetail
           countryCode={countryCode}
+          currencyCode={currencyCode}
           card={{
             id: item.id, name: item.title, number: item.cardNumber || null, rarity: item.rarity || null, supertype: item.supertype || null,
             energyTypes: Array.isArray(item.energyTypes) ? item.energyTypes : [], hp: item.hp || null, artist: item.artist || null,
@@ -136,6 +137,7 @@ export async function ProductPage(props: Props) {
           primaryFinish={variants.find((v: any) => v.finish)?.finish ?? null}
           preorder={preorderVariant ? { releaseDate: preorderVariant.preorderReleaseDate, limit: preorderVariant.preorderLimitPerCustomer } : null}
           purchase={<CardBuyPanel variants={variants} currencyCode={currencyCode} />}
+          aside={<section className="deneb-stock-record"><h2>IN STOCK</h2>{variants.map((v: any) => <div key={v.id}><span>{[v.stockKind === 'raw' ? 'Raw' : v.stockKind === 'graded' ? `${grade?.company || 'Graded'} ${grade?.grade || ''}` : 'Sealed', v.condition ? conditionLabel(v.condition) : null, v.finish ? finishLabel(v.finish) : null].filter(Boolean).join(' · ')} · {v.quantity} available</span><strong>{money(v.priceMinor, currencyCode)}</strong></div>)}</section>}
         />
         {sameCard.length > 0 || moreFromSet.length > 0 ? (
           <div className="mx-auto grid w-full max-w-[1320px] gap-14 px-4 pb-24 sm:px-6">

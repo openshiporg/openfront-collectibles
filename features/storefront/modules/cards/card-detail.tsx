@@ -9,7 +9,6 @@ import {
   SetLogo,
   SlabView,
   finishLabel,
-  observedDay,
   sealedFormatLabel,
 } from "@/features/storefront/components/cards"
 import type { GradeFace } from "@/features/storefront/components/cards"
@@ -40,6 +39,7 @@ export type DetailCard = {
  */
 export function CardDetail({
   countryCode,
+  currencyCode = 'USD',
   card,
   set,
   readings,
@@ -52,6 +52,7 @@ export function CardDetail({
   preorder,
 }: {
   countryCode: string
+  currencyCode?: string
   card: DetailCard
   set: CardSet | null
   readings: Reading[]
@@ -67,11 +68,10 @@ export function CardDetail({
   const finishes = [...new Set(nearMint.map((r) => r.finish ?? "normal"))]
   const sealed = card.kind === "sealed"
   const face = { id: card.id, name: card.name, number: card.number, rarity: card.rarity, setName: set?.name, imageUrl: card.imageUrl, imageLargeUrl: card.imageLargeUrl }
-  const latest = nearMint.at(-1)
 
   return (
-    <div className="tc mx-auto grid w-full max-w-[1320px] gap-10 px-4 pb-16 pt-6 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:pt-10">
-      <div className="mx-auto w-full max-w-[460px] lg:sticky lg:top-24 lg:self-start">
+    <div className="tc deneb-detail">
+      <div className="deneb-detail-art">
         {grade ? (
           <SlabView card={face} grade={grade} year={slabYear} eager />
         ) : sealed ? (
@@ -90,9 +90,11 @@ export function CardDetail({
         ) : (
           <CardArt src={card.imageLargeUrl || card.imageUrl} alt={`${card.name} card art`} eager />
         )}
+        {purchase}
+        <WantToggle catalogItemId={card.id} label={card.name} finish={primaryFinish ?? null} wide />
       </div>
 
-      <div className="grid min-w-0 content-start gap-7">
+      <div className="deneb-detail-info">
         <div className="grid gap-3">
           <h1 className="font-cx-display text-[38px] leading-[1.02] text-cx-ink sm:text-[52px]">{(title ?? card.name).replace(/\s*\(Pre-order\)$/, "")}</h1>
           {!sealed && set ? (
@@ -106,14 +108,12 @@ export function CardDetail({
           ) : null}
         </div>
 
-        {purchase}
-
-        <div className="flex flex-wrap items-start gap-2">
-          {!sealed ? <BinderButton catalogItemId={card.id} finish={primaryFinish ?? null} label={card.name} /> : null}
-          <WantToggle catalogItemId={card.id} label={card.name} finish={primaryFinish ?? null} wide />
-        </div>
-
-        <CardFacts
+        <section className="deneb-detail-market" aria-label="Market price">
+          <h2>MARKET PRICE</h2>
+          {finishes.length ? finishes.map(f => <PriceHistory key={f} currencyCode={currencyCode} readings={nearMint.filter(r => (r.finish ?? 'normal') === f).map(r => ({ lowMinor:r.lowMinor, midMinor:r.midMinor, highMinor:r.highMinor, marketMinor:r.marketMinor, observedAt:r.observedAt }))} label={`TCGplayer market, ${finishLabel(f)}`} />) : <p>No market readings for this {sealed ? 'product' : 'card'} yet.</p>}
+          {grade ? <p>Market readings are for raw copies, not this graded slab.</p> : null}
+        </section>
+        <div className="deneb-detail-record"><h2>DETAILS</h2><CardFacts
           facts={sealed ? [
             { label: "Product", value: sealedFormatLabel(card.sealedFormat) },
             { label: "Set", value: set?.name },
@@ -129,27 +129,9 @@ export function CardDetail({
             { label: "Grade", value: grade ? `${grade.company} ${grade.grade}${grade.label ? ` ${grade.label}` : ""}` : null },
             { label: "Certificate", value: grade?.certificate ? (grade.sample ? `${grade.certificate} (sample record)` : grade.certificate) : null },
           ]}
-        />
+        /></div>
 
-        <section className="grid gap-4" aria-labelledby="market-heading">
-          <div className="flex items-baseline justify-between gap-3 border-b-2 border-cx-ink pb-2">
-            <h2 id="market-heading" className="text-[18px] font-bold text-cx-ink">Market</h2>
-            {latest ? <span className="text-[13px] text-cx-ink-3">{sealed ? "Sealed" : "Near Mint, raw"} · last read {observedDay(latest.observedAt)}</span> : null}
-          </div>
-          {finishes.length ? (
-            finishes.map((f) => (
-              <PriceHistory
-                key={f}
-                readings={nearMint.filter((r) => (r.finish ?? "normal") === f).map((r) => ({ lowMinor: r.lowMinor, midMinor: r.midMinor, highMinor: r.highMinor, marketMinor: r.marketMinor, observedAt: r.observedAt }))}
-                label={`TCGplayer market, ${finishLabel(f)}`}
-              />
-            ))
-          ) : (
-            <p className="text-[14px] text-cx-ink-3">No market readings for this {sealed ? "product" : "card"} yet.</p>
-          )}
-          {grade ? <p className="text-[13px] text-cx-ink-3">Readings are for raw copies; graded slabs are priced by the shop.</p> : null}
-        </section>
-
+        {!sealed ? <BinderButton catalogItemId={card.id} finish={primaryFinish ?? null} label={card.name} /> : null}
         {aside}
       </div>
     </div>
