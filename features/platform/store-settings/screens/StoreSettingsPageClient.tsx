@@ -8,17 +8,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import * as SelectPrimitive from '@radix-ui/react-select';
 import { cn } from '@/lib/utils';
 import { sanitizeStoreLogoSvg } from '@/features/lib/sanitize-store-logo';
-import { PageTitle, Pill, Track, SectionTitle, pillClass } from '@/features/platform/components/vault-ui';
+import { PageTitle, Pill, Track, SectionTitle } from '@/features/platform/components/vault-ui';
 import { storeBrand } from '@/features/storefront/lib/collectibles-brand';
 import { LOGO_ICONS, HUE_PRESETS } from '../lib/icon-registry';
-import { HueSlider } from '../components/HueSlider';
+import { StoreSettingsSaveBar } from '../components/StoreSettingsSaveBar';
 import { updateStoreSettings } from '../actions';
 
 // Registry marks are drawn at hue 221; the storefront accent is that hue after rotation.
 const REGISTRY_BASE_HUE = 221;
-const HUES: Array<{ name: string; value: number }> = [{ name: "Bronze", value: 165 }, ...HUE_PRESETS];
 
 interface StoreSettingsPageClientProps {
   initialData: {
@@ -88,15 +90,20 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
   }
 
   return (
-    <div className="w-full max-w-6xl space-y-8 px-4 pb-10 pt-4 md:px-6">
+    <div className="w-full max-w-6xl space-y-8 px-4 pb-24 pt-4 md:px-6 md:pb-10">
       <PageTitle
         title="Store settings"
         actions={
-          <Track label="Save">
-            <Pill active onClick={handleSave} disabled={isLoading}>
-              {isLoading ? 'Saving' : 'Save'}
-            </Pill>
-          </Track>
+          <StoreSettingsSaveBar
+            isSaving={isLoading}
+            button={
+              <Track label="Save">
+                <Pill active onClick={handleSave} disabled={isLoading}>
+                  {isLoading ? 'Saving' : 'Save'}
+                </Pill>
+              </Track>
+            }
+          />
         }
       />
 
@@ -123,70 +130,134 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
             </div>
           </section>
 
-          <section className="space-y-3">
-            <SectionTitle meta={selectedIcon?.name ?? 'Custom'}>Mark</SectionTitle>
-            <div
-              role="radiogroup"
-              aria-label="Logo mark"
-              className="grid grid-cols-5 gap-1.5 rounded-xl bg-muted/40 p-2 ring-1 ring-inset ring-border/60 sm:grid-cols-8 xl:grid-cols-10"
-            >
-              {LOGO_ICONS.map((icon) => {
-                const active = selectedIcon?.id === icon.id;
-                return (
-                  <button
-                    key={icon.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    aria-label={icon.name}
-                    title={icon.name}
-                    onClick={() => setLogoIcon(icon.lightSvg)}
+          <section className="space-y-6">
+            <SectionTitle>Logo</SectionTitle>
+            {/* Logo Icon Selector */}
+            <div>
+              <Label>Logo Icon</Label>
+              <div className="mt-2 flex items-center gap-2">
+                <Select
+                  value={selectedIcon?.id || ''}
+                  onValueChange={(id) => {
+                    const icon = LOGO_ICONS.find((i) => i.id === id);
+                    if (icon) setLogoIcon(icon.lightSvg);
+                  }}
+                >
+                  <SelectPrimitive.Trigger
                     className={cn(
-                      'flex aspect-square items-center justify-center rounded-lg transition-colors hover:bg-background/70 focus-visible:outline-2 focus-visible:outline-ring',
-                      active && 'bg-background shadow-[0_1px_2px_rgb(0_0_0/0.12),0_0_0_0.5px_rgb(0_0_0/0.06)] dark:bg-zinc-800'
+                      'flex h-12 w-12 shrink-0 rounded-lg border border-input bg-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 p-0 overflow-hidden items-center justify-center'
                     )}
                   >
-                    <MarkTile svg={icon.lightSvg} rotation={logoColor} className="size-6" />
-                  </button>
-                );
-              })}
-            </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <button type="button" className={cn(pillClass, 'bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)]')}>
-                  <Code className="size-3.5" aria-hidden="true" />
-                  Custom SVG
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[min(500px,calc(100vw-2rem))] space-y-3" align="start">
-                <Label htmlFor="custom-svg">SVG</Label>
-                <Textarea
-                  id="custom-svg"
-                  value={logoIcon}
-                  onChange={(e) => setLogoIcon(e.target.value)}
-                  className="min-h-[260px] font-mono text-xs"
-                  placeholder="<svg>...</svg>"
-                />
-                {logoIcon.trim() && !safeLogo && <p role="alert" className="text-xs text-destructive">Not a valid, safe SVG</p>}
-              </PopoverContent>
-            </Popover>
-          </section>
+                    <div
+                      dangerouslySetInnerHTML={{ __html: logoIcon }}
+                      style={{ filter: `hue-rotate(${logoColor}deg)` }}
+                      className="[&>svg]:w-6 [&>svg]:h-6"
+                    />
+                  </SelectPrimitive.Trigger>
+                  <SelectContent className="border-border dark:border-blue-700">
+                    {LOGO_ICONS.map((icon) => (
+                      <SelectItem key={icon.id} value={icon.id}>
+                        <span className="flex items-center gap-3">
+                          <div
+                            dangerouslySetInnerHTML={{ __html: icon.lightSvg }}
+                            style={{ filter: `hue-rotate(${logoColor}deg)` }}
+                            className="[&>svg]:w-6 [&>svg]:h-6"
+                          />
+                          <span>
+                            <span className="block font-medium text-gray-900 dark:text-gray-100">
+                              {icon.name}
+                            </span>
+                          </span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-          <section className="space-y-3">
-            <SectionTitle meta={`${Math.round(rotation)}°`}>Colour</SectionTitle>
-            <Track label="Logo colour">
-              {HUES.map((preset) => (
-                <Pill key={preset.value} active={Math.round(rotation) === preset.value} onClick={() => setLogoColor(String(preset.value))}>
-                  <span
-                    aria-hidden="true"
-                    className="size-2.5 rounded-full"
-                    style={{ background: `hsl(${(REGISTRY_BASE_HUE + preset.value) % 360} 64% 45%)` }}
-                  />
-                  {preset.name}
-                </Pill>
-              ))}
-            </Track>
-            <HueSlider value={rotation} onValueChange={(value) => setLogoColor(String(value))} className="max-w-md" />
+                {/* SVG Code Editor Popover */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-12 w-12 shrink-0"
+                      type="button"
+                    >
+                      <Code className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[min(500px,calc(100vw-2rem))]" align="start">
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-medium mb-2">Edit SVG Code</h4>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Edit the SVG code directly. Changes will be reflected in the icon preview.
+                        </p>
+                      </div>
+                      <Textarea
+                        value={logoIcon}
+                        onChange={(e) => setLogoIcon(e.target.value)}
+                        className="font-mono text-xs min-h-[300px]"
+                        placeholder="<svg>...</svg>"
+                      />
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm text-muted-foreground">Preview:</div>
+                        <div
+                          dangerouslySetInnerHTML={{ __html: logoIcon }}
+                          style={{ filter: `hue-rotate(${logoColor}deg)` }}
+                          className="[&>svg]:w-8 [&>svg]:h-8 flex items-center justify-center p-2 border rounded"
+                        />
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            {/* Logo Color Selector */}
+            <div>
+              <Label>Logo Color</Label>
+              <div className="mt-2">
+                <Select
+                  value={logoColor}
+                  onValueChange={(value) => setLogoColor(value)}
+                >
+                  <SelectPrimitive.Trigger
+                    className={cn(
+                      'flex h-12 w-12 shrink-0 rounded-lg border border-input bg-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 p-0 overflow-hidden items-center justify-center'
+                    )}
+                  >
+                    <SelectValue>
+                      <div
+                        className="w-6 h-6 rounded-full"
+                        style={{
+                          background: `hsl(${(240 + parseInt(logoColor)) % 360}, 70%, 50%)`
+                        }}
+                      />
+                    </SelectValue>
+                  </SelectPrimitive.Trigger>
+                  <SelectContent className="border-border dark:border-blue-700">
+                    <div className="grid grid-cols-4 gap-2 p-2">
+                      {HUE_PRESETS.map((preset) => (
+                        <SelectItem
+                          key={preset.value}
+                          value={preset.value.toString()}
+                          className="cursor-pointer p-0 h-12 w-12 flex items-center justify-center [&>span:first-child]:hidden"
+                        >
+                          <div
+                            className="w-6 h-6 rounded-full"
+                            style={{
+                              background: `hsl(${(240 + preset.value) % 360}, 70%, 50%)`
+                            }}
+                          />
+                        </SelectItem>
+                      ))}
+                    </div>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {logoIcon.trim() && !safeLogo && <p role="alert" className="text-sm text-destructive">Not a valid, safe SVG</p>}
           </section>
         </div>
 
@@ -201,7 +272,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
               <p className="font-serif text-2xl leading-7">{homepageTitle || name || 'Store'}</p>
               {homepageDescription && <p className="text-sm text-[#5a5348]">{homepageDescription}</p>}
               <span
-                className="mt-2 inline-flex min-h-9 items-center rounded-full px-4 text-[13px] font-medium text-[#fbf8f1]"
+                className="mt-2 inline-flex min-h-9 items-center rounded-full px-4 text-sm font-medium text-[#fbf8f1]"
                 style={{ background: `hsl(${accentHue} 64% 34%)` }}
               >
                 Accent
