@@ -10,13 +10,13 @@ export function SlabView({ card, grade, year, eager, compact, className }: { car
   return (
     <figure className={cn('tc tc-slab', className)} aria-label={`${card.name} graded ${grade.company} ${grade.grade}`}>
       <div className="tc-slab-label">
-        <span className="tc-stamp text-[11px] leading-none">{grade.company}</span>
+        <span className="tc-stamp text-[12px] leading-none">{grade.company}</span>
         <span className="tc-slab-grade">
           <span className={cn('block font-extrabold tracking-[-0.03em]', compact ? 'text-[26px]' : 'text-[34px]')} style={{ fontStretch: '75%' }}>{grade.grade}</span>
-          {grade.label ? <span className="tc-stamp block text-[10px]">{grade.label}</span> : null}
+          {grade.label ? <span className="tc-stamp block text-[12px]">{grade.label}</span> : null}
         </span>
         <span className={cn('truncate font-bold leading-tight', compact ? 'text-[12px]' : 'text-[13px]')}>{card.name}</span>
-        <span className="tc-num truncate text-[11px] leading-tight opacity-75">
+        <span className="tc-num truncate text-[12px] leading-tight opacity-75">
           {[year, card.setName, card.number].filter(Boolean).join(' · ')}
         </span>
       </div>

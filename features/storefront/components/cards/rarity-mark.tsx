@@ -44,7 +44,7 @@ export function RarityMark({ rarity, className }: { rarity?: string | null; clas
   return (
     <span className={`inline-flex items-center gap-px text-[var(--tc-ink-2)] ${className ?? ''}`} title={rarity} role="img" aria-label={rarity}>
       {spec.shape === 'text' ? (
-        <span className="tc-stamp text-[10px] leading-none">{spec.text}</span>
+        <span className="tc-stamp text-[12px] leading-none">{spec.text}</span>
       ) : (
         Array.from({ length: spec.count ?? 1 }, (_, i) => <Glyph key={i} shape={spec.shape} tone={spec.tone} sparkle={spec.sparkle && i === 0} />)
       )}

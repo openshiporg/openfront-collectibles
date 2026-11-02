@@ -6,7 +6,7 @@ export function MarketStamp({ minor, observedAt, currencyCode = 'USD' }: { minor
   return (
     <span className="inline-grid justify-items-end leading-tight" title={observedAt ? `TCGplayer market, read ${shortDay(observedAt)}` : 'TCGplayer market'}>
       <span>{money(minor, currencyCode)}</span>
-      {observedAt ? <span className="text-[11px] text-[var(--tc-ink-3)]">{shortDay(observedAt)}</span> : null}
+      {observedAt ? <span className="text-[12px] text-[var(--tc-ink-3)]">{shortDay(observedAt)}</span> : null}
     </span>
   );
 }
