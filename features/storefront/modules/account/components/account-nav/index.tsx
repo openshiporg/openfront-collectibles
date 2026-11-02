@@ -61,7 +61,7 @@ const AccountNav = ({ customer }: AccountNavProps) => {
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
         <div className="min-w-0">
           {name && (
-            <p className="mt-1 truncate font-cx-serif text-[28px] leading-[32px] tracking-[-0.01em] text-cx-ink sm:text-[34px] sm:leading-[38px]">
+            <p className="mt-1 truncate font-cx-display text-[26px] font-bold leading-[32px] tracking-[-0.01em] text-cx-ink sm:text-[32px] sm:leading-[38px]">
               {name}
             </p>
           )}
@@ -77,7 +77,7 @@ const AccountNav = ({ customer }: AccountNavProps) => {
           {signingOut ? "Signing out" : "Sign out"}
         </button>
       </div>
-      <nav aria-label="Account" className="mt-4" data-testid="mobile-account-nav">
+      <nav aria-label="Account" className="mt-6" data-testid="mobile-account-nav">
         <Track label="Account sections" className="w-full sm:w-auto">
           {LINKS.map((link) => (
             <PillLink

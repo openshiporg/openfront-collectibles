@@ -50,10 +50,10 @@ const Overview = ({ user, orders }: OverviewProps) => {
 
       <section>
         <div className="mb-3 flex items-end justify-between gap-4 border-b border-cx-line pb-3">
-          <h2 className="font-cx-serif text-[26px] leading-[30px] text-cx-ink">Recent orders</h2>
+          <h2 className="deneb-section-label">Recent orders</h2>
           <LocalizedClientLink
             href="/account/orders"
-            className="group inline-flex min-h-11 items-center gap-1 text-[14px] font-medium text-cx-ink-2 hover:text-cx-ink"
+            className="group inline-flex min-h-11 items-center gap-1 font-mono text-[12px] uppercase tracking-[0.1em] text-cx-ink-2 hover:text-cx-ink"
           >
             All orders
             <ArrowUpRight className="size-4" aria-hidden="true" />

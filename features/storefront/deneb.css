@@ -11,3 +11,71 @@
 @media(max-width:700px){.deneb-detail{grid-template-columns:minmax(0,1fr)}.deneb-detail-art{padding:16px;border-right:0;border-bottom:1px solid #252729}.deneb-detail-art>.tc-art{max-width:300px}.deneb-detail-info{padding:18px 12px;gap:16px}.deneb-detail-info h1{font-size:34px}.deneb-detail-market figure>div:first-child>span:first-child{font-size:32px}.deneb-detail-market>figure{padding:12px}.deneb-stock-record>div{flex-wrap:wrap}.deneb-detail-record dl{grid-template-columns:minmax(0,90px) minmax(0,1fr)}}
 
 .deneb-breadcrumb{display:flex;flex-wrap:wrap;gap:12px;padding:12px 26px;border-bottom:1px solid #252729;font:12px ui-monospace,monospace;text-transform:uppercase;color:#a4a6af}.deneb-breadcrumb a:hover{color:#c8ff00}
+
+/* ---- Polish 2026-11-02: rhythm, hierarchy, one accent ------------------------------------- */
+/* Labels: mono uppercase, muted, 12px floor. */
+.cx-sf .cx-label,.cx-sf .tc-field>span,.cx-sf .tc-sheet-head{font:500 12px/16px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:#a4a6af}
+.cx-sf .tc-field{gap:6px}
+.cx-sf .deneb-section-label{font:500 13px/18px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:#f5f5f5}
+/* One accent: every primary is Deneb lime, raised. */
+.cx-sf .cx-btn{background:#c8ff00;color:#080909;border-radius:0;font:700 14px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 2px 0 #6b8a00}
+@media (hover:hover) and (pointer:fine){.cx-sf .cx-btn:hover{background:#d6ff3d}}
+.cx-sf .cx-btn:active{box-shadow:none;transform:translateY(1px)}
+.cx-sf .tc-btn:not([data-variant=line]){box-shadow:0 2px 0 #6b8a00}
+.cx-sf .tc-btn:not([data-variant=line]):active{box-shadow:none;transform:translateY(1px)}
+.cx-sf .cx-pill[data-active=true]{background:#c8ff00;color:#080909}
+
+/* Home: room between title, line and actions; quieter card meta. */
+.deneb-intro{padding:22px 24px}.deneb-intro h1{line-height:1.05}.deneb-intro p{margin:12px 0 22px;font-size:16px;line-height:1.5}
+.deneb-stock{gap:6px}.deneb-stock>strong{line-height:1.1}.deneb-stock p{color:#a4a6af}
+.deneb-section-head{padding:12px 20px}
+.deneb-card{padding:12px 14px 16px}.deneb-card>div{padding-top:12px;display:grid;gap:4px}
+.deneb-card h3{line-height:1.35}.deneb-card strong{line-height:1.2;font-size:22px}.deneb-card p{color:#a4a6af;text-transform:uppercase;letter-spacing:.08em}
+.deneb-shelf,.deneb-sets{margin-top:16px}
+.deneb-sets{padding:12px 6px 6px}.deneb-sets>h2{padding:0 14px 12px}.deneb-sets>div{gap:6px}.deneb-sets>div>a{padding:14px 16px;display:grid;gap:6px}
+.deneb-sets p{color:#a4a6af}.deneb-sets progress{margin:2px 0 6px}
+
+/* Listing sheet: breathing rows, quieter detail line. */
+.cx-sf .tc-sheet-head{padding:12px 0 10px}
+@media(min-width:768px){.cx-sf .tc-row{padding:12px 0;min-height:60px}}
+.cx-sf .tc-a-market{color:#a4a6af}
+
+/* Product detail: one primary (Add to cart), the rest quiet. */
+.deneb-detail-art{display:grid;align-content:start;gap:16px}
+.deneb-detail-art>section{padding:16px 0 4px;gap:14px}
+.deneb-detail-art .tc-btn{min-height:48px}
+.deneb-detail-secondary{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.deneb-detail-secondary>span{display:grid}
+.deneb-detail-art .deneb-detail-secondary .tc-btn,.deneb-detail-art .deneb-detail-secondary .tc-btn[data-variant=line]{background:transparent;color:#f5f5f5;box-shadow:inset 0 0 0 1px #3a3c40;font:500 12px ui-monospace,monospace;letter-spacing:.1em;min-height:42px}
+@media (hover:hover) and (pointer:fine){.deneb-detail-art .deneb-detail-secondary .tc-btn:hover{box-shadow:inset 0 0 0 1px #f5f5f5}}
+.deneb-detail-secondary form{grid-column:1/-1}
+.deneb-detail-info{gap:24px;padding:28px 32px}
+.deneb-detail-info>div:first-child{gap:12px}
+.deneb-detail-info>div:first-child>a{font:12px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#a4a6af}
+.deneb-detail-info h2{font:500 12px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:#a4a6af;padding:12px 20px}
+.deneb-detail-market>figure{padding:20px}
+.deneb-detail-market figure>div:first-child>span:first-child{font-size:40px}
+.deneb-detail-record dl{padding:4px 20px 8px;font:13px ui-monospace,monospace}
+.deneb-detail-record dt{color:#a4a6af}
+.deneb-detail-record dt,.deneb-detail-record dd{padding:10px 0}
+.deneb-detail-record dl>div:last-child>*{border-bottom:0}
+.deneb-breadcrumb{gap:10px;padding:14px 26px;letter-spacing:.08em}
+
+/* Footer: the wordmark sits below the page H1s; mono uppercase column heads. */
+.cx-sf footer [data-testid=nav-store-link]>span:last-child{font:500 14px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase}
+.cx-sf footer .cx-label{color:#a4a6af}
+
+@media(max-width:700px){
+  .deneb-intro{padding:16px}
+  .deneb-section-head{padding:10px 8px}
+  .deneb-section-head>a{max-width:none;white-space:nowrap}
+  .deneb-card{padding:6px 6px 14px}.deneb-card>div{padding:10px 4px 0}
+  .deneb-card h3{font-size:15px}.deneb-card strong{font-size:21px}
+  .deneb-sets>div>a{padding:14px}
+  .deneb-detail-art{padding:16px 14px;gap:14px}
+  .deneb-detail-info{padding:22px 14px;gap:20px}
+  .deneb-detail-info h2{padding:12px 14px}
+  .deneb-detail-market>figure{padding:16px 14px}
+  .deneb-detail-record dl{padding:4px 14px 8px}
+  .cx-sf .tc-row{gap:6px 12px;padding:14px 0}
+}

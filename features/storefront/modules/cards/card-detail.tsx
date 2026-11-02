@@ -70,7 +70,7 @@ export function CardDetail({
   const face = { id: card.id, name: card.name, number: card.number, rarity: card.rarity, setName: set?.name, imageUrl: card.imageUrl, imageLargeUrl: card.imageLargeUrl }
 
   return (
-    <><nav className="deneb-breadcrumb" aria-label="Breadcrumb"><Link href={`/${countryCode}/store`}>Singles</Link><span>/</span>{set ? <><Link href={`/${countryCode}/sets/${set.handle}`}>{set.name}</Link><span>/</span></> : null}<span>{card.name} {card.number}</span></nav><div className="tc deneb-detail">
+    <><nav className="deneb-breadcrumb" aria-label="Breadcrumb"><Link href={`/${countryCode}/store${sealed ? "?kind=sealed" : grade ? "?kind=graded" : "?kind=raw"}`}>{sealed ? "Sealed" : grade ? "Graded" : "Singles"}</Link><span>/</span>{set ? <><Link href={`/${countryCode}/sets/${set.handle}`}>{set.name}</Link><span>/</span></> : null}<span>{card.name} {card.number}</span></nav><div className="tc deneb-detail">
       <div className="deneb-detail-art">
         {grade ? (
           <SlabView card={face} grade={grade} year={slabYear} eager />
@@ -91,7 +91,10 @@ export function CardDetail({
           <CardArt src={card.imageLargeUrl || card.imageUrl} alt={`${card.name} card art`} eager />
         )}
         {purchase}
-        <WantToggle catalogItemId={card.id} label={card.name} finish={primaryFinish ?? null} wide />
+        <div className="deneb-detail-secondary">
+          <WantToggle catalogItemId={card.id} label={card.name} finish={primaryFinish ?? null} wide />
+          {!sealed ? <BinderButton catalogItemId={card.id} finish={primaryFinish ?? null} label={card.name} /> : null}
+        </div>
       </div>
 
       <div className="deneb-detail-info">
@@ -103,35 +106,32 @@ export function CardDetail({
               <span className="tc-num group-hover:underline group-hover:underline-offset-4">{[set.name, card.number].filter(Boolean).join(" · ")}</span>
             </Link>
           ) : null}
+          {sealed ? (
+            <p className="tc-num text-[12px] uppercase tracking-[0.08em] text-cx-ink-3">{[sealedFormatLabel(card.sealedFormat), set?.name].filter(Boolean).join(" · ")}</p>
+          ) : null}
           {card.rarity ? (
-            <p className="flex items-center gap-2 text-[15px] text-cx-ink-2"><RarityMark rarity={card.rarity} /> {card.rarity}</p>
+            <p className="flex items-center gap-2 text-[14px] text-cx-ink-3"><RarityMark rarity={card.rarity} /> {card.rarity}</p>
           ) : null}
         </div>
 
         <section className="deneb-detail-market" aria-label="Market price">
-          <h2>MARKET PRICE</h2>
-          {finishes.length ? finishes.map(f => <PriceHistory key={f} currencyCode={currencyCode} readings={nearMint.filter(r => (r.finish ?? 'normal') === f).map(r => ({ lowMinor:r.lowMinor, midMinor:r.midMinor, highMinor:r.highMinor, marketMinor:r.marketMinor, observedAt:r.observedAt }))} label={`TCGplayer market, ${finishLabel(f)}`} />) : <p>No market readings for this {sealed ? 'product' : 'card'} yet.</p>}
-          {grade ? <p>Market readings are for raw copies, not this graded slab.</p> : null}
+          <h2>Market price</h2>
+          {finishes.length ? finishes.map(f => <PriceHistory key={f} currencyCode={currencyCode} readings={nearMint.filter(r => (r.finish ?? 'normal') === f).map(r => ({ lowMinor:r.lowMinor, midMinor:r.midMinor, highMinor:r.highMinor, marketMinor:r.marketMinor, observedAt:r.observedAt }))} label={`${grade ? "Raw copy, " : ""}TCGplayer ${finishLabel(f)}`} />) : <p>No market readings for this {sealed ? 'product' : 'card'} yet.</p>}
         </section>
-        <div className="deneb-detail-record"><h2>DETAILS</h2><CardFacts
+        <div className="deneb-detail-record"><h2>Details</h2><CardFacts
           facts={sealed ? [
             { label: "Product", value: sealedFormatLabel(card.sealedFormat) },
             { label: "Set", value: set?.name },
-            { label: "Set code", value: set?.code },
             { label: "Language", value: "English" },
           ] : [
             { label: "Set", value: set ? `${set.name}${set.series ? ` (${set.series})` : ""}` : null },
-            { label: "Number", value: card.number },
-            { label: "Rarity", value: card.rarity },
             { label: "Card type", value: [card.supertype, card.energyTypes.join(", ")].filter(Boolean).join(" · ") },
             { label: "HP", value: card.hp },
             { label: "Illustrator", value: card.artist },
-            { label: "Grade", value: grade ? `${grade.company} ${grade.grade}${grade.label ? ` ${grade.label}` : ""}` : null },
             { label: "Certificate", value: grade?.certificate ? grade.certificate : null },
           ]}
         /></div>
 
-        {!sealed ? <BinderButton catalogItemId={card.id} finish={primaryFinish ?? null} label={card.name} /> : null}
         {aside}
       </div>
     </div></>

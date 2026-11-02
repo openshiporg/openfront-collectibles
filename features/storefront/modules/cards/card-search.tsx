@@ -4,7 +4,7 @@ import { Search } from "lucide-react"
 export function CardSearch({ countryCode, defaultValue, autoFocus }: { countryCode: string; defaultValue?: string; autoFocus?: boolean }) {
   return (
     <form action={`/${countryCode}/search`} method="get" role="search" className="tc grid gap-2">
-      <label htmlFor="card-search" className="text-[13px] font-semibold text-cx-ink-3">Find a card</label>
+      <label htmlFor="card-search" className="cx-label">Find a card</label>
       <div className="flex h-12 items-stretch border-2 border-cx-ink bg-cx-bg focus-within:border-cx-accent">
         <input
           id="card-search"

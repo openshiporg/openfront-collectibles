@@ -35,13 +35,13 @@ export async function HomePage({ params }: { params: Promise<{ countryCode: stri
         const card = p.catalogItem
         const variant = p.productVariants.filter(v => v.stockKind === 'raw' && v.inventoryQuantity > 0).sort((a,b) => (a.prices.find(x => x.currency?.code?.toUpperCase() === currency)?.amount ?? Infinity) - (b.prices.find(x => x.currency?.code?.toUpperCase() === currency)?.amount ?? Infinity))[0]
         const price = variant?.prices.find(x => x.currency?.code?.toUpperCase() === currency)
-        return <Link className="deneb-card" key={p.id} href={href(`/products/${p.handle}`)}><img src={card?.imageLargeUrl || card?.imageUrl || p.thumbnail || undefined} alt={card?.title || p.title} loading="eager" /><div><h3>{card?.title || p.title}</h3><strong>{price ? money(price.amount,currency) : 'Price unavailable'}</strong><p>{[card?.collectibleSet?.code,card?.cardNumber,variant?.cardCondition].filter(Boolean).join(' · ')}</p></div></Link>
+        return <Link className="deneb-card" key={p.id} href={href(`/products/${p.handle}`)}><img src={card?.imageLargeUrl || card?.imageUrl || p.thumbnail || undefined} alt={card?.title || p.title} loading="eager" /><div><h3>{card?.title || p.title}</h3><strong>{price ? money(price.amount,currency) : 'Price unavailable'}</strong><p>{[card?.collectibleSet?.name,variant?.cardCondition].filter(Boolean).join(' · ')}</p></div></Link>
       })}</div>
     </section>
     {stockedSets.length > 0 && <section className="deneb-sets"><h2>BROWSE SETS</h2><div>{stockedSets.map(set => {
       const preview = inventory.products.filter(p => p.catalogItem?.collectibleSet?.handle === set.handle && p.catalogItem?.kind === 'single').filter((p,i,a) => a.findIndex(x => x.catalogItem?.id === p.catalogItem?.id) === i).slice(0,5)
       const total = set.totalCards || set.printedTotal || 0
-      return <Link key={set.handle} href={href(`/sets/${set.handle}`)}><h3>{set.name} · {set.code} <span>›</span></h3><p>{set.cardsStocked} {total ? `of ${total}` : 'cards'} in stock</p>{total > 0 && <progress value={set.cardsStocked ?? 0} max={total} aria-label={`${set.name} stock coverage`} />}<div className="deneb-set-art">{preview.map(p => <img key={p.id} src={p.catalogItem?.imageUrl || p.thumbnail || undefined} alt={p.catalogItem?.title || p.title} />)}</div></Link>
+      return <Link key={set.handle} href={href(`/sets/${set.handle}`)}><h3>{set.name} <span>›</span></h3><p>{set.cardsStocked} {total ? `of ${total}` : 'cards'} in stock</p>{total > 0 && <progress value={set.cardsStocked ?? 0} max={total} aria-label={`${set.name} stock coverage`} />}<div className="deneb-set-art">{preview.map(p => <img key={p.id} src={p.catalogItem?.imageUrl || p.thumbnail || undefined} alt={p.catalogItem?.title || p.title} />)}</div></Link>
     })}</div></section>}
   </div>
 }

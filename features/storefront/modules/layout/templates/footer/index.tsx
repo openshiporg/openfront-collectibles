@@ -17,7 +17,7 @@ function Column({ title, links }: { title: string; links: { title: string; href:
           <li key={link.href}>
             <LocalizedClientLink
               href={link.href}
-              className="inline-flex min-h-9 items-center text-[15px] text-cx-ink-2 transition-colors hover:text-cx-accent"
+              className="inline-flex min-h-9 items-center text-[14px] text-cx-ink-2 transition-colors hover:text-cx-ink"
             >
               {link.title}
             </LocalizedClientLink>
@@ -49,7 +49,7 @@ export default async function Footer() {
       <div className="mx-auto w-full max-w-[1320px] px-4 pb-10 pt-14 sm:px-6 sm:pt-16">
         <div className="grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)]">
           <div className="space-y-5">
-            <Logo size="lg" tone="paper" />
+            <Logo tone="paper" />
             {regions && regions.length > 0 && (
               <div className="max-w-[260px] space-y-1.5">
                 <p className="cx-label">Ship to</p>
@@ -65,10 +65,8 @@ export default async function Footer() {
               links={[
                 { title: customer ? "Account" : "Sign in", href: "/account" },
                 { title: "Orders", href: "/account/orders" },
-                { title: "Binder", href: "/account/binder" },
                 { title: "Want list", href: "/account/wishlist" },
                 { title: "Sell to us", href: "/trade-in" },
-                { title: "Cart", href: "/cart" },
               ]}
             />
           </div>

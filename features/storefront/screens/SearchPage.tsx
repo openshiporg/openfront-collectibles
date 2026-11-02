@@ -45,10 +45,7 @@ export async function SearchPage(props: Props) {
       {query ? (
         <div className="mt-10 grid gap-14">
           <section className="grid gap-5" aria-label="In stock">
-            <div className="flex items-baseline justify-between">
-              <h2 className="text-[18px] font-bold text-cx-ink">In stock</h2>
-              <span className="tc-num text-[13px] text-cx-ink-3" data-testid="search-count">{stock.count} for “{query}”</span>
-            </div>
+            <h2 className="deneb-section-label">In stock <span className="text-cx-ink-3" data-testid="search-count">· {stock.count} for “{query}”</span></h2>
             {stock.products.length ? (
               <CardSheet label="Search results in stock" actions>
                 {stock.products.map((p, i) => <ProductSheetRow key={p.id} product={p} index={i} />)}
@@ -59,10 +56,7 @@ export async function SearchPage(props: Props) {
           </section>
           {elsewhere.length > 0 ? (
             <section className="grid gap-5" aria-label="In the catalog">
-              <div className="flex items-baseline justify-between">
-                <h2 className="text-[18px] font-bold text-cx-ink">In the catalog</h2>
-                <span className="tc-num text-[13px] text-cx-ink-3">{elsewhere.length} cards</span>
-              </div>
+              <h2 className="deneb-section-label">Not in stock <span className="text-cx-ink-3">· {elsewhere.length} cards</span></h2>
               <CardSheet label="Catalog matches" heads={false}>
                 {elsewhere.map((c: any, i: number) => (
                   <CardRow

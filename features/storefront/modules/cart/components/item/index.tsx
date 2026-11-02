@@ -82,19 +82,21 @@ const Item = ({ item, region, type = "full" }: CartItemProps) => {
 
       <div className="min-w-0">
         <LocalizedClientLink href={href} className="block">
-          <p className="font-cx-serif text-[18px] leading-[22px] text-cx-ink hover:text-cx-accent sm:text-[20px] sm:leading-[24px]">
+          <p className="text-[16px] font-semibold leading-[22px] text-cx-ink hover:underline hover:underline-offset-4 sm:text-[17px]">
             {item.title}
           </p>
         </LocalizedClientLink>
-        <div className="mt-1 text-[13px] text-cx-ink-2">
+        <div className="tc-num mt-1.5 text-[12px] uppercase tracking-[0.06em] text-cx-ink-3">
           <LineItemOptions
             variant={{ sku: item.productVariant?.sku || "" }}
             variantTitle={item.productVariant?.title}
           />
         </div>
-        <div className="mt-1 text-[13px] text-cx-ink-3">
-          <LineItemUnitPrice item={item} style="tight" />
-        </div>
+        {item.quantity > 1 ? (
+          <div className="mt-1.5 text-[13px] text-cx-ink-3">
+            <LineItemUnitPrice item={item} style="tight" /> each
+          </div>
+        ) : null}
       </div>
 
       <div className="col-start-2 flex flex-wrap items-center justify-between gap-3 sm:col-start-3 sm:row-start-1 sm:flex-col sm:items-end">
@@ -115,7 +117,7 @@ const Item = ({ item, region, type = "full" }: CartItemProps) => {
             <DeleteButton id={item.id} />
           )}
         </div>
-        <div className="text-[15px]">
+        <div className="tc-num text-[16px] font-bold">
           <LineItemPrice item={item} style="tight" />
         </div>
         <ErrorMessage error={error} />

@@ -25,10 +25,9 @@ export async function AccountWishlistPage(props: { params: Promise<{ countryCode
 
   return (
     <div className="tc w-full" data-testid="wishlist-page-wrapper">
-      <AccountHeading title="Want list" meta={total} />
+      <AccountHeading title="Want list" meta={`${total} ${total === 1 ? "card" : "cards"}`} />
       {total === 0 ? (
         <EmptyState title="Nothing on your want list">
-          <p className="max-w-[48ch] text-[15px] text-cx-ink-2">Open any set and press Want on a card we don&apos;t have. When one meets your terms, it shows here as in stock.</p>
           <LocalizedClientLink href="/sets" className="cx-btn">Browse sets</LocalizedClientLink>
         </EmptyState>
       ) : null}

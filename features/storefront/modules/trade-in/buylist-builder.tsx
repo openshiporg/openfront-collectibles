@@ -60,7 +60,7 @@ function BuylistRow({ entry, index, currencyCode, countryCode, onAdd }: { entry:
         status={entry.hotlist ? "wanted" : "none"}
         href={`/${countryCode}/cards/${entry.catalogItemId}`}
         card={{ id: entry.id, name: entry.title, number: entry.number, rarity: entry.rarity, imageUrl: entry.imageUrl, setName: entry.set?.name }}
-        detail={[entry.set?.name, entry.finish ? finishLabel(entry.finish) : null, entry.hotlist ? "Hotlist" : null, entry.maximumQuantity != null ? `buying ${entry.maximumQuantity}` : null].filter(Boolean).join(" · ")}
+        detail={[entry.set?.name, entry.finish ? finishLabel(entry.finish) : null, entry.maximumQuantity != null ? `buying ${entry.maximumQuantity}` : null].filter(Boolean).join(" · ")}
         run={controls.run}
         market={controls.cash}
         price={controls.credit}
@@ -130,7 +130,7 @@ export function BuylistBuilder({ entries, currencyCode, countryCode, signedIn }:
         ) : (
           <>
             {lines.length === 0 ? (
-              <p className="text-[14px] leading-[1.5] text-cx-ink-2">Add cards from the buylist, or a card that isn&apos;t on it below.</p>
+              <p className="text-[14px] leading-[1.5] text-cx-ink-3">No cards yet.</p>
             ) : (
               <ul className="grid divide-y divide-cx-line border-y border-cx-line">
                 {lines.map((l, i) => (
@@ -158,7 +158,7 @@ export function BuylistBuilder({ entries, currencyCode, countryCode, signedIn }:
                 setOther({ title: "", condition: "NM" })
               }}
             >
-              <span className="text-[12px] font-semibold text-cx-ink-3">Not on the buylist</span>
+              <span className="cx-label">Not on the buylist</span>
               <div className="grid grid-cols-[minmax(0,1fr)_80px_auto] gap-2">
                 <input className="tc-input flex-1" placeholder="Card, set and number" value={other.title} maxLength={200} onChange={(e) => setOther({ ...other, title: e.target.value })} aria-label="Card not on the buylist" />
                 <select className="tc-select !min-w-0 w-[80px]" value={other.condition} onChange={(e) => setOther({ ...other, condition: e.target.value })} aria-label="Its condition">
@@ -169,7 +169,7 @@ export function BuylistBuilder({ entries, currencyCode, countryCode, signedIn }:
             </form>
 
             <div className="grid gap-2" role="radiogroup" aria-label="Payout">
-              <span className="text-[12px] font-semibold text-cx-ink-3">Payout</span>
+              <span className="cx-label">Payout</span>
               <div className="grid grid-cols-2 gap-1">
                 {(["store_credit", "cash"] as const).map((p) => (
                   <button key={p} type="button" role="radio" aria-checked={payout === p} className="tc-run-cell min-h-11" data-live="true" data-tone="ink" data-selected={payout === p ? "true" : undefined} onClick={() => setPayout(p)}>
@@ -177,7 +177,6 @@ export function BuylistBuilder({ entries, currencyCode, countryCode, signedIn }:
                   </button>
                 ))}
               </div>
-              <p className="text-[12px] text-cx-ink-3">Listed offers are estimates until we inspect the cards.</p>
             </div>
 
             {signedIn ? (

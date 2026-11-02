@@ -39,27 +39,16 @@ export function PriceHistory({ readings, currencyCode = 'USD', label }: { readin
     // Too little history for a trend: print the readings themselves.
     const latest = points[points.length - 1];
     return (
-      <figure className="tc grid gap-3" aria-label={label}>
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="tc-num text-[28px] font-bold leading-none text-[var(--tc-ink)]">{money(latest.marketMinor, currencyCode)}</span>
-          <span className="text-[13px] text-[var(--tc-ink-3)]">{label}, {observedDay(latest.observedAt)}</span>
+      <figure className="tc grid gap-4" aria-label={label}>
+        <div className="grid gap-2">
+          <span className="tc-num text-[32px] font-bold leading-none text-[var(--tc-ink)]">{money(latest.marketMinor, currencyCode)}</span>
+          <figcaption className="tc-num text-[12px] uppercase tracking-[0.08em] text-[var(--tc-ink-3)]">{label} · {observedDay(latest.observedAt)}</figcaption>
         </div>
-        <table className="tc-num w-full text-left text-[13px] text-[var(--tc-ink-2)]">
-          <thead className="text-[var(--tc-ink-3)]">
-            <tr><th className="py-1 font-normal">Read</th><th className="py-1 text-right font-normal">Low</th><th className="py-1 text-right font-normal">Mid</th><th className="py-1 text-right font-normal">Market</th></tr>
-          </thead>
-          <tbody>
-            {points.slice().reverse().map((p) => (
-              <tr key={p.observedAt} className="border-t border-[var(--tc-line)]">
-                <td className="py-1.5">{observedDay(p.observedAt)}</td>
-                <td className="py-1.5 text-right">{money(p.lowMinor, currencyCode)}</td>
-                <td className="py-1.5 text-right">{money(p.midMinor ?? null, currencyCode)}</td>
-                <td className="py-1.5 text-right font-semibold text-[var(--tc-ink)]">{money(p.marketMinor, currencyCode)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <figcaption className="text-[12px] text-[var(--tc-ink-3)]">A chart appears once there is a week of readings.</figcaption>
+        <dl className="tc-num flex flex-wrap gap-x-8 gap-y-2 text-[13px]">
+          <div className="grid gap-1"><dt className="text-[12px] uppercase tracking-[0.08em] text-[var(--tc-ink-3)]">Low</dt><dd className="text-[var(--tc-ink-2)]">{money(latest.lowMinor, currencyCode)}</dd></div>
+          {latest.midMinor != null ? <div className="grid gap-1"><dt className="text-[12px] uppercase tracking-[0.08em] text-[var(--tc-ink-3)]">Mid</dt><dd className="text-[var(--tc-ink-2)]">{money(latest.midMinor, currencyCode)}</dd></div> : null}
+          {latest.highMinor != null ? <div className="grid gap-1"><dt className="text-[12px] uppercase tracking-[0.08em] text-[var(--tc-ink-3)]">High</dt><dd className="text-[var(--tc-ink-2)]">{money(latest.highMinor, currencyCode)}</dd></div> : null}
+        </dl>
       </figure>
     );
   }

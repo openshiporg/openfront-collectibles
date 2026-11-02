@@ -28,7 +28,7 @@ const Login = ({ setCurrentView }: Props) => {
       <form className="mt-8 w-full" action={formAction}>
         <div className="flex w-full flex-col gap-y-4">
           <div className="flex flex-col gap-y-1.5">
-            <label htmlFor="email" className="text-[13px] font-medium text-cx-ink">Email</label>
+            <label htmlFor="email" className="cx-label">Email</label>
             <Input
               id="email"
               aria-label="Email"
@@ -42,7 +42,7 @@ const Login = ({ setCurrentView }: Props) => {
             />
           </div>
           <div className="flex flex-col gap-y-1.5">
-            <label htmlFor="password" className="text-[13px] font-medium text-cx-ink">Password</label>
+            <label htmlFor="password" className="cx-label">Password</label>
             <div className="relative">
               <Input
                 id="password"

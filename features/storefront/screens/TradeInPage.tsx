@@ -24,7 +24,6 @@ export async function TradeInPage(props: { params: Promise<{ countryCode: string
           <p>
             {buylist.notes || `For Near Mint cards we pay ${pct(buylist.cashPercentBasisPoints)} of TCGplayer market in cash, or ${pct(buylist.creditPercentBasisPoints)} in store credit. Played copies pay a share of that.`}
           </p>
-          <p className="text-[14px] text-cx-ink-3">Cards marked with a dashed box are on the hotlist: the ones we need most.</p>
         </div>
       ) : null}
 
@@ -38,10 +37,7 @@ export async function TradeInPage(props: { params: Promise<{ countryCode: string
         )}
       </div>
       {buylist && entries.length > 0 ? (
-        <p className="mt-8 text-[13px] text-cx-ink-3">
-          Offers follow TCGplayer market readings and change when prices are refreshed.
-          {buylist.minimumOfferMinor ? ` The minimum offer is ${money(buylist.minimumOfferMinor, buylist.currencyCode)} a card.` : ""}
-        </p>
+        buylist.minimumOfferMinor ? <p className="mt-8 font-mono text-[12px] uppercase tracking-[0.08em] text-cx-ink-3">Minimum offer {money(buylist.minimumOfferMinor, buylist.currencyCode)} a card</p> : null
       ) : null}
     </div>
   )

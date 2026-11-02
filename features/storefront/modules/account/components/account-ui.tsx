@@ -17,7 +17,7 @@ export function AccountHeading({ title, meta, actions }: { title: ReactNode; met
         <h1 className="font-cx-display font-extrabold text-[30px] leading-[34px] tracking-[-0.01em] text-cx-ink sm:text-[36px] sm:leading-[40px]">
           {title}
         </h1>
-        {meta !== undefined && <span className="cx-num shrink-0 text-[13px] text-cx-ink-3">{meta}</span>}
+        {meta !== undefined && <span className="cx-num shrink-0 text-[12px] uppercase tracking-[0.08em] text-cx-ink-3">{meta}</span>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -45,7 +45,7 @@ export function TitleState({ title, tone, state, className }: { title: ReactNode
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="cx-band flex flex-col items-start gap-4 px-5 py-8">
-      <p className="font-cx-serif text-[20px] leading-[26px] text-cx-ink">{title}</p>
+      <p className="text-[17px] font-semibold leading-[24px] text-cx-ink">{title}</p>
       {children}
     </div>
   )

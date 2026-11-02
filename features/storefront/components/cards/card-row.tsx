@@ -109,7 +109,7 @@ export function CardRow({
         ) : (
           <span className="tc-name line-clamp-2 block text-[15px] font-semibold leading-snug text-[var(--tc-ink)] md:line-clamp-1">{card.name}</span>
         )}
-        {detail ? <span className="block text-[12px] leading-snug text-[var(--tc-ink-3)] md:truncate">{detail}</span> : null}
+        {detail ? <span className="mt-1 block text-[12px] leading-snug text-[var(--tc-ink-3)] md:truncate">{detail}</span> : null}
       </span>
       <span className="tc-a-rarity" role="cell">
         <RarityMark rarity={card.rarity} />

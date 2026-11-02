@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { CardRow, ConditionRun, MarketStamp, finishLabel, money, sealedFormatLabel, shortDay } from '@/features/storefront/components/cards';
+import { CardRow, ConditionRun, MarketStamp, finishLabel, money, shortDay } from '@/features/storefront/components/cards';
 import type { RowStatus, StockCell } from '@/features/storefront/components/cards';
 import { addToCart } from '@/features/storefront/lib/data/cart';
 import type { CardProduct } from '@/features/storefront/lib/data/cards';
@@ -55,9 +55,8 @@ export function ProductSheetRow({ product, index }: { product: CardProduct; inde
   };
 
   const detail = message ?? [
-    set?.name,
+    kind === 'sealed' ? null : set?.name,
     kind === 'raw' && finish && finish !== 'normal' ? finishLabel(finish) : null,
-    kind === 'sealed' ? sealedFormatLabel(item?.sealedFormat) : null,
     single?.preorder ? `ships ${shortDay(single.preorderReleaseDate)}` : null,
   ].filter(Boolean).join(' · ');
 
@@ -79,14 +78,12 @@ export function ProductSheetRow({ product, index }: { product: CardProduct; inde
         kind === 'raw' ? (
           <ConditionRun cells={cells} selected={selected?.condition} onSelect={setSelected} currencyCode={currency} />
         ) : kind === 'graded' && grade ? (
-          <span className="tc-stamp inline-flex h-[26px] items-center border border-[var(--tc-ink-3)] px-2 text-[12px] text-[var(--tc-ink)]">{grade[1]} {grade[2]}</span>
+          <span className="tc-num text-[13px] font-semibold uppercase tracking-[0.06em] text-[var(--tc-ink)]">{grade[1]} {grade[2]}</span>
         ) : single?.preorder ? (
           <span className="tc-preorder-stamp">Pre-order{single.preorderLimitPerCustomer ? ` · limit ${single.preorderLimitPerCustomer}` : ''}</span>
-        ) : kind === 'sealed' ? (
-          <span className="tc-num text-[12px] text-[var(--tc-ink-3)]">{single ? `${single.inventoryQuantity} in stock` : ''}</span>
         ) : null
       }
-      market={kind === 'graded' ? null : <MarketStamp minor={reading?.marketMinor} observedAt={reading?.observedAt} currencyCode={currency} />}
+      market={kind === 'graded' ? null : <MarketStamp minor={reading?.marketMinor} observedAt={reading?.observedAt} currencyCode={currency} dated={false} />}
       price={available ? money(buyPrice, currency) : <span className="font-normal text-[var(--tc-ink-3)]">Sold out</span>}
       action={
         <button type="button" className="tc-btn w-[64px] px-0" onClick={add} disabled={!available || pending} aria-label={`Add ${product.title} to cart`}>

@@ -29,10 +29,9 @@ export async function AccountBinderPage(props: { params: Promise<{ countryCode: 
 
   return (
     <div className="tc w-full" data-testid="binder-page-wrapper">
-      <AccountHeading title="Binder" meta={copies} />
+      <AccountHeading title="Binder" meta={`${copies} ${copies === 1 ? "copy" : "copies"}`} />
       {cards.length === 0 ? (
         <EmptyState title="Your binder is empty">
-          <p className="max-w-[48ch] text-[15px] text-cx-ink-2">On any card page, press I have this to add your copy, its condition and what you paid. Market value and set completion follow.</p>
           <LocalizedClientLink href="/sets" className="cx-btn">Browse sets</LocalizedClientLink>
         </EmptyState>
       ) : (

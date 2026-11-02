@@ -56,7 +56,7 @@ export function ChecklistRow({ card, setName, index, currencyCode, wanted: initi
       card={{ id: card.id, name: card.name, number: card.number, rarity: card.rarity, imageUrl: card.imageUrl, setName }}
       detail={message ?? (finish && finish !== 'normal' ? finishLabel(finish) : undefined)}
       run={hasRaw ? <ConditionRun cells={cells} selected={selected?.condition} onSelect={setSelected} currencyCode={currencyCode} /> : null}
-      market={market?.marketMinor != null ? <MarketStamp minor={market.marketMinor} observedAt={market.observedAt} currencyCode={currencyCode} /> : null}
+      market={market?.marketMinor != null ? <MarketStamp minor={market.marketMinor} observedAt={market.observedAt} currencyCode={currencyCode} dated={false} /> : null}
       price={selected ? money(selected.priceMinor, currencyCode) : hasRaw ? <span className="font-normal text-[var(--tc-ink-3)]">Sold out</span> : null}
       action={
         selected ? (
