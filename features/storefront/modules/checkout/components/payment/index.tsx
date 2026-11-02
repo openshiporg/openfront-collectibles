@@ -1,10 +1,9 @@
 "use client";
-import { isStripe, isPaypal, paymentInfoMap, isStripeSandbox, isPayPalSandbox } from "@/features/storefront/lib/constants";
+import { isStripe, isPaypal, paymentInfoMap } from "@/features/storefront/lib/constants";
 import { initiatePaymentSession } from "@/features/storefront/lib/data/payment";
-import { CreditCard, FlaskConical } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ErrorMessage from "../error-message";
 import { StripeContext } from "../payment-wrapper/stripe-wrapper";
 import Radio from "@/features/storefront/modules/common/components/radio";
@@ -204,21 +203,6 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
                         </span>
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
-                        {((isStripe(method.code) && isStripeSandbox()) || (isPaypal(method.code) && isPayPalSandbox())) && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="inline-flex items-center gap-1 rounded-[2px] bg-cx-tint px-2 py-0.5 text-[13px] font-medium text-cx-accent">
-                                  <FlaskConical className="size-3" strokeWidth={2.5} aria-hidden="true" />
-                                  Test
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Sandbox: do not enter real payment details</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
                         <span className="flex size-5 items-center justify-center text-cx-ink-2">
                           {paymentInfoMap[method.code]?.icon}
                         </span>

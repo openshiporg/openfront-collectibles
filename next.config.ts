@@ -27,6 +27,9 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      // Card artwork for the catalogue comes from the public card-image hosts.
+      { protocol: 'https', hostname: 'images.pokemontcg.io', port: '', pathname: '/**' },
+      { protocol: 'https', hostname: 'images.scrydex.com', port: '', pathname: '/**' },
     ],
   },
 };
