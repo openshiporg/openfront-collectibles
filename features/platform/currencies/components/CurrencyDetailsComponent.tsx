@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import {
@@ -52,11 +53,7 @@ export function CurrencyDetailsComponent({
               <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
                 <span>Symbol <span className="font-mono tabular-nums text-foreground">{currency.symbol}</span></span>
                 <span className="font-mono tabular-nums">
-                  {new Date(currency.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  <ViewerTime value={currency.createdAt} style="date" />
                 </span>
               </div>
             </div>
@@ -92,7 +89,7 @@ export function CurrencyDetailsComponent({
                   <div>
                     <dt className="text-xs text-muted-foreground">Updated</dt>
                     <dd className="mt-0.5 font-mono tabular-nums text-foreground">
-                      {new Date(currency.updatedAt).toLocaleDateString()}
+                      <ViewerTime value={currency.updatedAt} style="date" />
                     </dd>
                   </div>
                 )}

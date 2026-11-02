@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import {
@@ -205,11 +206,7 @@ export function RegionDetailsComponent({
                   Tax <span className="font-mono tabular-nums">{(region.taxRate * 100).toFixed(1)}%</span>
                 </span>
                 <span className="font-mono tabular-nums">
-                  {new Date(region.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  <ViewerTime value={region.createdAt} style="date" />
                 </span>
               </div>
             </div>

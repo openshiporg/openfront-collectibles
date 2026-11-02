@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import {
@@ -137,11 +138,7 @@ export function ProductDetailsComponent({
                   {product.productType && <span>{product.productType.value}</span>}
                   {product.handle && <span className="font-mono">{product.handle}</span>}
                   <span className="font-mono tabular-nums">
-                    {new Date(product.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
+                    <ViewerTime value={product.createdAt} style="date" />
                   </span>
                 </div>
               </div>

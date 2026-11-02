@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import { Dot, ListBand, type DotTone } from "@/features/platform/components/vault-ui";
@@ -75,7 +76,7 @@ export const ReturnsSection = ({ order, returns, totalItems }: ReturnsSectionPro
                   </span>
                 </div>
                 <div className="mt-0.5 flex flex-wrap gap-x-3 font-mono text-xs tabular-nums text-muted-foreground">
-                  <span>{new Date(returnItem.createdAt).toLocaleDateString()}</span>
+                  <span><ViewerTime value={returnItem.createdAt} style="date" /></span>
                   {returnItem.refundAmount > 0 && (
                     <span className="text-foreground">
                       {formatCurrency(returnItem.refundAmount, order.currency?.code)}

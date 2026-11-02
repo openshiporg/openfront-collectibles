@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import { useState } from "react";
 import {
@@ -54,11 +55,7 @@ export function CountryDetailsComponent({ country, list }: CountryDetailsCompone
                 <span className="font-mono tabular-nums">#{country.numCode}</span>
                 {country.region && <span className="text-foreground">{country.region.name}</span>}
                 <span className="font-mono tabular-nums">
-                  {new Date(country.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  <ViewerTime value={country.createdAt} style="date" />
                 </span>
               </div>
             </div>

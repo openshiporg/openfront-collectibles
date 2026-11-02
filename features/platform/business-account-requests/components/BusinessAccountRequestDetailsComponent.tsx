@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -148,7 +149,7 @@ export function BusinessAccountRequestDetailsComponent({
               <span className="font-mono tabular-nums text-foreground">{businessAccountRequest.formattedRequestedCredit}</span> requested
             </span>
             <span>
-              Submitted <span className="font-mono tabular-nums">{new Date(businessAccountRequest.submittedAt).toLocaleDateString()}</span>
+              Submitted <span className="font-mono tabular-nums"><ViewerTime value={businessAccountRequest.submittedAt} style="date" /></span>
             </span>
           </div>
           {businessAccountRequest.reviewNotes && (
@@ -232,7 +233,7 @@ export function BusinessAccountRequestDetailsComponent({
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Submitted</dt>
-                <dd className="mt-0.5 font-mono tabular-nums text-foreground">{new Date(businessAccountRequest.submittedAt).toLocaleString()}</dd>
+                <dd className="mt-0.5 font-mono tabular-nums text-foreground"><ViewerTime value={businessAccountRequest.submittedAt} style="datetime" /></dd>
               </div>
             </dl>
 

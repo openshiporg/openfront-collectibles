@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import {
@@ -129,14 +130,10 @@ export function GiftCardDetailsComponent({
                   </span>
                 )}
                 {giftcard.endsAt && (
-                  <span>Expires <span className="font-mono tabular-nums">{new Date(giftcard.endsAt).toLocaleDateString()}</span></span>
+                  <span>Expires <span className="font-mono tabular-nums"><ViewerTime value={giftcard.endsAt} style="date" /></span></span>
                 )}
                 <span className="font-mono tabular-nums">
-                  {new Date(giftcard.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  <ViewerTime value={giftcard.createdAt} style="date" />
                 </span>
               </div>
             </div>
@@ -197,11 +194,7 @@ export function GiftCardDetailsComponent({
                                 #{transaction.order.displayId}
                               </Link>
                               <span className="font-mono text-xs tabular-nums text-muted-foreground">
-                                {new Date(transaction.createdAt).toLocaleDateString("en-US", {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                })}
+                                <ViewerTime value={transaction.createdAt} style="date" />
                               </span>
                             </div>
                             <div className="mt-0.5 text-xs text-muted-foreground">

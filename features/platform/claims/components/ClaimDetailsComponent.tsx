@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import {
@@ -52,11 +53,7 @@ export function ClaimDetailsComponent({
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
                 <span className="font-mono tabular-nums">
-                  {new Date(claim.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  <ViewerTime value={claim.createdAt} style="dateLong" />
                 </span>
               </div>
             </div>
@@ -92,7 +89,7 @@ export function ClaimDetailsComponent({
                   <div>
                     <dt className="text-xs text-muted-foreground">Updated</dt>
                     <dd className="mt-0.5 font-mono tabular-nums text-foreground">
-                      {new Date(claim.updatedAt).toLocaleDateString()}
+                      <ViewerTime value={claim.updatedAt} style="date" />
                     </dd>
                   </div>
                 )}

@@ -1,4 +1,5 @@
 'use client';
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import Link from 'next/link';
 import { Dot, type DotTone } from '@/features/platform/components/vault-ui';
@@ -48,7 +49,7 @@ export function InventoryDetailsComponent({ inventory }: { inventory: InventoryV
           <span className="font-mono tabular-nums">{inventory.sku || 'No SKU'}</span>
           {' · '}{inventory.location?.name || 'Default location'}
           {inventory.allowBackorder ? ' · Backorders allowed' : ''}
-          {inventory.updatedAt ? ` · Updated ${new Date(inventory.updatedAt).toLocaleDateString()}` : ''}
+          {inventory.updatedAt ? <> · Updated <ViewerTime value={inventory.updatedAt} style="date" /></> : ''}
         </p>
       </div>
       <div className="shrink-0 text-right">

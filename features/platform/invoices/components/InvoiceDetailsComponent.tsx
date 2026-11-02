@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import {
@@ -142,14 +143,10 @@ export function InvoiceDetailsComponent({
                   <span className="font-mono tabular-nums">{ordersData.length}</span> {ordersData.length === 1 ? 'order' : 'orders'}
                 </span>
                 {invoice.dueDate && (
-                  <span>Due <span className="font-mono tabular-nums">{new Date(invoice.dueDate).toLocaleDateString()}</span></span>
+                  <span>Due <span className="font-mono tabular-nums"><ViewerTime value={invoice.dueDate} style="date" /></span></span>
                 )}
                 <span className="font-mono tabular-nums">
-                  {new Date(invoice.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  <ViewerTime value={invoice.createdAt} style="dateLong" />
                 </span>
               </div>
             </div>

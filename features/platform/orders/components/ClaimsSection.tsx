@@ -1,4 +1,5 @@
 "use client";
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime';
 
 import React, { useState } from "react";
 import { Dot, ListBand, type DotTone } from "@/features/platform/components/vault-ui";
@@ -101,7 +102,7 @@ export const ClaimsSection = ({ order, claims, totalItems }: ClaimsSectionProps)
                   )}
                 </div>
                 <div className="mt-0.5 flex flex-wrap gap-x-3 font-mono text-xs tabular-nums text-muted-foreground">
-                  <span>{new Date(claim.createdAt).toLocaleDateString()}</span>
+                  <span><ViewerTime value={claim.createdAt} style="date" /></span>
                   {claim.refundAmount > 0 && (
                     <span className="text-foreground">
                       {formatCurrency(claim.refundAmount, order.currency?.code)}
