@@ -48,7 +48,7 @@
 .deneb-detail-secondary>span{display:grid}
 .deneb-detail-art .deneb-detail-secondary .tc-btn,.deneb-detail-art .deneb-detail-secondary .tc-btn[data-variant=line]{background:transparent;color:#f5f5f5;box-shadow:inset 0 0 0 1px #3a3c40;font:500 12px ui-monospace,monospace;letter-spacing:.1em;min-height:42px}
 @media (hover:hover) and (pointer:fine){.deneb-detail-art .deneb-detail-secondary .tc-btn:hover{box-shadow:inset 0 0 0 1px #f5f5f5}}
-.deneb-detail-secondary form{grid-column:1/-1}
+.deneb-detail-secondary form{grid-column:1/-1}.deneb-detail-secondary>:only-child{grid-column:1/-1}
 .deneb-detail-info{gap:24px;padding:28px 32px}
 .deneb-detail-info>div:first-child{gap:12px}
 .deneb-detail-info>div:first-child>a{font:12px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#a4a6af}
