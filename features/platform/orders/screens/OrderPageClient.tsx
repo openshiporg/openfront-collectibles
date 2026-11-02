@@ -135,6 +135,12 @@ export function OrderPageClient({
 
   const { lineItems = [] } = order;
   const paymentCaptured = order.paymentDetails?.[0]?.status === "captured";
+  const capturedPayments = (order.payments || []).filter((p) => p.status === "captured");
+  const capturedCents = capturedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+  const refundedCents = capturedPayments.reduce((sum, p) => sum + (p.amountRefunded || 0), 0);
+  const refundCurrency = capturedPayments[0]?.currencyCode || "USD";
+  const formatCents = (cents: number, currency: string) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
   const awaitingTransfer =
     order.paymentDetails?.[0]?.status === "pending" && order.paymentDetails?.[0]?.manual === true;
   const formatDate = (value?: string) =>
@@ -255,8 +261,8 @@ export function OrderPageClient({
               <SectionTitle
                 meta={
                   <span className="inline-flex items-baseline gap-1.5 font-sans">
-                    <Dot tone={paymentCaptured ? "ok" : "warn"} />
-                    {paymentCaptured ? "Payment complete" : awaitingTransfer ? "Awaiting bank transfer" : "Payment processing"}
+                    <Dot tone={paymentCaptured && !refundedCents ? "ok" : "warn"} />
+                    {paymentCaptured && refundedCents ? (refundedCents >= capturedCents ? "Refunded" : "Partly refunded") : paymentCaptured ? "Payment complete" : awaitingTransfer ? "Awaiting bank transfer" : "Payment processing"}
                   </span>
                 }
               >
@@ -281,6 +287,12 @@ export function OrderPageClient({
                   <span className="text-muted-foreground">Paid</span>
                   <span className="font-mono tabular-nums text-foreground">{order.formattedTotalPaid}</span>
                 </div>
+                {refundedCents > 0 && (
+                  <div className="flex justify-between gap-4 px-4 py-2.5 text-sm">
+                    <span className="text-muted-foreground">Refunded</span>
+                    <span className="font-mono tabular-nums text-foreground">-{formatCents(refundedCents, refundCurrency)}</span>
+                  </div>
+                )}
                 {awaitingTransfer && ["pending", "requires_action"].includes(order.status) && (
                   <RecordBankTransfer orderId={order.id} />
                 )}
