@@ -33,7 +33,7 @@ interface ExtendedOrder {
     phone?: string;
     orders?: { id: string }[];
   };
-  fulfillmentStatus?: string;
+  fulfillmentStatus?: string | { status?: string | null } | null;
   billingAddress?: ExtendedOrder["shippingAddress"];
   fulfillments?: Array<{
     id: string;
@@ -92,6 +92,13 @@ interface OrderPageClientProps {
   fieldModes?: Record<string, unknown>;
   fieldPositions?: Record<string, unknown>;
   uiConfig?: Record<string, unknown>;
+}
+
+
+// Order.fulfillmentStatus is a virtual JSON summary ({ status, ... }); older callers pass a plain string.
+function fulfillmentLabel(value: unknown): string {
+  const raw = typeof value === "string" ? value : value && typeof value === "object" ? (value as { status?: unknown }).status : null;
+  return typeof raw === "string" && raw ? raw.replaceAll("_", " ") : "";
 }
 
 export function OrderPageClient({
@@ -181,9 +188,9 @@ export function OrderPageClient({
                   #{order.displayId}
                 </h1>
                 <StatusBadge status={order.status as any} className="text-sm" />
-                {order.fulfillmentStatus && (
+                {fulfillmentLabel(order.fulfillmentStatus) && (
                   <span className="text-sm text-muted-foreground">
-                    {order.fulfillmentStatus.replaceAll("_", " ")}
+                    {fulfillmentLabel(order.fulfillmentStatus)}
                   </span>
                 )}
               </div>
