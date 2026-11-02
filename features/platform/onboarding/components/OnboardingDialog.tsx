@@ -17,6 +17,7 @@ import { useOnboardingApi } from '../hooks/useOnboardingApi';
 import { STORE_TEMPLATES, SECTION_DEFINITIONS } from '../config/templates';
 import { Dot, ListBand, Pill, Track, pillClass } from '@/features/platform/components/vault-ui';
 import { COLLECTIBLES_LOGO_COLOR, COLLECTIBLES_LOGO_ICON } from '@/features/storefront/lib/collectibles-brand';
+import { logoMarkFilter } from '@/features/platform/store-settings/lib/logo-filter';
 
 
 
@@ -179,7 +180,7 @@ const OnboardingDialog: React.FC<OnboardingDialogProps> = ({
             <span
               aria-hidden="true"
               dangerouslySetInnerHTML={{ __html: COLLECTIBLES_LOGO_ICON }}
-              style={{ filter: `hue-rotate(${COLLECTIBLES_LOGO_COLOR}deg)` }}
+              style={{ filter: logoMarkFilter(COLLECTIBLES_LOGO_COLOR) }}
               className="block size-5 shrink-0 [&>svg]:block [&>svg]:h-full [&>svg]:w-full"
             />
             Store setup

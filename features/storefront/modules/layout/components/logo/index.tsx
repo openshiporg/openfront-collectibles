@@ -2,13 +2,14 @@ import { cn } from '@/lib/utils';
 import LocalizedClientLink from '@/features/storefront/modules/common/components/localized-client-link';
 import { getStore } from '@/features/storefront/lib/data/store';
 import { storeBrand } from '@/features/storefront/lib/collectibles-brand';
+import { logoMarkFilter } from '@/features/platform/store-settings/lib/logo-filter';
 
 export function LogoMark({ svg, color, className }: { svg: string; color: string; className?: string }) {
   return (
     <span
       aria-hidden="true"
       dangerouslySetInnerHTML={{ __html: svg }}
-      style={{ filter: `hue-rotate(${color}deg)` }}
+      style={{ filter: logoMarkFilter(color) }}
       className={cn('block shrink-0 [&>svg]:block [&>svg]:h-full [&>svg]:w-full', className)}
     />
   );

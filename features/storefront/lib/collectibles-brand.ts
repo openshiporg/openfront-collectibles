@@ -3,9 +3,10 @@ import { LOGO_ICONS } from "@/features/platform/store-settings/lib/icon-registry
 // Untitled UI marks are drawn in #155eef (hue 221) and tinted with hue-rotate.
 const REGISTRY_BASE_HUE = 221
 
-// Collectibles' default mark: Boltshift from the Store Settings registry, rotated to card-border yellow.
+// Collectibles' default mark: Boltshift from the Store Settings registry, rotated to the
+// storefront's lime (#c8ff00). logoMarkFilter lifts it to full brightness (≈#c9ff00).
 export const COLLECTIBLES_LOGO_ICON_ID = "boltshift"
-export const COLLECTIBLES_LOGO_COLOR = "189"
+export const COLLECTIBLES_LOGO_COLOR = "206"
 export const COLLECTIBLES_LOGO_ICON =
   LOGO_ICONS.find((icon) => icon.id === COLLECTIBLES_LOGO_ICON_ID)?.lightSvg ?? LOGO_ICONS[0].lightSvg
 

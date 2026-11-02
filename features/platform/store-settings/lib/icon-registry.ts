@@ -257,6 +257,7 @@ export const LOGO_ICONS = [
 // Preset hue values (0-360 degrees) for common color shifts
 export const HUE_PRESETS = [
   { name: 'Original', value: 0 },
+  { name: 'Lime', value: 206 },
   { name: 'Orange', value: 30 },
   { name: 'Yellow', value: 60 },
   { name: 'Green', value: 120 },
