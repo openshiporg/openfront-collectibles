@@ -103,7 +103,7 @@ export function CardBuyPanel({ variants, currencyCode }: { variants: BuyVariant[
           </span>
         </div>
         <button type="button" className="tc-btn min-h-12 px-8 text-[16px]" onClick={add} disabled={!available || pending}>
-          {pending ? "Adding" : chosen?.preorder ? "Pre-order" : "Add to cart"}
+          {pending ? "Adding" : chosen?.preorder ? "Pre-order" : "Add to cart"}{chosen && !pending ? ` · ${money(chosen.priceMinor, currencyCode)}` : ''}
         </button>
       </div>
       {message ? (
