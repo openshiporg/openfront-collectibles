@@ -16,6 +16,7 @@ import { X, CheckCircle2, Loader2 } from "lucide-react";
 import { Dot, ListBand } from "../../../components/vault-ui";
 import { POPULAR_REGIONS } from "../../constants/popular-regions";
 import { createPopularRegion } from "../../actions/popular-regions";
+import { pluralNoun } from '@/features/platform/lib/plural'
 
 interface PopularRegionsDrawerProps {
   open: boolean;
@@ -98,8 +99,8 @@ export function PopularRegionsDrawer({
                       <p className="mt-1 text-sm text-muted-foreground">{template.description}</p>
                     )}
                     <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span><span className="font-mono tabular-nums">{template.countries.length}</span> countries</span>
-                      <span><span className="font-mono tabular-nums">{template.currencies.length}</span> currencies</span>
+                      <span><span className="font-mono tabular-nums">{template.countries.length}</span> {pluralNoun(template.countries.length, 'country', 'countries')}</span>
+                      <span><span className="font-mono tabular-nums">{template.currencies.length}</span> {pluralNoun(template.currencies.length, 'currency', 'currencies')}</span>
                       <span>Tax <span className="font-mono tabular-nums">{template.taxRate}%</span></span>
                       <span>Default <span className="font-mono tabular-nums text-foreground">{template.defaultCurrency}</span></span>
                     </div>

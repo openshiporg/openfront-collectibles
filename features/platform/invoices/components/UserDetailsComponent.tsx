@@ -20,6 +20,7 @@ import Link from "next/link";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 import { ItemPagination } from "../../orders/components/ItemPagination";
 import { OrderDetailsComponent } from "../../orders/components/OrderDetailsComponent";
+import { pluralNoun } from '@/features/platform/lib/plural'
 
 interface User {
   id: string;
@@ -373,7 +374,7 @@ export function UserDetailsComponent({
                               )}
                               <span className="font-mono tabular-nums">{new Date(cart.createdAt).toLocaleDateString()}</span>
                               {cart.lineItems && (
-                                <span><span className="font-mono tabular-nums">{cart.lineItems.length}</span> items</span>
+                                <span><span className="font-mono tabular-nums">{cart.lineItems.length}</span> {pluralNoun(cart.lineItems.length, 'item')}</span>
                               )}
                             </div>
                           </div>

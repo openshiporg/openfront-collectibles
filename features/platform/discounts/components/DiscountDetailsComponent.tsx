@@ -19,6 +19,7 @@ import { Dot, ListBand, SectionTitle } from "../../components/vault-ui";
 import Link from "next/link";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 import { Discount } from "../actions";
+import { pluralNoun } from '@/features/platform/lib/plural'
 
 interface DiscountDetailsComponentProps {
   discount: Discount;
@@ -77,7 +78,7 @@ export function DiscountDetailsComponent({ discount, list }: DiscountDetailsComp
                   {discount.usageLimit ? <> / <span className="font-mono tabular-nums">{discount.usageLimit}</span></> : null} uses
                 </span>
                 {discount.orders && discount.orders.length > 0 && (
-                  <span><span className="font-mono tabular-nums">{discount.orders.length}</span> orders</span>
+                  <span><span className="font-mono tabular-nums">{discount.orders.length}</span> {pluralNoun(discount.orders.length, 'order')}</span>
                 )}
                 <span className="font-mono tabular-nums">
                   {new Date(discount.createdAt).toLocaleDateString("en-US", {

@@ -15,6 +15,7 @@ import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClie
 import { ProductImage } from "../../components/ProductImage";
 import { ProductSectionTabs } from "./ProductSectionTabs";
 import { StatusBadge } from "./StatusBadge";
+import { pluralNoun } from '@/features/platform/lib/plural'
 
 interface ProductVariant {
   id: string;
@@ -126,7 +127,7 @@ export function ProductDetailsComponent({
                     in stock
                   </span>
                   <span>
-                    <span className="font-mono tabular-nums text-foreground">{variantCount}</span> variants
+                    <span className="font-mono tabular-nums text-foreground">{variantCount}</span> {pluralNoun(variantCount, 'variant')}
                   </span>
                   {imageCount > 0 && (
                     <span>
