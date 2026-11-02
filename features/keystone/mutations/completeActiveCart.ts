@@ -14,7 +14,7 @@ import {
   reserveDiscountUsage,
   updateCheckoutAttempt,
 } from "../checkout/recovery";
-import { createOrderFromCartAtomically } from "../checkout/order-commit";
+import { createOrderFromCartAtomically, resolveOrderCustomer } from "../checkout/order-commit";
 import { providerCaptureKey } from '../payments/provider-capture-key';
 import { isManualPaymentProvider } from '../utils/paymentProviderConfig';
 import {
@@ -40,6 +40,7 @@ async function completeActiveCart(
     query: `
       id
       email
+      createdAt
       rawTotal
       metadata
       order {
@@ -54,6 +55,7 @@ async function completeActiveCart(
       user {
         id
         hasAccount
+        createdAt
       }
       shippingAddress {
         id
@@ -61,6 +63,7 @@ async function completeActiveCart(
         user {
           id
           hasAccount
+          createdAt
         }
       }
       region {
@@ -599,7 +602,7 @@ async function createPaymentRecord(
         capturedAt: new Date(),
         paymentCollectionId: cart.paymentCollection.id,
         orderId: order.id,
-        userId: cart.user?.id || cart.shippingAddress?.user?.id || null,
+        userId: resolveOrderCustomer(cart).userId || null,
       },
     });
     await tx.capture.create({
@@ -660,7 +663,7 @@ async function createPendingManualPayment(selectedSession: any, order: any, cart
         idempotencyKey: checkoutKey(cart.id),
         paymentCollectionId: cart.paymentCollection.id,
         orderId: order.id,
-        userId: cart.user?.id || cart.shippingAddress?.user?.id || null,
+        userId: resolveOrderCustomer(cart).userId || null,
       },
     });
     await tx.orderEvent.create({
