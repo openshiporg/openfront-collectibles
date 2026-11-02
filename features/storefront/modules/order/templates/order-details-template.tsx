@@ -29,7 +29,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
         >
           <ArrowLeft className="size-4" aria-hidden="true" /> Orders
         </LocalizedClientLink>
-        <h1 className="flex items-baseline gap-3 font-cx-serif text-[32px] leading-[36px] tracking-[-0.015em] text-cx-ink sm:text-[40px] sm:leading-[44px]">
+        <h1 className="flex items-baseline gap-3 font-cx-display text-[32px] font-extrabold leading-[36px] tracking-[-0.015em] text-cx-ink sm:text-[40px] sm:leading-[44px]">
           Order <span className="cx-num text-[24px] sm:text-[28px]">{order.displayId}</span>
         </h1>
       </div>

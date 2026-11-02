@@ -19,9 +19,8 @@ export default async function OrderCompletedTemplate({
   return (
     <div className="mx-auto w-full max-w-[880px] px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
       <div className="flex flex-col gap-8" data-testid="order-complete-container">
-        <div className="space-y-2">
-          <p className="cx-num text-[13px] text-cx-ink-3">Order {order.displayId}</p>
-          <h1 className="flex items-baseline gap-3 font-cx-serif text-[36px] leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px]">
+        <div>
+          <h1 className="flex items-center gap-3 font-cx-display text-[34px] font-extrabold leading-[40px] tracking-[-0.015em] text-cx-ink sm:text-[48px] sm:leading-[52px]">
             <StatusDot tone="ok" className="size-2.5" />
             Order placed
           </h1>

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 
-/** One order record section: serif heading over a hairline, then content. */
+/** One order record section: mono label heading over a hairline, then content. */
 export default function OrderSection({
   title,
   meta,
@@ -14,8 +14,8 @@ export default function OrderSection({
 }) {
   return (
     <section className="space-y-4" {...props}>
-      <div className="flex items-baseline justify-between gap-3 border-b border-cx-line pb-2">
-        <h2 className="font-cx-serif text-[22px] leading-[26px] text-cx-ink sm:text-[24px] sm:leading-[28px]">{title}</h2>
+      <div className="flex items-baseline justify-between gap-3 border-b border-cx-line pb-3">
+        <h2 className="deneb-section-label">{title}</h2>
         {meta}
       </div>
       {children}

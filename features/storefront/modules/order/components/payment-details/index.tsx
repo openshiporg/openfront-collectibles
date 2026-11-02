@@ -21,7 +21,7 @@ const PaymentDetails = ({ order }: { order: StoreOrder }) => {
         <Field label="Details">
           <div className="flex items-center gap-2">
             {paymentInfoMap[provider.code]?.icon && (
-              <span className="flex h-7 items-center rounded-[2px] bg-cx-well px-2 text-cx-ink-2">
+              <span className="flex items-center text-cx-ink-3">
                 {paymentInfoMap[provider.code]?.icon}
               </span>
             )}

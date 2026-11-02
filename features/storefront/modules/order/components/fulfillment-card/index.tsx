@@ -161,7 +161,7 @@ const FulfillmentCard: React.FC<FulfillmentCardProps> = ({ order }) => {
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-cx-serif text-[15px] text-cx-ink">{item.lineItem.title}</p>
+                          <p className="truncate text-[15px] font-semibold text-cx-ink">{item.lineItem.title}</p>
                           <p className="cx-num text-[13px] text-cx-ink-3">
                             Qty {item.quantity}
                             {item.lineItem.sku ? ` · SKU ${item.lineItem.sku}` : ""}
