@@ -41,7 +41,7 @@
 .cx-sf .tc-a-market{color:#a4a6af}
 
 /* Product detail: one primary (Add to cart), the rest quiet. */
-.deneb-detail-art{display:grid;align-content:start;gap:16px}
+.deneb-detail-art{display:grid;align-content:start;gap:16px}.deneb-detail-art>.tc-art{width:100%}
 .deneb-detail-art>section{padding:16px 0 4px;gap:14px}
 .deneb-detail-art .tc-btn{min-height:48px}
 .deneb-detail-secondary{display:grid;grid-template-columns:1fr 1fr;gap:8px}

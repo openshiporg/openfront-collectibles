@@ -47,7 +47,6 @@ export function PriceHistory({ readings, currencyCode = 'USD', label }: { readin
         <dl className="tc-num flex flex-wrap gap-x-8 gap-y-2 text-[13px]">
           <div className="grid gap-1"><dt className="text-[12px] uppercase tracking-[0.08em] text-[var(--tc-ink-3)]">Low</dt><dd className="text-[var(--tc-ink-2)]">{money(latest.lowMinor, currencyCode)}</dd></div>
           {latest.midMinor != null ? <div className="grid gap-1"><dt className="text-[12px] uppercase tracking-[0.08em] text-[var(--tc-ink-3)]">Mid</dt><dd className="text-[var(--tc-ink-2)]">{money(latest.midMinor, currencyCode)}</dd></div> : null}
-          {latest.highMinor != null ? <div className="grid gap-1"><dt className="text-[12px] uppercase tracking-[0.08em] text-[var(--tc-ink-3)]">High</dt><dd className="text-[var(--tc-ink-2)]">{money(latest.highMinor, currencyCode)}</dd></div> : null}
         </dl>
       </figure>
     );
