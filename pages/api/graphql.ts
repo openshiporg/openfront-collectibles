@@ -1,5 +1,4 @@
 import { keystoneContext } from '../../features/keystone/context'
-import { demoGuardErrorsPlugin } from '../../features/keystone/lib/demo-guard'
 import { createYoga } from "graphql-yoga";
 import processRequest from "graphql-upload/processRequest.js";
 import { type NextApiRequest, type NextApiResponse } from 'next'
@@ -46,6 +45,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return keystoneContext.withRequest(req, res);
     },
     multipart: false,
-    plugins: [demoGuardErrorsPlugin()],
   })(req, res);
 }
