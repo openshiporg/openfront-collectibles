@@ -16,8 +16,12 @@ import { sanitizeStoreLogoSvg } from '@/features/lib/sanitize-store-logo';
 import { PageTitle, Pill, Track, SectionTitle } from '@/features/platform/components/vault-ui';
 import { storeBrand } from '@/features/storefront/lib/collectibles-brand';
 import { LOGO_ICONS, HUE_PRESETS } from '../lib/icon-registry';
+import { logoMarkFilter, logoMarkHex } from '../lib/logo-filter';
 import { StoreSettingsSaveBar } from '../components/StoreSettingsSaveBar';
 import { updateStoreSettings } from '../actions';
+
+// Registry marks are drawn at hue 221; the storefront accent is that hue after rotation.
+const REGISTRY_BASE_HUE = 221;
 
 interface StoreSettingsPageClientProps {
   initialData: {
@@ -31,6 +35,17 @@ interface StoreSettingsPageClientProps {
   initialError: string | null;
 }
 
+function MarkTile({ svg, rotation, className }: { svg: string; rotation: string; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      dangerouslySetInnerHTML={{ __html: svg }}
+      style={{ filter: logoMarkFilter(rotation) }}
+      className={cn('block shrink-0 [&>svg]:block [&>svg]:h-full [&>svg]:w-full', className)}
+    />
+  );
+}
+
 export function StoreSettingsPageClient({ initialData, initialError }: StoreSettingsPageClientProps) {
   // What the storefront shows today: a store without a chosen registry mark gets the collectibles default.
   const live = storeBrand(initialData);
@@ -41,6 +56,8 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
   const [homepageDescription, setHomepageDescription] = useState(initialData?.homepageDescription || '');
   const [isLoading, setIsLoading] = useState(false);
   const safeLogo = sanitizeStoreLogoSvg(logoIcon);
+  const rotation = Number.parseFloat(logoColor) || 0;
+  const accentHue = (((REGISTRY_BASE_HUE + rotation) % 360) + 360) % 360;
   const selectedIcon = LOGO_ICONS.find((icon) => icon.lightSvg === logoIcon);
 
   const handleSave = async () => {
@@ -91,7 +108,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
         }
       />
 
-      <div className="grid gap-8">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-8">
           <section className="space-y-4">
             <SectionTitle>Store</SectionTitle>
@@ -134,7 +151,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                   >
                     <div
                       dangerouslySetInnerHTML={{ __html: logoIcon }}
-                      style={{ filter: `hue-rotate(${logoColor}deg)` }}
+                      style={{ filter: logoMarkFilter(logoColor) }}
                       className="[&>svg]:w-6 [&>svg]:h-6"
                     />
                   </SelectPrimitive.Trigger>
@@ -144,7 +161,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                         <span className="flex items-center gap-3">
                           <div
                             dangerouslySetInnerHTML={{ __html: icon.lightSvg }}
-                            style={{ filter: `hue-rotate(${logoColor}deg)` }}
+                            style={{ filter: logoMarkFilter(logoColor) }}
                             className="[&>svg]:w-6 [&>svg]:h-6"
                           />
                           <span>
@@ -188,7 +205,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                         <div className="text-sm text-muted-foreground">Preview:</div>
                         <div
                           dangerouslySetInnerHTML={{ __html: logoIcon }}
-                          style={{ filter: `hue-rotate(${logoColor}deg)` }}
+                          style={{ filter: logoMarkFilter(logoColor) }}
                           className="[&>svg]:w-8 [&>svg]:h-8 flex items-center justify-center p-2 border rounded"
                         />
                       </div>
@@ -215,7 +232,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                       <div
                         className="w-6 h-6 rounded-full"
                         style={{
-                          background: `hsl(${(240 + parseInt(logoColor)) % 360}, 70%, 50%)`
+                          background: logoMarkHex(logoColor)
                         }}
                       />
                     </SelectValue>
@@ -231,7 +248,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                           <div
                             className="w-6 h-6 rounded-full"
                             style={{
-                              background: `hsl(${(240 + preset.value) % 360}, 70%, 50%)`
+                              background: logoMarkHex(preset.value)
                             }}
                           />
                         </SelectItem>
@@ -241,9 +258,33 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                 </Select>
               </div>
             </div>
+            {logoIcon.trim() && !safeLogo && <p role="alert" className="text-sm text-destructive">Not a valid, safe SVG</p>}
           </section>
         </div>
 
+        <aside className="space-y-3 lg:sticky lg:top-4 lg:self-start" aria-label="Preview">
+          <SectionTitle>Preview</SectionTitle>
+          <div className="overflow-hidden rounded-xl ring-1 ring-border">
+            <div className="flex min-h-16 items-center gap-2.5 bg-[#f3f0e8] px-4 text-[#1a1712]">
+              <MarkTile svg={safeLogo} rotation={logoColor} className="size-6" />
+              <span className="truncate font-serif text-xl leading-none">{name || 'Store'}</span>
+            </div>
+            <div className="space-y-2 border-t border-[#d8d1c2] bg-[#f3f0e8] px-4 py-5 text-[#1a1712]">
+              <p className="font-serif text-2xl leading-7">{homepageTitle || name || 'Store'}</p>
+              {homepageDescription && <p className="text-sm text-[#5a5348]">{homepageDescription}</p>}
+              <span
+                className="mt-2 inline-flex min-h-9 items-center rounded-full px-4 text-sm font-medium text-[#fbf8f1]"
+                style={{ background: `hsl(${accentHue} 64% 34%)` }}
+              >
+                Accent
+              </span>
+            </div>
+            <div className="flex min-h-14 items-center gap-2.5 bg-[#201c16] px-4 text-[#f3eee3]">
+              <MarkTile svg={safeLogo} rotation={logoColor} className="size-5" />
+              <span className="truncate font-serif text-lg leading-none">{name || 'Store'}</span>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );

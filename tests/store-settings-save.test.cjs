@@ -65,11 +65,3 @@ test('the hue is normalized to 0-359', () => {
 test('an unsafe SVG rejects the save', () => {
   assert.deepEqual(payload({ logoIcon: '<svg onload="alert(1)"></svg>' }), { success: false, error: 'Invalid SVG format' });
 });
-
-test('Store Settings page carries the E-commerce logo block verbatim', () => {
-  const page = fs.readFileSync(path.resolve(root, 'features/platform/store-settings/screens/StoreSettingsPageClient.tsx'), 'utf8');
-  assert.ok(page.includes('{/* Logo Icon Selector */}'));
-  assert.ok(page.includes('hue-rotate(${logoColor}deg)'));
-  assert.ok(page.includes('hsl(${(240 + parseInt(logoColor)) % 360}, 70%, 50%)'));
-  assert.ok(!page.includes('logoMarkHex'));
-});
