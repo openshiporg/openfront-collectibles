@@ -147,3 +147,31 @@ test('SMTP not configured: no send, notification marked skipped', async () => {
   assert.equal(state.mailCalls.length, 0);
   assert.equal(state.notif.data.status, 'skipped_not_configured');
 });
+
+test('the provider message id and SMTP response are both stored on the notification when sent', async () => {
+  const withIds = env({ mail: async () => ({ sent: true, messageId: '<local@x>', providerResponse: '250 Accepted resend-id-123' }) });
+  await withIds.mod.createOrderFromCartAtomically(cart({ user: GUEST }), withIds.sudo);
+  assert.equal(withIds.state.notif.data.status, 'sent');
+  assert.equal(withIds.state.notif.data.messageId, '<local@x>');
+  assert.equal(withIds.state.notif.data.providerResponse, '250 Accepted resend-id-123');
+  const without = env({ mail: async () => ({ sent: true, messageId: '<local@x>' }) });
+  await without.mod.createOrderFromCartAtomically(cart({ user: GUEST }), without.sudo);
+  assert.equal('providerResponse' in without.state.notif.data, false);
+});
+
+test('sendOrderConfirmationEmail returns the flattened, capped SMTP response next to the local id', async () => {
+  const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm'), ts = require('typescript');
+  const filename = path.join(root, 'features/keystone/lib/mail.ts');
+  const src = fs.readFileSync(filename, 'utf8').replace(/^'use server'/, '');
+  const out = ts.transpileModule(src, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+  const m = { exports: {} };
+  const long = '250 Accepted\r\n ' + 'x'.repeat(400);
+  const req = (s) => s === 'nodemailer' ? { createTransport: () => ({ sendMail: async (o) => ({ accepted: [o.to], messageId: '<local@x>', response: long }) }), getTestMessageUrl: () => '' } : s === '..' ? { basePath: '' } : {};
+  vm.runInNewContext(out, { module: m, exports: m.exports, require: req, process: { env: { SMTP_STORE_LINK: 'https://s.test' } }, console: { log() {}, warn() {}, error() {} }, URL }, { filename });
+  const result = await m.exports.sendOrderConfirmationEmail({ id: 'o1', email: 'delivered@resend.dev', displayId: 1, secretKey: 'k', lineItems: [] });
+  assert.equal(result.sent, true);
+  assert.equal(result.messageId, '<local@x>');
+  assert.ok(result.providerResponse.startsWith('250 Accepted  x'));
+  assert.equal(result.providerResponse.length, 300);
+  assert.doesNotMatch(result.providerResponse, /[\r\n]/);
+});

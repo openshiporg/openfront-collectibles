@@ -68,7 +68,7 @@ async function deliverOrderConfirmation(sudo: any, orderId: string) {
     // Loaded lazily: lib/mail imports the keystone index, which imports this module.
     const { sendOrderConfirmationEmail } = await import("../lib/mail");
     const result = await sendOrderConfirmationEmail(order);
-    if (result?.sent) await mark("sent", { sentAt: new Date().toISOString(), ...(result.messageId ? { messageId: result.messageId } : {}) });
+    if (result?.sent) await mark("sent", { sentAt: new Date().toISOString(), ...(result.messageId ? { messageId: result.messageId } : {}), ...(result.providerResponse ? { providerResponse: result.providerResponse } : {}) });
     else await mark("failed", { error: result?.error || "send_failed" });
   } catch (error) {
     console.error("Order confirmation email failed:", error instanceof Error ? error.message : "Unknown error");
