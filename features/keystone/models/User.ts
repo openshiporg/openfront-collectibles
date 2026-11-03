@@ -150,10 +150,14 @@ export const User = list<Lists.User.TypeInfo>({
     team: relationship({
       ref: 'Team.members',
       many: false,
+      // Team placement is a user-manager action, never self-service (sign-up included).
+      access: { create: permissions.canManageUsers, update: permissions.canManageUsers },
     }),
     teamLead: relationship({
       ref: 'Team.leader',
       many: true,
+      // Team placement is a user-manager action, never self-service (sign-up included).
+      access: { create: permissions.canManageUsers, update: permissions.canManageUsers },
     }),
     userField: relationship({
       ref: 'UserField.user',

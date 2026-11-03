@@ -41,10 +41,14 @@ export const Team = list<Lists.Team.TypeInfo>({
     members: relationship({
       ref: "User.team",
       many: true,
+      // Only user managers place people on teams (no connecting arbitrary users).
+      access: { create: permissions.canManageUsers, update: permissions.canManageUsers },
     }),
     leader: relationship({
       ref: "User.teamLead",
       many: false,
+      // Only user managers place people on teams (no connecting arbitrary users).
+      access: { create: permissions.canManageUsers, update: permissions.canManageUsers },
     }),
     ...trackingFields,
   },
