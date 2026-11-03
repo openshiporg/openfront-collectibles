@@ -49,10 +49,16 @@ export const User = list<Lists.User.TypeInfo>({
       if (operation === 'create' && !permissions.canManageUsers({ session: context.session })) {
         // A returning guest frees the email held by their earlier guest record.
         // Registered customers (hasAccount true) are never touched.
-        await retireReturningGuest(context.prisma, resolvedData.email);
         return resolvePublicUserCreateData({ inputData, resolvedData });
       }
       return resolvedData;
+    },
+    // Runs only after resolveInput and all field/list validation passed, right before the DB write,
+    // so a create that fails validation never frees a guest's email.
+    beforeOperation: async ({ operation, resolvedData, context }) => {
+      if (operation === 'create' && !permissions.canManageUsers({ session: context.session })) {
+        await retireReturningGuest(context.prisma, (resolvedData as any)?.email);
+      }
     },
     // Every customer (a user without a staff role) gets a private collector
     // profile, so wishlists, trade-ins and collector desks have a record to use.
