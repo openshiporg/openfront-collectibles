@@ -18,6 +18,11 @@ const PUBLIC_USER_CREATE_FIELDS = new Set([
 
 type UserCreateData = Record<string, unknown>;
 
+/** New accounts are members unless the guest checkout explicitly sends false. */
+export function resolvePublicHasAccount(inputData?: UserCreateData): boolean {
+  return inputData?.hasAccount !== false;
+}
+
 /**
  * Restrict fields supplied by an unauthenticated/non-manager caller without
  * deleting values added by Keystone field defaults or initFirstItem.itemData.
@@ -40,8 +45,8 @@ export function resolvePublicUserCreateData({
     }
   }
 
-  // hasAccount only marks a customer as registered (storefront signUp sends true;
-  // guest checkout sends false). It grants no privileges, so it is not forced.
-  restrictedData.hasAccount = inputData?.hasAccount === true;
+  // hasAccount only marks a customer as registered (sign-ups default to true;
+  // only guest checkout sends false). It grants no privileges, so it is not forced.
+  restrictedData.hasAccount = resolvePublicHasAccount(inputData);
   return restrictedData;
 }
