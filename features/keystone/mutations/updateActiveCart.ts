@@ -1,3 +1,4 @@
+import { shopperError } from "../lib/shopperError";
 import {
   assertAddressAccess,
   assertCartAccess,
@@ -34,14 +35,14 @@ async function updateActiveCart(
     throw new Error("Cart not found");
   }
   if (safeData.region && existingCart.lineItems?.length) {
-    throw new Error("Region cannot change after items are added; start a new cart");
+    throw shopperError("Region cannot change after items are added; start a new cart", "CART_REGION_LOCKED");
   }
 
   // Commercial state and every nested write are constructed from a narrow DTO.
   for (const relation of [safeData.shippingAddress, safeData.billingAddress]) {
     const addressId = relation?.connect?.id;
     if (addressId) await assertAddressAccess(context, addressId);
-    if (relation && !addressId) throw new Error("Address ID is required");
+    if (relation && !addressId) throw shopperError("Address ID is required", "ADDRESS_REQUIRED");
   }
 
   const existingLineItemIds = [
@@ -60,7 +61,7 @@ async function updateActiveCart(
       entry.data?.quantity !== undefined &&
       (!Number.isInteger(entry.data.quantity) || entry.data.quantity <= 0 || entry.data.quantity > 99)
     ) {
-      throw new Error("Line item quantity must be a positive integer");
+      throw shopperError("Line item quantity must be a positive integer", "INVALID_QUANTITY");
     }
   }
 
@@ -72,7 +73,7 @@ async function updateActiveCart(
         !Number.isInteger(newItem.quantity) ||
         newItem.quantity <= 0
       ) {
-        throw new Error("A variant and positive integer quantity are required");
+        throw shopperError("A variant and positive integer quantity are required", "INVALID_QUANTITY");
       }
       const variantId = newItem.productVariant.connect.id;
       const variant = await sudoContext.query.ProductVariant.findOne({
@@ -80,7 +81,7 @@ async function updateActiveCart(
         query: "id product { id status }",
       });
       if (!variant || variant.product?.status !== "published") {
-        throw new Error("Product variant is unavailable");
+        throw shopperError("Product variant is unavailable", "VARIANT_UNAVAILABLE");
       }
       const existingLineItem = existingCart.lineItems?.find(
         (item: any) => item.productVariant.id === variantId

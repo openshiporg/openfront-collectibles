@@ -1,3 +1,4 @@
+import { shopperError } from "../shopperError";
 // Pre-order allocation limits: a customer may hold at most the variant's limit across
 // this cart and their earlier, uncancelled orders. Guests are limited per cart.
 
@@ -22,10 +23,10 @@ export async function assertPreorderLimit(prisma: any, { cartId, variantId, quan
     const inCart = adding != null ? quantity - adding : null;
     const left = inCart != null ? Math.max(0, limit - held - inCart) : null;
     const have = held + (inCart ?? 0);
-    throw new Error(left
+    throw shopperError(left
       ? `${name} is limited to ${limit} per customer; you can add ${left} more`
       : have
         ? `${name} is limited to ${limit} per customer, and you already have ${have}`
-        : `${name} is limited to ${limit} per customer`);
+        : `${name} is limited to ${limit} per customer`, 'PREORDER_LIMIT_EXCEEDED');
   }
 }

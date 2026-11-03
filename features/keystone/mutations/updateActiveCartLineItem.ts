@@ -1,10 +1,11 @@
+import { shopperError } from "../lib/shopperError";
 import type * as Generated from '.keystone/types';
 import { assertLineItemBelongsToCart } from "../security/cart-access";
 import { assertPreorderLimit } from "../lib/pokemon/preorder-limit";
 
 async function updateActiveCartLineItem(root: unknown, { cartId, lineId, quantity }: { cartId: string; lineId: string; quantity: number }, context: Generated.Context) {
   if (!Number.isInteger(quantity) || quantity <= 0) {
-    throw new Error("Quantity must be a positive integer");
+    throw shopperError("Quantity must be a positive integer", "INVALID_QUANTITY");
   }
   await assertLineItemBelongsToCart(context, cartId, lineId);
   const sudoContext = context.sudo();

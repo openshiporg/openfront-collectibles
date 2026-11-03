@@ -1,3 +1,4 @@
+import { shopperError } from "../lib/shopperError";
 import type * as Generated from '.keystone/types';
 /**
  * addDiscountToActiveCart - Apply a discount code to a cart
@@ -18,7 +19,7 @@ interface DiscountEligibilityView { id: string; isDisabled: boolean; stackable: 
 
 async function addDiscountToActiveCart(root: unknown, { cartId, code }: { cartId: string; code: string }, context: Generated.Context) {
   await assertCartAccess(context, cartId);
-  if (!code || code.length > 128) throw new Error('Invalid discount code');
+  if (!code || code.length > 128) throw shopperError('Invalid discount code', "INVALID_DISCOUNT_CODE");
   const sudoContext = context.sudo();
 
   // Get cart with customer and region info for eligibility validation
@@ -51,7 +52,7 @@ async function addDiscountToActiveCart(root: unknown, { cartId, code }: { cartId
   }
 
   if (!cart.lineItems || cart.lineItems.length === 0) {
-    throw new Error(`Cannot apply discount to an empty cart`);
+    throw shopperError(`Cannot apply discount to an empty cart`, "CART_EMPTY");
   }
 
   if (!cart.region) throw new Error('Cart region is required');
@@ -90,38 +91,38 @@ async function addDiscountToActiveCart(root: unknown, { cartId, code }: { cartId
   }) as DiscountEligibilityView | null;
 
   if (!discount) {
-    throw new Error(`Invalid discount code: ${code}`);
+    throw shopperError(`Invalid discount code: ${code}`, "INVALID_DISCOUNT_CODE");
   }
 
   // Check if discount is already applied
   if (cart.discounts?.some(d => d.id === discount.id)) {
-    throw new Error(`Discount ${code} is already applied to this cart`);
+    throw shopperError(`Discount ${code} is already applied to this cart`, "DISCOUNT_ALREADY_APPLIED");
   }
 
   // Validate discount is enabled
   if (discount.isDisabled) {
-    throw new Error(`Discount ${code} is no longer available`);
+    throw shopperError(`Discount ${code} is no longer available`, "DISCOUNT_UNAVAILABLE");
   }
 
   // Check date validity
   const now = new Date();
   if (discount.startsAt && new Date(discount.startsAt) > now) {
-    throw new Error(`Discount ${code} is not yet active`);
+    throw shopperError(`Discount ${code} is not yet active`, "DISCOUNT_NOT_ACTIVE");
   }
   if (discount.endsAt && new Date(discount.endsAt) < now) {
-    throw new Error(`Discount ${code} has expired`);
+    throw shopperError(`Discount ${code} has expired`, "DISCOUNT_EXPIRED");
   }
 
   // Check usage limits
   if (discount.usageLimit && discount.usageCount >= discount.usageLimit) {
-    throw new Error(`Discount ${code} has reached its usage limit`);
+    throw shopperError(`Discount ${code} has reached its usage limit`, "DISCOUNT_USAGE_LIMIT");
   }
 
   // Validate region eligibility (if discount has region restrictions)
   if (discount.regions && discount.regions.length > 0 && cart.region) {
     const isValidForRegion = discount.regions.some(r => r.id === cart.region?.id);
     if (!isValidForRegion) {
-      throw new Error(`Discount ${code} is not available in your region`);
+      throw shopperError(`Discount ${code} is not available in your region`, "DISCOUNT_NOT_ELIGIBLE");
     }
   }
 

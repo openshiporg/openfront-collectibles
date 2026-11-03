@@ -1,3 +1,4 @@
+import { shopperError } from "../lib/shopperError";
 import type { PaymentContainerProjection, PaymentSessionProjection } from '../lib/payment-session-projection';
 import type * as Generated from '.keystone/types';
 import { assertCartAccess } from "../security/cart-access";
@@ -28,7 +29,7 @@ async function setActiveCartPaymentSession(root: unknown, { cartId, providerId }
   }
 
   if (!cart.paymentCollection) {
-    throw new Error("Cart has no payment collection");
+    throw shopperError("Cart has no payment collection", "PAYMENT_NOT_STARTED");
   }
 
   // Update all payment sessions to not selected
