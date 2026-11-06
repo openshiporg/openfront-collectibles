@@ -10,6 +10,7 @@ import { Dot, ListBand, SectionTitle } from "@/features/platform/components/vaul
 import { StatusBadge } from "../components/StatusBadge";
 import { RecordBankTransfer } from "../components/RecordBankTransfer";
 import { RefundOrderDialog, type RefundablePayment } from "../components/RefundOrderDialog";
+import { CancelOrderDialog } from "../components/CancelOrderDialog";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 
 
@@ -152,6 +153,12 @@ export function OrderPageClient({
   const ship = order.shippingAddress;
   const bill = order.billingAddress;
   const fulfillments = order.fulfillments || [];
+  // Same rule as the server: open, nothing shipped, and no captured money left to refund.
+  const canCancel =
+    ["pending", "requires_action"].includes(String(order.status || "")) &&
+    !fulfillments.some((f) => !f.canceledAt) &&
+    !(order.payments || []).some((p) => p.status === "captured" && p.amount > p.amountRefunded) &&
+    !(order.paymentDetails || []).some((p) => p.status === "pending" && !p.manual);
   const editButton =
     "inline-flex min-h-7 items-center rounded-full bg-muted px-3 text-xs font-medium text-foreground hover:bg-muted/70 max-sm:min-h-10";
 
@@ -296,6 +303,7 @@ export function OrderPageClient({
                 {(order.payments || []).some((p) => p.status === "captured" && p.amount > p.amountRefunded) && (
                   <div className="px-4 py-3"><RefundOrderDialog orderId={order.id} payments={order.payments || []} /></div>
                 )}
+                {canCancel && <div className="px-4 py-3"><CancelOrderDialog orderId={order.id} /></div>}
               </ListBand>
             </section>
 

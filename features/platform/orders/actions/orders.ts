@@ -246,6 +246,7 @@ export async function updateOrderStatus(
 
   if (response.success) {
     revalidatePath(`/dashboard/platform/orders/${id}`);
+    revalidatePath('/dashboard/platform/orders');
   } else {
     console.error(`Failed to update order status for ${id}:`, response.error);
   }
