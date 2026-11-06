@@ -16,7 +16,7 @@ import { sanitizeStoreLogoSvg } from '@/features/lib/sanitize-store-logo';
 import { PageTitle, Pill, Track, SectionTitle } from '@/features/platform/components/vault-ui';
 import { storeBrand } from '@/features/storefront/lib/collectibles-brand';
 import { LOGO_ICONS, HUE_PRESETS } from '../lib/icon-registry';
-import { logoMarkFilter, logoMarkHex } from '../lib/logo-filter';
+import { logoMarkFilter } from '../lib/logo-filter';
 import { StoreSettingsSaveBar } from '../components/StoreSettingsSaveBar';
 import { updateStoreSettings } from '../actions';
 
@@ -151,7 +151,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                   >
                     <div
                       dangerouslySetInnerHTML={{ __html: logoIcon }}
-                      style={{ filter: logoMarkFilter(logoColor) }}
+                      style={{ filter: `hue-rotate(${logoColor}deg)` }}
                       className="[&>svg]:w-6 [&>svg]:h-6"
                     />
                   </SelectPrimitive.Trigger>
@@ -161,7 +161,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                         <span className="flex items-center gap-3">
                           <div
                             dangerouslySetInnerHTML={{ __html: icon.lightSvg }}
-                            style={{ filter: logoMarkFilter(logoColor) }}
+                            style={{ filter: `hue-rotate(${logoColor}deg)` }}
                             className="[&>svg]:w-6 [&>svg]:h-6"
                           />
                           <span>
@@ -205,7 +205,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                         <div className="text-sm text-muted-foreground">Preview:</div>
                         <div
                           dangerouslySetInnerHTML={{ __html: logoIcon }}
-                          style={{ filter: logoMarkFilter(logoColor) }}
+                          style={{ filter: `hue-rotate(${logoColor}deg)` }}
                           className="[&>svg]:w-8 [&>svg]:h-8 flex items-center justify-center p-2 border rounded"
                         />
                       </div>
@@ -232,7 +232,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                       <div
                         className="w-6 h-6 rounded-full"
                         style={{
-                          background: logoMarkHex(logoColor)
+                          background: `hsl(${(240 + parseInt(logoColor)) % 360}, 70%, 50%)`
                         }}
                       />
                     </SelectValue>
@@ -248,7 +248,7 @@ export function StoreSettingsPageClient({ initialData, initialError }: StoreSett
                           <div
                             className="w-6 h-6 rounded-full"
                             style={{
-                              background: logoMarkHex(preset.value)
+                              background: `hsl(${(240 + preset.value) % 360}, 70%, 50%)`
                             }}
                           />
                         </SelectItem>
