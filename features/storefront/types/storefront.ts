@@ -123,7 +123,7 @@ export interface StoreOrder {
     shippingLabels?: { id: string; carrier?: string | null; trackingNumber?: string | null; trackingUrl?: string | null; labelUrl?: string | null }[];
   }[];
   payments?: {
-    id: string; createdAt: string; status: string; data?: { cardLast4?: string; manual?: boolean } | null;
+    id: string; createdAt: string; status: string; amount?: number; data?: { cardLast4?: string; manual?: boolean; tender?: string; giftCards?: { amount: number; last4?: string }[] } | null;
     paymentCollection?: { paymentSessions?: { id: string; isSelected: boolean; paymentProvider?: { code: string } | null }[] } | null;
   }[];
 }

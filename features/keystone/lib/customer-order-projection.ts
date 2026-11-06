@@ -91,6 +91,20 @@ function projectPaymentData(value: unknown): JsonRecord | null {
   if (typeof value.cardLast4 === "string" && /^\d{4}$/.test(value.cardLast4)) {
     projected.cardLast4 = value.cardLast4;
   }
+  if (value.manual === true) projected.manual = true;
+  if (value.tender === "gift_card") {
+    projected.tender = "gift_card";
+    // Only the last four characters and the amount applied; never the full code or card id.
+    projected.giftCards = Array.isArray(value.giftCards)
+      ? value.giftCards.slice(0, 20).flatMap((card: unknown) => {
+          if (!isRecord(card)) return [];
+          const amount = nonNegativeInteger(card.amount);
+          if (amount === undefined) return [];
+          const last4 = typeof card.last4 === "string" && /^[A-Z0-9]{4}$/i.test(card.last4) ? card.last4 : undefined;
+          return [{ amount, ...(last4 ? { last4 } : {}) }];
+        })
+      : [];
+  }
   return projected;
 }
 
