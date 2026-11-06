@@ -110,11 +110,11 @@ test('a stale variant counter cannot be incremented twice for an already-restore
   await f.cancel();
   assert.equal(f.variant.inventoryQuantity, 1); assert.equal(f.stockMovements.length, 1);
 });
-test('restock false (and the default) leaves stock unchanged', async () => {
+test('restock false (and the default) leaves stock unchanged but closes the fully refunded order', async () => {
   for (const o of [{ restock: false }, {}]) {
     const f = fixture(); await f.refund(o);
     assert.equal(f.unit.status, 'sold'); assert.equal(f.variant.inventoryQuantity, 0);
-    assert.equal(f.inventoryMovements.length, 0); assert.equal(f.stockMovements.length, 0); assert.equal(f.order.status, 'completed');
+    assert.equal(f.inventoryMovements.length, 0); assert.equal(f.stockMovements.length, 0); assert.equal(f.order.status, 'canceled');
   }
 });
 test('partial refund never restocks, even when asked', async () => {

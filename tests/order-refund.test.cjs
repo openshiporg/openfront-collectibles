@@ -13,7 +13,7 @@ function load(file, mocks = {}) {
 }
 const idempotency = load('features/keystone/utils/idempotency.ts');
 function fixture({ amount = 3940, refunded = 0, allowed = true, status = 'captured', providerFails = false } = {}) {
-  const attempts = new Map(), refunds = [], events = [], outbox = [];
+  const attempts = new Map(), refunds = [], events = [], outbox = [], transitions = [];
   let calls = 0;
   const payment = { id: 'p1', amount, amountRefunded: refunded, status, currencyCode: 'USD', order: { id: 'o1' }, data: { payment_intent_id: 'pi_test' }, refunds: [], paymentCollection: { paymentSessions: [{ isSelected: true, paymentProvider: { id: 'stripe', code: 'pp_stripe_stripe' } }] } };
   const prisma = {
@@ -26,7 +26,7 @@ function fixture({ amount = 3940, refunded = 0, allowed = true, status = 'captur
       update: async ({where,data}) => { const row = [...attempts.values()].find(a => a.id === where.id); Object.assign(row,data); return {...row}; },
       updateMany: async ({where,data}) => { const row = [...attempts.values()].find(a => a.id === where.id); if (row.lockedAt && new Date(row.lockedAt) >= where.OR[1].lockedAt.lt) return {count:0}; Object.assign(row,data); return {count:1}; },
     },
-    payment: { updateMany: async ({where,data}) => { if (payment.amountRefunded > where.amountRefunded.lte) return {count:0}; payment.amountRefunded += data.amountRefunded.increment; return {count:1}; } },
+    payment: { findMany: async () => [{ status: payment.status, amount: payment.amount, refunds: refunds.map(r => ({ amount: r.amount })) }], updateMany: async ({where,data}) => { if (payment.amountRefunded > where.amountRefunded.lte) return {count:0}; payment.amountRefunded += data.amountRefunded.increment; return {count:1}; } },
     refund: { findFirst: async ({where}) => refunds.find(r => r.idempotencyKey === where.idempotencyKey), create: async ({data}) => { if ('paymentId' in data || 'createdById' in data || data.payment?.connect?.id !== 'p1') throw new Error('Unknown argument `paymentId`'); const r = {...data,id:`r${refunds.length}`}; refunds.push(r); payment.refunds.push(r); return r; } },
     orderEvent: { create: async ({data}) => { events.push(data); return data; } },
   };
@@ -38,12 +38,12 @@ function fixture({ amount = 3940, refunded = 0, allowed = true, status = 'captur
   const fn = load('features/keystone/mutations/refundOrderPayment.ts', {
     '../access': {permissions: {canManagePayments: () => allowed, canManageReturns: () => allowed}},
     '../utils/idempotency': idempotency,
-    '../utils/orderStatusTransition': {applyOrderStatusTransition: async () => ({changed: true})},
+    '../utils/orderStatusTransition': {applyOrderStatusTransition: async (_sudo, input) => { transitions.push(input); return {changed: true}; }},
     '../utils/paymentProviderAdapter': {refundPayment: async input => { calls++; if(providerFails) throw new Error('network outcome unknown'); return {status:'succeeded',amount:input.amount,currency:'USD',data:{id:'re_test'}}; }},
     '../../webhooks/outbox': {subscribedWebhookEndpointIds: async () => ['endpoint'], enqueueWebhookOutbox: async (...args) => { outbox.push(args); }},
   }).default;
   const args = {orderId:'o1',paymentId:'p1',amount:3940,reason:'Customer request',idempotencyKey:'request1'};
-  return {run: overrides => fn(null,{...args,...overrides},context), payment, refunds, events, outbox, attempts, calls:()=>calls};
+  return {run: overrides => fn(null,{...args,...overrides},context), payment, refunds, events, outbox, attempts, transitions, calls:()=>calls};
 }
 
 test('full refund uses the provider, preserves reason and records audit/outbox without a return', async () => {
@@ -98,4 +98,18 @@ test('replay of an attempt that already holds a provider result finalizes withou
   const row = f.attempts.get('refund:request1'); f.refunds.length = 0; f.payment.refunds.length = 0;
   row.recoveryPoint = 'completed'; row.responseBody = {providerResult:{status:'succeeded',amount:3940,currency:'USD',data:{id:'re_test'}}};
   await f.run(); assert.equal(f.calls(),1); assert.equal(f.refunds.length,1);
+});
+
+test('a full refund closes the order even without restock; stock moves only when asked', async () => {
+  const f = fixture(); await f.run();
+  assert.equal(f.transitions.length,1); assert.equal(f.transitions[0].status,'canceled'); assert.equal(f.transitions[0].restock,false);
+  const g = fixture(); await g.run({restock:true}); assert.equal(g.transitions[0].restock,true);
+});
+test('a partial refund leaves the order open', async () => {
+  const f = fixture(); await f.run({amount:1000}); assert.equal(f.transitions.length,0);
+});
+test('cancel transition skips both stock loops when restock is false', () => {
+  const src = fs.readFileSync(path.join(root,'features/keystone/utils/orderStatusTransition.ts'),'utf8');
+  assert.equal((src.match(/for \(const line of restock \? order\.lineItems : \[\]\)/g)||[]).length,2);
+  assert.match(src,/restock = true \}/);
 });

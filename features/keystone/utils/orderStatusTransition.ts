@@ -8,7 +8,7 @@ import {
 // status check, the unit version fence and the stock-movement key all stop a repeat.
 export async function applyOrderStatusTransition(
   sudo: any,
-  { orderId, status, reason, userId }: { orderId: string; status: "canceled" | "archived"; reason: string; userId: string }
+  { orderId, status, reason, userId, restock = true }: { orderId: string; status: "canceled" | "archived"; reason: string; userId: string; restock?: boolean }
 ): Promise<{ changed: boolean }> {
   const endpointIds = await subscribedWebhookEndpointIds(sudo, `order.${status}`);
   return sudo.prisma.$transaction(async (tx: any) => {
@@ -76,7 +76,9 @@ export async function applyOrderStatusTransition(
       // with no serialized unit, with the order status transition), so a replay,
       // a later cancel or a second refund can never add stock twice.
       const restoredVariantIds = new Set<string>();
-      for (const line of order.lineItems) {
+      // A full refund without "restock" still closes the order (Shopify: refund without
+      // restocking leaves inventory alone), so skip both stock loops in that case.
+      for (const line of restock ? order.lineItems : []) {
         const unit = line.productVariant?.collectibleInventoryUnit;
         if (!unit || unit.status !== "sold") continue;
         const restored = await tx.inventoryUnit.updateMany({
@@ -101,7 +103,7 @@ export async function applyOrderStatusTransition(
           },
         });
       }
-      for (const line of order.lineItems) {
+      for (const line of restock ? order.lineItems : []) {
         if (!line.productVariant?.manageInventory) continue;
         const hasUnit = !!line.productVariant.collectibleInventoryUnit;
         if (hasUnit && !restoredVariantIds.has(line.productVariant.id)) continue;

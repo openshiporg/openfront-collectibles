@@ -20,6 +20,6 @@ export async function refundOrderPaymentAction(input: {
   return {
     success: true as const,
     data: { refundOrderPayment: { id: refund?.id, amount: refund?.amount } },
-    restock: restock ? { restocked: !!restock.restocked, reason: restock.reason } : undefined,
+    restock: restock && input.restock ? { restocked: !!restock.restocked, reason: restock.reason } : undefined,
   }
 }

@@ -239,35 +239,37 @@ async function restockIfFullyRefunded(
   refund: any,
   { orderId, reason, restock, userId }: { orderId: string; reason: string; restock?: boolean | null; userId: string }
 ) {
-  // Optional: once the order is fully refunded, return its items to stock through the
-  // same cancel path as transitionOrderStatus. A failure here never undoes the refund.
-  if (restock === true) {
-    let outcome: { restocked: boolean; reason?: string };
-    try {
-      const payments = await sudo.prisma.payment.findMany({
-        where: { order: { id: orderId } },
-        select: { status: true, amount: true, refunds: { select: { amount: true } } },
+  // Once every captured payment is fully refunded the order is closed: it leaves
+  // "Pending" through the same cancel path as transitionOrderStatus. Items go back
+  // to stock only when the operator asked to restock. A failure here never undoes the refund.
+  let outcome: { canceled: boolean; restocked: boolean; reason?: string };
+  try {
+    const payments = await sudo.prisma.payment.findMany({
+      where: { order: { id: orderId } },
+      select: { status: true, amount: true, refunds: { select: { amount: true } } },
+    });
+    const fullyRefunded = payments.length > 0 && payments.every(
+      (p: any) =>
+        p.status === "pending" ||
+        p.status === "canceled" ||
+        p.refunds.reduce((sum: number, r: any) => sum + r.amount, 0) >= p.amount
+    );
+    if (!fullyRefunded) {
+      outcome = { canceled: false, restocked: false, reason: "the order is not fully refunded" };
+    } else {
+      const result = await applyOrderStatusTransition(sudo, {
+        orderId,
+        status: "canceled",
+        reason: `Full refund: ${reason.trim()}`.slice(0, 1000),
+        userId: userId,
+        restock: restock === true,
       });
-      const fullyRefunded = payments.every(
-        (p: any) =>
-          p.status === "pending" ||
-          p.status === "canceled" ||
-          p.refunds.reduce((sum: number, r: any) => sum + r.amount, 0) >= p.amount
-      );
-      if (!fullyRefunded) {
-        outcome = { restocked: false, reason: "the order is not fully refunded" };
-      } else {
-        await applyOrderStatusTransition(sudo, {
-          orderId,
-          status: "canceled",
-          reason: `Full refund: ${reason.trim()}`.slice(0, 1000),
-          userId: userId,
-        });
-        outcome = { restocked: true };
-      }
-    } catch (error: any) {
-      outcome = { restocked: false, reason: String(error?.message || "unknown error").slice(0, 300) };
+      outcome = { canceled: result.changed, restocked: result.changed && restock === true };
     }
+  } catch (error: any) {
+    outcome = { canceled: false, restocked: false, reason: String(error?.message || "unknown error").slice(0, 300) };
+  }
+  if (restock === true || outcome.canceled) {
     try {
       await sudo.prisma.refund.update({
         where: { id: refund.id },
@@ -277,7 +279,6 @@ async function restockIfFullyRefunded(
       // The outcome note is informational; the refund itself is already final.
     }
   }
-
 }
 
 export default refundOrderPayment;
