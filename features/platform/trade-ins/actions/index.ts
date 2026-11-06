@@ -200,6 +200,9 @@ export async function addTradeInItem(input: {
   if (!['draft', 'submitted', 'received', 'inspecting'].includes(submission.status)) return fail('Items can no longer be added');
   const description = String(input.description || '').trim();
   if (!description && !input.catalogItemId) return fail('Choose a catalogue item or describe the item');
+  // Items carry the currency they will be quoted in (required by the model); it starts as the store currency.
+  const store = await keystoneClient<{ stores: { defaultCurrencyCode?: string | null }[] }>(`query { stores(take: 1) { defaultCurrencyCode } }`);
+  const currencyCode = String((store.success && store.data.stores?.[0]?.defaultCurrencyCode) || 'USD').toUpperCase();
   const response = await keystoneClient(
     `mutation AddTradeInItem($data: TradeInItemCreateInput!) { createTradeInItem(data: $data) { id } }`,
     {
@@ -207,6 +210,7 @@ export async function addTradeInItem(input: {
         submission: { connect: { id: input.submissionId } },
         customerDescription: description.slice(0, 4000),
         customerCondition: String(input.condition || '').trim().slice(0, 300),
+        currencyCode,
         ...(input.catalogItemId ? { catalogItem: { connect: { id: input.catalogItemId } } } : {}),
       },
     },
