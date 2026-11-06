@@ -68,7 +68,7 @@ export function CheckoutLayout({
           <div aria-hidden="true" />
         </nav>
       </header>
-      <div className="relative flex-1" data-testid="checkout-container">{children}</div>
+      <main className="relative flex-1" data-testid="checkout-container">{children}</main>
     </CollectiblesShell>
   )
 }

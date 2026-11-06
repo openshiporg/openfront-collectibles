@@ -79,3 +79,5 @@
   .deneb-detail-record dl{padding:4px 14px 8px}
   .cx-sf .tc-row{gap:6px 12px;padding:14px 0}
 }
+/* Narrow phones: the store name wraps to two lines instead of truncating. */
+@media(max-width:420px){.deneb-nav [data-testid=nav-store-link]>span:last-child{white-space:normal;overflow:hidden;text-overflow:clip;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-height:1.2;font-size:12px;letter-spacing:1.2px;overflow-wrap:anywhere}}
