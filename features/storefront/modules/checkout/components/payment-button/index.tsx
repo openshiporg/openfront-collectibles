@@ -15,6 +15,8 @@ interface PaymentButtonProps {
     billingAddress: any;
     email: string;
     shippingMethods: any[];
+    giftCards?: any[];
+    rawTotal?: number;
     paymentCollection?: {
       paymentSessions?: {
         id: string;
@@ -46,6 +48,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const paymentSession = cart.paymentCollection?.paymentSessions?.find(
     (s) => s.isSelected
   )
+
+  if ((cart.giftCards?.length ?? 0) > 0 && cart.rawTotal === 0) {
+    return <GiftCardPaymentButton notReady={notReady} data-testid={dataTestId} />
+  }
 
   switch (true) {
     case isStripe(paymentSession?.paymentProvider?.code):
@@ -175,6 +181,43 @@ const StripePaymentButton: React.FC<StripePaymentButtonProps> = ({
         error={errorMessage}
         data-testid="stripe-payment-error-message"
       />
+    </>
+  )
+}
+
+// The order is fully covered by gift cards or store credit: nothing to charge.
+const GiftCardPaymentButton = ({ notReady, "data-testid": dataTestId }: { notReady: boolean; "data-testid"?: string }) => {
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const router = useRouter()
+
+  const handlePayment = async () => {
+    setSubmitting(true)
+    setErrorMessage(null)
+    try {
+      const result = await placeOrder()
+      if (result?.success && result.redirectTo) return router.push(result.redirectTo)
+      setErrorMessage("The order could not be placed")
+    } catch (err: any) {
+      setErrorMessage(err?.message || "The order could not be placed")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        disabled={notReady || submitting}
+        onClick={handlePayment}
+        className="cx-btn w-full sm:w-auto"
+        data-testid={dataTestId}
+      >
+        {submitting ? <RiLoader2Fill className="size-4 animate-spin" aria-hidden="true" /> : null}
+        Place order
+      </button>
+      <ErrorMessage error={errorMessage} data-testid="gift-card-payment-error-message" />
     </>
   )
 }

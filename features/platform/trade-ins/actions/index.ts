@@ -15,7 +15,7 @@ const LIST_SELECTION = `
 `;
 
 const DETAIL_SELECTION = `
-  id reference status disposition createdAt updatedAt
+  id reference status disposition createdAt updatedAt storeCredit
   customer { id name email }
   items {
     id customerDescription customerCondition quotedAmountMinor acceptedAmountMinor currencyCode createdAt decisionEvidence
@@ -167,6 +167,17 @@ export async function transitionSubmission(id: string, to: string): Promise<Resu
         if (!updated.success) return fail('Could not record the accepted amounts');
       }
     }
+  }
+
+  // Paying is its own server command: store-credit payouts issue the credit in the same transaction.
+  if (to === 'paid') {
+    const paid = await keystoneClient<{ payTradeInSubmission: any }>(
+      `mutation PayTradeIn($id: ID!) { payTradeInSubmission(id: $id) }`,
+      { id },
+    );
+    if (!paid.success) return fail(paid.error || 'Payout rejected');
+    refresh(id);
+    return { success: true, data: null };
   }
 
   const response = await keystoneClient(

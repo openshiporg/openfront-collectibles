@@ -203,6 +203,7 @@ export async function createOrderFromCartAtomically(cart: any, sudo: any, checko
             thumbnail,
             description: line.productVariant.product.description,
             metadata: line.productVariant.product.metadata,
+            ...(line.productVariant.product.isGiftcard ? { isGiftcard: true } : {}),
             ...(collectibleSnapshot ? { collectible: collectibleSnapshot } : {}),
           },
           variantData: {

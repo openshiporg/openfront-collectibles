@@ -236,7 +236,7 @@ function orderFulfillmentEmail({ order, fulfillment, orderUrl }: { order: any; f
         Tracking: ${label.trackingNumber}
       </td>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">
-        ${label.url ? `<a href="${label.url}" target="_blank" style="color: ${buttonBackgroundColor}; text-decoration: none;">Track Package</a>` : ''}
+        ${(label.trackingUrl || label.url) ? `<a href="${label.trackingUrl || label.url}" target="_blank" style="color: ${buttonBackgroundColor}; text-decoration: none;">Track Package</a>` : ''}
       </td>
     </tr>
   `).join('') || '';
@@ -363,17 +363,12 @@ export async function sendOrderConfirmationEmail(
   }
 }
 
-export async function sendOrderFulfillmentEmail(order: any, fulfillment: any, baseUrl?: string): Promise<void> {
-  if (!order.email) {
-    console.warn('No email address found for order', order.id);
-    return;
-  }
+export async function sendOrderFulfillmentEmail(order: any, fulfillment: any, baseUrl?: string): Promise<{ sent: boolean; error?: string; messageId?: string; providerResponse?: string }> {
+  if (!order.email) return { sent: false, error: 'no_recipient' };
 
   const countryCode = order.shippingAddress?.country?.iso2?.toLowerCase() || 'us';
-  
-  // Use provided baseUrl or fall back to utility function
   const frontendUrl = baseUrl || getBaseUrlForEmails();
-  const orderUrl = order.secretKey 
+  const orderUrl = order.secretKey
     ? `${frontendUrl}/${countryCode}/order/confirmed/${order.id}?secretKey=${order.secretKey}`
     : `${frontendUrl}/${countryCode}/order/confirmed/${order.id}`;
 
@@ -381,16 +376,55 @@ export async function sendOrderFulfillmentEmail(order: any, fulfillment: any, ba
     const info = await transport.sendMail({
       to: order.email,
       from: process.env.SMTP_FROM,
-      subject: `Order Shipped - Order #${order.displayId}`,
+      subject: `Your order #${order.displayId} has shipped`,
       html: orderFulfillmentEmail({ order, fulfillment, orderUrl }),
     });
-
-    if (process.env.SMTP_USER?.includes("ethereal.email")) {
-      console.log(`📧 Order fulfillment email sent! Preview it at ${getTestMessageUrl(info as any)}`);
-    } else {
-      console.log(`📧 Order fulfillment email sent to ${order.email}`);
-    }
+    const providerResponse = typeof (info as any)?.response === 'string' ? (info as any).response.replace(/[\r\n]+/g, ' ').trim().slice(0, 300) : '';
+    return {
+      sent: true,
+      messageId: typeof (info as any)?.messageId === 'string' ? (info as any).messageId : undefined,
+      ...(providerResponse ? { providerResponse } : {}),
+    };
   } catch (error) {
     console.error('Failed to send order fulfillment email:', error);
+    return { sent: false, error: error instanceof Error ? error.message : 'send_failed' };
+  }
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
+}
+
+export async function sendStoreCreditEmail(input: {
+  to: string;
+  code: string;
+  amountMinor: number;
+  currencyCode: string;
+  reference: string;
+  kind?: 'store_credit' | 'gift_card';
+}): Promise<{ sent: boolean; error?: string; messageId?: string }> {
+  const giftCard = input.kind === 'gift_card';
+  if (!input.to) return { sent: false, error: 'no_recipient' };
+  const amount = new Intl.NumberFormat('en-US', { style: 'currency', currency: input.currencyCode }).format(input.amountMinor / 100);
+  const storeUrl = getBaseUrlForEmails();
+  const font = 'font-family: Helvetica, Arial, sans-serif;';
+  const html = `
+    <body style="background: #f9f9f9;">
+      <table width="100%" border="0" cellspacing="20" cellpadding="0" style="background: #ffffff; max-width: 600px; margin: auto; border-radius: 10px;">
+        <tr><td align="center" style="padding: 20px 0 0; font-size: 24px; ${font} color: #333333; font-weight: bold;">${giftCard ? 'Your gift card' : 'Your store credit is ready'}</td></tr>
+        <tr><td align="center" style="font-size: 16px; ${font} color: #444444;">${giftCard
+          ? `Here is your <strong>${amount}</strong> gift card${input.reference ? ` from order #${escapeHtml(input.reference)}` : ''}.`
+          : `Thanks for trading in${input.reference ? ` (${escapeHtml(input.reference)})` : ''}. We've added <strong>${amount}</strong> in store credit.`}</td></tr>
+        <tr><td align="center" style="padding: 10px 0;"><div style="display: inline-block; padding: 14px 22px; border: 1px solid #dddddd; border-radius: 6px; font-family: Menlo, Consolas, monospace; font-size: 20px; letter-spacing: 1px; color: #111111;">${escapeHtml(input.code)}</div></td></tr>
+        <tr><td align="center" style="font-size: 14px; ${font} color: #666666;">Enter this code in the gift card or discount field at checkout, or show it at the counter. Any balance left stays on the code.</td></tr>
+        ${storeUrl ? `<tr><td align="center" style="padding: 10px 0 20px;"><a href="${storeUrl}" style="font-size: 16px; ${font} color: #ffffff; background: #346df1; text-decoration: none; border-radius: 5px; padding: 10px 20px; display: inline-block; font-weight: bold;">Shop now</a></td></tr>` : ''}
+      </table>
+    </body>`;
+  try {
+    const info = await transport.sendMail({ to: input.to, from: process.env.SMTP_FROM, subject: giftCard ? `Your ${amount} gift card` : `Your ${amount} store credit`, html });
+    return { sent: true, messageId: typeof (info as any)?.messageId === 'string' ? (info as any).messageId : undefined };
+  } catch (error) {
+    console.error('Failed to send store credit email:', error);
+    return { sent: false, error: error instanceof Error ? error.message : 'send_failed' };
   }
 }

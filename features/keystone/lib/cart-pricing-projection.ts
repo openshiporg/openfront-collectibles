@@ -18,7 +18,7 @@ export interface CartPricingProjection {
   lineItems?: { quantity: number; productVariant: { id: string; title?: string; product?: DiscountProduct | null } }[];
   discounts?: { id: string; code?: string; discountRule?: { type: string; value: number; allocation?: string; discountConditions?: ProductDiscountCondition[] } | null }[];
   shippingMethods?: { price?: number | null; shippingOption?: { name: string } | null }[];
-  giftCards?: { balance: number; value?: number }[];
+  giftCards?: { id?: string; code?: string; balance: number; value?: number; isDisabled?: boolean | null; endsAt?: string | null; region?: { id: string } | null }[];
   billingAddress?: { id: string } | null;
   shippingAddress?: { id: string } | null;
   paymentCollection?: { id: string; paymentSessions?: { isSelected: boolean; isInitiated?: boolean; data?: { status?: string; clientSecret?: string } | null }[] } | null;

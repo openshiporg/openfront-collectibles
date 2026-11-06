@@ -62,6 +62,12 @@ export async function AccountTradeInsPage() {
                 {label(tradeIn.disposition)} ·{" "}
                 {new Date(tradeIn.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
               </p>
+              {tradeIn.storeCredit && (
+                <p className="text-[14px] text-cx-ink">
+                  Store credit <span className="cx-num">{tradeIn.storeCredit.code}</span> ·{" "}
+                  <span className="cx-num">{money(tradeIn.storeCredit.balance, tradeIn.storeCredit.currencyCode)}</span> left. Enter the code at checkout.
+                </p>
+              )}
               <Band>
                 {tradeIn.items.map((item: any) => {
                   const quoted = money(item.quotedAmountMinor, item.currencyCode)

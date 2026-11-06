@@ -777,12 +777,31 @@ export async function applyDiscount(code: string) {
   updateTag("checkout");
 }
 
+const ADD_GIFT_CARD_MUTATION = gql`
+  mutation AddGiftCardToActiveCart($cartId: ID!, $code: String!) {
+    addGiftCardToActiveCart(cartId: $cartId, code: $code) { id }
+  }
+`;
+
+const REMOVE_GIFT_CARD_MUTATION = gql`
+  mutation RemoveGiftCardFromActiveCart($cartId: ID!, $code: String!) {
+    removeGiftCardFromActiveCart(cartId: $cartId, code: $code) { id }
+  }
+`;
+
 export async function applyGiftCard(code: string) {
   const cartId = await getCartId();
 
   if (!cartId) return "No cartId cookie found";
 
-  return "Gift-card redemption is currently unavailable.";
+  try {
+    await openfrontClient.request(ADD_GIFT_CARD_MUTATION, { cartId, code }, await getAuthHeaders());
+    updateTag("cart");
+    updateTag("checkout");
+    return null;
+  } catch (error: any) {
+    return customerError(error, "That gift card can't be used");
+  }
 }
 
 export async function removeDiscount(code: string) {
@@ -803,13 +822,9 @@ export async function removeGiftCard(code: string) {
 
   if (!cartId) return "No cartId cookie found";
 
-  try {
-    await Promise.resolve().then(() => {
-      updateTag("cart");
-    });
-  } catch (error) {
-    throw error;
-  }
+  await openfrontClient.request(REMOVE_GIFT_CARD_MUTATION, { cartId, code }, await getAuthHeaders());
+  updateTag("cart");
+  updateTag("checkout");
 }
 
 export async function submitDiscountForm(prevState: any, formData: FormData) {
@@ -829,15 +844,18 @@ export async function submitDiscountForm(prevState: any, formData: FormData) {
     updateTag("cart");
     return null;
   } catch (error: any) {
+    // One field takes both, as on Shopify: a code that isn't a discount is tried as a gift card.
+    const codeName = error?.response?.errors?.[0]?.extensions?.code;
+    if (codeName === "INVALID_DISCOUNT_CODE") {
+      const giftCardError = await applyGiftCard(code);
+      return giftCardError ? "That code isn't a valid discount or gift card" : null;
+    }
     return customerError(error, "That code can't be applied to this cart");
   }
 }
 
 export async function submitGiftCard(code: string) {
-  const cartId = await getCartId();
-  if (!cartId) return "No cartId cookie found";
-
-  return "Gift-card redemption is currently unavailable.";
+  return applyGiftCard(code);
 }
 
 const UPDATE_CART_MUTATION = gql`

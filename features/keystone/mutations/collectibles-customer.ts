@@ -227,11 +227,23 @@ export async function activeTradeIns(_root: unknown, _args: unknown, context: an
     take: 50,
     include: { items: { orderBy: { createdAt: 'asc' }, include: { catalogItem: true } } },
   });
+  const paidCreditIds = rows.filter((row: any) => row.status === 'paid' && row.disposition === 'store_credit').map((row: any) => row.id);
+  const credits = paidCreditIds.length
+    ? await context.sudo().prisma.giftCard.findMany({
+        where: { OR: paidCreditIds.map((id: string) => ({ metadata: { path: ['tradeInSubmissionId'], equals: id } })) },
+        select: { code: true, value: true, balance: true, metadata: true },
+      })
+    : [];
+  const creditBySubmission = new Map(credits.map((card: any) => [(card.metadata as any)?.tradeInSubmissionId, card]));
   return rows.map((row: any) => ({
     id: row.id,
     reference: row.reference,
     status: row.status,
     disposition: row.disposition,
+    storeCredit: (() => {
+      const card: any = creditBySubmission.get(row.id);
+      return card ? { code: card.code, value: card.value, balance: card.balance, currencyCode: card.metadata?.currencyCode || 'USD' } : null;
+    })(),
     submittedAt: row.createdAt.toISOString(),
     items: row.items.map((item: any) => ({
       id: item.id,

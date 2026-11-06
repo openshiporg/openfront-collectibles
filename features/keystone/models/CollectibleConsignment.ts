@@ -1,6 +1,7 @@
 import { lockedRecordUi } from './lifecycle-ui';
 import { list } from '@keystone-6/core';
-import { checkbox, integer, json, relationship, select, text, timestamp } from '@keystone-6/core/fields';
+import { checkbox, integer, json, relationship, select, text, timestamp, virtual } from '@keystone-6/core/fields';
+import { graphql } from '@keystone-6/core';
 import { denyAll } from '@keystone-6/core/access';
 
 import { permissions } from '../access';
@@ -151,6 +152,22 @@ export const TradeInSubmission = list({
     disposition: select({ type: 'string', options: ['cash', 'store_credit', 'trade'], defaultValue: 'cash' }),
     items: relationship({ ref: 'TradeInItem.submission', many: true }),
     shippingEvidence: json({ defaultValue: {} }),
+    // Store credit issued when a store-credit trade-in is paid (see payTradeInSubmission).
+    storeCredit: virtual({
+      field: graphql.field({
+        type: graphql.JSON,
+        async resolve(item: any, _args: any, context: any) {
+          if (item.disposition !== 'store_credit' || item.status !== 'paid') return null;
+          const card = await context.sudo().prisma.giftCard.findFirst({
+            where: { metadata: { path: ['tradeInSubmissionId'], equals: item.id } },
+            select: { id: true, code: true, value: true, balance: true, isDisabled: true, metadata: true },
+          });
+          if (!card) return null;
+          return { id: card.id, code: card.code, value: card.value, balance: card.balance, isDisabled: card.isDisabled, currencyCode: (card.metadata as any)?.currencyCode || 'USD' };
+        },
+      }),
+      ui: { itemView: { fieldMode: 'read' }, listView: { fieldMode: 'hidden' }, createView: { fieldMode: 'hidden' } },
+    }),
     ...trackingFields,
   },
 });

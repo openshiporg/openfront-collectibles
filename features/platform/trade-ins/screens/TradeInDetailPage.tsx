@@ -84,6 +84,16 @@ export async function TradeInDetailPage({ params }: { params: Promise<{ id: stri
             <Fact label="Quoted">{totals(items, 'quotedAmountMinor')}</Fact>
             <Fact label="Accepted">{totals(items, 'acceptedAmountMinor')}</Fact>
           </dl>
+          {submission.storeCredit && (
+            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-border px-4 py-3 text-sm">
+              <span className="text-muted-foreground">Store credit issued</span>
+              <span className="font-mono tabular-nums text-foreground">{submission.storeCredit.code}</span>
+              <span className="tabular-nums text-foreground">
+                {money(submission.storeCredit.balance, submission.storeCredit.currencyCode)} left of {money(submission.storeCredit.value, submission.storeCredit.currencyCode)}
+              </span>
+              <Link href={`/dashboard/platform/gift-cards?search=${encodeURIComponent(submission.storeCredit.code)}`} className="text-foreground underline-offset-4 hover:underline">View gift card</Link>
+            </div>
+          )}
         </ListBand>
 
         <section>

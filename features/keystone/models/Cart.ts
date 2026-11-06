@@ -248,6 +248,31 @@ async function calculateCartTotal(cart: CartPricingProjection, context: Context)
   return subtotal - discount + shipping + tax;
 }
 
+/** Gift cards / store credit usable on this cart, applied in order until the balance due is zero. */
+export function applicableGiftCards(cards: CartPricingProjection["giftCards"], grossTotal: number, regionId?: string | null) {
+  let remaining = Math.max(0, Math.round(grossTotal));
+  const now = Date.now();
+  const applied: { id: string; code?: string; amount: number }[] = [];
+  for (const card of cards || []) {
+    if (remaining <= 0) break;
+    if (card.isDisabled || (card.endsAt && new Date(card.endsAt).getTime() <= now)) continue;
+    if (card.region?.id && regionId && card.region.id !== regionId) continue;
+    const amount = Math.min(Math.max(0, card.balance || 0), remaining);
+    if (amount <= 0) continue;
+    applied.push({ id: card.id as string, code: card.code, amount });
+    remaining -= amount;
+  }
+  return applied;
+}
+
+async function calculateCartAmountDue(cart: CartPricingProjection, context: Context) {
+  const gross = Math.round(await calculateCartTotal(cart, context));
+  const giftCards = applicableGiftCards(cart.giftCards, gross, cart.region?.id);
+  return gross - giftCards.reduce((sum, card) => sum + card.amount, 0);
+}
+
+const GIFT_CARD_PROJECTION = `giftCards { id code balance isDisabled endsAt region { id } }`;
+
 async function findCheapestShippingOption(regionId: string, context: Context) {
   const sudoContext = context.sudo();
   const shippingOptions = await sudoContext.query.ShippingOption.findMany({
@@ -591,13 +616,14 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       }
                     }
                   }
+                  ${GIFT_CARD_PROJECTION}
                   shippingMethods {
                     price
                   }
                 `,
               });
 
-              const total = await calculateCartTotal(cart, context);
+              const total = await calculateCartAmountDue(cart, context);
               const currencyCode = cart.region?.currency?.code || "USD";
               const divisor = cart.region?.currency?.noDivisionCurrency
                 ? 1
@@ -655,6 +681,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       }
                     }
                   }
+                  ${GIFT_CARD_PROJECTION}
                   shippingMethods {
                     price
                   }
@@ -663,7 +690,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
 
               if (!cart) return 0;
 
-              return Math.round(await calculateCartTotal(cart, context));
+              return calculateCartAmountDue(cart, context);
             },
           }),
         }),
@@ -918,47 +945,120 @@ export const Cart = list<Lists.Cart.TypeInfo>({
           field: graphql.field({
             type: graphql.String,
             async resolve(item, args, context) {
-              const sudoContext = context.sudo();
-
-              const cart: CartPricingProjection = await sudoContext.query.Cart.findOne({
+              const cart: CartPricingProjection = await context.sudo().query.Cart.findOne({
                 where: { id: item.id },
                 query: `
-                  giftCards {
-                    id
-                    balance
-                    value
-                  }
                   region {
                     id
+                    taxRate
                     currency {
                       code
                       noDivisionCurrency
                     }
                   }
+                  lineItems {
+                    id
+                    quantity
+                    productVariant {
+                      id
+                      product {
+                        id
+                        discountable
+                        productType { id }
+                        productCollections { id }
+                        productTags { id }
+                      }
+                    }
+                  }
+                  discounts {
+                    id
+                    discountRule {
+                      type
+                      value
+                      allocation
+                      discountConditions {
+                        id
+                        type
+                        operator
+                        products { id }
+                        productTypes { id }
+                        productCollections { id }
+                        productTags { id }
+                      }
+                    }
+                  }
+                  ${GIFT_CARD_PROJECTION}
+                  shippingMethods {
+                    price
+                  }
                 `,
               });
-
-              if (!cart?.giftCards?.length) {
-                return null;
-              }
-
-              const total = cart.giftCards.reduce((sum, card) => {
-                // Use the lower of balance or value
-                const usableAmount = Math.min(
-                  card.balance,
-                  card.value || card.balance
-                );
-                return sum + usableAmount;
-              }, 0);
-
+              if (!cart?.giftCards?.length) return null;
+              const gross = Math.round(await calculateCartTotal(cart, context));
+              const total = applicableGiftCards(cart.giftCards, gross, cart.region?.id).reduce((sum, card) => sum + card.amount, 0);
               if (total === 0) return null;
-
               const currencyCode = cart.region?.currency?.code || "USD";
-              const divisor = cart.region?.currency?.noDivisionCurrency
-                ? 1
-                : 100;
-
+              const divisor = cart.region?.currency?.noDivisionCurrency ? 1 : 100;
               return formatCurrency(total / divisor, currencyCode);
+            },
+          }),
+        }),
+        giftCardAllocation: virtual({
+          field: graphql.field({
+            type: graphql.JSON,
+            async resolve(item, args, context) {
+              const cart: CartPricingProjection = await context.sudo().query.Cart.findOne({
+                where: { id: item.id },
+                query: `
+                  region {
+                    id
+                    taxRate
+                    currency {
+                      code
+                      noDivisionCurrency
+                    }
+                  }
+                  lineItems {
+                    id
+                    quantity
+                    productVariant {
+                      id
+                      product {
+                        id
+                        discountable
+                        productType { id }
+                        productCollections { id }
+                        productTags { id }
+                      }
+                    }
+                  }
+                  discounts {
+                    id
+                    discountRule {
+                      type
+                      value
+                      allocation
+                      discountConditions {
+                        id
+                        type
+                        operator
+                        products { id }
+                        productTypes { id }
+                        productCollections { id }
+                        productTags { id }
+                      }
+                    }
+                  }
+                  ${GIFT_CARD_PROJECTION}
+                  shippingMethods {
+                    price
+                  }
+                `,
+              });
+              if (!cart) return null;
+              const gross = Math.round(await calculateCartTotal(cart, context));
+              const applied = applicableGiftCards(cart.giftCards, gross, cart.region?.id);
+              return { gross, applied, due: gross - applied.reduce((sum, card) => sum + card.amount, 0) };
             },
           }),
         }),

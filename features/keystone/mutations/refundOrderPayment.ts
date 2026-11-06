@@ -77,6 +77,19 @@ async function refundOrderPayment(
     throw refundRuleError("Refund exceeds captured payment amount", "REFUND_EXCEEDS_BALANCE");
   }
 
+  // Gift card / store credit: value goes back onto the cards, no processor involved.
+  if (payment.data?.tender === "gift_card") {
+    const { refundGiftCardTender } = await import("../checkout/gift-card-tender");
+    const refund = await refundGiftCardTender(sudo.prisma, {
+      orderId, paymentId, amount, reason: reason.trim(), businessKey, userId: context.session.itemId,
+    });
+    await restockIfFullyRefunded(sudo, refund, { orderId, reason, restock, userId: context.session.itemId });
+    return sudo.query.Refund.findOne({
+      where: { id: refund.id },
+      query: "id amount reason idempotencyKey metadata payment { id amount amountRefunded }",
+    });
+  }
+
   const provider =
     payment.paymentCollection?.paymentSessions?.find((session: any) => session.isSelected)?.paymentProvider ||
     payment.paymentCollection?.paymentSessions?.[0]?.paymentProvider;
@@ -212,6 +225,20 @@ async function refundOrderPayment(
     return created;
   });
 
+  await restockIfFullyRefunded(sudo, refund, { orderId, reason, restock, userId: context.session.itemId });
+
+  return sudo.query.Refund.findOne({
+    where: { id: refund.id },
+    query: "id amount reason idempotencyKey metadata payment { id amount amountRefunded }",
+  });
+}
+
+
+async function restockIfFullyRefunded(
+  sudo: any,
+  refund: any,
+  { orderId, reason, restock, userId }: { orderId: string; reason: string; restock?: boolean | null; userId: string }
+) {
   // Optional: once the order is fully refunded, return its items to stock through the
   // same cancel path as transitionOrderStatus. A failure here never undoes the refund.
   if (restock === true) {
@@ -234,7 +261,7 @@ async function refundOrderPayment(
           orderId,
           status: "canceled",
           reason: `Full refund: ${reason.trim()}`.slice(0, 1000),
-          userId: context.session.itemId,
+          userId: userId,
         });
         outcome = { restocked: true };
       }
@@ -251,10 +278,6 @@ async function refundOrderPayment(
     }
   }
 
-  return sudo.query.Refund.findOne({
-    where: { id: refund.id },
-    query: "id amount reason idempotencyKey metadata payment { id amount amountRefunded }",
-  });
 }
 
 export default refundOrderPayment;

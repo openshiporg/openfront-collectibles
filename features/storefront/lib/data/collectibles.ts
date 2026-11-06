@@ -117,6 +117,7 @@ export async function getPublicBuylist(): Promise<any[] | null> {
 export async function submitTradeIn(input: {
   key: string;
   disposition: string;
+  storeCredit?: { code: string; value: number; balance: number; currencyCode: string } | null;
   items: { buylistEntryId?: string; description: string; condition: string; cardCondition?: string; quantity?: number }[];
 }): Promise<{ reference?: string; error?: string }> {
   const headers = await signedIn();

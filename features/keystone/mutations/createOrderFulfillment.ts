@@ -18,6 +18,48 @@ function trackingUrl(carrier: string, number: string) {
   }
 }
 
+/**
+ * Emails the customer that their order shipped. The FULFILLMENT_CREATED notification written in the
+ * fulfilment transaction is the dedupe record: it is claimed once, then marked sent, failed or skipped.
+ */
+async function deliverShippingNotice(sudo: any, fulfillmentId: string) {
+  try {
+    const notification = await sudo.prisma.notification.findFirst({
+      where: { eventName: "FULFILLMENT_CREATED", resourceType: "Fulfillment", resourceId: fulfillmentId },
+      select: { id: true, data: true },
+    });
+    if (!notification) return;
+    const base = (notification.data || {}) as Record<string, unknown>;
+    const claim = await sudo.prisma.notification.updateMany({
+      where: { id: notification.id, data: { path: ["status"], equals: "pending_delivery" } },
+      data: { data: { ...base, status: "sending" } },
+    });
+    if (claim.count !== 1) return;
+    const mark = (status: string, extra: Record<string, unknown> = {}) =>
+      sudo.prisma.notification.update({ where: { id: notification.id }, data: { data: { ...base, status, ...extra } } });
+    if (!process.env.SMTP_HOST) return void (await mark("skipped_not_configured"));
+    const fulfillment = await sudo.query.Fulfillment.findOne({
+      where: { id: fulfillmentId },
+      query: `id order { id displayId email secretKey shippingAddress { firstName lastName company address1 address2 city province postalCode phone country { iso2 displayName } } }
+        fulfillmentItems { quantity lineItem { title variantTitle sku formattedUnitPrice formattedTotal } }
+        shippingLabels { carrier trackingNumber trackingUrl }`,
+    });
+    if (!fulfillment?.order?.email) return void (await mark("skipped_no_recipient"));
+    // Loaded lazily: lib/mail imports the keystone index.
+    const { sendOrderFulfillmentEmail } = await import("../lib/mail");
+    const result = await sendOrderFulfillmentEmail(fulfillment.order, { items: fulfillment.fulfillmentItems, shippingLabels: fulfillment.shippingLabels });
+    await mark(result.sent ? "sent" : "failed", {
+      to: fulfillment.order.email,
+      ...(result.sent ? { sentAt: new Date().toISOString() } : { error: result.error || "send_failed" }),
+      ...(result.messageId ? { messageId: result.messageId } : {}),
+      ...(result.providerResponse ? { providerResponse: result.providerResponse } : {}),
+    });
+  } catch (error) {
+    // The fulfilment is committed; a mail problem never fails it.
+    console.error("Shipping email failed:", error instanceof Error ? error.message : "Unknown error");
+  }
+}
+
 async function createOrderFulfillment(
   root: any,
   {
@@ -178,7 +220,7 @@ async function createOrderFulfillment(
           resourceType: "Fulfillment",
           resourceId: fulfillment.id,
           to: "notification-operations",
-          data: { orderId, fulfillmentId: fulfillment.id, status: "pending_delivery" },
+          data: { orderId, fulfillmentId: fulfillment.id, status: "pending_delivery", channel: "email" },
         },
       });
     }
@@ -219,6 +261,8 @@ async function createOrderFulfillment(
       );
     }
   }
+
+  if (!noNotification) await deliverShippingNotice(sudo, fulfillmentResult.fulfillmentId);
 
   return sudo.query.Fulfillment.findOne({
     where: { id: fulfillmentResult.fulfillmentId },

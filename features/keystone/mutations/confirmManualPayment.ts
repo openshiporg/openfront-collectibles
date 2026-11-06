@@ -83,6 +83,10 @@ async function confirmManualPayment(
     );
   }, { isolationLevel: "Serializable" });
 
+  // Bank transfer cleared: any gift cards bought on the order are issued now.
+  const { issuePurchasedGiftCards } = await import("../checkout/gift-card-issue");
+  await issuePurchasedGiftCards(sudo, orderId);
+
   return sudo.query.Order.findOne({
     where: { id: orderId },
     query: "id status displayId",

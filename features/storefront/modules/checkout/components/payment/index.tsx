@@ -29,6 +29,7 @@ interface PaymentProps {
     };
     shippingMethods: any[];
     giftCards?: any[];
+    rawTotal?: number;
   };
   availablePaymentMethods: Array<{
     id: string;
@@ -61,7 +62,7 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
   // Check if we're in sandbox/test mode
 
   const paidByGiftcard =
-    cart?.giftCards && cart?.giftCards?.length > 0 && cart?.total === 0;
+    (cart?.giftCards?.length ?? 0) > 0 && cart?.rawTotal === 0;
 
   const paymentReady =
     (activeSession && cart?.shippingMethods.length !== 0) || paidByGiftcard;
@@ -112,6 +113,9 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
+      if (paidByGiftcard) {
+        return router.push(pathname + "?" + createQueryString("step", "review"), { scroll: false });
+      }
       const shouldInputCard = isStripe(selectedPaymentMethod) && !cardComplete;
 
       const hasExistingSelectedSession =
