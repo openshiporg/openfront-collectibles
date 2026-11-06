@@ -18,7 +18,7 @@ const DETAIL_SELECTION = `
   id reference status disposition createdAt updatedAt
   customer { id name email }
   items {
-    id customerDescription customerCondition quotedAmountMinor acceptedAmountMinor currencyCode createdAt
+    id customerDescription customerCondition quotedAmountMinor acceptedAmountMinor currencyCode createdAt decisionEvidence
     catalogItem { id title catalogNumber maker year }
     specimen { id displayName specimenCode }
     inspectedConditionObservation { id label score observedAt }

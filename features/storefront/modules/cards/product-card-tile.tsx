@@ -61,13 +61,13 @@ export function ProductCardTile({ product, countryCode, eager }: { product: Card
     const grade = slabGrade(product)
     return (
       <li className="tc-tile">
-        <Link href={href} className="grid gap-2.5 outline-none" aria-label={product.title}>
+        <Link href={href} className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-2.5 outline-none" aria-label={product.title}>
           {grade ? (
             <SlabView card={face} grade={grade} compact eager={eager} />
           ) : null}
-          <span className="flex items-baseline justify-between gap-2">
-            <span className="tc-num text-[16px] font-bold text-[var(--tc-ink)]">{soldOut ? "Sold" : money(Math.min(...prices), currency)}</span>
-            <span className="text-[12px] text-[var(--tc-ink-3)]">{set?.name}</span>
+          <span className="flex min-w-0 items-baseline justify-between gap-2">
+            <span className="tc-num shrink-0 text-[16px] font-bold text-[var(--tc-ink)]">{soldOut ? "Sold" : money(Math.min(...prices), currency)}</span>
+            <span className="min-w-0 truncate text-[12px] text-[var(--tc-ink-3)]">{set?.name}</span>
           </span>
         </Link>
       </li>

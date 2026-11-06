@@ -97,6 +97,9 @@ export async function TradeInDetailPage({ params }: { params: Promise<{ id: stri
               const offer = item.catalogItem?.id ? offers[item.catalogItem.id] : undefined;
               const currency = item.currencyCode || offer?.currencyCode || storeCurrency;
               const title = item.catalogItem?.title || item.customerDescription || 'Item';
+              // What the customer was shown at submission, for the payout they chose (cash or store credit).
+              const evidence = (item.decisionEvidence || {}) as { estimateCashMinor?: number | null; estimateCreditMinor?: number | null };
+              const estimateMinor = submission.disposition === 'cash' ? evidence.estimateCashMinor : evidence.estimateCreditMinor ?? evidence.estimateCashMinor;
               return (
                 <div key={item.id} className="space-y-3 px-4 py-3">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -124,7 +127,10 @@ export async function TradeInDetailPage({ params }: { params: Promise<{ id: stri
                       ) : null}
                     </div>
                     <dl className="flex shrink-0 gap-4 text-right font-mono text-xs tabular-nums">
-                      <div><dt className="font-sans text-muted-foreground">Buylist</dt><dd>{offer ? money(offer.offerAmountMinor, offer.currencyCode) : '—'}</dd></div>
+                      {estimateMinor != null ? (
+                        <div><dt className="font-sans text-muted-foreground">{submission.disposition === 'cash' ? 'Estimate (cash)' : 'Estimate (credit)'}</dt><dd>{money(estimateMinor, currency)}</dd></div>
+                      ) : null}
+                      <div><dt className="font-sans text-muted-foreground">Buylist (cash, NM)</dt><dd>{offer ? money(offer.offerAmountMinor, offer.currencyCode) : '—'}</dd></div>
                       <div><dt className="font-sans text-muted-foreground">Quote</dt><dd>{item.quotedAmountMinor != null ? money(item.quotedAmountMinor, item.currencyCode) : '—'}</dd></div>
                       <div><dt className="font-sans text-muted-foreground">Accepted</dt><dd>{item.acceptedAmountMinor != null ? money(item.acceptedAmountMinor, item.currencyCode) : '—'}</dd></div>
                     </dl>
@@ -140,7 +146,7 @@ export async function TradeInDetailPage({ params }: { params: Promise<{ id: stri
                           submissionId={submission.id}
                           itemId={item.id}
                           currencyCode={currency}
-                          defaultValue={major(item.quotedAmountMinor ?? offer?.offerAmountMinor, currency)}
+                          defaultValue={major(item.quotedAmountMinor ?? estimateMinor ?? offer?.offerAmountMinor, currency)}
                         />
                       )}
                       {submission.status === 'quoted' && (

@@ -37,7 +37,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
         />
         <div className="mt-1 flex flex-wrap items-center gap-x-2 text-[13px] text-cx-ink-2">
           <span data-testid="order-created-at">
-            {order.createdAt ? new Date(order.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : ""}
+            {order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }) : ""}
           </span>
           <span aria-hidden="true">·</span>
           <span className="cx-num text-cx-ink" data-testid="order-amount">{order.total}</span>

@@ -316,6 +316,8 @@
   position: relative;
   display: grid;
   grid-template-rows: auto 1fr;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   gap: 10px;
   padding: 10px;
   border-radius: 10px;

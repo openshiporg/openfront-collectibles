@@ -48,7 +48,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
       <div className="min-w-0 space-y-1">
         <dt className="cx-label">Placed</dt>
         <dd className="cx-num text-[14px] text-cx-ink" data-testid="order-date">
-          {new Date(order.createdAt ?? "").toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+          {new Date(order.createdAt ?? "").toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}
         </dd>
       </div>
       <div className="col-span-2 min-w-0 space-y-1">

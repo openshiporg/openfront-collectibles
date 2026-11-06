@@ -181,7 +181,7 @@ export function BuylistBuilder({ entries, currencyCode, countryCode, signedIn }:
 
             {signedIn ? (
               <button type="button" className="tc-btn min-h-12" disabled={!lines.length || pending} onClick={submit}>
-                {pending ? "Submitting" : `Submit ${lines.reduce((n, l) => n + l.quantity, 0)} cards`}
+                {pending ? "Submitting" : (() => { const n = lines.reduce((s, l) => s + l.quantity, 0); return `Submit ${n} ${n === 1 ? "card" : "cards"}` })()}
               </button>
             ) : (
               <LocalizedClientLink href="/account" className="tc-btn min-h-12">Sign in to submit</LocalizedClientLink>

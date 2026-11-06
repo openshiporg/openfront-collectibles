@@ -12,7 +12,7 @@ export default async function StoreSettingsPage() {
           {
             type: "link",
             label: "Dashboard",
-            href: "/dashboard",
+            href: "/",
           },
           {
             type: "page",

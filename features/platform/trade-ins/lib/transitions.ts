@@ -5,8 +5,8 @@ import type { DotTone } from '@/features/platform/components/vault-ui';
 export const SUBMISSION_TRANSITIONS: Record<string, string[]> = {
   draft: ['submitted'],
   submitted: ['received', 'declined'],
-  received: ['inspecting'],
-  inspecting: ['quoted'],
+  received: ['inspecting', 'declined'],
+  inspecting: ['quoted', 'declined'],
   quoted: ['accepted', 'declined'],
   accepted: ['paid'],
   declined: ['returned'],

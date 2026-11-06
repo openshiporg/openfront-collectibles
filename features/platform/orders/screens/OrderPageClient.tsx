@@ -200,12 +200,15 @@ export function OrderPageClient({
                 {formatDate(order.createdAt)}
               </div>
             </div>
-            <Link
+            {!(
+              ["fulfilled", "shipped", "delivered"].includes(fulfillmentLabel(order.fulfillmentStatus)) ||
+              ["canceled", "archived"].includes(String(order.status || ""))
+            ) && <Link
               href={`/dashboard/platform/orders/${order.id}/fulfill`}
               className="inline-flex min-h-10 items-center rounded-full bg-foreground px-5 text-sm font-medium text-background hover:bg-foreground/90"
             >
               Fulfill items
-            </Link>
+            </Link>}
           </div>
         </div>
 

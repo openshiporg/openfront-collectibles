@@ -28,7 +28,7 @@ const PaymentDetails = ({ order }: { order: StoreOrder }) => {
             <span className="cx-num text-[13px]">
               {provider.code === "stripe" && payment.data?.cardLast4
                 ? `•••• ${payment.data?.cardLast4}`
-                : `${order.total} · ${new Date(payment.createdAt).toLocaleDateString()}`}
+                : `${order.total} · ${new Date(payment.createdAt).toLocaleDateString("en-US", { timeZone: "UTC" })}`}
             </span>
           </div>
         </Field>
