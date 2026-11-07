@@ -26,6 +26,27 @@ export default async function payTradeInSubmission(_root: unknown, { id }: { id:
     const moved = await tx.tradeInSubmission.updateMany({ where: { id, status: "accepted" }, data: { status: "paid" } });
     if (moved.count !== 1) throw transitionRefused("Trade-in changed; reload and try again");
 
+    // A buylist entry buys at most maximumQuantity cards. Paying out is when the shop has bought them,
+    // so count them here with one conditional increment per entry: two payouts racing for the last
+    // slot can't both pass (this was a per-submission check only, and quantityBought never moved).
+    const perEntry = new Map<string, number>();
+    for (const item of submission.items as any[]) {
+      if (!item.buylistEntryId || item.acceptedAmountMinor == null) continue;
+      perEntry.set(item.buylistEntryId, (perEntry.get(item.buylistEntryId) ?? 0) + (item.quantity ?? 1));
+    }
+    for (const [entryId, quantity] of perEntry) {
+      const counted = await tx.$executeRaw`
+        UPDATE "BuylistEntry" SET "quantityBought" = "quantityBought" + ${quantity}
+        WHERE id = ${entryId} AND ("maximumQuantity" IS NULL OR "quantityBought" + ${quantity} <= "maximumQuantity")`;
+      if (counted !== 1) {
+        const entry = await tx.buylistEntry.findUnique({ where: { id: entryId }, select: { maximumQuantity: true, quantityBought: true, catalogItem: { select: { title: true } } } });
+        const left = entry?.maximumQuantity == null ? 0 : Math.max(0, entry.maximumQuantity - (entry.quantityBought ?? 0));
+        throw transitionRefused(
+          `The buylist only wants ${left} more of ${entry?.catalogItem?.title || "this card"}, and this trade-in has ${quantity}. Raise the buylist limit or decline the extra cards first.`
+        );
+      }
+    }
+
     if (submission.disposition !== "store_credit") return { submission, giftCard: null, replay: false };
 
     const items = submission.items.filter((item: any) => item.acceptedAmountMinor != null);

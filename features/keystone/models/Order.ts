@@ -86,6 +86,8 @@ export const Order = list<Lists.Order.TypeInfo>({
       validation: {
         isRequired: true,
       },
+      // Assigned from the Order_displayId_seq sequence at checkout; one number per order.
+      isIndexed: "unique",
     }),
     email: text({
       validation: {

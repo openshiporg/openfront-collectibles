@@ -28,6 +28,23 @@ export const ProductVariant = list<Lists.ProductVariant.TypeInfo>({
       query: ({ session }) => permissions.canManageProducts({ session }) ? true : { product: { status: { equals: "published" } } },
     },
   },
+  hooks: {
+    // Stock below zero is a backorder; it is only legal when the variant allows backorders.
+    // Checkout reservations and adjustInventory already decrement conditionally; this covers raw
+    // sets (dashboard, Openship sync) and switching backorders off while stock is negative.
+    validateInput({ operation, resolvedData, item, addValidationError }) {
+      const quantity = resolvedData.inventoryQuantity !== undefined ? resolvedData.inventoryQuantity : item?.inventoryQuantity;
+      const backorder = resolvedData.allowBackorder !== undefined ? resolvedData.allowBackorder : item?.allowBackorder;
+      const touched = operation === "create" || resolvedData.inventoryQuantity !== undefined || resolvedData.allowBackorder !== undefined;
+      if (touched && typeof quantity === "number" && quantity < 0 && !backorder) {
+        addValidationError(
+          resolvedData.allowBackorder === false && resolvedData.inventoryQuantity === undefined
+            ? `This variant is ${Math.abs(quantity)} on backorder. Restock it before turning backorders off.`
+            : "Stock can't go below zero unless backorders are allowed for this variant."
+        );
+      }
+    },
+  },
   fields: {
     isUniqueCollectible: virtual({
       field: graphql.field({

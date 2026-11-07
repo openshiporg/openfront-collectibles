@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '..');
 function load(file, mocks = {}) {
   const module = { exports: {} };
   const source = ts.transpileModule(fs.readFileSync(path.join(root, file), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
-  vm.runInNewContext(source, { module, exports: module.exports, require: name => name in mocks ? mocks[name] : require(name), process, Date, Number, Math }, { filename: file });
+  vm.runInNewContext(source, { module, exports: module.exports, require: name => name in mocks ? mocks[name] : name.startsWith('.') ? load(path.join(path.dirname(file), name).replace(/\.ts$/, '') + '.ts') : require(name), process, Date, Number, Math }, { filename: file });
   return module.exports;
 }
 const idempotency = load('features/keystone/utils/idempotency.ts');
