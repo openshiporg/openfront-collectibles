@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
 import { CreateReturnModal } from "./modals/CreateReturnModal";
-import { updateReturnStatusAction } from "../actions/return-actions";
+import { refundReturnAction, updateReturnStatusAction } from "../actions/return-actions";
 import { toast } from 'sonner';
 
 interface ReturnsSectionProps {
@@ -37,6 +37,26 @@ const formatCurrency = (amount: number, currencyCode: string = 'USD') => {
 export const ReturnsSection = ({ order, returns, totalItems }: ReturnsSectionProps) => {
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  // One key per return while the page is open, so a retry after a timeout cannot pay twice.
+  const [refundKeys] = useState(() => new Map<string, string>());
+
+  const handleRefund = async (returnId: string) => {
+    if (!refundKeys.has(returnId)) refundKeys.set(returnId, crypto.randomUUID());
+    setIsUpdating(returnId);
+    try {
+      const response = await refundReturnAction(returnId, refundKeys.get(returnId)!);
+      if (response.success) {
+        toast.success("Return refunded");
+        window.location.reload();
+      } else {
+        toast.error(response.error || "The return could not be refunded");
+      }
+    } catch {
+      toast.error("Refund not confirmed. Try again to reconcile.");
+    } finally {
+      setIsUpdating(null);
+    }
+  };
 
   const handleStatusUpdate = async (returnId: string, newStatus: string) => {
     setIsUpdating(returnId);
@@ -138,11 +158,18 @@ export const ReturnsSection = ({ order, returns, totalItems }: ReturnsSectionPro
                     </>
                   )}
                   {returnItem.status === 'received' && (
-                    <DropdownMenuItem
-                      onClick={() => handleStatusUpdate(returnItem.id, 'requires_action')}
-                    >
-                      Requires Action
-                    </DropdownMenuItem>
+                    <>
+                      {returnItem.refundAmount > 0 && (
+                        <DropdownMenuItem onClick={() => handleRefund(returnItem.id)}>
+                          Refund {formatCurrency(returnItem.refundAmount, order.currency?.code)}
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem
+                        onClick={() => handleStatusUpdate(returnItem.id, 'requires_action')}
+                      >
+                        Requires Action
+                      </DropdownMenuItem>
+                    </>
                   )}
                   {returnItem.status === 'requires_action' && (
                     <DropdownMenuItem

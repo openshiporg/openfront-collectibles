@@ -165,6 +165,23 @@ export async function processReturnRefundAction({
   return response
 }
 
+/**
+ * Refunds a received return to the order's captured payment. The idempotency key comes
+ * from the dialog so a retry after an uncertain outcome reuses it. A refusal (already
+ * refunded, canceled return, more than was captured) comes back as the rule's own text.
+ */
+export async function refundReturnAction(returnId: string, idempotencyKey: string) {
+  const lookup = await keystoneClient(
+    `query ReturnPayment($id: ID!) { return(where: { id: $id }) { id order { id payments(where: { status: { equals: captured } }) { id amount amountRefunded } } } }`,
+    { id: returnId }
+  )
+  if (!lookup.success) return lookup
+  const payments = (lookup.data?.return?.order?.payments || []) as { id: string; amount: number; amountRefunded: number }[]
+  const payment = [...payments].sort((a, b) => (b.amount - b.amountRefunded) - (a.amount - a.amountRefunded))[0]
+  if (!payment) return { success: false as const, error: 'This order has no captured payment to refund.' }
+  return processReturnRefundAction({ returnId, paymentId: payment.id, idempotencyKey })
+}
+
 export async function getReturnReasonsAction() {
   try {
     const query = `
