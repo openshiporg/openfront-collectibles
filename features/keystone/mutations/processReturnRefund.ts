@@ -1,3 +1,4 @@
+import { transitionRefused } from "../lib/transitionRefused";
 import { permissions } from "../access";
 import { returnRefundError } from "../lib/lifecycles";
 import { refundPayment } from "../utils/paymentProviderAdapter";
@@ -50,12 +51,12 @@ async function processReturnRefund(
     query: `id status refundAmount metadata order { id payments { id } }`,
   });
   if (!returnRecord?.order?.id || returnRecord.refundAmount <= 0) {
-    throw new Error("Return is not refundable");
+    throw transitionRefused("Return is not refundable");
   }
   // A return is refunded once. A canceled return is never refunded, and a second
   // refund under a fresh idempotency key must not pay it out again.
   const blocked = returnRefundError(returnRecord);
-  if (blocked && !priorAttempt) throw new Error(blocked);
+  if (blocked && !priorAttempt) throw transitionRefused(blocked);
   if (!returnRecord.order.payments?.some((payment: any) => payment.id === paymentId)) {
     throw new Error("Payment does not belong to return order");
   }
@@ -78,7 +79,7 @@ async function processReturnRefund(
   if (!payment) throw new Error("Payment not found");
   const alreadyRefunded = payment.refunds?.reduce((sum: number, refund: any) => sum + refund.amount, 0) || 0;
   if (alreadyRefunded + returnRecord.refundAmount > payment.amount) {
-    throw new Error("Refund exceeds captured payment amount");
+    throw transitionRefused("Refund exceeds captured payment amount");
   }
 
   const provider =
@@ -87,7 +88,7 @@ async function processReturnRefund(
   const providerReference = providerPaymentReference(payment);
   if (!provider || !providerReference) throw new Error("Refund provider reference is missing");
   if (provider.code?.includes("manual")) {
-    throw new Error("Manual tender refunds require operator verification");
+    throw transitionRefused("Manual tender refunds require operator verification");
   }
 
   const { attempt, replay } = priorAttempt
@@ -110,7 +111,7 @@ async function processReturnRefund(
       },
       data: { lockedAt: new Date() },
     });
-    if (acquired.count !== 1) throw new Error("Refund is already in progress");
+    if (acquired.count !== 1) throw transitionRefused("Refund is already in progress");
   }
 
   if (attempt.recoveryPoint === "started") {
@@ -123,7 +124,7 @@ async function processReturnRefund(
         data: { amountRefunded: { increment: returnRecord.refundAmount } },
       });
       if (reserved.count !== 1) {
-        throw new Error("Concurrent refund exceeds captured payment amount");
+        throw transitionRefused("Concurrent refund exceeds captured payment amount");
       }
       await tx.idempotencyKey.update({
         where: { id: attempt.id },
@@ -176,7 +177,7 @@ async function processReturnRefund(
     if (duplicate) return duplicate;
 
     const fresh = await tx.return.findUnique({ where: { id: returnId }, select: { status: true, metadata: true } });
-    if (fresh?.status === "canceled") throw new Error("A canceled return cannot be refunded");
+    if (fresh?.status === "canceled") throw transitionRefused("A canceled return cannot be refunded");
     const created = await tx.refund.create({
       data: {
         amount: returnRecord.refundAmount,

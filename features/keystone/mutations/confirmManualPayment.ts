@@ -1,3 +1,4 @@
+import { transitionRefused } from "../lib/transitionRefused";
 import { permissions } from "../access";
 import { providerCaptureKey } from "../payments/provider-capture-key";
 import {
@@ -30,12 +31,12 @@ async function confirmManualPayment(
     });
     if (!order) throw new Error("Order not found");
     if (!["pending", "requires_action"].includes(order.status)) {
-      throw new Error("Payment can only be recorded on an open order");
+      throw transitionRefused("Payment can only be recorded on an open order");
     }
     const pending = order.payments.filter(
       (payment: any) => payment.status === "pending" && payment.data?.manual === true
     );
-    if (pending.length !== 1) throw new Error("This order has no pending bank transfer to record");
+    if (pending.length !== 1) throw transitionRefused("This order has no pending bank transfer to record");
     const payment = pending[0];
     const providerId = String(payment.data?.paymentProviderId || "");
     const capturedAt = new Date();
@@ -48,7 +49,7 @@ async function confirmManualPayment(
         data: { ...payment.data, reference: trimmedReference },
       },
     });
-    if (updated.count !== 1) throw new Error("Payment changed before it was recorded");
+    if (updated.count !== 1) throw transitionRefused("Payment changed before it was recorded");
     await tx.capture.create({
       data: {
         amount: payment.amount,

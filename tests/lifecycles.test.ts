@@ -132,3 +132,15 @@ test("an expired cart hold is abandoned only before payment is taken", () => {
   assert.equal(isAbandonedCartHold(hold, { recoveryPoint: "resources_reserved", lockedAt: new Date("2026-11-07T08:00:00Z") }, now), true);
   assert.equal(isAbandonedCartHold({ ...hold, purpose: "auction" }, null, now), false);
 });
+
+test("a refused transition reaches staff with its reason, not a masked error", async () => {
+  const { transitionRefused, TRANSITION_REFUSED } = await import("../features/keystone/lib/transitionRefused");
+  const { publicGraphQLErrorMessage } = await import("../features/dashboard/lib/security");
+  const refusal = transitionRefused("A canceled return cannot be refunded");
+  assert.equal(refusal.extensions.code, TRANSITION_REFUSED);
+  const wire = { response: { errors: [{ message: refusal.message, extensions: { code: TRANSITION_REFUSED } }] } };
+  assert.equal(publicGraphQLErrorMessage(wire), "A canceled return cannot be refunded");
+  // An unclassified server error still falls back to the generic text.
+  const masked = { response: { errors: [{ message: "Unexpected error.", extensions: { code: "INTERNAL_SERVER_ERROR" } }] } };
+  assert.notEqual(publicGraphQLErrorMessage(masked), "Unexpected error.");
+});

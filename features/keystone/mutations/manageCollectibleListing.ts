@@ -1,3 +1,4 @@
+import { transitionRefused } from '../lib/transitionRefused';
 import type { Context } from '.keystone/types';
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
@@ -45,28 +46,28 @@ export default async function manageCollectibleListing(_root: unknown, { input }
     await tx.$queryRaw`SELECT id FROM "InventoryUnit" WHERE id = ${unitId} FOR UPDATE`;
     const unit = await tx.inventoryUnit.findUnique({ where: { id: unitId }, include: { specimen: true } });
     if (!unit || unit.storeId !== storeId || !unit.specimen || unit.specimen.storeId !== storeId || unit.quantity !== 1 || unit.version === null) throw new Error('Unit scope conflict');
-    if (unit.version !== command.expectedVersion) throw new Error('Record changed; reload before retrying');
-    if (unit.status !== 'available' || unit.specimen.lifecycleStatus !== 'available' || unit.ownershipBasis !== 'owned') throw new Error('Claimed or unavailable stock cannot be edited');
+    if (unit.version !== command.expectedVersion) throw transitionRefused('Record changed; reload before retrying');
+    if (unit.status !== 'available' || unit.specimen.lifecycleStatus !== 'available' || unit.ownershipBasis !== 'owned') throw transitionRefused('Claimed or unavailable stock cannot be edited');
     if (![0, 2].includes(currencyExponent(unit.currencyCode))) throw new Error('Unsupported stock currency precision');
     const live = { inventoryUnitId: unitId, status: { in: ['draft', 'scheduled', 'published', 'paused'] } };
     const now = new Date(), at = now.toISOString();
     let listing;
     if (command.action === 'create') {
       if (!command.title || !command.slug || !command.publicSummary || command.priceMinor === undefined) throw new Error('Complete listing fields required');
-      if (await tx.listing.count({ where: live })) throw new Error('Withdraw the existing listing first');
+      if (await tx.listing.count({ where: live })) throw transitionRefused('Withdraw the existing listing first');
       listing = await tx.listing.create({ data: { storeId, inventoryUnitId: unitId, title: command.title, slug: command.slug, priceMinor: command.priceMinor, currencyCode: unit.currencyCode, publicSummary: command.publicSummary, format: 'fixed_price', status: 'draft', offersEnabled: false } });
     } else {
       listing = await tx.listing.findUnique({ where: { id: command.listingId! } });
       if (!listing || listing.inventoryUnitId !== unitId || listing.storeId !== storeId || listing.format !== 'fixed_price' || listing.currencyCode !== unit.currencyCode || !listing.status || ['sold', 'ended'].includes(listing.status)) throw new Error('Listing scope or lifecycle conflict');
       if (command.action === 'update_draft') {
-        if (listing.status !== 'draft' || !command.title || !command.publicSummary || command.priceMinor === undefined) throw new Error('Complete draft fields required');
+        if (listing.status !== 'draft' || !command.title || !command.publicSummary || command.priceMinor === undefined) throw transitionRefused('Complete draft fields required');
         listing = await tx.listing.update({ where: { id: listing.id }, data: { title: command.title, publicSummary: command.publicSummary, priceMinor: command.priceMinor, updatedAt: now } });
       } else if (command.action === 'publish') {
-        if (!['draft', 'withdrawn'].includes(listing.status) || !listing.priceMinor || !listing.publicSummary) throw new Error('Complete unpublished listing required');
-        if (await tx.listing.count({ where: { ...live, id: { not: listing.id } } })) throw new Error('Another live listing exists');
+        if (!['draft', 'withdrawn'].includes(listing.status) || !listing.priceMinor || !listing.publicSummary) throw transitionRefused('Complete unpublished listing required');
+        if (await tx.listing.count({ where: { ...live, id: { not: listing.id } } })) throw transitionRefused('Another live listing exists');
         listing = await tx.listing.update({ where: { id: listing.id }, data: { status: 'published', publishedAt: now, updatedAt: now, publicationSnapshot: { source: 'operator_declaration', authority: 'none', specimenCode: unit.specimen.specimenCode, title: listing.title, condition: listing.publicSummary, askingPriceMinor: listing.priceMinor, currencyCode: listing.currencyCode, actorId, at } } });
       } else {
-        if (!['draft', 'scheduled', 'published', 'paused'].includes(listing.status)) throw new Error('Listing cannot be withdrawn');
+        if (!['draft', 'scheduled', 'published', 'paused'].includes(listing.status)) throw transitionRefused('Listing cannot be withdrawn');
         listing = await tx.listing.update({ where: { id: listing.id }, data: { status: 'withdrawn', updatedAt: now } });
       }
     }

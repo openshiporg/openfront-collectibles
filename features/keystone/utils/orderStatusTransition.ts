@@ -1,3 +1,4 @@
+import { transitionRefused } from '../lib/transitionRefused';
 import {
   enqueueWebhookOutbox,
   subscribedWebhookEndpointIds,
@@ -47,12 +48,12 @@ export async function applyOrderStatusTransition(
     if (order.status === status) return { changed: false };
 
     if (status === "archived") {
-      if (order.status !== "completed") throw new Error("Only completed orders can be archived");
+      if (order.status !== "completed") throw transitionRefused("Only completed orders can be archived");
     } else {
       if (!["pending", "completed", "requires_action"].includes(order.status)) {
-        throw new Error("Order cannot be canceled from its current state");
+        throw transitionRefused("Order cannot be canceled from its current state");
       }
-      if (order.fulfillments.length) throw new Error("Cancel active fulfillments before canceling the order");
+      if (order.fulfillments.length) throw transitionRefused("Cancel active fulfillments before canceling the order");
       // Pending manual payments (an unpaid bank transfer) hold no money; they are
       // cancelled with the order. Anything else must be fully refunded first.
       if (
@@ -63,7 +64,7 @@ export async function applyOrderStatusTransition(
             payment.refunds.reduce((sum: number, refund: any) => sum + refund.amount, 0) < payment.amount
         )
       ) {
-        throw new Error("Captured payments must be fully refunded before cancellation");
+        throw transitionRefused("Captured payments must be fully refunded before cancellation");
       }
       for (const payment of order.payments) {
         if (payment.status !== "pending") continue;
@@ -131,7 +132,7 @@ export async function applyOrderStatusTransition(
           (item: any) => item.paymentStatus !== "unpaid" || item.invoiceLineItems.length
         )
       ) {
-        throw new Error("Invoiced account orders require an approved credit-note workflow");
+        throw transitionRefused("Invoiced account orders require an approved credit-note workflow");
       }
       for (const item of order.accountLineItems) {
         await tx.accountLineItem.update({

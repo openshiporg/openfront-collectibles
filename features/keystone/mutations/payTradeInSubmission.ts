@@ -1,3 +1,4 @@
+import { transitionRefused } from "../lib/transitionRefused";
 import { permissions } from "../access";
 import { giftCardCode } from "../checkout/gift-card-issue";
 
@@ -21,14 +22,14 @@ export default async function payTradeInSubmission(_root: unknown, { id }: { id:
       const prior = await tx.giftCard.findFirst({ where: { metadata: { path: ["tradeInSubmissionId"], equals: id } } });
       return { submission, giftCard: prior, replay: true };
     }
-    if (submission.status !== "accepted") throw new Error(`Cannot pay a trade-in that is ${submission.status}`);
+    if (submission.status !== "accepted") throw transitionRefused(`Cannot pay a trade-in that is ${submission.status}`);
     const moved = await tx.tradeInSubmission.updateMany({ where: { id, status: "accepted" }, data: { status: "paid" } });
-    if (moved.count !== 1) throw new Error("Trade-in changed; reload and try again");
+    if (moved.count !== 1) throw transitionRefused("Trade-in changed; reload and try again");
 
     if (submission.disposition !== "store_credit") return { submission, giftCard: null, replay: false };
 
     const items = submission.items.filter((item: any) => item.acceptedAmountMinor != null);
-    if (!items.length) throw new Error("No accepted amounts to pay");
+    if (!items.length) throw transitionRefused("No accepted amounts to pay");
     const currencies = new Set(items.map((item: any) => item.currencyCode || "USD"));
     if (currencies.size !== 1) throw new Error("Accepted amounts are in more than one currency");
     const total = items.reduce((sum: number, item: any) => sum + item.acceptedAmountMinor, 0);

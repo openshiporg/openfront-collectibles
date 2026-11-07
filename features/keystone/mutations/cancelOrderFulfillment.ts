@@ -1,3 +1,4 @@
+import { transitionRefused } from "../lib/transitionRefused";
 import { permissions } from "../access";
 import {
   enqueueWebhookOutbox,
@@ -35,7 +36,7 @@ async function cancelOrderFulfillment(
           label.providerId && label.metadata?.cancellation?.status !== "confirmed"
       )
     ) {
-      throw new Error("Cancel the purchased shipping label before canceling fulfillment");
+      throw transitionRefused("Cancel the purchased shipping label before canceling fulfillment");
     }
     const canceled = await tx.fulfillment.update({
       where: { id: fulfillmentId },

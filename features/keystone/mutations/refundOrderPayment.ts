@@ -1,3 +1,4 @@
+import { transitionRefused } from "../lib/transitionRefused";
 import { GraphQLError } from "graphql";
 import { permissions } from "../access";
 import { refundPayment } from "../utils/paymentProviderAdapter";
@@ -96,7 +97,7 @@ async function refundOrderPayment(
   const providerReference = providerPaymentReference(payment);
   if (!provider || !providerReference) throw new Error("Refund provider reference is missing");
   if (provider.code?.includes("manual")) {
-    throw new Error("Manual tender refunds require operator verification");
+    throw transitionRefused("Manual tender refunds require operator verification");
   }
 
   const { attempt, replay } = priorAttempt

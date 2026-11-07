@@ -1,3 +1,4 @@
+import { transitionRefused } from "../lib/transitionRefused";
 import { permissions } from "../access";
 import { applyOrderStatusTransition } from "../utils/orderStatusTransition";
 
@@ -9,7 +10,7 @@ async function transitionOrderStatus(
   if (!permissions.canManageOrders({ session: context.session })) throw new Error("Access denied");
   if (!reason?.trim()) throw new Error("Transition reason is required");
   if (!["canceled", "archived"].includes(status)) {
-    throw new Error("Order status is controlled by payment and fulfillment commands");
+    throw transitionRefused("Order status is controlled by payment and fulfillment commands");
   }
   const sudo = context.sudo();
   await applyOrderStatusTransition(sudo, {
