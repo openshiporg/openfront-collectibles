@@ -181,11 +181,27 @@ export function itemMoveBlockedByIntake(intakeStatus: string | null | undefined,
 
 /** Trade-in amounts are editable only in the stage that owns them. */
 export function tradeInAmountError(submissionStatus: string | null | undefined, data: Record<string, unknown>): string | null {
-  if ('quotedAmountMinor' in data && !['received', 'inspecting'].includes(submissionStatus || '')) {
+  // Keystone's resolvedData carries every field (unset ones as undefined), so test the value, not the key.
+  if (data.quotedAmountMinor !== undefined && !['received', 'inspecting'].includes(submissionStatus || '')) {
     return 'Quotes can be changed only while the trade-in is received or being inspected';
   }
-  if ('acceptedAmountMinor' in data && submissionStatus !== 'quoted') {
+  if (data.acceptedAmountMinor !== undefined && submissionStatus !== 'quoted') {
     return 'Accepted amounts are set only while the quote is open';
+  }
+  return null;
+}
+
+/** Moving a trade-in to quoted needs a quote on every item; to accepted, an accepted amount on every item. */
+export function tradeInStageAmountsError(
+  to: string,
+  items: { quotedAmountMinor?: number | null; acceptedAmountMinor?: number | null }[],
+): string | null {
+  if (!items.length) return 'Add the cards to this trade-in before quoting it';
+  if (to === 'quoted' && items.some((item) => item.quotedAmountMinor == null)) {
+    return 'Quote every card before sending the quote';
+  }
+  if (to === 'accepted' && items.some((item) => item.acceptedAmountMinor == null)) {
+    return 'Every card needs an accepted amount before the trade-in is accepted';
   }
   return null;
 }

@@ -61,3 +61,12 @@ test("an uncapped entry still counts", async () => {
   await payTradeInSubmission(null, { id: "t3" }, h.context);
   assert.equal(h.entry.quantityBought, 12);
 });
+
+test("a trade-in with an unpriced card can't be paid", async () => {
+  const h = harness({ maximumQuantity: null, quantityBought: 0 });
+  h.add("t4", 1);
+  h.submissions.t4.items[0].acceptedAmountMinor = null;
+  await assert.rejects(payTradeInSubmission(null, { id: "t4" }, h.context), /accepted amount/);
+  assert.equal(h.submissions.t4.status, "accepted");
+  assert.equal(h.entry.quantityBought, 0);
+});

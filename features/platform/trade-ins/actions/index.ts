@@ -164,7 +164,7 @@ export async function transitionSubmission(id: string, to: string): Promise<Resu
           `mutation AcceptQuote($id: ID!, $amount: Int!) { updateTradeInItem(where: { id: $id }, data: { acceptedAmountMinor: $amount }) { id } }`,
           { id: item.id, amount: item.quotedAmountMinor },
         );
-        if (!updated.success) return fail('Could not record the accepted amounts');
+        if (!updated.success) return fail(updated.error || 'Could not record the accepted amounts');
       }
     }
   }
@@ -184,7 +184,7 @@ export async function transitionSubmission(id: string, to: string): Promise<Resu
     `mutation MoveTradeIn($id: ID!, $status: String!) { updateTradeInSubmission(where: { id: $id }, data: { status: $status }) { id } }`,
     { id, status: to },
   );
-  if (!response.success) return fail('Update rejected');
+  if (!response.success) return fail(response.error || 'Update rejected');
   refresh(id);
   return { success: true, data: null };
 }
@@ -236,7 +236,7 @@ export async function quoteTradeInItem(input: { submissionId: string; itemId: st
     `mutation QuoteTradeInItem($id: ID!, $data: TradeInItemUpdateInput!) { updateTradeInItem(where: { id: $id }, data: $data) { id } }`,
     { id: input.itemId, data: { quotedAmountMinor: amount, currencyCode: currency } },
   );
-  if (!response.success) return fail('Update rejected');
+  if (!response.success) return fail(response.error || 'Update rejected');
   refresh(input.submissionId);
   return { success: true, data: null };
 }
@@ -256,7 +256,7 @@ export async function setAcceptedAmount(input: { submissionId: string; itemId: s
     `mutation AcceptTradeInItem($id: ID!, $amount: Int!) { updateTradeInItem(where: { id: $id }, data: { acceptedAmountMinor: $amount }) { id } }`,
     { id: input.itemId, amount },
   );
-  if (!response.success) return fail('Update rejected');
+  if (!response.success) return fail(response.error || 'Update rejected');
   refresh(input.submissionId);
   return { success: true, data: null };
 }
@@ -307,7 +307,7 @@ export async function linkSpecimen(input: { submissionId: string; itemId: string
     `mutation LinkTradeInSpecimen($id: ID!, $specimen: ID!) { updateTradeInItem(where: { id: $id }, data: { specimen: { connect: { id: $specimen } } }) { id } }`,
     { id: input.itemId, specimen: input.specimenId },
   );
-  if (!response.success) return fail('Update rejected');
+  if (!response.success) return fail(response.error || 'Update rejected');
   refresh(input.submissionId);
   return { success: true, data: null };
 }

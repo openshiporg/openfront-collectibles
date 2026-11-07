@@ -23,6 +23,9 @@ export default async function payTradeInSubmission(_root: unknown, { id }: { id:
       return { submission, giftCard: prior, replay: true };
     }
     if (submission.status !== "accepted") throw transitionRefused(`Cannot pay a trade-in that is ${submission.status}`);
+    if (!submission.items.length || submission.items.some((item: any) => item.acceptedAmountMinor == null)) {
+      throw transitionRefused("Every card needs an accepted amount before the trade-in is paid");
+    }
     const moved = await tx.tradeInSubmission.updateMany({ where: { id, status: "accepted" }, data: { status: "paid" } });
     if (moved.count !== 1) throw transitionRefused("Trade-in changed; reload and try again");
 
@@ -31,7 +34,7 @@ export default async function payTradeInSubmission(_root: unknown, { id }: { id:
     // slot can't both pass (this was a per-submission check only, and quantityBought never moved).
     const perEntry = new Map<string, number>();
     for (const item of submission.items as any[]) {
-      if (!item.buylistEntryId || item.acceptedAmountMinor == null) continue;
+      if (!item.buylistEntryId) continue;
       perEntry.set(item.buylistEntryId, (perEntry.get(item.buylistEntryId) ?? 0) + (item.quantity ?? 1));
     }
     for (const [entryId, quantity] of perEntry) {

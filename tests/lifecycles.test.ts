@@ -4,7 +4,7 @@ import {
   AGREEMENT_TRANSITIONS, CLAIM_FULFILLMENT_TRANSITIONS, CLAIM_PAYMENT_TRANSITIONS, DISPUTE_TRANSITIONS, INTAKE_TRANSITIONS,
   ITEM_TRANSITIONS, LIFECYCLES, PAYMENT_TRANSITIONS, RETURN_TRANSITIONS, SELLER_TRANSITIONS, SUBMISSION_TRANSITIONS,
   canAddTradeInItem, canMovePayment, isAbandonedCartHold, itemMoveBlockedByIntake, returnCancelError, returnRefundError,
-  transitionError, tradeInAmountError, validateFieldMove, validateStatusWrite,
+  transitionError, tradeInAmountError, tradeInStageAmountsError, validateFieldMove, validateStatusWrite,
 } from "../features/keystone/lib/lifecycles";
 
 const maps: Record<string, Record<string, string[]>> = {
@@ -143,4 +143,18 @@ test("a refused transition reaches staff with its reason, not a masked error", a
   // An unclassified server error still falls back to the generic text.
   const masked = { response: { errors: [{ message: "Unexpected error.", extensions: { code: "INTERNAL_SERVER_ERROR" } }] } };
   assert.notEqual(publicGraphQLErrorMessage(masked), "Unexpected error.");
+});
+
+test("trade-in amount rules read values, since Keystone resolvedData lists unset fields as undefined", () => {
+  assert.equal(tradeInAmountError("inspecting", { quotedAmountMinor: 60000, acceptedAmountMinor: undefined }), null);
+  assert.equal(tradeInAmountError("quoted", { quotedAmountMinor: undefined, acceptedAmountMinor: 60000 }), null);
+  assert.match(tradeInAmountError("inspecting", { quotedAmountMinor: undefined, acceptedAmountMinor: 1 })!, /Accepted amounts/);
+});
+
+test("a trade-in is quoted and accepted only with amounts on every card", () => {
+  assert.match(tradeInStageAmountsError("quoted", [])!, /Add the cards/);
+  assert.match(tradeInStageAmountsError("quoted", [{ quotedAmountMinor: 100 }, { quotedAmountMinor: null }])!, /Quote every card/);
+  assert.equal(tradeInStageAmountsError("quoted", [{ quotedAmountMinor: 100 }]), null);
+  assert.match(tradeInStageAmountsError("accepted", [{ quotedAmountMinor: 100, acceptedAmountMinor: null }])!, /accepted amount/);
+  assert.equal(tradeInStageAmountsError("accepted", [{ quotedAmountMinor: 100, acceptedAmountMinor: 100 }]), null);
 });

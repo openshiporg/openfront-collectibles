@@ -6,7 +6,7 @@ import { denyAll } from '@keystone-6/core/access';
 
 import { permissions } from '../access';
 import { trackingFields } from './trackingFields';
-import { LIFECYCLES, validateStatusWrite, itemMoveBlockedByIntake, tradeInAmountError } from '../lib/lifecycles';
+import { LIFECYCLES, validateStatusWrite, itemMoveBlockedByIntake, tradeInAmountError, tradeInStageAmountsError } from '../lib/lifecycles';
 import { CARD_CONDITIONS, CARD_FINISHES, options } from '../lib/pokemon/card-enums';
 
 const canRead = ({ session }: any) => permissions.canReadCollectibles({ session }) || permissions.canManageConsignments({ session });
@@ -165,8 +165,17 @@ export const BuylistEntry = list({
 export const TradeInSubmission = list({
   access: managedAccess,
   hooks: {
-    validateInput(args: any) {
-      validateStatusWrite(LIFECYCLES.tradeInSubmission, args);
+    async validateInput(args: any) {
+      const move = validateStatusWrite(LIFECYCLES.tradeInSubmission, args);
+      if (!move || args.operation !== 'update' || !['quoted', 'accepted'].includes(move.to)) return;
+      // A quote is the shop's price for every card; accepting fixes what will be paid. Only the
+      // dashboard action checked this, so a raw status write could quote or accept nothing.
+      const items = await args.context.sudo().prisma.tradeInItem.findMany({
+        where: { submissionId: String(args.item.id) },
+        select: { quotedAmountMinor: true, acceptedAmountMinor: true },
+      });
+      const message = tradeInStageAmountsError(move.to, items);
+      if (message) args.addValidationError(message);
     },
   },
   fields: {
@@ -202,7 +211,7 @@ export const TradeInItem = list({
   hooks: {
     async validateInput({ operation, resolvedData, item, context, addValidationError }: any) {
       if (operation !== 'update' || !item?.submissionId) return;
-      if (!('quotedAmountMinor' in resolvedData) && !('acceptedAmountMinor' in resolvedData)) return;
+      if (resolvedData.quotedAmountMinor === undefined && resolvedData.acceptedAmountMinor === undefined) return;
       const submission = await context.sudo().db.TradeInSubmission.findOne({ where: { id: item.submissionId } });
       const message = tradeInAmountError(submission?.status, resolvedData);
       if (message) addValidationError(message);
