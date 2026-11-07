@@ -167,7 +167,7 @@ test('sendOrderConfirmationEmail returns the flattened, capped SMTP response nex
   const out = ts.transpileModule(src, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
   const m = { exports: {} };
   const long = '250 Accepted\r\n ' + 'x'.repeat(400);
-  const req = (s) => s === 'nodemailer' ? { createTransport: () => ({ sendMail: async (o) => ({ accepted: [o.to], messageId: '<local@x>', response: long }) }), getTestMessageUrl: () => '' } : s === '..' ? { basePath: '' } : {};
+  const req = (s) => s === 'nodemailer' ? { createTransport: () => ({ sendMail: async (o) => ({ accepted: [o.to], messageId: '<local@x>', response: long }) }), getTestMessageUrl: () => '' } : s === '..' ? { basePath: '' } : s === './email-layout' ? (() => { const lm = { exports: {} }; vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(root, 'features/keystone/lib/email-layout.ts'), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, { module: lm, exports: lm.exports, process: { env: {} } }); return lm.exports; })() : {};
   vm.runInNewContext(out, { module: m, exports: m.exports, require: req, process: { env: { SMTP_STORE_LINK: 'https://s.test' } }, console: { log() {}, warn() {}, error() {} }, URL }, { filename });
   const result = await m.exports.sendOrderConfirmationEmail({ id: 'o1', email: 'delivered@resend.dev', displayId: 1, secretKey: 'k', lineItems: [] });
   assert.equal(result.sent, true);
