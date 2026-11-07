@@ -3,6 +3,7 @@ import { list } from '@keystone-6/core';
 import { checkbox, integer, json, relationship, select, text, timestamp } from '@keystone-6/core/fields';
 import { denyAll } from '@keystone-6/core/access';
 
+import { LIFECYCLES, validateStatusWrite } from '../lib/lifecycles';
 import { permissions } from '../access';
 import { customerOwnerFilter, isHumanOwnerSession, requireHumanOwnerId } from '../security/customer-personalization-owner';
 import { trackingFields } from './trackingFields';
@@ -76,6 +77,11 @@ export const CollectorProfile = list({
 });
 
 export const SellerProfile = list({
+  hooks: {
+    validateInput(args: any) {
+      validateStatusWrite(LIFECYCLES.seller, args);
+    },
+  },
   access: {
     operation: { query: canManageCustomers, create: canManageCustomers, update: canManageCustomers, delete: canManageCustomers },
   },
@@ -128,6 +134,14 @@ export const ShipmentEvidence = list({
 });
 
 export const DisputeCase = list({
+  hooks: {
+    validateInput(args: any) {
+      const move = validateStatusWrite(LIFECYCLES.dispute, args);
+      if (move?.to === 'resolved' && !String(args.resolvedData.resolution ?? args.item?.resolution ?? '').trim()) {
+        args.addValidationError('A resolution is required to resolve a dispute');
+      }
+    },
+  },
   access: { operation: { query: canManageRisk, create: canManageRisk, update: canManageRisk, delete: canManageRisk } },
   fields: {
     store: relationship({ ref: 'Store' }),

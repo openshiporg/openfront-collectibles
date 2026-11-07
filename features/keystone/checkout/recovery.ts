@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { getOrCreateIdempotencyAttempt } from "../utils/idempotency";
+import { isAbandonedCartHold } from "../lib/lifecycles";
 import {
   assertCartReservationFence,
   type CartReservationFence,
@@ -131,6 +132,36 @@ export async function reserveCartInventory(
             expiresAt: true,
           },
         });
+        // Free a unit held by an abandoned checkout (expired hold, no payment taken) so the
+        // listing does not stay reserved forever.
+        if (activeHolds.length === 1 && activeHolds[0].cartId && activeHolds[0].cartId !== cartId && current.status === "reserved") {
+          const stale = activeHolds[0];
+          const otherAttempt = await tx.idempotencyKey.findUnique({
+            where: { idempotencyKey: checkoutKey(stale.cartId as string) },
+            select: { recoveryPoint: true, lockedAt: true },
+          });
+          if (isAbandonedCartHold(stale, otherAttempt, new Date())) {
+            const freed = await tx.reservation.updateMany({
+              where: { id: stale.id, status: "active" },
+              data: { status: "expired", releasedAt: new Date(), releaseReason: "checkout_abandoned" },
+            });
+            const unitFreed = await tx.inventoryUnit.updateMany({
+              where: { id: unitId, status: "reserved", version: current.version },
+              data: { status: "available", version: { increment: 1 } },
+            });
+            if (freed.count !== 1 || unitFreed.count !== 1) throw new Error("Serialized inventory unit changed during reservation");
+            // The abandoned checkout also took the variant counter; give it back once.
+            if (variant.manageInventory) {
+              await tx.productVariant.update({ where: { id: variant.id }, data: { inventoryQuantity: { increment: 1 } } });
+              await tx.stockMovement.create({
+                data: { type: "RECEIVE", quantity: 1, reason: "checkout_abandoned", note: checkoutKey(stale.cartId as string), variantId: variant.id },
+              });
+            }
+            activeHolds.length = 0;
+            current.status = "available";
+            current.version = (current.version as number) + 1;
+          }
+        }
         if (activeHolds.length > 0) {
           const hold = requireExactlyOne(activeHolds, "active reservation for the serialized unit");
           assertCartReservationFence(hold, { cartId, unitId, listingId: listing.id, idempotencyKey, now: new Date(), allowExpired: true });

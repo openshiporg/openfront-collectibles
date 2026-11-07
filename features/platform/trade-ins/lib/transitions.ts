@@ -2,17 +2,9 @@ import type { DotTone } from '@/features/platform/components/vault-ui';
 
 // Allowed trade-in moves. Server actions check these before writing; the UI
 // offers only these.
-export const SUBMISSION_TRANSITIONS: Record<string, string[]> = {
-  draft: ['submitted'],
-  submitted: ['received', 'declined'],
-  received: ['inspecting', 'declined'],
-  inspecting: ['quoted', 'declined'],
-  quoted: ['accepted', 'declined'],
-  accepted: ['paid'],
-  declined: ['returned'],
-  paid: [],
-  returned: [],
-};
+import { SUBMISSION_TRANSITIONS, canMove as canMoveIn } from '@/features/keystone/lib/lifecycles';
+
+export { SUBMISSION_TRANSITIONS };
 
 export const SUBMISSION_STATUSES = ['draft', 'submitted', 'received', 'inspecting', 'quoted', 'accepted', 'declined', 'paid', 'returned'];
 
@@ -30,5 +22,5 @@ export const ACTION_LABELS: Record<string, string> = {
 export const QUOTABLE = new Set(['received', 'inspecting']);
 
 export function canMove(from: string | null | undefined, to: string) {
-  return !!from && (SUBMISSION_TRANSITIONS[from] || []).includes(to);
+  return canMoveIn(SUBMISSION_TRANSITIONS, from, to);
 }

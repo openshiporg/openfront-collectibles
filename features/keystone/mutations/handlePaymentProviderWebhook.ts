@@ -1,5 +1,6 @@
 "use server";
 
+import { canMovePayment } from "../lib/lifecycles";
 import { handleWebhook } from "../utils/paymentProviderAdapter";
 import { reconcileOrderFulfillmentStatus } from "../orders/order-lifecycle";
 import { parseMajorToMinor } from '../../lib/minor-units';
@@ -187,7 +188,15 @@ async function handlePaymentProviderWebhook(
         },
       });
     }
-    if (paymentId) {
+    // Provider events arrive out of order and are retried. A late failed, authorized or
+    // voided event must never undo a capture (PAYMENT_TRANSITIONS has no way out of captured).
+    let staleEvent = false;
+    if (paymentId && !succeeded && (failed || authorized || voided)) {
+      const existingPayment = await tx.payment.findUnique({ where: { id: paymentId }, select: { status: true } });
+      const target = failed ? "failed" : authorized ? "authorized" : "canceled";
+      if (existingPayment && !canMovePayment(existingPayment.status, target)) staleEvent = true;
+    }
+    if (paymentId && !staleEvent) {
       if (succeeded) {
         const currentPayment = await tx.payment.findUnique({
           where: { id: paymentId },
@@ -247,7 +256,7 @@ async function handlePaymentProviderWebhook(
             data: { paymentId: paymentId || null, providerId: provider.id, providerEventId },
           },
         });
-      } else if (failed || voided) {
+      } else if ((failed || voided) && !staleEvent) {
         const currentOrder = await tx.order.findUnique({
           where: { id: orderId },
           select: { status: true },

@@ -1,4 +1,5 @@
 import type { DotTone } from '../../components/vault-ui';
+import { DISPUTE_TRANSITIONS as CENTRAL_DISPUTE_TRANSITIONS } from '@/features/keystone/lib/lifecycles';
 
 export const DISPUTE_STATUSES: { value: string; label: string; tone: DotTone }[] = [
   { value: 'open', label: 'Open', tone: 'danger' },
@@ -18,20 +19,20 @@ export const DISPUTE_TYPES: { value: string; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
-/** Allowed status moves, enforced again on the server before any update. */
-export const DISPUTE_TRANSITIONS: Record<string, { to: string; label: string }[]> = {
-  open: [
-    { to: 'evidence_requested', label: 'Request evidence' },
-    { to: 'review', label: 'Start review' },
-  ],
-  evidence_requested: [{ to: 'review', label: 'Start review' }],
-  review: [
-    { to: 'evidence_requested', label: 'Request more evidence' },
-    { to: 'resolved', label: 'Resolve' },
-  ],
-  resolved: [{ to: 'closed', label: 'Close' }],
-  closed: [],
+const DISPUTE_ACTION_LABELS: Record<string, string> = {
+  evidence_requested: 'Request evidence',
+  review: 'Start review',
+  resolved: 'Resolve',
+  closed: 'Close',
 };
+
+/** Allowed status moves (one map in keystone/lib/lifecycles), enforced again on the server before any update. */
+export const DISPUTE_TRANSITIONS: Record<string, { to: string; label: string }[]> = Object.fromEntries(
+  Object.entries(CENTRAL_DISPUTE_TRANSITIONS).map(([from, tos]) => [
+    from,
+    tos.map((to) => ({ to, label: from === 'review' && to === 'evidence_requested' ? 'Request more evidence' : DISPUTE_ACTION_LABELS[to] })),
+  ]),
+);
 
 export function disputeStatus(value?: string | null) {
   return DISPUTE_STATUSES.find((s) => s.value === value) ?? { value: value || '', label: value || 'Unknown', tone: 'muted' as DotTone };

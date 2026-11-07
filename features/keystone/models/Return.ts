@@ -11,9 +11,19 @@ import {
   relationship,
 } from "@keystone-6/core/fields";
 import { permissions } from "../access";
+import { LIFECYCLES, returnCancelError, validateStatusWrite } from "../lib/lifecycles";
 import { trackingFields } from "./trackingFields";
 
 export const Return = list({
+  hooks: {
+    validateInput(args: any) {
+      const move = validateStatusWrite(LIFECYCLES.return, args);
+      if (move?.to === "canceled") {
+        const message = returnCancelError({ metadata: args.item?.metadata });
+        if (message) args.addValidationError(message);
+      }
+    },
+  },
   access: {
     operation: {
       query: ({ session }) =>

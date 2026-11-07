@@ -6,6 +6,7 @@ import { denyAll } from '@keystone-6/core/access';
 
 import { permissions } from '../access';
 import { trackingFields } from './trackingFields';
+import { LIFECYCLES, validateStatusWrite, itemMoveBlockedByIntake, tradeInAmountError } from '../lib/lifecycles';
 import { CARD_CONDITIONS, CARD_FINISHES, options } from '../lib/pokemon/card-enums';
 
 const canRead = ({ session }: any) => permissions.canReadCollectibles({ session }) || permissions.canManageConsignments({ session });
@@ -15,6 +16,11 @@ const lockedAccess = { operation: { query: canRead, create: () => false, update:
 
 export const ConsignmentIntake = list({
   access: managedAccess,
+  hooks: {
+    validateInput(args: any) {
+      validateStatusWrite(LIFECYCLES.consignmentIntake, args);
+    },
+  },
   fields: {
     store: relationship({ ref: 'Store' }),
     consignor: relationship({ ref: 'SellerProfile' }),
@@ -32,6 +38,11 @@ export const ConsignmentIntake = list({
 
 export const ConsignmentAgreement = list({
   access: managedAccess,
+  hooks: {
+    validateInput(args: any) {
+      validateStatusWrite(LIFECYCLES.consignmentAgreement, args);
+    },
+  },
   fields: {
     intake: relationship({ ref: 'ConsignmentIntake.agreement' }),
     consignor: relationship({ ref: 'SellerProfile' }),
@@ -52,6 +63,15 @@ export const ConsignmentAgreement = list({
 
 export const ConsignmentItem = list({
   access: managedAccess,
+  hooks: {
+    async validateInput(args: any) {
+      const move = validateStatusWrite(LIFECYCLES.consignmentItem, args);
+      if (!move || args.operation !== 'update' || !args.item?.intakeId) return;
+      const intake = await args.context.sudo().db.ConsignmentIntake.findOne({ where: { id: args.item.intakeId } });
+      const blocked = itemMoveBlockedByIntake(intake?.status, move.to);
+      if (blocked) args.addValidationError(blocked);
+    },
+  },
   fields: {
     intake: relationship({ ref: 'ConsignmentIntake.items' }),
     specimen: relationship({ ref: 'Specimen' }),
@@ -144,6 +164,11 @@ export const BuylistEntry = list({
 
 export const TradeInSubmission = list({
   access: managedAccess,
+  hooks: {
+    validateInput(args: any) {
+      validateStatusWrite(LIFECYCLES.tradeInSubmission, args);
+    },
+  },
   fields: {
     store: relationship({ ref: 'Store' }),
     customer: relationship({ ref: 'User' }),
@@ -174,6 +199,15 @@ export const TradeInSubmission = list({
 
 export const TradeInItem = list({
   access: managedAccess,
+  hooks: {
+    async validateInput({ operation, resolvedData, item, context, addValidationError }: any) {
+      if (operation !== 'update' || !item?.submissionId) return;
+      if (!('quotedAmountMinor' in resolvedData) && !('acceptedAmountMinor' in resolvedData)) return;
+      const submission = await context.sudo().db.TradeInSubmission.findOne({ where: { id: item.submissionId } });
+      const message = tradeInAmountError(submission?.status, resolvedData);
+      if (message) addValidationError(message);
+    },
+  },
   fields: {
     submission: relationship({ ref: 'TradeInSubmission.items' }),
     catalogItem: relationship({ ref: 'CatalogItem' }),

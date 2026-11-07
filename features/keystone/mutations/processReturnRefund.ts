@@ -1,4 +1,5 @@
 import { permissions } from "../access";
+import { returnRefundError } from "../lib/lifecycles";
 import { refundPayment } from "../utils/paymentProviderAdapter";
 import {
   enqueueWebhookOutbox,
@@ -51,6 +52,10 @@ async function processReturnRefund(
   if (!returnRecord?.order?.id || returnRecord.refundAmount <= 0) {
     throw new Error("Return is not refundable");
   }
+  // A return is refunded once. A canceled return is never refunded, and a second
+  // refund under a fresh idempotency key must not pay it out again.
+  const blocked = returnRefundError(returnRecord);
+  if (blocked && !priorAttempt) throw new Error(blocked);
   if (!returnRecord.order.payments?.some((payment: any) => payment.id === paymentId)) {
     throw new Error("Payment does not belong to return order");
   }
@@ -170,6 +175,8 @@ async function processReturnRefund(
     });
     if (duplicate) return duplicate;
 
+    const fresh = await tx.return.findUnique({ where: { id: returnId }, select: { status: true, metadata: true } });
+    if (fresh?.status === "canceled") throw new Error("A canceled return cannot be refunded");
     const created = await tx.refund.create({
       data: {
         amount: returnRecord.refundAmount,

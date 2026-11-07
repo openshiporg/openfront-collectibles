@@ -11,9 +11,16 @@ import {
   relationship,
 } from "@keystone-6/core/fields";
 import { permissions } from "../access";
+import { CLAIM_FULFILLMENT_TRANSITIONS, CLAIM_PAYMENT_TRANSITIONS, validateFieldMove } from "../lib/lifecycles";
 import { trackingFields } from "./trackingFields";
 
 export const ClaimOrder = list({
+  hooks: {
+    validateInput(args: any) {
+      validateFieldMove("payment status", CLAIM_PAYMENT_TRANSITIONS, "paymentStatus", args);
+      validateFieldMove("fulfillment status", CLAIM_FULFILLMENT_TRANSITIONS, "fulfillmentStatus", args);
+    },
+  },
   access: {
     operation: {
       query: ({ session }) =>

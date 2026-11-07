@@ -1,4 +1,5 @@
 import type { DotTone } from '../../components/vault-ui';
+import { SELLER_TRANSITIONS as CENTRAL_SELLER_TRANSITIONS } from '@/features/keystone/lib/lifecycles';
 
 export const SELLER_STATUSES: { value: string; label: string; tone: DotTone }[] = [
   { value: 'applicant', label: 'Applicant', tone: 'warn' },
@@ -17,27 +18,19 @@ export const IDENTITY_STATES: { value: string; label: string; tone: DotTone }[] 
 ];
 
 /** Allowed status moves, enforced again on the server before any update. */
-export const SELLER_TRANSITIONS: Record<string, { to: string; label: string }[]> = {
-  applicant: [
-    { to: 'active', label: 'Approve' },
-    { to: 'closed', label: 'Decline' },
-  ],
-  active: [
-    { to: 'paused', label: 'Pause' },
-    { to: 'suspended', label: 'Suspend' },
-    { to: 'closed', label: 'Close' },
-  ],
-  paused: [
-    { to: 'active', label: 'Resume' },
-    { to: 'suspended', label: 'Suspend' },
-    { to: 'closed', label: 'Close' },
-  ],
-  suspended: [
-    { to: 'active', label: 'Reinstate' },
-    { to: 'closed', label: 'Close' },
-  ],
-  closed: [],
+const SELLER_ACTION_LABELS: Record<string, Record<string, string>> = {
+  applicant: { active: 'Approve', closed: 'Decline' },
+  suspended: { active: 'Reinstate' },
+  paused: { active: 'Resume' },
 };
+const SELLER_DEFAULT_LABELS: Record<string, string> = { active: 'Approve', paused: 'Pause', suspended: 'Suspend', closed: 'Close' };
+
+export const SELLER_TRANSITIONS: Record<string, { to: string; label: string }[]> = Object.fromEntries(
+  Object.entries(CENTRAL_SELLER_TRANSITIONS).map(([from, tos]) => [
+    from,
+    tos.map((to) => ({ to, label: SELLER_ACTION_LABELS[from]?.[to] ?? SELLER_DEFAULT_LABELS[to] })),
+  ]),
+);
 
 export function sellerStatus(value?: string | null) {
   return SELLER_STATUSES.find((s) => s.value === value) ?? { value: value || '', label: value || 'Unknown', tone: 'muted' as DotTone };
