@@ -14,6 +14,7 @@ import {
   checkbox,
 } from "@keystone-6/core/fields";
 import { permissions } from "../access";
+import { resolveCartOwner } from "../lib/cart-owner";
 import { canCreateRawCart } from "../security/raw-cart-create-access";
 import { trackingFields } from "./trackingFields";
 
@@ -423,15 +424,15 @@ export const Cart = list<Lists.Cart.TypeInfo>({
       ref: "User.carts",
       many: false,
       hooks: {
-        resolveInput({ operation, resolvedData, context }) {
-          if (
-            (operation === "create" || operation === "update") &&
-            !resolvedData.user &&
-            context.session?.itemId
-          ) {
-            return { connect: { id: context.session.itemId } };
-          }
-          return resolvedData.user;
+        // Staff edits keep the cart's owner; only a shopper's own write claims an unowned cart.
+        resolveInput({ operation, resolvedData, item, context }) {
+          return resolveCartOwner({
+            operation,
+            resolvedUser: resolvedData.user,
+            existingUserId: (item as any)?.userId ?? null,
+            sessionUserId: context.session?.itemId ?? null,
+            editorIsStaff: Boolean(permissions.canManageOrders({ session: context.session })),
+          });
         },
       },
     }),
