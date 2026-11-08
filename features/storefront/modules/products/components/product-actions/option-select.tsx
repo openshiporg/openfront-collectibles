@@ -36,6 +36,9 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
       return a.localeCompare(b);
     });
 
+  // An option left without values in the dashboard has nothing to choose.
+  if (!filteredOptions.length) return null
+
   return (
     <div className="flex flex-col gap-2">
       <span className="flex items-baseline justify-between gap-3 text-[13px]">
