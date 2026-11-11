@@ -43,21 +43,12 @@ function totals(items: any[], key: 'quotedAmountMinor' | 'acceptedAmountMinor') 
 export async function TradeInDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [response, options, specimens] = await Promise.all([getSubmission(id), getTradeInOptions(), getSpecimenOptions()]);
-  if (response.success && !response.data) notFound();
+  if (!response.success || !response.data) notFound();
   const breadcrumbs = [
     { type: 'link' as const, label: 'Dashboard', href: '/dashboard' },
     { type: 'link' as const, label: 'Trade-ins', href: '/dashboard/platform/trade-ins' },
     { type: 'page' as const, label: response.success && response.data ? response.data.submission.reference : 'Trade-in' },
   ];
-  if (!response.success || !response.data) {
-    return (
-      <PageContainer title="Trade-in" breadcrumbs={breadcrumbs}>
-        <div className="px-4 md:px-6">
-          <ListBand><p role="alert" className="px-4 py-3.5 text-sm text-destructive">{response.success ? 'Trade-in unavailable' : response.error}</p></ListBand>
-        </div>
-      </PageContainer>
-    );
-  }
 
   const { submission, offers } = response.data;
   const items: any[] = submission.items || [];

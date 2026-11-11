@@ -5,7 +5,7 @@ import { DisputeDetailPageClient } from './DisputeDetailPageClient';
 export async function DisputeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [response, options] = await Promise.all([getDispute(id), getDisputeFormOptions()]);
-  if (!response.success) throw new Error('Case unavailable');
+  if (!response.success) notFound();
   if (!response.data) notFound();
   return <DisputeDetailPageClient dispute={response.data} staff={options.staff} />;
 }

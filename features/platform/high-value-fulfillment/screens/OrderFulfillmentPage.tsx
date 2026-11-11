@@ -5,7 +5,7 @@ import { OrderFulfillmentPageClient } from './OrderFulfillmentPageClient';
 export async function OrderFulfillmentPage({ params }: { params: Promise<{ orderId: string }> }) {
   const { orderId } = await params;
   const response = await getOrderFulfillment(orderId);
-  if (!response.success) throw new Error('Order fulfillment unavailable');
+  if (!response.success) notFound();
   if (!response.data) notFound();
   return <OrderFulfillmentPageClient {...response.data} />;
 }

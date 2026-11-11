@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { PageBreadcrumbs } from '@/features/dashboard/components/PageBreadcrumbs';
 import { OrderPageClient } from './OrderPageClient';
 import { getOrder } from '@/features/platform/orders/actions';
@@ -15,9 +16,8 @@ export async function OrderDetailPage({ params }: OrderPageParams) {
   const response = await getOrder(itemId);
 
   if (!response.success) {
-    // Handle error case - Log and re-throw
     console.error('Error fetching order:', response.error);
-    throw new Error(`Failed to fetch order ${itemId}: ${response.error}`);
+    notFound();
   }
 
   const order = response.data?.order; // Extract order from data
@@ -28,7 +28,7 @@ export async function OrderDetailPage({ params }: OrderPageParams) {
     // You might need to import it: import { notFound } from "next/navigation";
     // notFound();
     // Or throw an error as before:
-    throw new Error(`Order not found: ${itemId}`);
+    notFound();
   }
 
   // Extract UI configuration

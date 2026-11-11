@@ -38,7 +38,7 @@ function Empty({ children }: { children: ReactNode }) {
 export async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const [response, options] = await Promise.all([getItem(id), getEvidenceOptions()])
-  if (response.success && !response.data) notFound()
+  if (!response.success || !response.data) notFound()
 
   const breadcrumbs = [
     { type: 'link' as const, label: 'Dashboard', href: '/dashboard' },

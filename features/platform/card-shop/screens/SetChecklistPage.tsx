@@ -10,7 +10,7 @@ import {
   type StockCell,
 } from '@/features/storefront/components/cards';
 import { getSetChecklist } from '../actions';
-import { DeskError, DeskFrame, DeskLink, DeskSection } from '../components/frame';
+import { DeskFrame, DeskLink, DeskSection } from '../components/frame';
 import { plural } from '@/features/platform/lib/plural'
 
 function latestMarket(market: Record<string, { marketMinor: number | null }>) {
@@ -21,8 +21,7 @@ function latestMarket(market: Record<string, { marketMinor: number | null }>) {
 export async function SetChecklistPage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
   const response = await getSetChecklist(handle);
-  if (!response.success) return <DeskFrame title="Set checklist"><DeskError message={response.error} /></DeskFrame>;
-  if (!response.data) notFound();
+  if (!response.success || !response.data) notFound();
   const { set, cards, currencyCode, idByHandle } = response.data as any;
   const singles = (cards as any[]).filter((c) => c.kind === 'single');
   const sealed = (cards as any[]).filter((c) => c.kind === 'sealed');

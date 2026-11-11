@@ -45,7 +45,7 @@ export async function ProductItemPage({ params }: ProductItemPageParams) {
     fetchedItem = response.data.item as Record<string, unknown>
   } else {
     console.error('Error fetching product:', response.error)
-    fetchedItem = {}
+    notFound()
   }
 
   // Get adminMeta for the list structure

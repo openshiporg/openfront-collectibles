@@ -32,22 +32,12 @@ function percentFromBasisPoints(bp: number) {
 export async function ConsignmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [response, options] = await Promise.all([getIntake(id), getConsignmentOptions()]);
-  if (response.success && !response.data) notFound();
+  if (!response.success || !response.data) notFound();
   const breadcrumbs = [
     { type: 'link' as const, label: 'Dashboard', href: '/dashboard' },
     { type: 'link' as const, label: 'Consignments', href: '/dashboard/platform/consignments' },
     { type: 'page' as const, label: response.success && response.data ? response.data.intake.reference : 'Consignment' },
   ];
-
-  if (!response.success || !response.data) {
-    return (
-      <PageContainer title="Consignment" breadcrumbs={breadcrumbs}>
-        <div className="px-4 md:px-6">
-          <ListBand><p role="alert" className="px-4 py-3.5 text-sm text-destructive">{response.success ? 'Consignment unavailable' : response.error}</p></ListBand>
-        </div>
-      </PageContainer>
-    );
-  }
 
   const { intake, settlements } = response.data;
   const currencyCode = intake.agreement?.currencyCode || (options.success ? options.data.currencyCode : 'USD');
