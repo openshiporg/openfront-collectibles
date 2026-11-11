@@ -42,6 +42,7 @@ export async function ProductItemPage({ params }: ProductItemPageParams) {
   let fetchedItem: Record<string, unknown> = {}
 
   if (response.success) {
+    if (!response.data?.item) notFound()
     fetchedItem = response.data.item as Record<string, unknown>
   } else {
     console.error('Error fetching product:', response.error)
