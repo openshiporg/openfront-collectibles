@@ -76,6 +76,16 @@ export const permissions = {
 // Rule based function
 // Rules can return a boolean - yes or no - or a filter which limits which products they can CRUD.
 export const rules = {
+  canReadRoles({ session }: PermissionAccessArgs) {
+    if (!isSignedIn({ session })) {
+      return false;
+    }
+    if (permissions.canReadRoles({ session }) || permissions.canManageRoles({ session })) {
+      return true;
+    }
+    // Staff can always read their own Role so the dashboard shell can read its flags.
+    return { assignedTo: { some: { id: { equals: session?.itemId } } } };
+  },
   canManageOrders({ session }: PermissionAccessArgs) {
     if (!isSignedIn({ session })) {
       return false;
