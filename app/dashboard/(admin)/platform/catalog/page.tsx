@@ -1,2 +1,3 @@
+import { gatePlatformPage } from '@/features/dashboard/lib/platformGate';
 import { CatalogWorkbenchPage } from '@/features/platform/collectibles/screens/CollectiblesWorkbenchPage';
-export default CatalogWorkbenchPage;
+export default gatePlatformPage('catalog', CatalogWorkbenchPage);

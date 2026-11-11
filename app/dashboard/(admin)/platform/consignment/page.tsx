@@ -1,2 +1,3 @@
+import { gatePlatformPage } from '@/features/dashboard/lib/platformGate';
 import { ConsignmentWorkbenchPage } from '@/features/platform/collectibles/screens/CollectiblesWorkbenchPage';
-export default ConsignmentWorkbenchPage;
+export default gatePlatformPage('consignment', ConsignmentWorkbenchPage);

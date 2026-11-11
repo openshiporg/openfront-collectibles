@@ -1,2 +1,3 @@
+import { gatePlatformPage } from '@/features/dashboard/lib/platformGate';
 import { EvidenceWorkbenchPage } from '@/features/platform/collectibles/screens/CollectiblesWorkbenchPage';
-export default EvidenceWorkbenchPage;
+export default gatePlatformPage('evidence', EvidenceWorkbenchPage);
