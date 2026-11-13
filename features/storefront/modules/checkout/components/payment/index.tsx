@@ -59,8 +59,6 @@ const Payment = ({ cart, availablePaymentMethods }: PaymentProps) => {
   const isStripePayment = isStripe(selectedPaymentMethod);
   const stripeReady = useContext(StripeContext);
 
-  // Check if we're in sandbox/test mode
-
   const paidByGiftcard =
     (cart?.giftCards?.length ?? 0) > 0 && cart?.rawTotal === 0;
 

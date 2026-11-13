@@ -722,7 +722,7 @@ export function useOnboardingApi({
     setError(errorMessage);
     console.error('Error during onboarding:', e);
 
-    // For demonstration purposes, let's mark only the first non-completed item as failed
+    // Mark the first non-completed item as failed
     const newItemErrors: Record<string, Record<string, string>> = {};
 
     // Find the first section with non-completed items
@@ -739,7 +739,7 @@ export function useOnboardingApi({
       if (failedItem) {
         // Mark only this item as failed
         setItemError(sectionType, failedItem, errorMessage);
-        // Only mark one item as failed for demonstration
+        // Only the first pending item is marked failed
         break;
       }
     }

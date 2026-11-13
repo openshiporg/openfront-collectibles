@@ -11,7 +11,6 @@ export interface CreateClaimData {
     quantity: number
     reason: 'missing_item' | 'wrong_item' | 'production_failure' | 'other'
     note?: string
-    images?: string[] // Image URLs
     tags?: string[] // Tag IDs
   }[]
   refundAmount?: number
@@ -20,7 +19,7 @@ export interface CreateClaimData {
   noNotification?: boolean
 }
 
-export async function createClaimAction(data: CreateClaimData) {
+export async function createClaimAction(data: CreateClaimData, imageFiles?: FormData) {
   try {
     // Calculate refund amount if not provided and type is refund
     let { refundAmount } = data
@@ -144,7 +143,6 @@ export async function createClaimAction(data: CreateClaimData) {
         quantity: item.quantity,
         note: item.note,
         metadata: {
-          images: item.images || [],
           tags: item.tags || [],
           orderLineItemId: item.lineItemId,
           relationshipSchemaGate: 'ClaimItem.lineItem currently targets cart LineItem'
@@ -178,27 +176,20 @@ export async function createClaimAction(data: CreateClaimData) {
 
       if (!claimItemId) continue
 
-      // Create claim images
-      if (item.images && item.images.length > 0) {
-        item.images.forEach(imageUrl => {
-          const createImageMutation = `
-            mutation CreateClaimImage($data: ClaimImageCreateInput!) {
-              claimImage: createClaimImage(data: $data) {
-                id
-                url
-              }
-            }
-          `
-          claimImagePromises.push(
-            keystoneClient(createImageMutation, {
-              data: {
-                url: imageUrl,
-                claimItem: { connect: { id: claimItemId } }
-              }
-            })
+      // Store each uploaded photo in the image bucket through the ClaimImage image field
+      const files = (imageFiles?.getAll(`image:${item.lineItemId}`) ?? []).filter(
+        (file): file is File => typeof file !== 'string' && file.size > 0
+      )
+      files.forEach(file => {
+        claimImagePromises.push(
+          keystoneClient(
+            `mutation CreateClaimImage($data: ClaimImageCreateInput!) {
+              claimImage: createClaimImage(data: $data) { id }
+            }`,
+            { data: { image: { upload: file }, altText: file.name, claimItem: { connect: { id: claimItemId } } } }
           )
-        })
-      }
+        )
+      })
 
       // Connect existing claim tags
       if (item.tags && item.tags.length > 0) {
@@ -224,7 +215,11 @@ export async function createClaimAction(data: CreateClaimData) {
 
     // Wait for all image and tag operations to complete
     if (claimImagePromises.length > 0) {
-      await Promise.all(claimImagePromises)
+      const imageResults = await Promise.all(claimImagePromises)
+      const failedImages = imageResults.filter(r => !r.success)
+      if (failedImages.length > 0) {
+        return { success: false, error: `Claim created, but ${failedImages.length} photo(s) failed to upload`, data: null }
+      }
     }
     if (claimTagPromises.length > 0) {
       await Promise.all(claimTagPromises)
@@ -338,32 +333,6 @@ export async function updateClaimStatusAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update claim status',
-      data: null
-    }
-  }
-}
-
-export async function uploadClaimImageAction(file: File) {
-  try {
-    // TODO: Implement actual file upload logic
-    // This would typically upload to your storage provider (S3, Cloudinary, etc.)
-    // For now, return a placeholder URL
-    
-    // Simulate upload delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const mockUrl = `https://example.com/uploads/${file.name}?t=${Date.now()}`
-    
-    return {
-      success: true,
-      data: { url: mockUrl },
-      error: null
-    }
-
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to upload image',
       data: null
     }
   }

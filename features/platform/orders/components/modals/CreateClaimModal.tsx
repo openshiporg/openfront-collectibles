@@ -35,7 +35,7 @@ import {
   Package2,
   Image as ImageIcon 
 } from "lucide-react";
-import { createClaimAction, getClaimTagsAction, uploadClaimImageAction } from '../../actions/claim-actions';
+import { createClaimAction, getClaimTagsAction } from '../../actions/claim-actions';
 import { toast } from 'sonner';
 
 interface ClaimItem {
@@ -97,7 +97,6 @@ export const CreateClaimModal = ({ isOpen, onClose, order }: CreateClaimModalPro
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [noNotification, setNoNotification] = useState(false);
-  const [uploadingImages, setUploadingImages] = useState<Set<string>>(new Set());
 
   // Calculate total refund amount for refund claims
   const totalRefundAmount = claimType === 'refund' ? claimItems.reduce((total, claimItem) => {
@@ -165,51 +164,25 @@ export const CreateClaimModal = ({ isOpen, onClose, order }: CreateClaimModalPro
     );
   };
 
-  const handleImageUpload = async (lineItemId: string, files: FileList) => {
+  // Photos stay in the browser until the claim is submitted; the server stores them with the claim.
+  const pendingFiles = React.useRef(new Map<string, File>());
+
+  const handleImageUpload = (lineItemId: string, files: FileList) => {
     const claimItem = claimItems.find(item => item.lineItemId === lineItemId);
     if (!claimItem) return;
-
-    const fileArray = Array.from(files);
-    setUploadingImages(prev => new Set([...prev, lineItemId]));
-
-    try {
-      const uploadPromises = fileArray.map(file => uploadClaimImageAction(file));
-      const results = await Promise.all(uploadPromises);
-      
-      const successfulUploads = results
-        .filter(result => result.success)
-        .map(result => result.data?.url)
-        .filter(Boolean);
-
-      if (successfulUploads.length > 0) {
-        updateClaimItemField(
-          lineItemId, 
-          'images', 
-          [...(claimItem.images || []), ...successfulUploads]
-        );
-        toast.success(`${successfulUploads.length} image(s) uploaded successfully`);
-      }
-
-      const failedUploads = results.filter(result => !result.success);
-      if (failedUploads.length > 0) {
-        toast.error(`${failedUploads.length} image(s) failed to upload`);
-      }
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      toast.error("Failed to upload images");
-    } finally {
-      setUploadingImages(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(lineItemId);
-        return newSet;
-      });
-    }
+    const previews = Array.from(files).map(file => {
+      const preview = URL.createObjectURL(file);
+      pendingFiles.current.set(preview, file);
+      return preview;
+    });
+    updateClaimItemField(lineItemId, 'images', [...(claimItem.images || []), ...previews]);
   };
 
   const removeImage = (lineItemId: string, imageUrl: string) => {
     const claimItem = claimItems.find(item => item.lineItemId === lineItemId);
     if (!claimItem) return;
-
+    pendingFiles.current.delete(imageUrl);
+    URL.revokeObjectURL(imageUrl);
     updateClaimItemField(
       lineItemId,
       'images',
@@ -253,13 +226,20 @@ export const CreateClaimModal = ({ isOpen, onClose, order }: CreateClaimModalPro
 
     setIsSubmitting(true);
     try {
+      const imageFiles = new FormData();
+      itemsToClaim.forEach(item => {
+        (item.images || []).forEach(preview => {
+          const file = pendingFiles.current.get(preview);
+          if (file) imageFiles.append(`image:${item.lineItemId}`, file);
+        });
+      });
       const response = await createClaimAction({
         orderId: order.id,
         type: claimType,
-        claimItems: itemsToClaim,
+        claimItems: itemsToClaim.map(({ images: _images, ...item }) => item),
         refundAmount: totalRefundAmount,
         noNotification,
-      });
+      }, imageFiles);
 
       if (response.success) {
         toast.success(`${claimType === 'refund' ? 'Refund' : 'Replacement'} claim created successfully`);
@@ -351,7 +331,7 @@ export const CreateClaimModal = ({ isOpen, onClose, order }: CreateClaimModalPro
               {order?.lineItems?.map((lineItem: any) => {
                 const claimItem = claimItems.find(ci => ci.lineItemId === lineItem.id);
                 const maxQuantity = lineItem.quantity || 0;
-                const isUploading = uploadingImages.has(lineItem.id);
+                const isUploading = false;
                 
                 return (
                   <Card key={lineItem.id}>

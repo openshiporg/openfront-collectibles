@@ -4,11 +4,9 @@ import React, { useContext, useMemo, type JSX } from "react"
 
 import Radio from "@/features/storefront/modules/common/components/radio"
 
-import { isManual } from "@/features/storefront/lib/constants"
 import SkeletonCardDetails from "@/features/storefront/modules/skeletons/components/skeleton-card-details"
 import { CardElement } from "@stripe/react-stripe-js"
 import { StripeCardElementOptions } from "@stripe/stripe-js"
-import PaymentTest from "../payment-test"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
 
 type PaymentContainerProps = {
@@ -26,7 +24,6 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   disabled = false,
   children,
 }) => {
-  const isDevelopment = process.env.NODE_ENV === "development"
 
   return (
     <div
@@ -50,17 +47,11 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
           <p className="text-[15px]">
             {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
           </p>
-          {isManual(paymentProviderId) && isDevelopment && (
-            <PaymentTest className="hidden sm:block" />
-          )}
         </div>
         <span className="justify-self-end text-cx-ink-2">
           {paymentInfoMap[paymentProviderId]?.icon}
         </span>
       </div>
-      {isManual(paymentProviderId) && isDevelopment && (
-        <PaymentTest className="sm:hidden text-[13px]" />
-      )}
       {children}
     </div>
   )
