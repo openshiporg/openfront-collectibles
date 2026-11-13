@@ -96,7 +96,7 @@ export async function createClaimAction(data: CreateClaimData, imageFiles?: Form
     const claimData = {
       type: data.type,
       paymentStatus: data.type === 'refund' ? 'not_refunded' : 'na',
-      fulfillmentStatus: data.type === 'replace' ? 'not_fulfilled' : 'na',
+      fulfillmentStatus: 'not_fulfilled',
       refundAmount: refundAmount || 0,
       metadata: data.metadata,
       noNotification: data.noNotification || false,
