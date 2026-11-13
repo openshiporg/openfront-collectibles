@@ -301,13 +301,13 @@ export const User = list<Lists.User.TypeInfo>({
             graphql.field({
               type: lists.Address.types.output,
               async resolve(item, args, context) {
-                const address = await context.db.Address.findMany({
-                  where: {
-                    user: { id: { equals: item.id } },
-                    isBilling: { equals: true },
-                  },
-                  take: 1,
+                // Scope by this user's own id through prisma, then read the row through the session's Address access.
+                const row = await context.prisma.address.findFirst({
+                  where: { userId: item.id, isBilling: true },
+                  select: { id: true },
                 });
+                if (!row) return null;
+                const address = await context.db.Address.findMany({ where: { id: { equals: row.id } }, take: 1 });
 
                 if (!address.length) return null;
 
