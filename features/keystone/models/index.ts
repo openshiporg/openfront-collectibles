@@ -1,4 +1,5 @@
 
+import { withFilterAccess } from "./filterAccess";
 import { Address } from "./Address";
 import { ApiKey } from "./ApiKey";
 import { BatchJob } from './BatchJob';
@@ -131,7 +132,7 @@ import { UserField } from "./UserField";
 import { WebhookEndpoint } from "./WebhookEndpoint";
 import { WebhookEvent } from "./WebhookEvent";
 
-const rawModels = {
+const baseModels = {
   Account,
   AccountLineItem,
   Address,
@@ -267,6 +268,8 @@ const rawModels = {
   WebhookEndpoint,
   WebhookEvent,
 };
+
+const rawModels = withFilterAccess(baseModels);
 
 // Sidebar visibility follows the role: a list whose query access denies the session is hidden from navigation
 // (Keystone evaluates ui.isHidden per session in admin meta). Explicit isHidden settings are kept.

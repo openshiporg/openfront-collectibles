@@ -8559,7 +8559,6 @@ input InviteWhereInput {
   userEmail: StringFilter
   role: InviteRoleTypeNullableFilter
   accepted: BooleanFilter
-  token: StringFilter
   expiresAt: DateTimeFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
@@ -8577,7 +8576,6 @@ input InviteOrderByInput {
   userEmail: OrderDirection
   role: OrderDirection
   accepted: OrderDirection
-  token: OrderDirection
   expiresAt: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
@@ -9723,7 +9721,6 @@ input OAuthAppWhereInput {
   id: IDFilter
   name: StringFilter
   clientId: StringFilter
-  clientSecret: StringFilter
   webhookUrl: StringFilter
   status: StringNullableFilter
   installUrl: StringFilter
@@ -9741,7 +9738,6 @@ input OAuthAppOrderByInput {
   id: OrderDirection
   name: OrderDirection
   clientId: OrderDirection
-  clientSecret: OrderDirection
   webhookUrl: OrderDirection
   status: OrderDirection
   installUrl: OrderDirection
@@ -9822,7 +9818,6 @@ type OAuthToken {
 
 input OAuthTokenWhereUniqueInput {
   id: ID
-  token: String
 }
 
 input OAuthTokenWhereInput {
@@ -9831,15 +9826,12 @@ input OAuthTokenWhereInput {
   NOT: [OAuthTokenWhereInput!]
   id: IDFilter
   tokenType: StringFilter
-  token: StringFilter
   clientId: StringFilter
   user: UserWhereInput
   redirectUri: StringFilter
   expiresAt: DateTimeNullableFilter
   isRevoked: StringNullableFilter
   authorizationCode: StringFilter
-  refreshToken: StringFilter
-  accessToken: StringFilter
   state: StringFilter
   codeChallenge: StringFilter
   codeChallengeMethod: StringNullableFilter
@@ -9850,14 +9842,11 @@ input OAuthTokenWhereInput {
 input OAuthTokenOrderByInput {
   id: OrderDirection
   tokenType: OrderDirection
-  token: OrderDirection
   clientId: OrderDirection
   redirectUri: OrderDirection
   expiresAt: OrderDirection
   isRevoked: OrderDirection
   authorizationCode: OrderDirection
-  refreshToken: OrderDirection
-  accessToken: OrderDirection
   state: OrderDirection
   codeChallenge: OrderDirection
   codeChallengeMethod: OrderDirection
@@ -10018,7 +10007,6 @@ input OrderWhereInput {
   swaps: SwapManyRelationFilter
   account: AccountWhereInput
   accountLineItems: AccountLineItemManyRelationFilter
-  secretKey: StringFilter
   events: OrderEventManyRelationFilter
   note: StringFilter
   shippingLabels: ShippingLabelManyRelationFilter
@@ -10061,7 +10049,6 @@ input OrderOrderByInput {
   idempotencyKey: OrderDirection
   noNotification: OrderDirection
   externalId: OrderDirection
-  secretKey: OrderDirection
   note: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
@@ -14751,7 +14738,6 @@ input WebhookEndpointWhereInput {
   scope: StringFilter
   user: UserWhereInput
   isActive: BooleanFilter
-  secret: StringFilter
   lastTriggered: DateTimeNullableFilter
   failureCount: IntNullableFilter
   webhookEvents: WebhookEventManyRelationFilter
@@ -14772,7 +14758,6 @@ input WebhookEndpointOrderByInput {
   subscriptionKey: OrderDirection
   scope: OrderDirection
   isActive: OrderDirection
-  secret: OrderDirection
   lastTriggered: OrderDirection
   failureCount: OrderDirection
   createdAt: OrderDirection
