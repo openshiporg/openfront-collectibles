@@ -17,7 +17,7 @@ function Column({ title, links }: { title: string; links: { title: string; href:
           <li key={link.href}>
             <LocalizedClientLink
               href={link.href}
-              className="inline-flex min-h-9 items-center text-[14px] text-cx-ink-2 transition-colors hover:text-cx-ink"
+              className="inline-flex min-h-11 items-center text-[14px] text-cx-ink-2 transition-colors hover:text-cx-ink"
             >
               {link.title}
             </LocalizedClientLink>

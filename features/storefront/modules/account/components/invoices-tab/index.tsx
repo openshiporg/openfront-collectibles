@@ -1,4 +1,5 @@
 "use client"
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime'
 
 import type { StorefrontAccountCustomer as User } from "@/features/storefront/types"
 import { AccountHeading, Band, EmptyState, TitleState } from "../account-ui"
@@ -89,7 +90,7 @@ const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
                     >
                       <span className="cx-num font-medium text-cx-ink">#{order?.displayId || lineItem.orderDisplayId}</span>
                       <span className="flex-1 text-cx-ink-2">
-                        {order?.createdAt ? new Date(order.createdAt).toLocaleDateString("en-US", { timeZone: "UTC" }) : ''}
+                        <ViewerTime value={order?.createdAt} style="date" fallback="" />
                       </span>
                       <span className="cx-num text-cx-ink">{order?.total || lineItem.formattedAmount}</span>
                     </a>

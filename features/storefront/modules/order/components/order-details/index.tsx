@@ -1,3 +1,4 @@
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime'
 import StatusDot, { type DotTone } from "@/features/storefront/modules/common/components/collectibles/status-dot"
 
 // Define inline types based on GraphQL schema and component usage
@@ -48,12 +49,23 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
       <div className="min-w-0 space-y-1">
         <dt className="cx-label">Placed</dt>
         <dd className="cx-num text-[14px] text-cx-ink" data-testid="order-date">
-          {new Date(order.createdAt ?? "").toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}
+          <ViewerTime value={order.createdAt} style="date" />
         </dd>
       </div>
       <div className="col-span-2 min-w-0 space-y-1">
-        <dt className="cx-label">Confirmation sent to</dt>
+        <dt className="cx-label">
+          {order.confirmationEmailStatus === "sent"
+            ? "Confirmation sent to"
+            : order.confirmationEmailStatus === "not_sent"
+              ? "Email"
+              : "Confirmation email to"}
+        </dt>
         <dd className="truncate text-[14px] text-cx-ink" data-testid="order-email">{order.email}</dd>
+        {order.confirmationEmailStatus === "not_sent" && (
+          <dd className="text-[13px] text-cx-ink-2" data-testid="order-email-not-sent">
+            We couldn&apos;t send the confirmation email. Keep this page&apos;s link to view your order.
+          </dd>
+        )}
       </div>
       {showStatus && (
         <>

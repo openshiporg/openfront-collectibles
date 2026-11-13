@@ -6736,89 +6736,6 @@ input FulfillmentRequirementCreateInput {
   updatedAt: DateTime
 }
 
-type NotificationIntent {
-  id: ID!
-  user: User
-  channel: String
-  template: String
-  status: String
-  payload: JSON
-  provider: String
-  providerReference: String
-  idempotencyKey: String
-  attemptedAt: DateTime
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-input NotificationIntentWhereUniqueInput {
-  id: ID
-  idempotencyKey: String
-}
-
-input NotificationIntentWhereInput {
-  AND: [NotificationIntentWhereInput!]
-  OR: [NotificationIntentWhereInput!]
-  NOT: [NotificationIntentWhereInput!]
-  id: IDFilter
-  user: UserWhereInput
-  channel: StringNullableFilter
-  template: StringFilter
-  status: StringNullableFilter
-  provider: StringFilter
-  providerReference: StringFilter
-  idempotencyKey: StringFilter
-  attemptedAt: DateTimeNullableFilter
-  createdAt: DateTimeFilter
-  updatedAt: DateTimeFilter
-}
-
-input NotificationIntentOrderByInput {
-  id: OrderDirection
-  channel: OrderDirection
-  template: OrderDirection
-  status: OrderDirection
-  provider: OrderDirection
-  providerReference: OrderDirection
-  idempotencyKey: OrderDirection
-  attemptedAt: OrderDirection
-  createdAt: OrderDirection
-  updatedAt: OrderDirection
-}
-
-input NotificationIntentUpdateInput {
-  user: UserRelateToOneForUpdateInput
-  channel: String
-  template: String
-  status: String
-  payload: JSON
-  provider: String
-  providerReference: String
-  idempotencyKey: String
-  attemptedAt: DateTime
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-input NotificationIntentUpdateArgs {
-  where: NotificationIntentWhereUniqueInput!
-  data: NotificationIntentUpdateInput!
-}
-
-input NotificationIntentCreateInput {
-  user: UserRelateToOneForCreateInput
-  channel: String
-  template: String
-  status: String
-  payload: JSON
-  provider: String
-  providerReference: String
-  idempotencyKey: String
-  attemptedAt: DateTime
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
 type ProviderConnection {
   id: ID!
   store: Store
@@ -15361,12 +15278,6 @@ type Mutation {
   updateFulfillmentRequirements(data: [FulfillmentRequirementUpdateArgs!]!): [FulfillmentRequirement]
   deleteFulfillmentRequirement(where: FulfillmentRequirementWhereUniqueInput!): FulfillmentRequirement
   deleteFulfillmentRequirements(where: [FulfillmentRequirementWhereUniqueInput!]!): [FulfillmentRequirement]
-  createNotificationIntent(data: NotificationIntentCreateInput!): NotificationIntent
-  createNotificationIntents(data: [NotificationIntentCreateInput!]!): [NotificationIntent]
-  updateNotificationIntent(where: NotificationIntentWhereUniqueInput!, data: NotificationIntentUpdateInput!): NotificationIntent
-  updateNotificationIntents(data: [NotificationIntentUpdateArgs!]!): [NotificationIntent]
-  deleteNotificationIntent(where: NotificationIntentWhereUniqueInput!): NotificationIntent
-  deleteNotificationIntents(where: [NotificationIntentWhereUniqueInput!]!): [NotificationIntent]
   createProviderConnection(data: ProviderConnectionCreateInput!): ProviderConnection
   createProviderConnections(data: [ProviderConnectionCreateInput!]!): [ProviderConnection]
   updateProviderConnection(where: ProviderConnectionWhereUniqueInput!, data: ProviderConnectionUpdateInput!): ProviderConnection
@@ -15881,6 +15792,7 @@ type Mutation {
   completeInvoicePayment(paymentSessionId: ID!): InvoicePaymentResult!
   processReturnRefund(returnId: ID!, paymentId: ID!, idempotencyKey: String!): Refund
   refundOrderPayment(orderId: ID!, paymentId: ID!, amount: Int!, reason: String!, idempotencyKey: String!, restock: Boolean): Refund
+  reconcileOrderRefunds(orderId: ID!): JSON!
   retryWebhookDeliveries(limit: Int): Int!
   registerWebhookEndpoint(registrationKey: String!, url: String!, events: [String!]!, secret: String!, requiredScope: String): WebhookEndpoint!
   updatePrivacyPreferences(preferences: JSON!): JSON!
@@ -16094,9 +16006,6 @@ type Query {
   fulfillmentRequirement(where: FulfillmentRequirementWhereUniqueInput!): FulfillmentRequirement
   fulfillmentRequirements(where: FulfillmentRequirementWhereInput! = {}, orderBy: [FulfillmentRequirementOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: FulfillmentRequirementWhereUniqueInput): [FulfillmentRequirement!]
   fulfillmentRequirementsCount(where: FulfillmentRequirementWhereInput! = {}): Int
-  notificationIntent(where: NotificationIntentWhereUniqueInput!): NotificationIntent
-  notificationIntents(where: NotificationIntentWhereInput! = {}, orderBy: [NotificationIntentOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: NotificationIntentWhereUniqueInput): [NotificationIntent!]
-  notificationIntentsCount(where: NotificationIntentWhereInput! = {}): Int
   providerConnection(where: ProviderConnectionWhereUniqueInput!): ProviderConnection
   providerConnections(where: ProviderConnectionWhereInput! = {}, orderBy: [ProviderConnectionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ProviderConnectionWhereUniqueInput): [ProviderConnection!]
   providerConnectionsCount(where: ProviderConnectionWhereInput! = {}): Int

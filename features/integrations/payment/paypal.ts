@@ -220,8 +220,11 @@ export async function refundPaymentFunction({ paymentId, amount = 0, currency = 
   );
 
   const refund = await response.json();
-  if (refund.error) {
-    throw new Error(`PayPal refund failed: ${refund.error.message}`);
+  if (!response.ok || refund.error) {
+    const error = new Error(`PayPal refund failed: ${refund?.error?.message || refund?.message || response.status}`);
+    // A 4xx (other than a 409 conflict) means PayPal did not make the refund: final for this request id.
+    if (response.status >= 400 && response.status < 500 && response.status !== 409) Object.assign(error, { providerDeclined: true });
+    throw error;
   }
 
   return {

@@ -1306,24 +1306,6 @@ model FulfillmentRequirement {
   @@index([orderLineItemId])
 }
 
-model NotificationIntent {
-  id                String    @id @default(cuid())
-  user              User?     @relation("NotificationIntent_user", fields: [userId], references: [id])
-  userId            String?   @map("user")
-  channel           String?   @default("email")
-  template          String    @default("")
-  status            String?   @default("queued")
-  payload           Json?     @default("{}")
-  provider          String    @default("")
-  providerReference String    @default("")
-  idempotencyKey    String    @unique @default("")
-  attemptedAt       DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @default(now()) @updatedAt
-
-  @@index([userId])
-}
-
 model ProviderConnection {
   id              String    @id @default(cuid())
   store           Store?    @relation("ProviderConnection_store", fields: [storeId], references: [id])
@@ -2824,7 +2806,6 @@ model User {
   from_DisputeCase_openedBy              DisputeCase[]            @relation("DisputeCase_openedBy")
   from_DisputeCase_assignedTo            DisputeCase[]            @relation("DisputeCase_assignedTo")
   from_EvidenceAttachment_uploadedBy     EvidenceAttachment[]     @relation("EvidenceAttachment_uploadedBy")
-  from_NotificationIntent_user           NotificationIntent[]     @relation("NotificationIntent_user")
   from_SellerProfile_user                SellerProfile[]          @relation("SellerProfile_user")
   from_StoreMembership_user              StoreMembership[]        @relation("StoreMembership_user")
   from_BusinessAccountRequest_reviewedBy BusinessAccountRequest[] @relation("BusinessAccountRequest_reviewedBy")

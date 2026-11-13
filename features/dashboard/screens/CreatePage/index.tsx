@@ -19,7 +19,8 @@ export async function CreatePage({ params }: CreatePageParams) {
 
   const list = await getListByPath(listKey)
 
-  if (!list) {
+  // A list hidden for this role (no query access) is a 404, same as the sidebar hiding it.
+  if (!list || list.isHidden) {
     notFound()
   }
 

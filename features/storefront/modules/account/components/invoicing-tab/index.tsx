@@ -1,4 +1,5 @@
 "use client"
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime'
 
 import type { StorefrontAccountCustomer as User } from "@/features/storefront/types"
 import { Copy, RefreshCw, CheckIcon } from "lucide-react"
@@ -173,7 +174,7 @@ const InvoicingTab = ({ customer, businessAccount, businessAccountRequest, order
           </div>
           {businessAccountRequest?.createdAt && (
             <p className="cx-num mt-2 text-[13px] text-cx-ink-2">
-              Submitted {new Date(businessAccountRequest.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}
+              Submitted <ViewerTime value={businessAccountRequest.createdAt} style="date" />
             </p>
           )}
         </div>

@@ -1,3 +1,4 @@
+import { gatePlatformPage } from '@/features/dashboard/lib/platformGate';
 import { RegionListPage } from "@/features/platform/regions/screens/RegionListPage";
 
-export default RegionListPage;
+export default gatePlatformPage('regions-management', RegionListPage);

@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dot, ListBand, SectionTitle } from "@/features/platform/components/vault-ui";
 import { StatusBadge } from "../components/StatusBadge";
 import { RecordBankTransfer } from "../components/RecordBankTransfer";
-import { RefundOrderDialog, type RefundablePayment } from "../components/RefundOrderDialog";
+import { CheckRefundsWithProcessor, RefundOrderDialog, heldRefundAmount, type RefundablePayment } from "../components/RefundOrderDialog";
 import { CancelOrderDialog } from "../components/CancelOrderDialog";
 import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClientWrapper";
 
@@ -105,6 +105,27 @@ function fulfillmentLabel(value: unknown): string {
   return typeof raw === "string" && raw ? raw.replaceAll("_", " ") : "";
 }
 
+
+// Same labels as the OrderEvent type options; an unknown code reads as words, never SHOUTING_CASE.
+const ORDER_EVENT_LABELS: Record<string, string> = {
+  ORDER_PLACED: "Order placed",
+  STATUS_CHANGE: "Status changed",
+  PAYMENT_STATUS_CHANGE: "Payment status changed",
+  PAYMENT_CAPTURED: "Payment captured",
+  FULFILLMENT_STATUS_CHANGE: "Fulfilment status changed",
+  NOTE_ADDED: "Note added",
+  EMAIL_SENT: "Email sent",
+  TRACKING_NUMBER_ADDED: "Tracking number added",
+  RETURN_REQUESTED: "Return requested",
+  REFUND_PROCESSED: "Refund processed",
+};
+export function orderEventLabel(type?: string | null) {
+  const code = String(type || "");
+  if (ORDER_EVENT_LABELS[code]) return ORDER_EVENT_LABELS[code];
+  const words = code.toLowerCase().replace(/_/g, " ").trim();
+  return words ? words[0].toUpperCase() + words.slice(1) : "Event";
+}
+
 export function OrderPageClient({
   order,
   listKey,
@@ -139,7 +160,9 @@ export function OrderPageClient({
   const paymentCaptured = order.paymentDetails?.[0]?.status === "captured";
   const capturedPayments = (order.payments || []).filter((p) => p.status === "captured");
   const capturedCents = capturedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-  const refundedCents = capturedPayments.reduce((sum, p) => sum + (p.amountRefunded || 0), 0);
+  // Refunded means a Refund row exists; an amount only held by an unconfirmed refund call is not money returned.
+  const refundedCents = capturedPayments.reduce((sum, p) => sum + (p.refunds || []).reduce((n, r) => n + r.amount, 0), 0);
+  const heldCents = heldRefundAmount(order.payments || []);
   const refundCurrency = capturedPayments[0]?.currencyCode || "USD";
   const formatCents = (cents: number, currency: string) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
@@ -157,7 +180,7 @@ export function OrderPageClient({
   const canCancel =
     ["pending", "requires_action"].includes(String(order.status || "")) &&
     !fulfillments.some((f) => !f.canceledAt) &&
-    !(order.payments || []).some((p) => p.status === "captured" && p.amount > p.amountRefunded) &&
+    !capturedPayments.some((p) => p.amount > (p.refunds || []).reduce((n, r) => n + r.amount, 0)) &&
     !(order.paymentDetails || []).some((p) => p.status === "pending" && !p.manual);
   const editButton =
     "inline-flex min-h-7 items-center rounded-full bg-muted px-3 text-xs font-medium text-foreground hover:bg-muted/70 max-sm:min-h-10";
@@ -300,6 +323,7 @@ export function OrderPageClient({
                 {awaitingTransfer && ["pending", "requires_action"].includes(order.status) && (
                   <RecordBankTransfer orderId={order.id} />
                 )}
+                {heldCents > 0 && <div className="px-4 py-3"><CheckRefundsWithProcessor orderId={order.id} /></div>}
                 {(order.payments || []).some((p) => p.status === "captured" && p.amount > p.amountRefunded) && (
                   <div className="px-4 py-3"><RefundOrderDialog orderId={order.id} payments={order.payments || []} /></div>
                 )}
@@ -400,7 +424,7 @@ export function OrderPageClient({
                   <div key={event.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 px-4 py-2.5 text-sm">
                     <span className="flex items-baseline gap-2.5 text-foreground">
                       <Dot tone="muted" />
-                      {event.type}
+                      {orderEventLabel(event.type)}
                     </span>
                     <span className="font-mono text-xs tabular-nums text-muted-foreground">
                       {formatDate(event.createdAt)}

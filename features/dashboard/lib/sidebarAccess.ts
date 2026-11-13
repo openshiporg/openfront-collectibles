@@ -41,6 +41,12 @@ export const PLATFORM_PAGE_LIST: Record<string, string> = {
   collectors: 'collector-profiles',
   sellers: 'seller-profiles',
   apps: 'oauth-apps',
+  'order-management-system': 'oauth-apps',
+  claims: 'claim-orders',
+  inventory: 'product-variants',
+  'regions-management': 'regions',
+  shipping: 'shipping-providers',
+  system: 'stores',
 }
 
 /**

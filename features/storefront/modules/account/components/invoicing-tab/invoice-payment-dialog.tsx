@@ -1,4 +1,5 @@
 "use client"
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime'
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -263,7 +264,7 @@ export default function InvoicePaymentDialog({
                       >
                         <span className="cx-num font-medium text-cx-ink">#{lineItem.accountLineItem.order.displayId}</span>
                         <span className="flex-1 text-cx-ink-2">
-                          {new Date(lineItem.accountLineItem.order.createdAt).toLocaleDateString("en-US", { timeZone: "UTC" })}
+                          <ViewerTime value={lineItem.accountLineItem.order.createdAt} style="date" />
                         </span>
                         <span className="cx-num text-cx-ink">{lineItem.accountLineItem.order.total}</span>
                       </a>

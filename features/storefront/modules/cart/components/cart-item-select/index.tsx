@@ -89,7 +89,7 @@ const CartItemSelect = forwardRef<HTMLInputElement, CartItemSelectProps>(
         <button
           type="button"
           aria-label="Decrease quantity"
-          className="inline-flex size-9 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40 max-sm:size-10"
+          className="inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40"
           onClick={handleDecrement}
           disabled={value !== undefined && value <= min}
         >
@@ -103,13 +103,13 @@ const CartItemSelect = forwardRef<HTMLInputElement, CartItemSelectProps>(
           step={step}
           value={value ?? ""}
           onChange={handleInputChange}
-          className="cx-num h-9 w-10 rounded-[2px] bg-cx-surface text-center text-[14px] text-cx-ink outline-none [appearance:textfield] focus-visible:ring-2 focus-visible:ring-cx-accent max-sm:h-10 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="cx-num h-11 w-11 rounded-[2px] bg-cx-surface text-center text-[14px] text-cx-ink outline-none [appearance:textfield] focus-visible:ring-2 focus-visible:ring-cx-accent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           {...props}
         />
         <button
           type="button"
           aria-label="Increase quantity"
-          className="inline-flex size-9 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40 max-sm:size-10"
+          className="inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink-2 hover:bg-cx-surface hover:text-cx-ink disabled:opacity-40"
           onClick={handleIncrement}
           disabled={value !== undefined && value >= max}
         >

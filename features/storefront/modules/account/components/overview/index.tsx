@@ -1,3 +1,4 @@
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime'
 import { ArrowUpRight } from "lucide-react"
 
 import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
@@ -82,7 +83,7 @@ const Overview = ({ user, orders }: OverviewProps) => {
                       state={statusLabel(order.status || "pending")}
                     />
                     <p className="mt-0.5 text-[13px] text-cx-ink-2" data-testid="order-created-date">
-                      {order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }) : ""}
+                      <ViewerTime value={order.createdAt} style="date" fallback="" />
                     </p>
                   </div>
                   <span className="cx-num shrink-0 text-[14px] text-cx-ink" data-testid="order-amount">

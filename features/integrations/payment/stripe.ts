@@ -63,13 +63,30 @@ export async function capturePaymentFunction({ paymentId, amount, idempotencyKey
   };
 }
 
+/**
+ * A 4xx answer means Stripe did not make the refund (declined, already refunded, bad amount): final for this key.
+ * An idempotency_error (the key was first used with other parameters), a 409 conflict, a 5xx or a dropped
+ * connection leave the outcome unknown, so they are not marked declined.
+ */
+export function isDefinitiveStripeDecline(error: any): boolean {
+  const status = Number(error?.statusCode);
+  if (!(status >= 400 && status < 500) || status === 409) return false;
+  return error?.rawType !== "idempotency_error" && error?.type !== "StripeIdempotencyError";
+}
+
 export async function refundPaymentFunction({ paymentId, amount, idempotencyKey }: PaymentOperationInput) {
   const stripe = getStripeClient();
 
-  const refund = await stripe.refunds.create({
-    payment_intent: paymentId,
-    ...(amount ? { amount } : {}),
-  }, idempotencyKey ? { idempotencyKey } : undefined);
+  let refund: Stripe.Refund;
+  try {
+    refund = await stripe.refunds.create({
+      payment_intent: paymentId,
+      ...(amount ? { amount } : {}),
+    }, idempotencyKey ? { idempotencyKey } : undefined);
+  } catch (error) {
+    if (isDefinitiveStripeDecline(error)) Object.assign(error as object, { providerDeclined: true });
+    throw error;
+  }
 
   return {
     status: refund.status,
@@ -79,16 +96,23 @@ export async function refundPaymentFunction({ paymentId, amount, idempotencyKey 
   };
 }
 
-export async function getPaymentStatusFunction({ paymentId }: PaymentOperationInput) {
+export async function getPaymentStatusFunction({ paymentId, includeRefunds }: PaymentOperationInput & { includeRefunds?: boolean }) {
   const stripe = getStripeClient();
 
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentId);
+  // Refund reconciliation asks what the processor already gave back; checkout does not need the extra call.
+  const refunds = includeRefunds
+    ? (await stripe.refunds.list({ payment_intent: paymentId, limit: 100 })).data
+        .filter((refund) => refund.status !== "failed" && refund.status !== "canceled")
+        .map((refund) => ({ id: refund.id, amount: refund.amount, status: String(refund.status) }))
+    : undefined;
 
   return {
     status: paymentIntent.status,
     amount: paymentIntent.amount_received || paymentIntent.amount,
     currency: paymentIntent.currency,
     data: paymentIntent,
+    ...(refunds ? { refunds } : {}),
   };
 }
 

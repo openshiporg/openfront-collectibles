@@ -9,11 +9,40 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { refundOrderPaymentAction } from '../actions/refund'
+import { reconcileOrderRefundsAction, refundOrderPaymentAction } from '../actions/refund'
+import { FINAL_REFUND_MESSAGES } from '@/features/keystone/checkout/refund-messages'
 
 export interface RefundablePayment {
   id: string; status: string; amount: number; amountRefunded: number; currencyCode: string
   refunds?: { id: string; amount: number; note: string; createdAt: string }[]
+}
+
+/** Captured money held by a refund that has no Refund row yet (a call in flight, or one the processor never answered). */
+export function heldRefundAmount(payments: RefundablePayment[]) {
+  return payments
+    .filter(p => p.status === 'captured')
+    .reduce((sum, p) => sum + Math.max(0, p.amountRefunded - (p.refunds || []).reduce((n, r) => n + r.amount, 0)), 0)
+}
+
+/** Staff check: ask the processor about held refunds, record what it made, free what it never made. */
+export function CheckRefundsWithProcessor({ orderId }: { orderId: string }) {
+  const router = useRouter()
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+  return <div className="space-y-2 text-sm">
+    <p className="text-muted-foreground">A refund on this order has no confirmation from the processor yet.</p>
+    <Button type="button" variant="outline" size="sm" className="min-h-11 sm:min-h-9" disabled={busy} onClick={async () => {
+      setBusy(true); setMessage('')
+      try {
+        const result = await reconcileOrderRefundsAction(orderId)
+        if (!result.success) { setMessage(result.error || 'The processor could not be checked. Try again shortly.'); return }
+        setMessage(result.recorded ? 'The processor had made the refund; it is now recorded.' : result.released ? 'The processor made no refund, so the held amount is free to refund again.' : 'Nothing to change yet. If a refund was just sent, wait a few minutes and check again.')
+        router.refresh()
+      } catch { setMessage('The processor could not be checked. Try again shortly.') }
+      finally { setBusy(false) }
+    }}>{busy ? 'Checking…' : 'Check with processor'}</Button>
+    {message && <p role="status" className="break-words">{message}</p>}
+  </div>
 }
 
 export function RefundOrderDialog({ orderId, payments }: { orderId: string; payments: RefundablePayment[] }) {
@@ -51,11 +80,16 @@ export function RefundOrderDialog({ orderId, payments }: { orderId: string; paym
           setBusy(true); setError('')
           try {
             const result = await refundOrderPaymentAction(request.current)
-            if (!result.success) { setError(result.error || 'Refund not confirmed. Retry this request to reconcile.'); return }
+            if (!result.success) {
+              // A decline is final for its key: unlock the form so staff start a new refund. Anything else keeps the
+              // same request for Retry, which never refunds twice.
+              if (result.error && FINAL_REFUND_MESSAGES.includes(result.error)) request.current = null
+              setError(result.error || 'Refund not confirmed. Retry sends the same request again.'); router.refresh(); return
+            }
             request.current = null; router.refresh()
             if (result.restock && !result.restock.restocked) { setNotice(`Refunded. Items were not returned to stock: ${result.restock.reason || 'unknown error'}`); return }
             setOpen(false)
-          } catch { setError('Refund not confirmed. Retry this request to reconcile.') }
+          } catch { setError('Refund not confirmed. Retry sends the same request again.') }
           finally { setBusy(false) }
         }}>
           <div className="space-y-2"><Label htmlFor="refund-payment">Payment</Label>
@@ -65,7 +99,7 @@ export function RefundOrderDialog({ orderId, payments }: { orderId: string; paym
           <div className="space-y-2"><Label htmlFor="refund-reason">Reason</Label><Textarea id="refund-reason" value={reason} maxLength={1000} disabled={busy || !!request.current} onChange={e => setReason(e.target.value)} required /></div>
           {bringsFullyRefunded && <div className="flex items-center gap-2"><Checkbox id="refund-restock" checked={request.current ? !!request.current.restock : restock} disabled={busy || !!request.current} onCheckedChange={v => setRestock(v === true)} /><Label htmlFor="refund-restock" className="text-sm font-normal">Return items to stock</Label></div>}
           {error && <p role="alert" className="text-sm text-destructive break-words">{error}</p>}
-          <DialogFooter><Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={busy}>Cancel</Button><Button type="submit" disabled={busy}>{busy ? 'Refunding…' : request.current ? 'Retry refund' : 'Confirm refund'}</Button></DialogFooter>
+          <DialogFooter><Button type="button" variant="outline" onClick={() => { setOpen(false); request.current = null; setError('') }} disabled={busy}>Cancel</Button><Button type="submit" disabled={busy}>{busy ? 'Refunding…' : request.current ? 'Retry refund' : 'Confirm refund'}</Button></DialogFooter>
         </form>}
       </DialogContent>
     </Dialog>}

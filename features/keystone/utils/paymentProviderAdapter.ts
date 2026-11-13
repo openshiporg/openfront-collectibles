@@ -39,18 +39,37 @@ export async function executeAdapterFunction({ provider, functionName, args }: {
     const operation = fn as unknown as (input: Record<string, unknown>) => Promise<unknown>;
     return await operation({ provider, ...args });
   } catch (error) {
-    throw new Error(
+    const wrapped = new Error(
       `Error executing ${functionName} for provider ${adapterKey}: ${error instanceof Error ? error.message : String(error)}`
     );
+    // Adapters mark a definitive refusal (the processor did not move money); everything else is an unknown outcome.
+    if ((error as { providerDeclined?: unknown } | null)?.providerDeclined === true) Object.assign(wrapped, { providerDeclined: true });
+    throw wrapped;
   }
 }
+
+export type ProviderRefundSummary = { id: string; amount: number; status: string };
 
 export type VerifiedPaymentOperationResult = {
   status: string;
   amount: number;
   currency: string;
   data?: unknown;
+  /** Present only when the adapter was asked for refunds and reports them. */
+  refunds?: ProviderRefundSummary[];
 };
+
+function parseProviderRefunds(value: unknown): ProviderRefundSummary[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const refunds: ProviderRefundSummary[] = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') return undefined;
+    const { id, amount, status } = entry as Record<string, unknown>;
+    if (typeof id !== 'string' || typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount < 0) return undefined;
+    refunds.push({ id, amount, status: typeof status === 'string' ? status : '' });
+  }
+  return refunds;
+}
 
 export function parseVerifiedPaymentOperationResult(value: unknown): VerifiedPaymentOperationResult {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
@@ -72,11 +91,13 @@ export function parseVerifiedPaymentOperationResult(value: unknown): VerifiedPay
     throw new Error('Payment provider returned an invalid operation result');
   }
 
+  const refunds = 'refunds' in value ? parseProviderRefunds(value.refunds) : undefined;
   return {
     status: status.trim(),
     amount,
     currency: normalizedCurrency,
     ...('data' in value ? { data: value.data } : {}),
+    ...(refunds ? { refunds } : {}),
   };
 }
 
@@ -106,8 +127,8 @@ export async function refundPayment({ provider, paymentId, amount, currency, ide
   return executeAdapterFunction({ provider, functionName: 'refundPaymentFunction', args: { paymentId, amount, currency, idempotencyKey } });
 }
 
-export async function getPaymentStatus({ provider, paymentId }: { provider: Record<string, any>; paymentId: string }): Promise<VerifiedPaymentOperationResult> {
-  const result = await executeAdapterFunction({ provider, functionName: 'getPaymentStatusFunction', args: { paymentId } });
+export async function getPaymentStatus({ provider, paymentId, includeRefunds }: { provider: Record<string, any>; paymentId: string; includeRefunds?: boolean }): Promise<VerifiedPaymentOperationResult> {
+  const result = await executeAdapterFunction({ provider, functionName: 'getPaymentStatusFunction', args: includeRefunds ? { paymentId, includeRefunds } : { paymentId } });
   return parseVerifiedPaymentOperationResult(result);
 }
 

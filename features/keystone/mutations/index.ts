@@ -69,6 +69,7 @@ import getCustomerPaidInvoices from './getCustomerPaidInvoices';
 import getProductsSortedByPrice from '../queries/getProductsSortedByPrice';
 import processReturnRefund from './processReturnRefund';
 import refundOrderPayment from './refundOrderPayment';
+import reconcileOrderRefunds from './reconcileOrderRefunds';
 import retryWebhookDeliveries from './retryWebhookDeliveries';
 import registerWebhookEndpoint from './registerWebhookEndpoint';
 import getFinanceClose from '../queries/getFinanceClose';
@@ -333,6 +334,7 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         completeInvoicePayment(paymentSessionId: ID!): InvoicePaymentResult!
         processReturnRefund(returnId: ID!, paymentId: ID!, idempotencyKey: String!): Refund
         refundOrderPayment(orderId: ID!, paymentId: ID!, amount: Int!, reason: String!, idempotencyKey: String!, restock: Boolean): Refund
+        reconcileOrderRefunds(orderId: ID!): JSON!
         retryWebhookDeliveries(limit: Int): Int!
         registerWebhookEndpoint(
           registrationKey: String!
@@ -427,6 +429,7 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         completeInvoicePayment,
         processReturnRefund,
         refundOrderPayment,
+        reconcileOrderRefunds,
         retryWebhookDeliveries,
         registerWebhookEndpoint,
         updatePrivacyPreferences,

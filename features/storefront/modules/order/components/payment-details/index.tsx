@@ -1,3 +1,4 @@
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime'
 import { paymentInfoMap } from "@/features/storefront/lib/constants";
 import OrderSection, { Field } from "../section";
 
@@ -54,7 +55,7 @@ const PaymentDetails = ({ order }: { order: StoreOrder }) => {
             <span className="cx-num text-[13px]">
               {provider.code === "stripe" && payment.data?.cardLast4
                 ? `•••• ${payment.data?.cardLast4}`
-                : `${typeof payment.amount === "number" ? new Intl.NumberFormat("en-US", { style: "currency", currency: String(currency).toUpperCase() }).format(payment.amount / 100) : order.total} · ${new Date(payment.createdAt).toLocaleDateString("en-US", { timeZone: "UTC" })}`}
+                : <>{typeof payment.amount === "number" ? new Intl.NumberFormat("en-US", { style: "currency", currency: String(currency).toUpperCase() }).format(payment.amount / 100) : order.total} · <ViewerTime value={payment.createdAt} style="date" /></>}
             </span>
           </div>
         </Field>

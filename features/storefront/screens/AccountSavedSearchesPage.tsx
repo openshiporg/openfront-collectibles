@@ -1,3 +1,4 @@
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime'
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
@@ -29,7 +30,7 @@ export async function AccountSavedSearchesPage() {
               <div className="min-w-0">
                 <p className="truncate font-cx-serif text-[18px] leading-[24px] text-cx-ink">{search.name}</p>
                 <p className="cx-num mt-0.5 text-[13px] text-cx-ink-3">
-                  {new Date(search.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                  <ViewerTime value={search.createdAt} style="date" />
                 </p>
               </div>
               <div className="cx-track self-start sm:self-auto">

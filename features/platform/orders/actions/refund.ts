@@ -23,3 +23,15 @@ export async function refundOrderPaymentAction(input: {
     restock: restock && input.restock ? { restocked: !!restock.restocked, reason: restock.reason } : undefined,
   }
 }
+
+/** "Check with processor": records refunds the processor made and frees amounts held by refund calls it never confirmed. */
+export async function reconcileOrderRefundsAction(orderId: string) {
+  const response = await keystoneClient(
+    `mutation ReconcileOrderRefunds($orderId: ID!) { reconcileOrderRefunds(orderId: $orderId) }`,
+    { orderId }
+  )
+  if (!response.success) return response
+  for (const path of [`/dashboard/platform/orders/${orderId}`, '/dashboard/platform/orders', '/dashboard/platform/payments', '/dashboard/platform/refunds']) revalidatePath(path)
+  const result = (response.data?.reconcileOrderRefunds || {}) as { recorded?: number; released?: number }
+  return { success: true as const, recorded: Number(result.recorded) || 0, released: Number(result.released) || 0 }
+}

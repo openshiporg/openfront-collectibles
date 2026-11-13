@@ -91,7 +91,7 @@ export async function CardShelf({
       {pages > 1 ? (
         <nav aria-label="Pages" className="flex flex-wrap items-center gap-1">
           {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
-            <Link key={n} href={pageHref(n)} aria-current={n === page ? "page" : undefined} className="tc-run-cell min-h-10 min-w-10" data-live="true" data-selected={n === page ? "true" : undefined}>
+            <Link key={n} href={pageHref(n)} aria-current={n === page ? "page" : undefined} className="tc-run-cell min-h-11 min-w-11" data-live="true" data-selected={n === page ? "true" : undefined}>
               {n}
             </Link>
           ))}

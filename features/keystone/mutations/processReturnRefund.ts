@@ -7,16 +7,16 @@ import {
   subscribedWebhookEndpointIds,
 } from "../../webhooks/outbox";
 import { findIdempotencyAttempt, getOrCreateIdempotencyAttempt } from "../utils/idempotency";
-
-function providerPaymentReference(payment: any): string | undefined {
-  return (
-    payment.data?.purchase_units?.[0]?.payments?.captures?.[0]?.id ||
-    payment.data?.payment_intent_id ||
-    payment.data?.paymentIntentId ||
-    payment.data?.orderId ||
-    payment.data?.id
-  );
-}
+import {
+  assertNoRefundAwaitingProcessor,
+  assertRefundReplayAllowed,
+  attemptProviderKey,
+  paymentProviderFor,
+  providerPaymentReference,
+  providerRefundKey,
+  reconcilePaymentRefunds,
+  sendProviderRefund,
+} from "../checkout/refund-reconcile";
 
 async function processReturnRefund(
   root: any,
@@ -38,7 +38,7 @@ async function processReturnRefund(
     requestPath: "processReturnRefund",
     requestParams: { returnId, paymentId },
   };
-  const priorAttempt = await findIdempotencyAttempt(sudo.prisma, idempotencyRequest);
+  let priorAttempt = await findIdempotencyAttempt(sudo.prisma, idempotencyRequest);
   if (priorAttempt?.recoveryPoint === "completed" && priorAttempt.responseBody?.refundId) {
     return sudo.query.Refund.findOne({
       where: { id: priorAttempt.responseBody.refundId },
@@ -55,6 +55,24 @@ async function processReturnRefund(
   }
   // A return is refunded once. A canceled return is never refunded, and a second
   // refund under a fresh idempotency key must not pay it out again.
+  // Settle refunds the processor already made (or never confirmed) before judging this one.
+  let reconciled = true;
+  try {
+    await reconcilePaymentRefunds(context, paymentId);
+  } catch (error) {
+    reconciled = false;
+    console.error("Refund reconcile failed", paymentId, error instanceof Error ? error.message : error);
+  }
+  if (priorAttempt) {
+    priorAttempt = await findIdempotencyAttempt(sudo.prisma, idempotencyRequest);
+    if (priorAttempt?.recoveryPoint === "completed" && priorAttempt.responseBody?.refundId) {
+      return sudo.query.Refund.findOne({
+        where: { id: priorAttempt.responseBody.refundId },
+        query: "id amount reason idempotencyKey payment { id amount amountRefunded }",
+      });
+    }
+    if (priorAttempt) assertRefundReplayAllowed(priorAttempt, reconciled);
+  }
   const blocked = returnRefundError(returnRecord);
   if (blocked && !priorAttempt) throw transitionRefused(blocked);
   if (!returnRecord.order.payments?.some((payment: any) => payment.id === paymentId)) {
@@ -82,17 +100,16 @@ async function processReturnRefund(
     throw transitionRefused("Refund exceeds captured payment amount");
   }
 
-  const provider =
-    payment.paymentCollection?.paymentSessions?.find((session: any) => session.isSelected)?.paymentProvider ||
-    payment.paymentCollection?.paymentSessions?.[0]?.paymentProvider;
+  const provider = paymentProviderFor(payment);
   const providerReference = providerPaymentReference(payment);
   if (!provider || !providerReference) throw new Error("Refund provider reference is missing");
   if (provider.code?.includes("manual")) {
     throw transitionRefused("Manual tender refunds require operator verification");
   }
 
-  const { attempt, replay } = priorAttempt
-    ? { attempt: priorAttempt, replay: true }
+  if (!priorAttempt) await assertNoRefundAwaitingProcessor(sudo.prisma, paymentId);
+  const { attempt } = priorAttempt
+    ? { attempt: priorAttempt }
     : await getOrCreateIdempotencyAttempt(sudo.prisma, idempotencyRequest);
   if (attempt.recoveryPoint === "completed" && attempt.responseBody?.refundId) {
     return sudo.query.Refund.findOne({
@@ -100,69 +117,18 @@ async function processReturnRefund(
       query: "id amount reason idempotencyKey payment { id amount amountRefunded }",
     });
   }
-  if (replay) {
-    const acquired = await sudo.prisma.idempotencyKey.updateMany({
-      where: {
-        id: attempt.id,
-        OR: [
-          { lockedAt: null },
-          { lockedAt: { lt: new Date(Date.now() - 5 * 60 * 1000) } },
-        ],
-      },
-      data: { lockedAt: new Date() },
-    });
-    if (acquired.count !== 1) throw transitionRefused("Refund is already in progress");
-  }
-
-  if (attempt.recoveryPoint === "started") {
-    await sudo.prisma.$transaction(async (tx: any) => {
-      const reserved = await tx.payment.updateMany({
-        where: {
-          id: paymentId,
-          amountRefunded: { lte: payment.amount - returnRecord.refundAmount },
-        },
-        data: { amountRefunded: { increment: returnRecord.refundAmount } },
-      });
-      if (reserved.count !== 1) {
-        throw transitionRefused("Concurrent refund exceeds captured payment amount");
-      }
-      await tx.idempotencyKey.update({
-        where: { id: attempt.id },
-        data: { recoveryPoint: "amount_reserved", lockedAt: new Date() },
-      });
-    });
-    attempt.recoveryPoint = "amount_reserved";
-  }
 
   let providerResult = attempt.responseBody?.providerResult;
-  if (attempt.recoveryPoint !== "provider_refunded" || !providerResult) {
-    providerResult = await refundPayment({
-      provider,
-      paymentId: providerReference,
+  if (!providerResult) {
+    const providerKey = attemptProviderKey(attempt, attempt.recoveryPoint === "started" ? providerRefundKey(paymentId, idempotencyKey.trim()) : businessKey);
+    providerResult = await sendProviderRefund(sudo.prisma, {
+      attempt,
+      paymentId,
+      paymentAmount: payment.amount,
       amount: returnRecord.refundAmount,
       currency: payment.currencyCode,
-      idempotencyKey: businessKey,
-    });
-    const status = String(providerResult.status || "").toLowerCase();
-    if (!["succeeded", "completed", "refunded"].includes(status)) {
-      throw new Error(`Provider refund is not complete: ${providerResult.status}`);
-    }
-    if (Number(providerResult.amount) !== returnRecord.refundAmount) {
-      throw new Error("Provider refund amount mismatch");
-    }
-    if (
-      providerResult.currency &&
-      String(providerResult.currency).toUpperCase() !== String(payment.currencyCode).toUpperCase()
-    ) {
-      throw new Error("Provider refund currency mismatch");
-    }
-    await sudo.prisma.idempotencyKey.update({
-      where: { id: attempt.id },
-      data: {
-        recoveryPoint: "provider_refunded",
-        responseBody: { providerResult },
-        lockedAt: new Date(),
-      },
+      providerKey,
+      call: (key) => refundPayment({ provider, paymentId: providerReference, amount: returnRecord.refundAmount, currency: payment.currencyCode, idempotencyKey: key }),
     });
   }
 

@@ -31,7 +31,8 @@ export async function ListPage({ params, searchParams }: PageProps) {
   // Get the list by path using our cached function
   const list = await getListByPath(listKeyParam);
 
-  if (!list) {
+  // A list hidden for this role (no query access) is a 404, same as the sidebar hiding it.
+  if (!list || list.isHidden) {
     notFound()
   }
 

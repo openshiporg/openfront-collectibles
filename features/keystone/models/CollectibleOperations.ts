@@ -221,20 +221,3 @@ export const ProviderConnection = list({
     ...trackingFields,
   },
 });
-
-export const NotificationIntent = list({
-  ui: lockedRecordUi,
-  access: { operation: { query: canManageIntegrations, create: () => false, update: () => false, delete: () => false } },
-  fields: {
-    user: relationship({ ref: 'User' }),
-    channel: select({ type: 'string', options: ['email', 'sms', 'push', 'webhook'], defaultValue: 'email' }),
-    template: text({ validation: { isRequired: true } }),
-    status: select({ type: 'string', options: ['queued', 'sending', 'delivered', 'failed', 'cancelled'], defaultValue: 'queued' }),
-    payload: json({ defaultValue: {} }),
-    provider: text(),
-    providerReference: text(),
-    idempotencyKey: text({ isIndexed: 'unique', access: { read: denyAll, create: () => false, update: () => false } }),
-    attemptedAt: timestamp(),
-    ...trackingFields,
-  },
-});

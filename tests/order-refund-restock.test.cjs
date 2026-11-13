@@ -6,10 +6,10 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const root = path.resolve(__dirname, '..');
 function load(file, mocks = {}) {
-  const module = { exports: {} };
+  const mod = { exports: {} };
   const source = ts.transpileModule(fs.readFileSync(path.join(root, file), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
-  vm.runInNewContext(source, { module, exports: module.exports, require: name => name in mocks ? mocks[name] : name.startsWith('.') ? load(path.join(path.dirname(file), name).replace(/\.ts$/, '') + '.ts') : require(name), process, Date, Number, Math, Set, Promise, String }, { filename: file });
-  return module.exports;
+  vm.runInNewContext(source, { module: mod, exports: mod.exports, require: name => name in mocks ? mocks[name] : name.startsWith('.') ? load(path.join(path.dirname(file), name).replace(/\.ts$/, '') + '.ts') : require(name), process, Date, Number, Math, Set, Promise, String }, { filename: file });
+  return mod.exports;
 }
 const outboxMock = { subscribedWebhookEndpointIds: async () => [], enqueueWebhookOutbox: async () => {} };
 const transitionLib = load('features/keystone/utils/orderStatusTransition.ts', { '../../webhooks/outbox': outboxMock });
@@ -28,11 +28,15 @@ function fixture({ amount = 5000, transitionFails = false } = {}) {
       findUnique: async ({ where }) => attempts.get(where.idempotencyKey) || null,
       create: async ({ data }) => { const row = { ...data, id: `a${attempts.size}`, createdAt: new Date() }; attempts.set(data.idempotencyKey, row); return { ...row }; },
       update: async ({ where, data }) => { const row = [...attempts.values()].find(a => a.id === where.id); Object.assign(row, data); return { ...row }; },
-      updateMany: async ({ where, data }) => { const row = [...attempts.values()].find(a => a.id === where.id); Object.assign(row, data); return { count: 1 }; },
+      updateMany: async ({ where, data }) => { const row = [...attempts.values()].find(a => a.id === where.id && (!where.recoveryPoint || a.recoveryPoint === where.recoveryPoint)); if (!row) return { count: 0 }; Object.assign(row, data); return { count: 1 }; },
+      findMany: async () => [],
+      findFirst: async () => null,
     },
+    $queryRaw: async () => [],
     payment: {
       updateMany: async ({ where, data }) => { if (payment.amountRefunded > where.amountRefunded.lte) return { count: 0 }; payment.amountRefunded += data.amountRefunded.increment; return { count: 1 }; },
       findMany: async () => [{ status: payment.status, amount: payment.amount, refunds: payment.refunds.map(r => ({ amount: r.amount })) }],
+      findUnique: async () => ({ amount: payment.amount, amountRefunded: payment.amountRefunded, orderId: 'o1', refunds: payment.refunds.map(r => ({ amount: r.amount, idempotencyKey: r.idempotencyKey })) }),
       update: async () => ({}),
     },
     refund: {
@@ -67,12 +71,17 @@ function fixture({ amount = 5000, transitionFails = false } = {}) {
   } };
   context.sudo = () => context;
   context.query.Payment = { findOne: async () => JSON.parse(JSON.stringify(payment)) };
+  const adapter = {
+    refundPayment: async input => ({ status: 'succeeded', amount: input.amount, currency: 'USD', data: { id: 're_test' } }),
+    getPaymentStatus: async () => ({ status: 'succeeded', amount, currency: 'USD', refunds: payment.refunds.map(r => ({ id: r.id, amount: r.amount, status: 'succeeded' })) }),
+  };
   const refundFn = load('features/keystone/mutations/refundOrderPayment.ts', {
     '../access': { permissions: { canManagePayments: () => true, canManageReturns: () => true, canManageOrders: () => true } },
     '../utils/idempotency': idempotency,
     '../utils/orderStatusTransition': transitionLib,
-    '../utils/paymentProviderAdapter': { refundPayment: async input => ({ status: 'succeeded', amount: input.amount, currency: 'USD', data: { id: 're_test' } }) },
+    '../utils/paymentProviderAdapter': adapter,
     '../../webhooks/outbox': outboxMock,
+    '../checkout/refund-reconcile': load('features/keystone/checkout/refund-reconcile.ts', { '../utils/paymentProviderAdapter': adapter, '../../webhooks/outbox': outboxMock }),
   }).default;
   const transitionFn = load('features/keystone/mutations/transitionOrderStatus.ts', {
     '../access': { permissions: { canManageOrders: () => true } },

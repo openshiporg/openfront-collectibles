@@ -176,7 +176,16 @@ async function getCustomerOrder(
 
   // The secret is an authorization credential, never part of the customer response.
   const { secretKey: _secretKey, ...customerOrder } = order;
-  return projectCustomerOrderForRead(customerOrder);
+  const projected = projectCustomerOrderForRead(customerOrder);
+  // Customer copy must say whether the confirmation actually went out, not assume it did.
+  const notification = await sudoContext.prisma.notification.findFirst({
+    where: { eventName: "ORDER_CONFIRMATION", resourceType: "Order", resourceId: orderId },
+    select: { data: true },
+  }).catch(() => null);
+  const status = (notification?.data as { status?: unknown } | null)?.status;
+  return projected
+    ? { ...projected, confirmationEmailStatus: status === "sent" ? "sent" : status === "failed" || status === "skipped_not_configured" ? "not_sent" : "pending" }
+    : projected;
 }
 
 export default getCustomerOrder;

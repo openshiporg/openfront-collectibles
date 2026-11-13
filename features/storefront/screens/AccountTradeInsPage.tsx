@@ -1,3 +1,4 @@
+import { ViewerTime } from '@/features/dashboard/components/ViewerTime'
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
@@ -60,7 +61,7 @@ export async function AccountTradeInsPage() {
               />
               <p className="text-[13px] text-cx-ink-2">
                 {label(tradeIn.disposition)} ·{" "}
-                {new Date(tradeIn.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}
+                <ViewerTime value={tradeIn.submittedAt} style="date" />
               </p>
               {tradeIn.storeCredit && (
                 <p className="text-[14px] text-cx-ink">

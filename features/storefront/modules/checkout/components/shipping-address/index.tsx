@@ -202,7 +202,7 @@ const ShippingAddress = ({
         </div>
 
         {/* ZIP and Country - together on mobile, but can be 2 columns on larger screens */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-[360px]:grid-cols-2">
           <CxField
             label="ZIP / Postal code"
             name="shippingAddress.postalCode"
