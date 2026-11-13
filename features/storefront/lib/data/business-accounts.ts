@@ -12,22 +12,26 @@ const CUSTOMER_BUSINESS_ACCOUNT_QUERY = gql`
 `;
 
 const BUSINESS_ACCOUNT_REQUEST_QUERY = gql`
-  query GetBusinessAccountRequest($customerId: ID!) {
-    businessAccountRequests(where: { user: { id: { equals: $customerId } } }, take: 1) {
-      id
-      status
-      businessName
-      businessType
-      monthlyOrderVolume
-      requestedCreditLimit
-      businessDescription
-      formattedRequestedCredit
-      businessTypeLabel
-      volumeLabel
-      statusLabel
-      submittedAt
-      reviewedAt
-      reviewNotes
+  query GetBusinessAccountRequest {
+    authenticatedItem {
+      ... on User {
+        businessAccountRequest {
+          id
+          status
+          businessName
+          businessType
+          monthlyOrderVolume
+          requestedCreditLimit
+          businessDescription
+          formattedRequestedCredit
+          businessTypeLabel
+          volumeLabel
+          statusLabel
+          submittedAt
+          reviewedAt
+          reviewNotes
+        }
+      }
     }
   }
 `;
@@ -89,16 +93,17 @@ export const getCustomerBusinessAccount = cache(async function (customerId: stri
   }
 });
 
-export const getBusinessAccountRequest = cache(async function (customerId: string) {
+export const getBusinessAccountRequest = cache(async function (_customerId: string) {
   const headers = await getAuthHeaders();
 
   try {
-    const { businessAccountRequests } = await openfrontClient.request(
+    // The caller's own request, read through their session; no list filter on user is needed.
+    const { authenticatedItem } = await openfrontClient.request(
       BUSINESS_ACCOUNT_REQUEST_QUERY,
-      { customerId },
+      {},
       headers
     );
-    return businessAccountRequests?.[0] || null;
+    return authenticatedItem?.businessAccountRequest || null;
   } catch (error) {
     throw error;
   }
