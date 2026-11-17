@@ -20,6 +20,7 @@ import { issuePurchasedGiftCards } from "../checkout/gift-card-issue";
 import { commitGiftCardHold, findGiftCardHold, holdGiftCards, releaseGiftCardHold, type GiftCardAllocation } from "../checkout/gift-card-tender";
 import { providerCaptureKey } from '../payments/provider-capture-key';
 import { isManualPaymentProvider } from '../utils/paymentProviderConfig';
+import { assertPreorderLimit } from "../lib/pokemon/preorder-limit";
 import {
   enqueueWebhookOutbox,
   subscribedWebhookEndpointIds,
@@ -252,6 +253,14 @@ async function completeActiveCart(
   ].includes(attempt.recoveryPoint);
   try {
     if (!inventoryReserved) {
+      // Pre-order limits count earlier orders, so a second cart can't get around them.
+      for (const line of cart.lineItems || []) {
+        await assertPreorderLimit(sudoContext.prisma, {
+          cartId,
+          variantId: line.productVariant.id,
+          quantity: line.quantity,
+        });
+      }
       await reserveCartInventory(
         sudoContext.prisma,
         cart.lineItems,
