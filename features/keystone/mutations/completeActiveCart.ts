@@ -436,14 +436,21 @@ async function handlePaidOrder(cart: any, paymentSessionId: string, sudoContext:
     try {
       paymentResult = await settlePaymentSession(selectedSession, cart);
     } catch (error) {
-      await updateCheckoutAttempt(
-        sudoContext.prisma,
-        attempt.id,
-        'payment_unknown',
-        { error: error instanceof Error ? error.message : String(error) }
-      );
-      attempt.recoveryPoint = 'payment_unknown';
-      throw error;
+      // Ask the provider once more: a definite "not paid" takes the failed path,
+      // which releases the card, instead of holding it with no way out.
+      const notPaid = await providerSaysNotPaid(selectedSession);
+      if (notPaid) {
+        paymentResult = { status: 'failed', paymentIntentId: notPaid.paymentId, error: `Payment status: ${notPaid.status}` };
+      } else {
+        await updateCheckoutAttempt(
+          sudoContext.prisma,
+          attempt.id,
+          'payment_unknown',
+          { error: error instanceof Error ? error.message : String(error) }
+        );
+        attempt.recoveryPoint = 'payment_unknown';
+        throw error;
+      }
     }
     if (paymentResult.status !== 'succeeded') {
       await updateCheckoutAttempt(
@@ -473,16 +480,40 @@ async function handlePaidOrder(cart: any, paymentSessionId: string, sudoContext:
   return order;
 }
 
+function sessionPaymentId(session: any): string | undefined {
+  return (
+    session.data?.paymentIntentId ||
+    session.data?.clientSecret?.split('_secret_')[0] ||
+    session.data?.orderId
+  );
+}
+
+// Statuses that mean money was taken, is being taken, or can still be captured.
+const MAYBE_PAID_STATUSES = [
+  'succeeded', 'completed', 'captured', 'processing',
+  'requires_capture', 'approved', 'authorized', 'pending',
+];
+
+async function providerSaysNotPaid(session: any): Promise<{ paymentId: string; status: string } | null> {
+  const paymentId = sessionPaymentId(session);
+  if (!paymentId) return null;
+  try {
+    const result = await getPaymentStatus({ provider: session.paymentProvider, paymentId });
+    const status = String(result?.status || '').toLowerCase();
+    if (!status || MAYBE_PAID_STATUSES.includes(status)) return null;
+    return { paymentId, status };
+  } catch {
+    return null;
+  }
+}
+
 async function settlePaymentSession(session: any, cart: any) {
   const provider = session.paymentProvider;
   if (provider.code === 'pp_system_default') {
     throw new Error('Manual tender cannot complete storefront checkout');
   }
 
-  const paymentId =
-    session.data?.paymentIntentId ||
-    session.data?.clientSecret?.split('_secret_')[0] ||
-    session.data?.orderId;
+  const paymentId = sessionPaymentId(session);
   if (!paymentId) throw new Error('Payment provider reference is missing');
 
   let result = await getPaymentStatus({ provider, paymentId });

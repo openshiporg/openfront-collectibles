@@ -183,7 +183,11 @@ export async function capturePaymentFunction({ paymentId, idempotencyKey }: Paym
     throw new Error(`PayPal capture failed: ${capture.error.message}`);
   }
 
-  const capturedAmount = capture.purchase_units[0].payments.captures[0].amount;
+  const capturedAmount = capture.purchase_units?.[0]?.payments?.captures?.[0]?.amount;
+  if (!capturedAmount) {
+    // A declined capture comes back without a capture: report it as not paid.
+    return { status: capture.status || capture.name || "FAILED", amount: 0, currency: "", data: capture };
+  }
   return {
     status: capture.status,
     amount: parsePayPalAmount(capturedAmount.value, capturedAmount.currency_code),
