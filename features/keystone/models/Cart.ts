@@ -86,7 +86,11 @@ async function calculateCartDiscount(cart: CartPricingProjection, context: Conte
     
     for (const lineItem of (cart.lineItems || [])) {
       // Check if product is discountable
-      if (lineItem.productVariant?.product?.discountable === false) {
+      // Gift cards are issued at face value, so they are never discounted.
+      if (
+        lineItem.productVariant?.product?.discountable === false ||
+        lineItem.productVariant?.product?.isGiftcard
+      ) {
         continue;
       }
 
@@ -594,6 +598,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       product {
                         id
                         discountable
+                        isGiftcard
                         productType { id }
                         productCollections { id }
                         productTags { id }
@@ -659,6 +664,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       product {
                         id
                         discountable
+                        isGiftcard
                         productType { id }
                         productCollections { id }
                         productTags { id }
@@ -779,6 +785,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       product {
                         id
                         discountable
+                        isGiftcard
                         productType { id }
                         productCollections { id }
                         productTags { id }
@@ -838,6 +845,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       product {
                         id
                         discountable
+                        isGiftcard
                         productType { id }
                         productCollections { id }
                         productTags { id }
@@ -965,6 +973,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       product {
                         id
                         discountable
+                        isGiftcard
                         productType { id }
                         productCollections { id }
                         productTags { id }
@@ -1027,6 +1036,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       product {
                         id
                         discountable
+                        isGiftcard
                         productType { id }
                         productCollections { id }
                         productTags { id }
@@ -1088,6 +1098,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       product {
                         id
                         discountable
+                        isGiftcard
                         productType { id }
                         productCollections { id }
                         productTags { id }
@@ -1278,6 +1289,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                       product {
                         id
                         discountable
+                        isGiftcard
                         productType { id }
                         productCollections { id }
                         productTags { id }

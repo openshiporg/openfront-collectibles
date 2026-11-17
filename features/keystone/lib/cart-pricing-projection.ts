@@ -1,6 +1,7 @@
 export interface DiscountProduct {
   id: string;
   discountable?: boolean;
+  isGiftcard?: boolean;
   title?: string;
   productType?: { id: string } | null;
   productCollections?: { id: string }[];
