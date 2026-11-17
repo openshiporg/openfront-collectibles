@@ -1,6 +1,7 @@
 
 import type { Context } from '.keystone/types';
 import type { CartPricingProjection, DiscountProduct, ProductDiscountCondition } from '../lib/cart-pricing-projection';
+import { giftCardCurrencyMismatch } from '../lib/cart-pricing-projection';
 import type { Lists } from '.keystone/types';
 import { graphql, group, list } from "@keystone-6/core";
 import { allOperations, allowAll, denyAll } from "@keystone-6/core/access";
@@ -264,7 +265,7 @@ async function calculateCartTotal(cart: CartPricingProjection, context: Context)
 }
 
 /** Gift cards / store credit usable on this cart, applied in order until the balance due is zero. */
-export function applicableGiftCards(cards: CartPricingProjection["giftCards"], grossTotal: number, regionId?: string | null) {
+export function applicableGiftCards(cards: CartPricingProjection["giftCards"], grossTotal: number, regionId?: string | null, currencyCode?: string | null) {
   let remaining = Math.max(0, Math.round(grossTotal));
   const now = Date.now();
   const applied: { id: string; code?: string; amount: number }[] = [];
@@ -272,6 +273,7 @@ export function applicableGiftCards(cards: CartPricingProjection["giftCards"], g
     if (remaining <= 0) break;
     if (card.isDisabled || (card.endsAt && new Date(card.endsAt).getTime() <= now)) continue;
     if (card.region?.id && regionId && card.region.id !== regionId) continue;
+    if (giftCardCurrencyMismatch(card.metadata, currencyCode)) continue;
     const amount = Math.min(Math.max(0, card.balance || 0), remaining);
     if (amount <= 0) continue;
     applied.push({ id: card.id as string, code: card.code, amount });
@@ -282,11 +284,11 @@ export function applicableGiftCards(cards: CartPricingProjection["giftCards"], g
 
 async function calculateCartAmountDue(cart: CartPricingProjection, context: Context) {
   const gross = Math.round(await calculateCartTotal(cart, context));
-  const giftCards = applicableGiftCards(cart.giftCards, gross, cart.region?.id);
+  const giftCards = applicableGiftCards(cart.giftCards, gross, cart.region?.id, cart.region?.currency?.code);
   return gross - giftCards.reduce((sum, card) => sum + card.amount, 0);
 }
 
-const GIFT_CARD_PROJECTION = `giftCards { id code balance isDisabled endsAt region { id } }`;
+const GIFT_CARD_PROJECTION = `giftCards { id code balance isDisabled endsAt metadata region { id } }`;
 
 async function findCheapestShippingOption(regionId: string, context: Context) {
   const sudoContext = context.sudo();
@@ -1020,7 +1022,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
               });
               if (!cart?.giftCards?.length) return null;
               const gross = Math.round(await calculateCartTotal(cart, context));
-              const total = applicableGiftCards(cart.giftCards, gross, cart.region?.id).reduce((sum, card) => sum + card.amount, 0);
+              const total = applicableGiftCards(cart.giftCards, gross, cart.region?.id, cart.region?.currency?.code).reduce((sum, card) => sum + card.amount, 0);
               if (total === 0) return null;
               const currencyCode = cart.region?.currency?.code || "USD";
               const divisor = cart.region?.currency?.noDivisionCurrency ? 1 : 100;
@@ -1083,7 +1085,7 @@ export const Cart = list<Lists.Cart.TypeInfo>({
               });
               if (!cart) return null;
               const gross = Math.round(await calculateCartTotal(cart, context));
-              const applied = applicableGiftCards(cart.giftCards, gross, cart.region?.id);
+              const applied = applicableGiftCards(cart.giftCards, gross, cart.region?.id, cart.region?.currency?.code);
               return { gross, applied, due: gross - applied.reduce((sum, card) => sum + card.amount, 0) };
             },
           }),
