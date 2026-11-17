@@ -234,6 +234,12 @@ async function completeActiveCart(
   const giftCardsApplied = !!allocation?.applied?.length;
   const coveredByGiftCards = giftCardsApplied && allocation!.due === 0;
   if (giftCardsApplied && paymentSessionId && !coveredByGiftCards && allocation!.due !== cart.rawTotal) {
+    if (attempt.recoveryPoint === 'started') {
+      await sudoContext.prisma.idempotencyKey.updateMany({
+        where: { id: attempt.id, recoveryPoint: 'started' },
+        data: { lockedAt: null },
+      });
+    }
     throw shopperError("Order total changed; review your order and try again", "PAYMENT_SESSION_STALE");
   }
 
@@ -300,6 +306,12 @@ async function completeActiveCart(
         error instanceof Error ? error.message : 'Checkout failed'
       );
       await releaseGiftCardHold(sudoContext.prisma, cartId, error instanceof Error ? error.message : 'Checkout failed');
+    } else if (!inventoryReserved) {
+      // Nothing was held: unlock so the shopper can retry at once.
+      await sudoContext.prisma.idempotencyKey.updateMany({
+        where: { id: attempt.id, recoveryPoint: 'started' },
+        data: { lockedAt: null },
+      });
     }
     throw error;
   }

@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { getOrCreateIdempotencyAttempt } from "../utils/idempotency";
+import {
+  canonicalIdempotencyParams,
+  getOrCreateIdempotencyAttempt,
+  idempotencyFingerprint,
+} from "../utils/idempotency";
 import { isAbandonedCartHold } from "../lib/lifecycles";
 import {
   assertCartReservationFence,
@@ -32,10 +36,27 @@ export async function getOrCreateCheckoutAttempt(
   paymentSessionId?: string
 ): Promise<any> {
   const idempotencyKey = checkoutKey(cartId);
+  const requestParams = { cartId, paymentSessionId: paymentSessionId || null };
+  // A released attempt (nothing held, not locked) may be reused with a new
+  // payment session: the shopper changed payment method or edited the cart.
+  await prisma.idempotencyKey.updateMany({
+    where: {
+      idempotencyKey,
+      requestPath: "completeActiveCart",
+      recoveryPoint: "started",
+      lockedAt: null,
+    },
+    data: {
+      requestParams: {
+        ...canonicalIdempotencyParams(requestParams),
+        _fingerprint: idempotencyFingerprint(requestParams),
+      },
+    },
+  });
   const { attempt, replay } = await getOrCreateIdempotencyAttempt(prisma, {
     key: idempotencyKey,
     requestPath: "completeActiveCart",
-    requestParams: { cartId, paymentSessionId: paymentSessionId || null },
+    requestParams,
   });
   if (attempt.recoveryPoint === "completed") return attempt;
   if (!replay) return attempt;
