@@ -1,7 +1,7 @@
 import { lockedRecordUi } from './lifecycle-ui';
 
 import { jsonTransport } from '../lib/json-transport';
-import { acceptedOrderCurrency, acceptedOrderTaxRate, acceptedOrderDiscounts } from '../lib/order-view-projection';
+import { acceptedOrderCurrency, acceptedOrderTaxRate, acceptedOrderDiscounts, acceptedOrderDiscountAmounts } from '../lib/order-view-projection';
 import type { OrderViewProjection } from '../lib/order-view-projection';
 import type { Lists } from '.keystone/types';
 import { graphql, group, list } from "@keystone-6/core";
@@ -363,6 +363,8 @@ export const Order = list<Lists.Order.TypeInfo>({
                 }
               }
 
+              const recorded = acceptedOrderDiscountAmounts(item);
+              if (recorded) totalDiscountAmount = recorded.goods + recorded.shipping;
               if (totalDiscountAmount === 0) return null;
 
               const currencyCode = acceptedOrderCurrency(item, order.currency).code;
@@ -437,6 +439,8 @@ export const Order = list<Lists.Order.TypeInfo>({
                 }
               }
 
+              const recorded = acceptedOrderDiscountAmounts(item);
+              if (recorded) totalDiscountAmount = recorded.goods;
               const taxableAmount = subtotal - totalDiscountAmount;
               const tax = taxableAmount * (acceptedOrderTaxRate(item));
 
@@ -527,8 +531,13 @@ export const Order = list<Lists.Order.TypeInfo>({
                 0
               ) || 0;
 
-              // Calculate tax
-              const taxableAmount = subtotal - totalDiscountAmount;
+              // Calculate tax: the recorded cart discount, with free shipping kept out of the tax base.
+              const recorded = acceptedOrderDiscountAmounts(item);
+              let taxableAmount = subtotal - totalDiscountAmount;
+              if (recorded) {
+                totalDiscountAmount = recorded.goods + recorded.shipping;
+                taxableAmount = subtotal - recorded.goods;
+              }
               const tax = taxableAmount * (acceptedOrderTaxRate(item));
 
               // Calculate total
@@ -621,8 +630,13 @@ export const Order = list<Lists.Order.TypeInfo>({
                 0
               ) || 0;
 
-              // Calculate tax
-              const taxableAmount = subtotal - totalDiscountAmount;
+              // Calculate tax: the recorded cart discount, with free shipping kept out of the tax base.
+              const recorded = acceptedOrderDiscountAmounts(item);
+              let taxableAmount = subtotal - totalDiscountAmount;
+              if (recorded) {
+                totalDiscountAmount = recorded.goods + recorded.shipping;
+                taxableAmount = subtotal - recorded.goods;
+              }
               const tax = taxableAmount * (acceptedOrderTaxRate(item));
 
               // Calculate total

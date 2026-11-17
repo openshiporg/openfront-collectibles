@@ -50,6 +50,16 @@ export function acceptedOrderDiscounts(item: AcceptedOrderItem, legacy: OrderVie
   });
 }
 
+/** The discount the cart charged at checkout, when the order recorded it (goods and free shipping apart). */
+export function acceptedOrderDiscountAmounts(item: AcceptedOrderItem): { goods: number; shipping: number } | null {
+  const stored = snapshot(item);
+  const goods = stored.discountAmount;
+  const shipping = stored.shippingDiscountAmount;
+  if (typeof goods !== 'number' || !Number.isSafeInteger(goods) || goods < 0) return null;
+  if (typeof shipping !== 'number' || !Number.isSafeInteger(shipping) || shipping < 0) return null;
+  return { goods, shipping };
+}
+
 export interface OrderViewProjection {
   region?: { taxRate?: number | null; currency?: { code: string; noDivisionCurrency?: boolean } | null } | null;
   currency?: { code: string; symbol: string; noDivisionCurrency?: boolean } | null;

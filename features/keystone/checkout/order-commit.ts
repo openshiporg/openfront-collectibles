@@ -138,8 +138,15 @@ export async function createOrderFromCartAtomically(cart: any, sudo: any, checko
     userId
   );
   const secretKey = userId ? "" : crypto.randomBytes(32).toString("hex");
+  // The amounts the cart actually charged, so the order shows the same totals.
+  const { cartDiscountParts } = await import("../models/Cart");
+  const discountParts = (cart.discounts || []).length
+    ? await cartDiscountParts(cart.id, sudo)
+    : { goods: 0, shipping: 0 };
   const commercialSnapshot = {
     version: 1,
+    discountAmount: Math.round(discountParts.goods),
+    shippingDiscountAmount: Math.round(discountParts.shipping),
     discounts: (cart.discounts || []).map((discount: { discountRule?: { type: string; value: number; allocation?: string } | null }) => {
       if (!discount.discountRule) throw new Error('Accepted discount policy is unavailable');
       return { discountRule: { type: discount.discountRule.type, value: discount.discountRule.value, allocation: discount.discountRule.allocation ?? null } };

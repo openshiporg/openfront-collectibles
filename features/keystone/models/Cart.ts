@@ -68,11 +68,18 @@ async function calculateCartSubtotal(cart: CartPricingProjection, context: Conte
  * - item: apply fixed amount per eligible item
  */
 async function calculateCartDiscount(cart: CartPricingProjection, context: Context) {
+  const { goods, shipping } = await calculateCartDiscountParts(cart, context);
+  return goods + shipping;
+}
+
+/** Goods discount (taxable base) and free-shipping discount, kept apart for tax. */
+async function calculateCartDiscountParts(cart: CartPricingProjection, context: Context) {
   const sudoContext = context.sudo();
 
-  if (!cart?.discounts?.length) return 0;
+  if (!cart?.discounts?.length) return { goods: 0, shipping: 0 };
 
   let totalDiscountAmount = 0;
+  let shippingDiscountAmount = 0;
 
   for (const discount of cart.discounts) {
     if (!discount.discountRule?.type) continue;
@@ -141,7 +148,7 @@ async function calculateCartDiscount(cart: CartPricingProjection, context: Conte
         }
         break;
       case "free_shipping":
-        totalDiscountAmount +=
+        shippingDiscountAmount +=
           cart.shippingMethods?.reduce(
             (total, method) => total + (method.price || 0),
             0
@@ -152,7 +159,9 @@ async function calculateCartDiscount(cart: CartPricingProjection, context: Conte
 
   // Ensure discount doesn't exceed subtotal (can't have negative totals)
   const subtotal = await calculateCartSubtotal(cart, context);
-  return Math.min(totalDiscountAmount, subtotal);
+  const goods = Math.min(totalDiscountAmount, subtotal);
+  const shipping = Math.min(shippingDiscountAmount, Math.max(0, subtotal - goods));
+  return { goods, shipping };
 }
 
 /**
@@ -237,8 +246,9 @@ async function calculateCartShipping(cart: CartPricingProjection) {
 
 async function calculateCartTax(cart: CartPricingProjection, context: Context) {
   const subtotal = await calculateCartSubtotal(cart, context);
-  const discount = await calculateCartDiscount(cart, context);
-  const taxableAmount = subtotal - discount;
+  // Free shipping does not lower the tax on the goods.
+  const { goods } = await calculateCartDiscountParts(cart, context);
+  const taxableAmount = subtotal - goods;
   return taxableAmount * (cart.region?.taxRate || 0);
 }
 
@@ -295,6 +305,53 @@ async function findCheapestShippingOption(regionId: string, context: Context) {
   });
 
   return shippingOptions[0];
+}
+
+const DISCOUNT_PARTS_QUERY = `
+  lineItems {
+    id
+    quantity
+    productVariant {
+      id
+      product {
+        id
+        discountable
+        isGiftcard
+        productType { id }
+        productCollections { id }
+        productTags { id }
+      }
+    }
+  }
+  discounts {
+    id
+    discountRule {
+      type
+      value
+      allocation
+      discountConditions {
+        id
+        type
+        operator
+        products { id }
+        productTypes { id }
+        productCollections { id }
+        productTags { id }
+      }
+    }
+  }
+  region { id currency { code noDivisionCurrency } }
+  shippingMethods { price }
+`;
+
+/** The discount the cart charges, split into goods and free shipping, for the order snapshot. */
+export async function cartDiscountParts(cartId: string, context: Context) {
+  const cart: CartPricingProjection = await context.sudo().query.Cart.findOne({
+    where: { id: cartId },
+    query: DISCOUNT_PARTS_QUERY,
+  });
+  if (!cart) throw new Error("Cart not found");
+  return calculateCartDiscountParts(cart, context);
 }
 
 export const Cart = list<Lists.Cart.TypeInfo>({
@@ -890,51 +947,9 @@ export const Cart = list<Lists.Cart.TypeInfo>({
                 return null;
               }
 
-              // First get subtotal for percentage calculations
               if (!cart.region?.id) throw new Error("Cart region is unavailable");
-              let subtotal = 0;
-              for (const lineItem of cart.lineItems || []) {
-                const prices = await sudoContext.query.MoneyAmount.findMany({
-                  where: {
-                    productVariant: {
-                      id: { equals: lineItem.productVariant.id },
-                    },
-                    region: { id: { equals: cart.region.id } },
-                    currency: { code: { equals: cart.region?.currency?.code } },
-                  },
-                  query: "calculatedPrice { calculatedAmount }",
-                });
-
-                const price = prices[0]?.calculatedPrice?.calculatedAmount || 0;
-                subtotal += price * lineItem.quantity;
-              }
-
-              // Calculate total discount amount
-              let totalDiscountAmount = 0;
-              for (const discount of cart.discounts) {
-                // Skip if no discount rule or type
-                if (!discount.discountRule?.type) continue;
-
-                switch (discount.discountRule.type) {
-                  case "percentage":
-                    totalDiscountAmount +=
-                      subtotal * (discount.discountRule.value / 100);
-                    break;
-                  case "fixed":
-                    totalDiscountAmount +=
-                      discount.discountRule.value *
-                      (cart.region?.currency?.noDivisionCurrency ? 1 : 100);
-                    break;
-                  case "free_shipping":
-                    // Add shipping amount to discount
-                    totalDiscountAmount +=
-                      cart.shippingMethods?.reduce(
-                        (total, method) => total + (method.price || 0),
-                        0
-                      ) || 0;
-                    break;
-                }
-              }
+              // Same eligibility and caps as the total the shopper pays.
+              const totalDiscountAmount = await calculateCartDiscount(cart, context);
 
               if (totalDiscountAmount === 0) return null;
 
