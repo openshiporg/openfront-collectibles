@@ -139,9 +139,8 @@ export async function createOrderFromCartAtomically(cart: any, sudo: any, checko
   );
   const secretKey = userId ? "" : crypto.randomBytes(32).toString("hex");
   // The amounts the cart actually charged, so the order shows the same totals.
-  const { cartDiscountParts } = await import("../models/Cart");
   const discountParts = (cart.discounts || []).length
-    ? await cartDiscountParts(cart.id, sudo)
+    ? await (await import("../models/Cart")).cartDiscountParts(cart.id, sudo)
     : { goods: 0, shipping: 0 };
   const commercialSnapshot = {
     version: 1,
