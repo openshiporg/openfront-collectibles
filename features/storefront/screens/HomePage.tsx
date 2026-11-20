@@ -7,7 +7,7 @@ import { money } from "@/features/storefront/components/cards"
 
 export async function generateMetadata(): Promise<Metadata> {
   const store = await getStore()
-  return { title: store?.name || "Card shop", description: store?.homepageDescription || "" }
+  return { title: { absolute: store?.name || "Card shop" }, description: store?.homepageDescription || "" }
 }
 
 export async function HomePage({ params }: { params: Promise<{ countryCode: string }> }) {

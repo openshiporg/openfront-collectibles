@@ -1,3 +1,5 @@
-import { AccountDashboardPage } from "@/features/storefront/screens/AccountDashboardPage";
+import { AccountDashboardPage, metadata } from "@/features/storefront/screens/AccountDashboardPage";
 
 export default AccountDashboardPage;
+
+export { metadata };

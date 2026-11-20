@@ -1,3 +1,5 @@
-import { AccountOrdersPage } from "@/features/storefront/screens/AccountOrdersPage";
+import { AccountOrdersPage, metadata } from "@/features/storefront/screens/AccountOrdersPage";
 
 export default AccountOrdersPage;
+
+export { metadata };

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Openfront Collectibles",
+  title: "Card shop",
   description: "Pokémon singles, graded slabs and sealed product",
 };
 

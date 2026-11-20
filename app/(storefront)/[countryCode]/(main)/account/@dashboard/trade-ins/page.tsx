@@ -1,3 +1,5 @@
-import { AccountTradeInsPage } from "@/features/storefront/screens/AccountTradeInsPage";
+import { AccountTradeInsPage, metadata } from "@/features/storefront/screens/AccountTradeInsPage";
 
 export default AccountTradeInsPage;
+
+export { metadata };

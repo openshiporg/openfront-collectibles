@@ -13,7 +13,7 @@ type Props = {
 
 export const metadata: Metadata = {
   title: "Order Confirmed",
-  description: "You purchase was successful",
+  description: "Your purchase was successful",
 }
 
 // Update function signature to accept searchParams

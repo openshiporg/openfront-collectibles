@@ -1,3 +1,5 @@
-import { AccountWishlistPage } from "@/features/storefront/screens/AccountWishlistPage";
+import { AccountWishlistPage, metadata } from "@/features/storefront/screens/AccountWishlistPage";
 
 export default AccountWishlistPage;
+
+export { metadata };
