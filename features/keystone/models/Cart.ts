@@ -1,6 +1,7 @@
 
 import type { Context } from '.keystone/types';
 import type { CartPricingProjection, DiscountProduct, ProductDiscountCondition } from '../lib/cart-pricing-projection';
+import { destinationTaxRate } from '../lib/cart-pricing-projection';
 import { giftCardCurrencyMismatch } from '../lib/cart-pricing-projection';
 import type { Lists } from '.keystone/types';
 import { graphql, group, list } from "@keystone-6/core";
@@ -250,7 +251,7 @@ async function calculateCartTax(cart: CartPricingProjection, context: Context) {
   // Free shipping does not lower the tax on the goods.
   const { goods } = await calculateCartDiscountParts(cart, context);
   const taxableAmount = subtotal - goods;
-  return taxableAmount * (cart.region?.taxRate || 0);
+  return taxableAmount * destinationTaxRate(cart);
 }
 
 async function calculateCartTotal(cart: CartPricingProjection, context: Context) {
@@ -641,9 +642,11 @@ export const Cart = list<Lists.Cart.TypeInfo>({
               const cart: CartPricingProjection = await sudoContext.query.Cart.findOne({
                 where: { id: item.id },
                 query: `
+                  shippingAddress { province country { iso2 } }
                   region {
                     id
                     taxRate
+                    taxRates { code rate }
                     currency {
                       code
                       noDivisionCurrency
@@ -707,9 +710,11 @@ export const Cart = list<Lists.Cart.TypeInfo>({
               const cart: CartPricingProjection = await sudoContext.query.Cart.findOne({
                 where: { id: item.id },
                 query: `
+                  shippingAddress { province country { iso2 } }
                   region {
                     id
                     taxRate
+                    taxRates { code rate }
                     currency {
                       code
                       noDivisionCurrency
@@ -828,9 +833,11 @@ export const Cart = list<Lists.Cart.TypeInfo>({
               const cart: CartPricingProjection = await sudoContext.query.Cart.findOne({
                 where: { id: item.id },
                 query: `
+                  shippingAddress { province country { iso2 } }
                   region {
                     id
                     taxRate
+                    taxRates { code rate }
                     currency {
                       code
                       noDivisionCurrency
@@ -974,9 +981,11 @@ export const Cart = list<Lists.Cart.TypeInfo>({
               const cart: CartPricingProjection = await context.sudo().query.Cart.findOne({
                 where: { id: item.id },
                 query: `
+                  shippingAddress { province country { iso2 } }
                   region {
                     id
                     taxRate
+                    taxRates { code rate }
                     currency {
                       code
                       noDivisionCurrency
@@ -1037,9 +1046,11 @@ export const Cart = list<Lists.Cart.TypeInfo>({
               const cart: CartPricingProjection = await context.sudo().query.Cart.findOne({
                 where: { id: item.id },
                 query: `
+                  shippingAddress { province country { iso2 } }
                   region {
                     id
                     taxRate
+                    taxRates { code rate }
                     currency {
                       code
                       noDivisionCurrency
@@ -1099,9 +1110,11 @@ export const Cart = list<Lists.Cart.TypeInfo>({
               const cart: CartPricingProjection = await sudoContext.query.Cart.findOne({
                 where: { id: item.id },
                 query: `
+                  shippingAddress { province country { iso2 } }
                   region {
                     id
                     taxRate
+                    taxRates { code rate }
                     currency {
                       code
                       noDivisionCurrency

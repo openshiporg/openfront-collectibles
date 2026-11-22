@@ -35,9 +35,11 @@ export async function POST(
     );
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
+    // The Stripe account is shared by many stores: an event this store cannot verify or does not own is
+    // acknowledged and ignored so the sender stops retrying it. Nothing is recorded or changed.
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Webhook rejected" },
-      { status: 400 }
+      { accepted: false, ignored: true, reason: error instanceof Error ? error.message : "Webhook not processed" },
+      { status: 200 }
     );
   }
 }

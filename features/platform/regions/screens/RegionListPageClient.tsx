@@ -101,6 +101,7 @@ export function RegionListPageClient({
   // For regions, use raw GraphQL string to include relationship fields (from working repomix)
   const querySelectedFields = `
     id name code createdAt updatedAt taxRate automaticTaxes
+    taxRates(orderBy: [{ code: asc }]) { id code name rate }
     currency {
       id code symbol symbolNative
     }

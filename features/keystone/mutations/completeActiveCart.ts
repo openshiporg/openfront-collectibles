@@ -35,8 +35,19 @@ async function completeActiveCart(
   if (paymentSessionId) {
     await assertPaymentSessionBelongsToCart(context, cartId, paymentSessionId);
   }
-  const sudoContext = context.sudo();
-  const user = context.session?.itemId;
+  return completeCheckout(cartId, paymentSessionId, context.sudo(), context.session?.itemId);
+}
+
+/**
+ * The checkout itself, after the caller has proved it may complete this cart. The return page and the
+ * server-side payment reconcile both come through here, so an order is placed one way, exactly once.
+ */
+export async function completeCheckout(
+  cartId: string,
+  paymentSessionId: string | undefined,
+  sudoContext: any,
+  user: string | undefined
+) {
 
   // Get cart with all necessary data
   const cart = await sudoContext.query.Cart.findOne({
@@ -64,6 +75,7 @@ async function completeActiveCart(
       }
       shippingAddress {
         id
+        province
         country { iso2 }
         user {
           id
@@ -74,6 +86,7 @@ async function completeActiveCart(
       region {
         id
         taxRate
+        taxRates { code rate }
         currency {
           code
           id
@@ -284,7 +297,7 @@ async function completeActiveCart(
     const order = coveredByGiftCards
       ? await handleGiftCardOrder(cart, sudoContext, attempt)
       : !paymentSessionId
-        ? await handleAccountOrder(cart, user, sudoContext, attempt)
+        ? await handleAccountOrder(cart, user as string, sudoContext, attempt)
         : await handlePaidOrder(cart, paymentSessionId, sudoContext, attempt);
     if (giftCardsApplied) {
       await commitGiftCardHold(sudoContext.prisma, cartId, order, cart.region.currency.code, resolveOrderCustomer(cart).userId);

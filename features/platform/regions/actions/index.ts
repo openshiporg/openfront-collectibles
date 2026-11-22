@@ -47,6 +47,7 @@ export async function getRegions(
   orderBy: Array<Record<string, string>> = [{ createdAt: 'desc' }],
   selectedFields: string = `
     id name code createdAt updatedAt taxRate automaticTaxes
+    taxRates(orderBy: [{ code: asc }]) { id code name rate }
     currency {
       id code symbol symbolNative
     }
@@ -483,4 +484,40 @@ export async function updateRegion(id: string, data: { name?: string; code?: str
       data: null,
     };
   }
+}
+
+/**
+ * Sales tax for one state or province in a region. The code is the state as shoppers type it at
+ * checkout (for example "TX"); an order shipping there is taxed at this rate instead of the region's.
+ * ratePercent is a percentage (8.25 = 8.25%); 0 or less removes the state's rate.
+ */
+export async function saveRegionStateTaxRate(regionId: string, input: { code: string; name?: string; ratePercent: number }) {
+  const code = String(input.code || '').trim().toUpperCase();
+  if (!/^[A-Z0-9-]{1,10}$/.test(code)) return { success: false, error: 'Enter the state code shoppers use, for example TX' };
+  const percent = Number(input.ratePercent);
+  if (!Number.isFinite(percent) || percent < 0 || percent > 30) return { success: false, error: 'Enter a rate between 0 and 30%' };
+  const found = await keystoneClient(
+    `query ($regionId: ID!, $code: String!) { taxRates(where: { region: { id: { equals: $regionId } }, code: { equals: $code } }) { id } }`,
+    { regionId, code }
+  );
+  if (!found.success) return { success: false, error: found.error || 'Could not read tax rates' };
+  const existing = found.data?.taxRates || [];
+  let response;
+  if (percent === 0) {
+    response = existing.length
+      ? await keystoneClient(`mutation ($where: [TaxRateWhereUniqueInput!]!) { deleteTaxRates(where: $where) { id } }`, { where: existing.map((rate: { id: string }) => ({ id: rate.id })) })
+      : { success: true };
+  } else {
+    const data = { code, name: (input.name || '').trim() || `${code} sales tax`, rate: Math.round(percent * 10000) / 1000000 };
+    response = existing[0]
+      ? await keystoneClient(`mutation ($id: ID!, $data: TaxRateUpdateInput!) { updateTaxRate(where: { id: $id }, data: $data) { id } }`, { id: existing[0].id, data })
+      : await keystoneClient(`mutation ($data: TaxRateCreateInput!) { createTaxRate(data: $data) { id } }`, { data: { ...data, region: { connect: { id: regionId } } } });
+  }
+  if (!response.success) return { success: false, error: (response as any).error || 'Could not save the tax rate' };
+  revalidatePath('/dashboard/platform/regions');
+  const list = await keystoneClient(
+    `query ($regionId: ID!) { taxRates(where: { region: { id: { equals: $regionId } } }, orderBy: [{ code: asc }]) { id code name rate } }`,
+    { regionId }
+  );
+  return { success: true, data: list.success ? list.data?.taxRates || [] : [] };
 }

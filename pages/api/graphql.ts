@@ -10,6 +10,10 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Card payments whose shopper closed the tab become orders here: at most once a minute, never awaited.
+  void import("../../features/keystone/checkout/reconcile-card-payments")
+    .then(({ reconcileOpenCardPayments }) => reconcileOpenCardPayments(keystoneContext.sudo()))
+    .catch(() => undefined);
   const contentType = req.headers["content-type"];
   if (contentType?.startsWith("multipart/form-data")) {
     req.body = await processRequest(req, res);

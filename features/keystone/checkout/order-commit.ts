@@ -3,6 +3,7 @@ import {
   enqueueWebhookOutbox,
   subscribedWebhookEndpointIds,
 } from "../../webhooks/outbox";
+import { destinationTaxRate } from "../lib/cart-pricing-projection";
 import { deliverWebhookEventsById } from "../../webhooks/webhook-plugin";
 import { convertCheckoutReservation } from "./reservation-conversion";
 import { assertCheckoutCommitAttemptFence, requireExactlyOne } from "./reservation-fencing";
@@ -152,9 +153,10 @@ export async function createOrderFromCartAtomically(cart: any, sudo: any, checko
     }),
     currency: cart.region.currency.code,
     tax: {
-      rate: cart.region.taxRate || 0,
+      rate: destinationTaxRate(cart),
       regionId: cart.region.id,
       destinationCountry: cart.shippingAddress?.country?.iso2 || null,
+      destinationProvince: cart.shippingAddress?.province || null,
     },
     acceptedAt: new Date().toISOString(),
   };
@@ -192,7 +194,7 @@ export async function createOrderFromCartAtomically(cart: any, sudo: any, checko
             prices: line.productVariant.prices,
             currencyCode: cart.region.currency.code,
             regionId: cart.region.id,
-            taxRate: cart.region.taxRate,
+            taxRate: destinationTaxRate(cart),
           },
           metadata: line.metadata,
         },
@@ -283,7 +285,7 @@ export async function createOrderFromCartAtomically(cart: any, sudo: any, checko
         lineItems: { connect: lineItemIds.map((id) => ({ id })) },
         status: "pending",
         displayId: Number(next),
-        taxRate: cart.region.taxRate || 0,
+        taxRate: destinationTaxRate(cart),
         metadata: { ...(cart.metadata || {}), commercialSnapshot },
         secretKey,
         events: {

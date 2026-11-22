@@ -21,6 +21,7 @@ import { EditItemDrawerClientWrapper } from "../../components/EditItemDrawerClie
 import { ItemPagination } from "../../orders/components/ItemPagination";
 import { Count, Dot, ListBand, Pill, Track } from "../../components/vault-ui";
 import { plural } from '@/features/platform/lib/plural'
+import { StateTaxRates } from "./StateTaxRates";
 
 interface Region {
   id: string;
@@ -30,6 +31,7 @@ interface Region {
   createdAt: string;
   updatedAt?: string;
   automaticTaxes: boolean;
+  taxRates?: Array<{ id: string; code: string | null; name: string; rate: number | null }>;
   currency: {
     id: string;
     code: string;
@@ -59,7 +61,7 @@ interface RegionDetailsComponentProps {
   list: any;
 }
 
-type TabType = 'currency' | 'countries' | 'payment' | 'fulfillment';
+type TabType = 'currency' | 'tax' | 'countries' | 'payment' | 'fulfillment';
 
 interface TabContentProps {
   items: any[];
@@ -100,6 +102,7 @@ export function RegionDetailsComponent({
   const [activeTab, setActiveTab] = useState<TabType>('currency');
   const [currentPages, setCurrentPages] = useState<Record<TabType, number>>({
     currency: 1,
+    tax: 1,
     countries: 1,
     payment: 1,
     fulfillment: 1
@@ -139,6 +142,13 @@ export function RegionDetailsComponent({
       count: currencyData.length,
       data: currencyData
     },
+    {
+      key: 'tax' as TabType,
+      label: 'Sales tax',
+      count: (region.taxRates || []).length,
+      data: region.taxRates || [],
+      always: true,
+    },
     { 
       key: 'countries' as TabType, 
       label: `${region.countries.length} Countr${region.countries.length !== 1 ? 'ies' : 'y'}`,
@@ -157,7 +167,7 @@ export function RegionDetailsComponent({
       count: fulfillmentProviders.length,
       data: fulfillmentProviders
     }
-  ].filter(tab => tab.count > 0);
+  ].filter(tab => tab.count > 0 || (tab as { always?: boolean }).always);
 
   const handlePageChange = (tabKey: TabType, newPage: number) => {
     setCurrentPages(prev => ({
@@ -170,6 +180,7 @@ export function RegionDetailsComponent({
 
   const tabLabels: Record<TabType, string> = {
     currency: 'Currency',
+    tax: 'Sales tax',
     countries: 'Countries',
     payment: 'Payment Providers',
     fulfillment: 'Fulfillment Providers',
@@ -247,7 +258,10 @@ export function RegionDetailsComponent({
 
               {activeTabData && (
                 <>
-                  {activeTabData.count > itemsPerPage && (
+                  {activeTab === 'tax' && (
+                    <StateTaxRates regionId={region.id} regionRate={region.taxRate} initialRates={region.taxRates || []} />
+                  )}
+                  {activeTab !== 'tax' && activeTabData.count > itemsPerPage && (
                     <div className="flex justify-end">
                       <ItemPagination
                         currentPage={currentPages[activeTab]}
@@ -258,7 +272,7 @@ export function RegionDetailsComponent({
                     </div>
                   )}
 
-                  <ListBand>
+                  {activeTab !== 'tax' && <ListBand>
                     {activeTab === 'currency' &&
                       currencyData.slice(
                         (currentPages.currency - 1) * itemsPerPage,
@@ -378,7 +392,7 @@ export function RegionDetailsComponent({
                   </DropdownMenu>
                         </div>
                       ))}
-                  </ListBand>
+                  </ListBand>}
                 </>
               )}
             </div>
