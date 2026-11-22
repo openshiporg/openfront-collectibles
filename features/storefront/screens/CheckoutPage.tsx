@@ -16,13 +16,29 @@ export const metadata = {
   title: "Checkout",
 };
 
-export async function CheckoutPage(props: { params: Promise<{ countryCode: string }> }) {
+const STEPS = ["address", "delivery", "payment"];
+
+export async function CheckoutPage(props: {
+  params: Promise<{ countryCode: string }>;
+  searchParams?: Promise<{ step?: string | string[] }>;
+}) {
   const { countryCode } = await props.params;
   const cart = await retrieveCart();
 
   // Checkout needs something to buy: no cart or an empty one goes back to the cart page.
   if (!cart || !cart.lineItems?.length) {
     redirect(`/${countryCode}/cart`);
+  }
+
+  // Resume where the cart is. A link with no step, an unknown step, or a step whose
+  // earlier steps are not saved yet opens the first step that still needs the customer.
+  const requested = (await props.searchParams)?.step;
+  const asked = Array.isArray(requested) ? requested[0] : requested;
+  const step = asked === "review" ? "payment" : asked;
+  const reached = STEPS.indexOf(cart.checkoutStep === "review" ? "payment" : cart.checkoutStep);
+  const resume = STEPS[reached < 0 ? 0 : reached];
+  if (!step || !STEPS.includes(step) || STEPS.indexOf(step) > STEPS.indexOf(resume)) {
+    redirect(`/${countryCode}/checkout?step=${resume}`);
   }
 
   const customer = await getUser();

@@ -2,7 +2,7 @@
 
 import { isManual, isStripe, isPaypal } from "@/features/storefront/lib/constants"
 import { placeOrder } from "@/features/storefront/lib/data/cart"
-import { useElements, useStripe } from "@stripe/react-stripe-js"
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
@@ -31,11 +31,17 @@ interface PaymentButtonProps {
       }[];
     };
   };
+  /** Text on the button, for example "Pay $12.98". */
+  label?: string;
+  /** Stripe only: the card field reports a complete card. */
+  cardComplete?: boolean;
   "data-testid": string;
 }
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({
   cart,
+  label = "Place order",
+  cardComplete = false,
   "data-testid": dataTestId,
 }) => {
   const notReady =
@@ -50,7 +56,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   )
 
   if ((cart.giftCards?.length ?? 0) > 0 && cart.rawTotal === 0) {
-    return <GiftCardPaymentButton notReady={notReady} data-testid={dataTestId} />
+    return <GiftCardPaymentButton notReady={notReady} label={label} data-testid={dataTestId} />
   }
 
   switch (true) {
@@ -58,6 +64,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       return (
         <StripePaymentButton
           notReady={notReady}
+          label={label}
+          cardComplete={cardComplete}
           cart={cart}
           data-testid={dataTestId}
         />
@@ -72,7 +80,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       )
     case isManual(paymentSession?.paymentProvider?.code):
       return (
-        <ManualTestPaymentButton notReady={notReady} cart={cart} data-testid={dataTestId} />
+        <ManualTestPaymentButton notReady={notReady} label={label} cart={cart} data-testid={dataTestId} />
       )
     default:
       return <button type="button" disabled className="cx-btn w-full sm:w-auto">Select a payment method</button>
@@ -82,12 +90,16 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 interface StripePaymentButtonProps {
   cart: PaymentButtonProps["cart"];
   notReady: boolean;
+  label: string;
+  cardComplete: boolean;
   "data-testid"?: string;
 }
 
 const StripePaymentButton: React.FC<StripePaymentButtonProps> = ({
   cart,
   notReady,
+  label,
+  cardComplete,
   "data-testid": dataTestId,
 }) => {
   const [submitting, setSubmitting] = useState(false)
@@ -110,28 +122,27 @@ const StripePaymentButton: React.FC<StripePaymentButtonProps> = ({
 
   const stripe = useStripe()
   const elements = useElements()
-  const card = elements?.getElement("card")
 
   const session = cart.paymentCollection?.paymentSessions?.find(
     (s) => s.isSelected && s.paymentProvider?.code === 'pp_stripe_stripe'
   )
 
-  const disabled = !stripe || !elements || !card ? true : false
+  const disabled = !stripe || !elements || !cardComplete
 
   const handlePayment = async () => {
     setSubmitting(true)
-    
+    setErrorMessage(null)
 
+    // Read the card field when the customer pays: it sits in the same step as this button.
+    const card = elements?.getElement(CardElement)
     if (!stripe || !elements || !card || !cart || !session?.data?.clientSecret || !session.id) {
       setSubmitting(false)
-      setErrorMessage("Stripe not initialized or payment session not found.")
+      setErrorMessage("The card payment could not start. Reload the page and try again.")
       return
     }
 
     // Confirm the payment intent with the card details, then pass session ID to backend
     try {
-      console.log('Confirming payment with Stripe...');
-      
       const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(
         session.data.clientSecret,
         {
@@ -152,7 +163,6 @@ const StripePaymentButton: React.FC<StripePaymentButtonProps> = ({
       }
 
       if (paymentIntent?.status === 'succeeded' || paymentIntent?.status === 'requires_capture') {
-        console.log('Payment confirmed, sending to backend...');
         await onPaymentCompleted(session.id);
       } else {
         setErrorMessage("Payment was not successful. Please try again.");
@@ -175,7 +185,7 @@ const StripePaymentButton: React.FC<StripePaymentButtonProps> = ({
         data-testid={dataTestId}
       >
         {submitting && <RiLoader2Fill className="size-4 animate-spin" />}
-        Place order
+        {label}
       </button>
       <ErrorMessage
         error={errorMessage}
@@ -186,7 +196,7 @@ const StripePaymentButton: React.FC<StripePaymentButtonProps> = ({
 }
 
 // The order is fully covered by gift cards or store credit: nothing to charge.
-const GiftCardPaymentButton = ({ notReady, "data-testid": dataTestId }: { notReady: boolean; "data-testid"?: string }) => {
+const GiftCardPaymentButton = ({ notReady, label, "data-testid": dataTestId }: { notReady: boolean; label: string; "data-testid"?: string }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const router = useRouter()
@@ -215,15 +225,16 @@ const GiftCardPaymentButton = ({ notReady, "data-testid": dataTestId }: { notRea
         data-testid={dataTestId}
       >
         {submitting ? <RiLoader2Fill className="size-4 animate-spin" aria-hidden="true" /> : null}
-        Place order
+        {label}
       </button>
       <ErrorMessage error={errorMessage} data-testid="gift-card-payment-error-message" />
     </>
   )
 }
 
-const ManualTestPaymentButton = ({ notReady, cart, "data-testid": dataTestId }: { 
+const ManualTestPaymentButton = ({ notReady, label, cart, "data-testid": dataTestId }: { 
   notReady: boolean, 
+  label: string,
   cart: PaymentButtonProps["cart"],
   "data-testid"?: string 
 }) => {
@@ -271,7 +282,7 @@ const ManualTestPaymentButton = ({ notReady, cart, "data-testid": dataTestId }: 
         data-testid={dataTestId || "submit-order-button"}
       >
         {submitting && <RiLoader2Fill className="size-4 animate-spin" />} 
-        Place order
+        {label}
       </button>
       <ErrorMessage
         error={errorMessage}

@@ -1,7 +1,6 @@
 import Addresses from "@/features/storefront/modules/checkout/components/addresses";
 import Shipping from "@/features/storefront/modules/checkout/components/shipping";
 import Payment from "@/features/storefront/modules/checkout/components/payment";
-import Review from "@/features/storefront/modules/checkout/components/review";
 import { listCartPaymentMethods } from "@/features/storefront/lib/data/payment";
 import { getCartShippingOptions } from "@/features/storefront/lib/data/shipping";
 
@@ -11,10 +10,13 @@ interface CheckoutFormProps {
     region: {
       id: string;
     };
-    total: number;
+    total: number | string;
+    rawTotal?: number;
     shippingMethods: any[];
     paymentCollection?: {
       paymentSessions?: Array<{
+        id: string;
+        data?: { clientSecret?: string; orderId?: string };
         isSelected: boolean;
         status?: string;
         paymentProvider: {
@@ -49,7 +51,6 @@ export default async function CheckoutForm({ cart, customer }: CheckoutFormProps
       <Addresses cart={cart} customer={customer} />
       <Shipping cart={cart} availableShippingMethods={availableShippingMethods} />
       <Payment cart={cart} availablePaymentMethods={availablePaymentMethods} />
-      <Review cart={cart} />
     </div>
   );
 }
