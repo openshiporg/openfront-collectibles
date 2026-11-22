@@ -15752,6 +15752,7 @@ type Mutation {
   addGiftCardToActiveCart(cartId: ID!, code: String!): Cart
   removeGiftCardFromActiveCart(cartId: ID!, code: String!): Cart
   payTradeInSubmission(id: ID!): JSON!
+  stockCardSingle(input: JSON!): JSON!
   createActiveCartPaymentSessions(cartId: ID!): Cart
   setActiveCartPaymentSession(cartId: ID!, providerId: ID!): Cart
   completeActiveCart(cartId: ID!, paymentSessionId: ID): JSON

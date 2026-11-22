@@ -29,6 +29,7 @@ import addDiscountToActiveCart from './addDiscountToActiveCart';
 import removeDiscountFromActiveCart from './removeDiscountFromActiveCart';
 import { addGiftCardToActiveCart, removeGiftCardFromActiveCart } from './activeCartGiftCards';
 import payTradeInSubmission from './payTradeInSubmission';
+import stockCardSingle from './stockCardSingle';
 import createActiveCartPaymentSessions from './createActiveCartPaymentSessions';
 import createActiveCart from './createActiveCart';
 import createActiveCartProof from './createActiveCartProof';
@@ -292,6 +293,7 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         addGiftCardToActiveCart(cartId: ID!, code: String!): Cart
         removeGiftCardFromActiveCart(cartId: ID!, code: String!): Cart
         payTradeInSubmission(id: ID!): JSON!
+        stockCardSingle(input: JSON!): JSON!
         createActiveCartPaymentSessions(cartId: ID!): Cart
         setActiveCartPaymentSession(cartId: ID!, providerId: ID!): Cart
         completeActiveCart(cartId: ID!, paymentSessionId: ID): JSON
@@ -404,6 +406,7 @@ export const extendGraphqlSchema = (schema: GraphQLSchema) =>
         addGiftCardToActiveCart,
         removeGiftCardFromActiveCart,
         payTradeInSubmission,
+        stockCardSingle,
         createActiveCartPaymentSessions,
         setActiveCartPaymentSession,
         completeActiveCart,

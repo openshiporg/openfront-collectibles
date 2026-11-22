@@ -157,3 +157,30 @@ export async function getSetStrips(): Promise<Result<Record<string, boolean[]>>>
   }
   return { success: true, data: strips };
 }
+
+const toMinor = (value: FormDataEntryValue | null) => {
+  const text = String(value ?? '').trim().replace(/[$,\s]/g, '');
+  if (!text) return null;
+  if (!/^\d+(\.\d{1,2})?$/.test(text)) return NaN;
+  return Math.round(Number(text) * 100);
+};
+
+/** Stock raw copies of a card from the set checklist. */
+export async function stockCardAction(_prev: unknown, form: FormData): Promise<Result<{ sku: string; quantity: number; created: boolean; productId: string }>> {
+  const cost = toMinor(form.get('cost'));
+  const price = toMinor(form.get('price'));
+  if (Number.isNaN(cost) || Number.isNaN(price)) return { success: false, error: 'Enter amounts like 12.50' };
+  const response = await run<{ stockCardSingle: any }>(`mutation Stock($input: JSON!) { stockCardSingle(input: $input) }`, {
+    input: {
+      catalogItemId: String(form.get('catalogItemId') || ''),
+      condition: String(form.get('condition') || ''),
+      finish: String(form.get('finish') || '') || null,
+      quantity: Number(form.get('quantity') || 0),
+      unitCostMinor: cost,
+      priceMinor: price,
+    },
+  });
+  if (!response.success) return response;
+  revalidatePath('/dashboard/platform/cards', 'layout');
+  return { success: true, data: response.data.stockCardSingle };
+}

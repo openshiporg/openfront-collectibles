@@ -11,6 +11,7 @@ import {
 } from '@/features/storefront/components/cards';
 import { getSetChecklist } from '../actions';
 import { DeskFrame, DeskLink, DeskSection } from '../components/frame';
+import { StockCardButton } from '../components/StockCardButton';
 import { plural } from '@/features/platform/lib/plural'
 
 function latestMarket(market: Record<string, { marketMinor: number | null }>) {
@@ -63,11 +64,12 @@ export async function SetChecklistPage({ params }: { params: Promise<{ handle: s
                   run={cellsByCondition.length ? <ConditionRun cells={cellsByCondition} currencyCode={currencyCode} label={`${card.name} stock by condition`} /> : null}
                   market={money(latestMarket(card.market), 'USD')}
                   price={prices.length ? money(Math.min(...prices), currencyCode) : null}
-                  action={productId ? (
-                    <Link href={`/dashboard/platform/products/${productId}`} className="text-xs font-medium text-foreground underline underline-offset-4">Edit</Link>
-                  ) : (
-                    <span className="text-xs text-muted-foreground" title="Not stocked"><span aria-hidden="true">—</span><span className="sr-only">Not stocked</span></span>
-                  )}
+                  action={
+                    <span className="inline-flex items-center gap-3">
+                      <StockCardButton catalogItemId={card.id} name={`${card.name} ${card.number ?? ''}`.trim()} finishes={Object.keys(card.market ?? {})} />
+                      {productId ? <Link href={`/dashboard/platform/products/${productId}`} className="text-xs font-medium text-foreground underline underline-offset-4 max-sm:inline-flex max-sm:min-h-11 max-sm:items-center">Edit</Link> : null}
+                    </span>
+                  }
                 />
               );
             })}
