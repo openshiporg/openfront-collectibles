@@ -138,7 +138,7 @@ export async function TradeInDetailPage({ params }: { params: Promise<{ id: stri
                         </p>
                       ) : null}
                     </div>
-                    <dl className="flex shrink-0 gap-4 text-right font-mono text-xs tabular-nums">
+                    <dl className="grid w-full grid-cols-2 gap-x-4 gap-y-2 font-mono text-xs tabular-nums sm:flex sm:w-auto sm:shrink-0 sm:text-right">
                       {estimateMinor != null ? (
                         <div><dt className="font-sans text-muted-foreground">{submission.disposition === 'cash' ? 'Estimate (cash)' : 'Estimate (credit)'}</dt><dd>{money(estimateMinor, currency)}</dd></div>
                       ) : null}
