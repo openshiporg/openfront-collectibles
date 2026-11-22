@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getRegion } from "@/features/storefront/lib/data/regions"
@@ -10,7 +11,7 @@ import { ProductSheetRow } from "@/features/storefront/modules/cards/product-she
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
-  searchParams: Promise<{ show?: string; rarity?: string }>
+  searchParams: Promise<{ show?: string; rarity?: string; all?: string }>
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
@@ -22,7 +23,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export async function SetChecklistPage(props: Props) {
   const { countryCode, handle } = await props.params
-  const { show, rarity } = await props.searchParams
+  const { show, rarity, all } = await props.searchParams
   const region = await getRegion(countryCode)
   const currencyCode = region?.currency?.code?.toUpperCase() || "USD"
   const [data, wants, sealed] = await Promise.all([
@@ -40,6 +41,11 @@ export async function SetChecklistPage(props: Props) {
   if (show === "stock") rows = rows.filter((c) => rawCells(c).hasRaw)
   if (show === "missing") rows = rows.filter((c) => !rawCells(c).cells.some((cell) => cell.available))
   if (rarity) rows = rows.filter((c) => c.rarity === rarity)
+  // A full set is 200+ rows; the first 60 keep a phone page short, the rest are one tap away (S12).
+  const FIRST = 60
+  const matching = rows.length
+  if (all !== "1" && rows.length > FIRST) rows = rows.slice(0, FIRST)
+  const allHref = `?${new URLSearchParams({ ...(show ? { show } : {}), ...(rarity ? { rarity } : {}), all: "1" }).toString()}`
   const preorder = data.set.releaseStatus === "preorder"
 
   return (
@@ -65,7 +71,7 @@ export async function SetChecklistPage(props: Props) {
                 { id: "rarity", label: "Rarity", allLabel: "Any rarity", options: rarities.map((r) => ({ value: r, label: r })) },
               ]}
             />
-            <JumpToNumber />
+            <JumpToNumber allHref={rows.length < matching ? allHref : null} />
           </div>
           <CardSheet label={`${data.set.name} checklist`} actions>
             {rows.map((card, i) => (
@@ -75,6 +81,11 @@ export async function SetChecklistPage(props: Props) {
             ))}
           </CardSheet>
           {rows.length === 0 ? <p className="text-[15px] text-cx-ink-2">No cards match these filters.</p> : null}
+          {rows.length < matching ? (
+            <Link href={allHref} scroll={false} className="tc-btn w-full sm:w-fit" data-variant="line" data-testid="show-all-cards">
+              Show all {matching} cards
+            </Link>
+          ) : null}
           <p className="text-[13px] text-cx-ink-3">
             Market prices are TCGplayer market readings for Near Mint, dated on each card page. Our prices follow them by condition.
           </p>

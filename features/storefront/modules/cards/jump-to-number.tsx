@@ -1,16 +1,25 @@
 'use client'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 /** The number is the navigation: jump the sheet to a card number. */
-export function JumpToNumber() {
+export function JumpToNumber({ allHref = null }: { allHref?: string | null }) {
   const [value, setValue] = useState("")
   const [missing, setMissing] = useState(false)
+  // Arriving from the shortened list with ?jump=N: scroll to that card once the full list is here.
+  useEffect(() => {
+    const n = new URLSearchParams(window.location.search).get("jump")
+    if (!n) return
+    const target = document.getElementById(`no-${n}`) ?? document.getElementById(`no-${n.padStart(3, "0")}`)
+    const row = target?.querySelector<HTMLElement>(".tc-row") ?? target
+    row?.scrollIntoView({ block: "center" })
+  }, [])
   const jump = (event: React.FormEvent) => {
     event.preventDefault()
     const n = value.trim().split("/")[0].replace(/^0+(?=\d)/, "")
     const target = document.getElementById(`no-${n}`) ?? document.getElementById(`no-${n.padStart(3, "0")}`)
     const row = target?.querySelector<HTMLElement>(".tc-row") ?? target
+    if (!row && allHref && n) { window.location.assign(`${allHref}&jump=${encodeURIComponent(n)}`); return }
     if (!row) { setMissing(true); return }
     setMissing(false)
     row.scrollIntoView({ behavior: "smooth", block: "center" })
@@ -26,11 +35,11 @@ export function JumpToNumber() {
           inputMode="text"
           maxLength={12}
           placeholder="199"
-          className="tc-input tc-num w-[96px]"
+          className="tc-input tc-num w-[96px] min-h-11"
           aria-invalid={missing}
           aria-describedby={missing ? "jump-missing" : undefined}
         />
-        <button type="submit" className="tc-btn min-h-10">Go</button>
+        <button type="submit" className="tc-btn min-h-11">Go</button>
       </div>
       {missing ? <span id="jump-missing" role="status" className="text-[12px] text-cx-danger">Not on this list</span> : null}
     </form>
