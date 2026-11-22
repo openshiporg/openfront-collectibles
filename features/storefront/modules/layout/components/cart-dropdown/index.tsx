@@ -1,6 +1,7 @@
 "use client";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { usePathname } from "next/navigation"
+import { ShoppingBag } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import LinkStatus from "@/features/storefront/modules/common/components/link-status"
 import LineItemOptions from "@/features/storefront/modules/common/components/line-item-options"
@@ -94,14 +95,17 @@ const CartDropdown = ({
             <LocalizedClientLink
               className="inline-flex min-h-11 items-center gap-2 rounded-[2px] px-3 text-[14px] font-medium text-cx-ink hover:bg-cx-well"
               href="/cart"
+              aria-label={`Cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
               data-testid="nav-cart-link"
             >
-              Cart
+              <ShoppingBag size={22} className="deneb-cart-icon" aria-hidden="true" />
+              <span className="deneb-cart-text">Cart</span>
               <span
+                data-empty={totalItems === 0}
                 className={
                   totalItems > 0
-                    ? "cx-num inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-cx-ink px-1.5 text-[13px] text-cx-bg"
-                    : "cx-num text-[13px] text-cx-ink-3"
+                    ? "deneb-cart-count cx-num inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-cx-ink px-1.5 text-[13px] text-cx-bg"
+                    : "deneb-cart-count cx-num text-[13px] text-cx-ink-3"
                 }
               >
                 {totalItems}

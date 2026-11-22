@@ -1,97 +1,68 @@
 "use client"
 
-import { useState, type ReactNode } from "react";
-import { Menu } from "lucide-react";
+import { useState, type ReactNode } from "react"
+import { ChevronRight, Menu, X } from "lucide-react"
 
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
 import type { StoreRegion } from "@/features/storefront/types/storefront"
 
-type MenuLink = { title: string; href: string }
+export type MenuLink = { title: string; href: string }
+export type MenuGroup = { label: string; links: MenuLink[] }
 
-const SideMenu = ({
-  regions,
-  categories = [],
-  collections = [],
-  logo,
-}: {
-  regions: StoreRegion[] | null
-  categories?: MenuLink[]
-  collections?: MenuLink[]
-  logo: ReactNode
-}) => {
-  const [open, setOpen] = useState(false);
-
-  const group = (label: string, links: MenuLink[]) =>
-    links.length > 0 && (
-      <div className="space-y-1">
-        <p className="cx-label px-1 pb-1">{label}</p>
-        <ul className="grid gap-1">
-          {links.map((link) => (
-            <li key={link.href}>
-              <LocalizedClientLink
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="flex min-h-[52px] items-center rounded-[2px] bg-cx-surface px-4 font-cx-display text-[19px] font-bold text-cx-ink active:scale-[0.99] transition-transform"
-              >
-                {link.title}
-              </LocalizedClientLink>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )
+// The phone menu: everything the desktop header shows, plus search and the account links.
+const SideMenu = ({ groups, regions, logo }: { groups: MenuGroup[]; regions: StoreRegion[] | null; logo: ReactNode }) => {
+  const [open, setOpen] = useState(false)
 
   return (
     // TODO: Remove suppressHydrationWarning when React 19.2.0 useId bug is fixed upstream
     // Known issue: https://github.com/radix-ui/primitives/issues/3700
-    <div suppressHydrationWarning>
+    <div className="deneb-menu" suppressHydrationWarning>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <button
-            data-testid="nav-menu-button"
-            aria-label="Menu"
-            className="-ml-2 inline-flex size-11 items-center justify-center rounded-[2px] text-cx-ink hover:bg-cx-well"
-            suppressHydrationWarning
-          >
-            <Menu className="size-5" aria-hidden="true" />
+          <button type="button" className="deneb-icon-btn" data-testid="nav-menu-button" aria-label="Menu" suppressHydrationWarning>
+            <Menu size={22} aria-hidden="true" />
           </button>
         </SheetTrigger>
         <SheetContent
-          side="left"
-          className="flex h-full w-full flex-col gap-0 border-0 bg-cx-bg p-0 sm:max-w-sm"
+          side="right"
           data-testid="nav-menu-popup"
+          className="deneb-drawer flex w-full max-w-none flex-col gap-0 border-0 p-0 sm:max-w-sm data-[state=closed]:duration-200 data-[state=open]:duration-300 [&>button.absolute]:hidden"
         >
-          <SheetHeader className="bg-cx-vault px-4 py-3 text-left">
-            <SheetTitle className="sr-only">Menu</SheetTitle>
-            <SheetDescription className="sr-only">Categories, collections and account</SheetDescription>
-            {logo}
-          </SheetHeader>
-
-          <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-5">
-            {group("Shop", [{ title: "Search", href: "/search" }, { title: "Sets", href: "/sets" }, ...categories, { title: "All products", href: "/store" }, { title: "Sell to us", href: "/trade-in" }])}
-            {group("Collections", collections)}
-            {group("You", [
-              { title: "Account", href: "/account" },
-              { title: "Wishlist", href: "/account/wishlist" },
-              { title: "Cart", href: "/cart" },
-            ])}
-            {regions && (
-              <div className="mt-auto space-y-1">
-                <p className="cx-label px-1 pb-1">Ship to</p>
-                <CountrySelect regions={regions} />
-              </div>
-            )}
+          <SheetTitle className="sr-only">Menu</SheetTitle>
+          <SheetDescription className="sr-only">Shop, account and shipping country</SheetDescription>
+          <div className="deneb-drawer-head">
+            <div className="min-w-0" onClick={() => setOpen(false)}>{logo}</div>
+            <SheetClose asChild>
+              <button type="button" className="deneb-icon-btn" aria-label="Close menu" data-testid="nav-menu-close">
+                <X size={22} aria-hidden="true" />
+              </button>
+            </SheetClose>
           </div>
+          <nav className="deneb-drawer-body" aria-label="Menu">
+            {groups.filter((group) => group.links.length > 0).map((group) => (
+              <section key={group.label}>
+                <h2>{group.label}</h2>
+                <ul>
+                  {group.links.map((link) => (
+                    <li key={link.href}>
+                      <LocalizedClientLink href={link.href} onClick={() => setOpen(false)}>
+                        <span>{link.title}</span>
+                        <ChevronRight size={18} aria-hidden="true" />
+                      </LocalizedClientLink>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+            {regions && regions.length > 0 && (
+              <section className="deneb-drawer-region">
+                <h2>Ship to</h2>
+                <CountrySelect regions={regions} />
+              </section>
+            )}
+          </nav>
         </SheetContent>
       </Sheet>
     </div>

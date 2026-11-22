@@ -22,14 +22,12 @@ export async function HomePage({ params }: { params: Promise<{ countryCode: stri
   const stocked = inventory.products.reduce((n, p) => n + p.productVariants.reduce((q, v) => q + Math.max(0, v.inventoryQuantity), 0), 0)
   const stockedSets = sets.filter(s => (s.cardsStocked ?? 0) > 0).slice(0, 4)
   const href = (path: string) => `/${countryCode}${path}`
-  const tabs = [["Singles", "/store?kind=raw"], ["Sets", "/sets"], ["Sealed", "/store?kind=sealed"], ["Graded", "/store?kind=graded"], ["Buylist", "/trade-in"]]
   return <div className="deneb-home">
     <section className="deneb-overview">
       <div className="deneb-intro"><h1>CARDS. PRICED LIVE.</h1><p>Raw and graded singles. Find your next card.</p><div><Link className="deneb-primary" href={href('/store?kind=raw')}>Shop singles</Link><Link className="deneb-outline" href={href('/trade-in')}>Sell to us</Link></div></div>
       <div className="deneb-stock"><span>STORE INVENTORY</span><strong>{stocked.toLocaleString()}</strong><p>Cards & sealed items in stock</p><Link href={href('/sets')}>{stockedSets.length ? sets.filter(s => (s.cardsStocked ?? 0) > 0).length : 0} stocked sets →</Link></div>
       <dl className="deneb-stats"><div><dt>Singles in stock</dt><dd>{singles.length}</dd></div><div><dt>Products</dt><dd>{inventory.count}</dd></div><div><dt>Catalog sets</dt><dd>{sets.length}</dd></div></dl>
     </section>
-    <nav className="deneb-mobile-tabs" aria-label="Browse inventory">{tabs.map(([label,path]) => <Link key={label} href={href(path)}>{label}</Link>)}</nav>
     <section className="deneb-shelf" aria-labelledby="stock-title"><div className="deneb-section-head"><h2 id="stock-title">SINGLES IN STOCK</h2><Link href={href('/store?kind=raw&sort=price_desc')}>Most valuable ↗</Link></div>
       <div className="deneb-card-grid">{singles.slice(0,6).map(p => {
         const card = p.catalogItem
