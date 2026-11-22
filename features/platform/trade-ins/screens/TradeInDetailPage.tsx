@@ -99,7 +99,11 @@ export async function TradeInDetailPage({ params }: { params: Promise<{ id: stri
               const currency = item.currencyCode || offer?.currencyCode || storeCurrency;
               const title = item.catalogItem?.title || item.customerDescription || 'Item';
               // What the customer was shown at submission, for the payout they chose (cash or store credit).
-              const evidence = (item.decisionEvidence || {}) as { estimateCashMinor?: number | null; estimateCreditMinor?: number | null };
+              const evidence = (item.decisionEvidence || {}) as {
+                estimateCashMinor?: number | null;
+                estimateCreditMinor?: number | null;
+                stockIn?: { sku?: string; quantity?: number; unitCostMinor?: number; reason?: string };
+              };
               const estimateMinor = submission.disposition === 'cash' ? evidence.estimateCashMinor : evidence.estimateCreditMinor ?? evidence.estimateCashMinor;
               return (
                 <div key={item.id} className="space-y-3 px-4 py-3">
@@ -125,6 +129,13 @@ export async function TradeInDetailPage({ params }: { params: Promise<{ id: stri
                         <Link href={`/dashboard/specimens/${item.specimen.id}`} className="mt-0.5 inline-block font-mono text-xs text-foreground hover:underline">
                           {item.specimen.specimenCode}
                         </Link>
+                      ) : null}
+                      {evidence.stockIn ? (
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {evidence.stockIn.sku
+                            ? <>In stock: <span className="font-mono text-foreground">{evidence.stockIn.sku}</span> · {evidence.stockIn.quantity} at {money(evidence.stockIn.unitCostMinor ?? 0, currency)} cost</>
+                            : <>Not stocked: {evidence.stockIn.reason}</>}
+                        </p>
                       ) : null}
                     </div>
                     <dl className="flex shrink-0 gap-4 text-right font-mono text-xs tabular-nums">

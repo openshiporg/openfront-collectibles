@@ -1,6 +1,7 @@
 import { transitionRefused } from "../lib/transitionRefused";
 import { permissions } from "../access";
 import { giftCardCode } from "../checkout/gift-card-issue";
+import { stockTradeInItems } from "../lib/pokemon/trade-in-stock";
 
 /**
  * Pay out an accepted trade-in. Cash and trade payouts are recorded as paid. Store-credit payouts
@@ -20,7 +21,8 @@ export default async function payTradeInSubmission(_root: unknown, { id }: { id:
     if (!submission) throw new Error("Trade-in not found");
     if (submission.status === "paid") {
       const prior = await tx.giftCard.findFirst({ where: { metadata: { path: ["tradeInSubmissionId"], equals: id } } });
-      return { submission, giftCard: prior, replay: true };
+      const stockIn = submission.items.map((item: any) => item.decisionEvidence?.stockIn).filter(Boolean);
+      return { submission, giftCard: prior, replay: true, stock: stockIn.length ? stockIn : null };
     }
     if (submission.status !== "accepted") throw transitionRefused(`Cannot pay a trade-in that is ${submission.status}`);
     if (!submission.items.length || submission.items.some((item: any) => item.acceptedAmountMinor == null)) {
@@ -50,7 +52,19 @@ export default async function payTradeInSubmission(_root: unknown, { id }: { id:
       }
     }
 
-    if (submission.disposition !== "store_credit") return { submission, giftCard: null, replay: false };
+    // The shop now owns the cards: each accepted single goes into stock at its payout cost.
+    const stock = await stockTradeInItems(tx, submission);
+    const at = new Date().toISOString();
+    for (const item of submission.items as any[]) {
+      const line = stock.stocked.find((row) => row.itemId === item.id) || stock.skipped.find((row) => row.itemId === item.id);
+      if (!line) continue;
+      await tx.tradeInItem.update({
+        where: { id: item.id },
+        data: { decisionEvidence: { ...((item.decisionEvidence as object) || {}), stockIn: { ...line, at } } },
+      });
+    }
+
+    if (submission.disposition !== "store_credit") return { submission, giftCard: null, replay: false, stock };
 
     const items = submission.items.filter((item: any) => item.acceptedAmountMinor != null);
     if (!items.length) throw transitionRefused("No accepted amounts to pay");
@@ -88,8 +102,8 @@ export default async function payTradeInSubmission(_root: unknown, { id }: { id:
         },
       });
     }
-    return { submission, giftCard, replay: false };
-  });
+    return { submission, giftCard, replay: false, stock };
+  }, { maxWait: 10_000, timeout: 30_000 });
 
   if (result.giftCard && !result.replay) await deliverStoreCreditEmail(sudo, result.giftCard.id);
 
@@ -97,6 +111,7 @@ export default async function payTradeInSubmission(_root: unknown, { id }: { id:
     id,
     status: "paid",
     disposition: result.submission.disposition,
+    stockIn: result.stock,
     storeCredit: result.giftCard
       ? { id: result.giftCard.id, code: result.giftCard.code, amountMinor: result.giftCard.value, currencyCode: result.giftCard.metadata?.currencyCode || "USD" }
       : null,
