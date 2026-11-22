@@ -439,8 +439,12 @@ const { withAuth } = createAuth({
   },
   passwordResetLink: {
     async sendToken(args) {
-      // send the email
-      await sendPasswordResetEmail(args.token, args.identity);
+      // Staff reset on the dashboard; customers reset on the shop, so the link opens where they sign in.
+      const user = await args.context.sudo().db.User.findOne({ where: { id: String(args.itemId) } }).catch(() => null);
+      const role = user?.roleId
+        ? await args.context.sudo().db.Role.findOne({ where: { id: String(user.roleId) } }).catch(() => null)
+        : null;
+      await sendPasswordResetEmail(args.token, args.identity, undefined, role?.canAccessDashboard ? "staff" : "customer");
     },
   },
   sessionData: `id name email role { ${permissionsList.join(" ")} }`,

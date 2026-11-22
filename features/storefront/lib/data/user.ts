@@ -576,3 +576,33 @@ export async function deleteCustomerShippingAddress(addressId: string) {
     return { success: false, error: "Account update failed" };
   }
 }
+
+/** Customer "Forgot password": always answers the same way, so it does not reveal which emails have accounts. */
+export async function requestCustomerPasswordReset(_state: any, formData: FormData) {
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  if (!email) return { success: false, error: "Enter your email" };
+  try {
+    await openfrontClient.request(gql`mutation SendReset($email: String!) { sendUserPasswordResetLink(email: $email) }`, { email });
+  } catch (error) {
+    console.error("Customer password reset request failed");
+    return { success: false, error: "We could not send the email. Try again in a minute." };
+  }
+  return { success: true, error: null };
+}
+
+export async function redeemCustomerPasswordReset(_state: any, formData: FormData) {
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const token = String(formData.get("token") || "");
+  const password = String(formData.get("password") || "");
+  if (password.length < 8) return { success: false, error: "Use at least 8 characters" };
+  try {
+    const { redeemUserPasswordResetToken } = await openfrontClient.request<any>(
+      gql`mutation Redeem($email: String!, $token: String!, $password: String!) { redeemUserPasswordResetToken(email: $email, token: $token, password: $password) { code message } }`,
+      { email, token, password }
+    );
+    if (redeemUserPasswordResetToken?.code) return { success: false, error: "This link has expired or was already used. Ask for a new one." };
+  } catch {
+    return { success: false, error: "We could not change the password. Try again." };
+  }
+  return { success: true, error: null };
+}

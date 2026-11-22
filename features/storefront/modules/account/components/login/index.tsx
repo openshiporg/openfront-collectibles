@@ -8,6 +8,7 @@ import { cxInput, cxSubmit } from "@/features/storefront/modules/account/compone
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { useState } from "react"
 import { useActionState } from "react"
+import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -71,13 +72,18 @@ const Login = ({ setCurrentView }: Props) => {
             </div>
           </div>
         </div>
+        <div className="mt-2 flex justify-end">
+          <LocalizedClientLink href="/reset-password" className="inline-flex min-h-11 items-center text-[14px] text-cx-ink-2 underline underline-offset-4 hover:text-cx-ink" data-testid="forgot-password-link">
+            Forgot password?
+          </LocalizedClientLink>
+        </div>
         <ErrorMessage error={message} data-testid="login-error-message" />
         <SubmitButton data-testid="sign-in-button" className={cn(cxSubmit, "mt-6")}>
           Sign in
         </SubmitButton>
       </form>
       <div className="mt-6 flex items-center justify-between gap-3 border-t border-cx-line pt-4 text-[14px] text-cx-ink-2">
-        <span>No account</span>
+        <span>New here?</span>
         <button
           type="button"
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}

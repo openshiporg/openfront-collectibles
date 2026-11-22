@@ -5,6 +5,7 @@ import { useParams, usePathname } from "next/navigation"
 import { useState } from "react"
 
 import { signOut } from "@/features/storefront/lib/data/user"
+import LocalizedClientLink from "@/features/storefront/modules/common/components/localized-client-link"
 import { PillLink, Track } from "@/features/storefront/modules/common/components/collectibles/track"
 
 // Define inline type based on GraphQL User schema
@@ -77,14 +78,31 @@ const AccountNav = ({ customer }: AccountNavProps) => {
           {signingOut ? "Signing out" : "Sign out"}
         </button>
       </div>
-      <nav aria-label="Account" className="mt-6" data-testid="mobile-account-nav">
+      {/* Phone: every section in view as a two-column list, no sideways scrolling (S11). */}
+      <nav aria-label="Account" className="mt-5 sm:hidden" data-testid="mobile-account-nav">
+        <ul className="grid grid-cols-2 border-l border-t border-cx-line">
+          {LINKS.map((link) => (
+            <li key={link.href} className="border-b border-r border-cx-line">
+              <LocalizedClientLink
+                href={link.href}
+                aria-current={isActive(link.href) ? "page" : undefined}
+                data-testid={link.testId}
+                className={`flex min-h-11 items-center px-3 text-[15px] ${isActive(link.href) ? "bg-cx-ink font-semibold text-cx-bg" : "text-cx-ink-2"}`}
+              >
+                {link.label}
+              </LocalizedClientLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <nav aria-label="Account" className="mt-6 hidden sm:block" data-testid="desktop-account-nav">
         <Track label="Account sections" className="w-full sm:w-auto">
           {LINKS.map((link) => (
             <PillLink
               key={link.href}
               href={link.href}
               active={isActive(link.href)}
-              data-testid={link.testId}
+              data-testid={`${link.testId}-desktop`}
             >
               {link.label}
             </PillLink>

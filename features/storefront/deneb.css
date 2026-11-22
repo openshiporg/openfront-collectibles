@@ -117,3 +117,11 @@
 .deneb-drawer-body li a svg{color:#6f717a;flex-shrink:0}
 .deneb-drawer-body li a:active{background:#141516}
 .deneb-drawer-region{padding:0 16px}.deneb-drawer-region h2{padding-left:0;padding-right:0}
+/* Phone touch rules (S9, S10): 16 px text in every field so iOS does not zoom, 44 px targets. */
+@media(max-width:767px){
+  .cx-sf select,.cx-sf input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.cx-sf textarea{font-size:16px!important}
+  .cx-sf select,.cx-sf input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=range]){min-height:44px}
+  .cx-sf .tc-btn,.cx-sf .tc-select,.cx-sf form button[type=submit]{min-height:44px}
+  .cx-sf .tc-a-num>button,.cx-sf .tc-a-num>a{min-height:44px;min-width:44px}
+  .cx-sf input[type=checkbox]{width:20px;height:20px}
+}

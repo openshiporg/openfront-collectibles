@@ -34,7 +34,7 @@ ${emailMuted("If you did not request this, you can safely ignore this email. You
   });
 }
 
-export async function sendPasswordResetEmail(resetToken: string, to: string, baseUrl?: string): Promise<void> {
+export async function sendPasswordResetEmail(resetToken: string, to: string, baseUrl?: string, audience: "staff" | "customer" = "staff"): Promise<void> {
   // Use provided baseUrl or fall back to utility function
   const frontendUrl = baseUrl || getBaseUrlForEmails();
   
@@ -42,9 +42,11 @@ export async function sendPasswordResetEmail(resetToken: string, to: string, bas
   const info = await transport.sendMail({
     to,
     from: process.env.SMTP_FROM,
-    subject: "Your password reset token!",
+    subject: "Reset your password",
     html: passwordResetEmail({
-      url: `${frontendUrl}${basePath && basePath}/reset?token=${resetToken}`,
+      url: audience === "customer"
+        ? `${frontendUrl}/us/reset-password?token=${encodeURIComponent(resetToken)}&email=${encodeURIComponent(to)}`
+        : `${frontendUrl}${basePath && basePath}/reset?token=${resetToken}`,
     }),
   });
   if (process.env.MAIL_USER?.includes("ethereal.email")) {
