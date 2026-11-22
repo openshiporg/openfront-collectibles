@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import Link from 'next/link';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { conditionLabel, finishLabel } from '@/features/storefront/components/cards';
+import { CARD_FINISHES } from '@/features/keystone/lib/pokemon/card-enums';
 import { stockCardAction } from '../actions';
 
 const field = 'h-10 w-full border border-border bg-background px-2 text-sm max-sm:h-11 max-sm:text-base';
@@ -12,7 +13,9 @@ const field = 'h-10 w-full border border-border bg-background px-2 text-sm max-s
 export function StockCardButton({ catalogItemId, name, finishes }: { catalogItemId: string; name: string; finishes: string[] }) {
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState(stockCardAction, null);
-  const options = finishes.length ? finishes : ['normal'];
+  // Catalogue order, so Normal (or Holofoil for holo-only cards) is the default rather than Reverse.
+  const order = CARD_FINISHES.map((f) => f.value as string);
+  const options = finishes.length ? [...finishes].sort((a, b) => order.indexOf(a) - order.indexOf(b)) : ['normal'];
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

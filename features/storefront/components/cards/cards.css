@@ -437,3 +437,11 @@ button.tc-run-cell, a.tc-run-cell { min-width: 44px; height: 44px; }
 }
 .tc-input::placeholder { color: var(--tc-ink-3); }
 .tc-input:focus-visible { outline: 2px solid var(--tc-accent); outline-offset: 1px; }
+/* Phone: filters fold behind one button; Sort sits beside it (S8). Unlayered, like the rules above. */
+.tc-filter-fold { display: none; }
+@media (max-width: 639px) {
+  .tc-filter-fold { display: grid; }
+  .tc-filters[data-fold="closed"] { display: none; }
+  .tc-filters[data-fold="open"] { margin-top: 8px; }
+  .tc-filters[data-fold] .tc-sort-dup { display: none; }
+}

@@ -53,7 +53,7 @@ export function FilterBar({ filters, label = 'Filter cards', resetLabel = 'Clear
   return (
     <section className="tc" aria-label={label} aria-busy={pending}>
       {rest.length > 2 ? (
-        <div className="grid grid-cols-2 items-end gap-2 sm:hidden">
+        <div className="tc-filter-fold grid grid-cols-2 items-end gap-2">
           <button
             type="button"
             aria-expanded={open}
@@ -68,9 +68,9 @@ export function FilterBar({ filters, label = 'Filter cards', resetLabel = 'Clear
           {sort ? field(sort) : <span />}
         </div>
       ) : null}
-      <div id="tc-filter-panel" className={`tc-filters grid grid-cols-2 sm:flex ${rest.length > 2 ? (open ? 'mt-2 sm:mt-0' : 'max-sm:hidden') : ''}`}>
+      <div id="tc-filter-panel" className="tc-filters grid grid-cols-2 sm:flex" data-fold={rest.length > 2 ? (open ? 'open' : 'closed') : undefined}>
         {filters.map((filter) => {
-          if (rest.length > 2 && filter === sort) return field(filter, 'max-sm:hidden');
+          if (rest.length > 2 && filter === sort) return field(filter, 'tc-sort-dup');
           return field(filter);
         })}
         {active.length ? (
